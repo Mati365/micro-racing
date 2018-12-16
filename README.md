@@ -3,5 +3,5 @@
 # kart-racing
 online 2D multiplayer go-carts racing game
 
-### License
+## License
 [Attribution-NonCommercial-ShareAlike 4.0 International](https://github.com/Mati365/kart-racing/blob/master/LICENSE.md)

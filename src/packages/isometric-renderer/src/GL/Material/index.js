@@ -1,5 +1,21 @@
+import {alwaysThrow} from '@pkg/basic-helpers';
+
+/**
+ * @export
+ * @class
+ */
 export default class Material {
-  constructor(config) {
-    this.config = config;
+  constructor({
+    uuid = alwaysThrow('Material UUID is required!'),
+    uniforms,
+    vertexShader,
+    fragmentShader,
+  }) {
+    this.uuid = uuid;
+    this.uniforms = uniforms;
+    this.shaders = {
+      vertex: vertexShader,
+      fragment: fragmentShader,
+    };
   }
 }

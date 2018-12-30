@@ -4,14 +4,14 @@ import {alwaysThrow} from '@pkg/basic-helpers';
  * @export
  * @class
  */
-export default class Material {
+export default class Shader {
   constructor({
-    uuid = alwaysThrow('Material UUID is required!'),
+    name = alwaysThrow('Shader name is required!'),
     uniforms,
     vertexShader,
     fragmentShader,
   }) {
-    this.uuid = uuid;
+    this.name = name;
     this.uniforms = uniforms;
     this.shaders = {
       vertex: vertexShader,

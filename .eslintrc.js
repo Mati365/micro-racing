@@ -37,7 +37,8 @@ module.exports = {
     curly: 0,
     'new-parens': 0,
     'no-continue': 0,
-    'no-param-reassign': 0
+    'no-param-reassign': 0,
+    'no-bitwise': 0,
   },
   settings: {
     'import/resolver': {

@@ -1,2 +1,2 @@
 export {default as createProgram} from './createProgram';
-export {default as loadShader} from './loadShader';
+export {default as compileShader} from './compileShader';

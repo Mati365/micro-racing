@@ -1,1 +1,1 @@
-export * from './GL';
+export {default} from './FGL';

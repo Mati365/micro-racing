@@ -7,7 +7,7 @@
  *
  * @returns {WebGLShader}
  */
-const loadShader = (gl, type, source) => {
+const compileShader = (gl, type, source) => {
   const shader = gl.createShader(type);
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
@@ -20,4 +20,4 @@ const loadShader = (gl, type, source) => {
   return shader;
 };
 
-export default loadShader;
+export default compileShader;

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
-import {Scene} from '@pkg/isometric-renderer';
+import fgl from '@pkg/isometric-renderer';
 
 export default class GameCanvas extends React.Component {
   static propTypes = {
@@ -13,12 +13,10 @@ export default class GameCanvas extends React.Component {
   componentDidMount() {
     const {current: canvasNode} = this.canvasRef;
 
-    this.scene = new Scene(
-      {
-        canvas: canvasNode,
-      },
-    );
-    this.scene.render();
+    const renderer = fgl(canvasNode);
+    renderer.frame(() => {
+      renderer.clear();
+    });
   }
 
   render() {

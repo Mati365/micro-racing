@@ -59,6 +59,7 @@ export const unrollMatrixOperation = R.curry((size1, size2, unrollCellFn) => {
     h: size1.h,
   };
 
+  // fix eval() context issues
   const _createMatrix = createMatrix; // eslint-disable-line
   const compileFn = source => eval(`(function() {return ${source}})()`); // eslint-disable-line
 

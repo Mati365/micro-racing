@@ -10,7 +10,7 @@ import {unrollSquareMatrixOperation} from '../compiler';
  *
  * @returns {Matrix}
  */
-export const addMatrix = (m1, m2, sign = 1) => {
+export const add = (m1, m2, sign = 1) => {
   const result = createMatrix(m2.w, m1.h);
 
   for (let i = result.h - 1; i >= 0; --i) {
@@ -32,7 +32,7 @@ export const addMatrix = (m1, m2, sign = 1) => {
  *
  * @returns {Matrix}
  */
-export const subMatrix = (m1, m2) => addMatrix(m1, m2, -1);
+export const sub = (m1, m2) => add(m1, m2, -1);
 
 /**
  * Performs sum of two cell

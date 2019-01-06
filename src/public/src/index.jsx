@@ -1,7 +1,7 @@
 // import ReactDOM from 'react-dom';
 // import React from 'react';
 
-import * as M from '@pkg/gl-math';
+import {mat} from '@pkg/gl-math';
 
 // import GameCanvas from './ui/GameCanvas';
 
@@ -13,8 +13,7 @@ const measureExec = fn => () => {
   return result;
 };
 
-const m1 = M.createMatrix(
-  4, 4,
+const m1 = mat.create4x4(
   [
     1, 2, 3, 4,
     5, 6, 7, 8,
@@ -23,8 +22,7 @@ const m1 = M.createMatrix(
   ],
 );
 
-const m2 = M.createMatrix(
-  4, 4,
+const m2 = mat.create4x4(
   [
     1, 2, 3, 4,
     5, 6, 7, 8,
@@ -33,18 +31,18 @@ const m2 = M.createMatrix(
   ],
 );
 
-console.log(M.mul4x4(m1, m2));
+console.log(mat.mul4x4(m1, m2));
 measureExec(
   () => {
     for (let i = 1000000; i >= 0; --i)
-      M.addMatrix(m1, m2);
+      mat.mul(m1, m2);
   },
 )();
 
 measureExec(
   () => {
     for (let i = 1000000; i >= 0; --i)
-      M.add4x4(m1, m2);
+      mat.mul4x4(m1, m2);
   },
 )();
 

@@ -9,7 +9,7 @@ import {unrollSquareMatrixOperation} from '../compiler';
  *
  * @returns {Matrix}
  */
-export const mulMatrix = (m1, m2) => {
+export const mul = (m1, m2) => {
   const result = createMatrix(m2.w, m1.h);
 
   for (let i = result.h - 1; i >= 0; --i) {

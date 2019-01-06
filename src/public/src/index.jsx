@@ -37,16 +37,20 @@ console.log(M.mul4x4(m1, m2));
 measureExec(
   () => {
     for (let i = 1000000; i >= 0; --i)
-      M.mulMatrix(m1, m2);
+      M.addMatrix(m1, m2);
   },
 )();
 
 measureExec(
   () => {
     for (let i = 1000000; i >= 0; --i)
-      M.mul4x4(m1, m2);
+      M.add4x4(m1, m2);
   },
 )();
+
+// console.log(M.mul4x4(m1, m2));
+// console.log(M.addMatrix(m1, m2));
+// console.log(M.add4x4(m1, m2));
 
 // ReactDOM.render(
 //   <GameCanvas

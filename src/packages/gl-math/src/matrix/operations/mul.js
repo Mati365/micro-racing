@@ -1,5 +1,4 @@
 import createMatrix from '../createMatrix';
-import {unrollSquareMatrixOperation} from '../compiler';
 
 /**
  * Multiply two matrices creating new matrix
@@ -34,7 +33,7 @@ export const mul = (m1, m2) => {
  *
  * @returns {String}
  */
-const multiplyUnrollExecutor = ({i, j, size1, size2}) => {
+export const multiplyUnrollExecutor = ({i, j, size1, size2}) => {
   const operations = [];
 
   for (let k = size2.h - 1; k >= 0; --k) {
@@ -45,6 +44,3 @@ const multiplyUnrollExecutor = ({i, j, size1, size2}) => {
 
   return operations.join(' + ');
 };
-
-export const mul3x3 = unrollSquareMatrixOperation(3)(multiplyUnrollExecutor);
-export const mul4x4 = unrollSquareMatrixOperation(4)(multiplyUnrollExecutor);

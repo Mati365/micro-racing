@@ -8,11 +8,17 @@
  * @returns {Matrix}
  */
 const createMatrix = (w, h, m) => ({
-  array: new Float32Array(
-    m || (w * h),
-  ),
+  array: m || new Float32Array(w * h),
   w,
   h,
 });
+
+/**
+ * Creates vector matrix
+ *
+ * @param {Number} w
+ * @param {Number|Number[]} m
+ */
+export const createVector = (w, m) => createMatrix(w, 1, m);
 
 export default createMatrix;

@@ -1,5 +1,4 @@
 import createMatrix from '../createMatrix';
-import {unrollSquareMatrixOperation} from '../compiler';
 
 /**
  * Adds two matrices creating new matrix
@@ -42,13 +41,7 @@ export const sub = (m1, m2) => add(m1, m2, -1);
  *
  * @returns {String}
  */
-const addUnrollExecutor = (operator = '+') => ({i, j, size1}) => {
+export const addUnrollExecutor = (operator = '+') => ({i, j, size1}) => {
   const index = i * size1.w + j;
   return `a${index} ${operator} b${index}`;
 };
-
-export const add3x3 = unrollSquareMatrixOperation(3)(addUnrollExecutor('-'));
-export const add4x4 = unrollSquareMatrixOperation(4)(addUnrollExecutor('-'));
-
-export const sub3x3 = unrollSquareMatrixOperation(3)(addUnrollExecutor('+'));
-export const sub4x4 = unrollSquareMatrixOperation(4)(addUnrollExecutor('+'));

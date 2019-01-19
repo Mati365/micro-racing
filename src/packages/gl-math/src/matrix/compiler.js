@@ -47,8 +47,8 @@ const unrollNestedArrayToVariables = (variableNamePrefix, arrayPath, length) => 
  * @see
  *  Only for small matrices!
  *
- * @param {Dimensions} size1
- * @param {Dimensions} size2
+ * @param {Dimensions} size1  Size of first matrix
+ * @param {Dimensions} size2  Size of second matrix
  * @param {Function}  unrollCellFn
  *
  * @returns {Function}

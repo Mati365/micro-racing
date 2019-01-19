@@ -13,9 +13,30 @@ export default class GameCanvas extends React.Component {
   componentDidMount() {
     const {current: canvasNode} = this.canvasRef;
 
-    const renderer = fgl(canvasNode);
-    renderer.frame(() => {
-      renderer.clear();
+    const f = fgl(canvasNode);
+    const material = f.material({
+      shaders: {
+        vertex: `
+          attribute vec4 aVertexPosition;
+          uniform mat4 uModelViewMatrix;
+          uniform mat4 uProjectionMatrix;
+          void main() {
+            gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+          }
+        `,
+
+        fragment: `
+          void main() {
+            gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+          }
+        `,
+      },
+    });
+
+    console.log(material);
+
+    f.frame(() => {
+      f.clear();
     });
   }
 

@@ -1,4 +1,6 @@
 import createDtRenderLoop from './createDtRenderLoop';
+import createMatrial from './Material/createMaterial';
+
 import clearContext from './Viewport/clearContext';
 
 /**
@@ -32,6 +34,7 @@ const createRenderContext = (canvasElement) => {
   return {
     ...state,
     frame: createDtRenderLoop(state),
+    material: createMatrial(gl),
     clear: clearContext(gl),
   };
 };

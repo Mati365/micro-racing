@@ -1,11 +1,14 @@
 import mat4 from './mat4';
 
 /**
- * orthographic matrix
+ * Creates blank orthographic matrix
  *
  * @see
  *  {@link} https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glOrtho.xml
  *  {@link} https://en.wikipedia.org/wiki/Orthographic_projection
+ *
+ * @param {Object}  config
+ * @returns {Matrix}
  *
  * @export
  */

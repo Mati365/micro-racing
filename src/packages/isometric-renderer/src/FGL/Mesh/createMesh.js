@@ -14,7 +14,7 @@ const createMesh = gl => ({
   drawMode = gl.STATIC_DRAW,
   vertices,
   indices,
-}) => ({
+}) => Object.freeze({
   vbo: vertices && createVertexBuffer(gl, vertices, drawMode),
   ibo: indices && createIndexBuffer(gl, indices, drawMode),
 });

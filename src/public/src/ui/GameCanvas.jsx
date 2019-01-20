@@ -5,27 +5,18 @@ import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
 import {mat4} from '@pkg/gl-math';
 import fgl from '@pkg/isometric-renderer';
 
-// const measureExec = fn => () => {
-//   const t = performance.now();
-//   const result = fn();
-//   console.info(performance.now() - t);
-
-//   return result;
-// };
-
-
-// measureExec(
-//   () => {
-//     for (let i = 1000000; i >= 0; --i)
-//       mat.mul4x4(m1, m2);
-//   },
-// )();
-// );
-
-// console.log(mat4.mul(m1, m2));
-// console.log(mat4.translate(vec4([2, 3, 4, 1])));
-
-console.log(mat4.identity());
+console.log(
+  mat4.ortho(
+    {
+      left: -1,
+      right: 1,
+      bottom: -1,
+      top: 1,
+      near: -1,
+      far: 1,
+    },
+  ),
+);
 
 export default class GameCanvas extends React.Component {
   static propTypes = {

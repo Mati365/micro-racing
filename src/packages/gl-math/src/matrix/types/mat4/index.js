@@ -1,12 +1,9 @@
-import createMatrixOptimizedOperations from '../createMatrixOptimizedOperations';
+import mat4 from './mat4';
+import ortho from './ortho';
 
-import isometric from './isometric';
-import perspective from './perspective';
-
-export default createMatrixOptimizedOperations(
-  4,
+export default Object.assign(
+  mat4,
   {
-    isometric,
-    perspective,
+    ortho,
   },
 );

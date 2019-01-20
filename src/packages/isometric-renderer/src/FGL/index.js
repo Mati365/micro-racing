@@ -1,3 +1,5 @@
+import * as R from 'ramda';
+
 import createDtRenderLoop from './createDtRenderLoop';
 import createMatrial from './Material/createMaterial';
 
@@ -25,6 +27,8 @@ const getElementWebGLContext = (element) => {
  */
 const createRenderContext = (canvasElement) => {
   const gl = getElementWebGLContext(canvasElement);
+  const bindGLContext = R.mapObjIndexed(R.applyTo(gl));
+
   const state = Object.freeze(
     {
       gl,
@@ -33,9 +37,13 @@ const createRenderContext = (canvasElement) => {
 
   return {
     ...state,
-    frame: createDtRenderLoop(state),
-    material: createMatrial(gl),
-    clear: clearContext(gl),
+    ...bindGLContext(
+      {
+        frame: createDtRenderLoop,
+        material: createMatrial,
+        clear: clearContext,
+      },
+    ),
   };
 };
 

@@ -16,13 +16,19 @@ const ortho = ({
   left, right,
   bottom, top,
   near, far,
-}) => mat4(
-  [
-    2 / (right - left), 0, 0, -((right + left) / (right - left)),
-    0, 2 / (top - bottom), 0, -((top + bottom) / (top - bottom)),
-    0, 0, -2 / (far - near), -((far + near) / (far - near)),
-    0, 0, 0, 1,
-  ],
-);
+}) => {
+  const dX = right - left;
+  const dY = top - bottom;
+  const dZ = far - near;
+
+  return mat4(
+    [
+      2 / dX, 0, 0, -((right + left) / dX),
+      0, 2 / dY, 0, -((top + bottom) / dY),
+      0, 0, -2 / dZ, -((far + near) / dZ),
+      0, 0, 0, 1,
+    ],
+  );
+};
 
 export default ortho;

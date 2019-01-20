@@ -1,7 +1,9 @@
-import {scale} from './scale';
+import {scaling} from './scaling';
 import {translation} from './translation';
+import {identity} from './identity';
 
 export {
-  scale,
+  identity,
+  scaling,
   translation,
 };

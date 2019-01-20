@@ -16,7 +16,7 @@ import {timesToString} from '../../utils';
  *  [0, 0, sX, 0]
  *  [0, 0, 0, 1]
  */
-export const scale = (w, src) => {
+export const scaling = (w, src) => {
   const m = createMatrix(w, w);
   const {array: dest} = m;
 
@@ -38,7 +38,7 @@ export const scale = (w, src) => {
  *
  * @returns {Matrix}
  */
-export const unrollScale = (matrixWidth, vectorWidth = matrixWidth) => {
+export const unrollScaling = (matrixWidth, vectorWidth = matrixWidth) => {
   const mapper = i => `dest[${i * (matrixWidth + 1)}] = ${i >= vectorWidth ? 1 : `m1[${i}]`};`;
 
   return unrollMatrixOperation(

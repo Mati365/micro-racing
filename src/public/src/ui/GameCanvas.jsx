@@ -6,14 +6,18 @@ import {mat, mat4} from '@pkg/gl-math';
 import fgl from '@pkg/isometric-renderer';
 
 mat.dump(
-  mat.from.scale(
+  mat.from.scaling(
     4,
     [2, 2, 2],
   ),
 );
 
 mat.dump(
-  mat4.from.scale([2, 2, 2]),
+  mat4.from.scaling([2, 2, 2]),
+);
+
+mat.dump(
+  mat4.from.identity(),
 );
 
 export default class GameCanvas extends React.Component {

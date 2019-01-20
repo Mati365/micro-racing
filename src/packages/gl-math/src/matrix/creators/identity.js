@@ -9,7 +9,7 @@ import createMatrix from '../createMatrix';
  *  [0, 0, 1, 0]
  *  [0, 0, 0, 1]
  */
-const identity = (w) => {
+export const identity = (w) => {
   const size = w ** 2;
   const m = new Float32Array(size);
 
@@ -30,7 +30,5 @@ const identity = (w) => {
 export const unrollIdentity = (w) => {
   const SOURCE_MATRIX = Object.freeze(identity(w));
 
-  return () => createMatrix(w, w, SOURCE_MATRIX);
+  return () => SOURCE_MATRIX;
 };
-
-export default identity;

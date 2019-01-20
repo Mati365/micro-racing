@@ -1,3 +1,5 @@
+import * as R from 'ramda';
+
 import createBuffer from './createBuffer';
 
 /**
@@ -5,18 +7,17 @@ import createBuffer from './createBuffer';
  *
  * @param {WebGLRenderingContext} GL
  * @param {Array} indices
+ * @param {GLEnum} drawMode
  *
  * @returns {Number}
  */
-const createIndexBuffer = (gl) => {
-  const creator = createBuffer(gl);
+const createIndexBuffer = (gl, indices, drawMode = gl.STATIC_DRAW) => createBuffer(
+  gl,
+  {
+    type: gl.ELEMENT_ARRAY_BUFFER,
+    data: new Uint16Array(indices),
+    drawMode,
+  },
+);
 
-  return indices => creator(
-    {
-      type: gl.ELEMENT_ARRAY_BUFFER,
-      indices: new Uint16Array(indices),
-    },
-  );
-};
-
-export default createIndexBuffer;
+export default R.curryN(2, createIndexBuffer);

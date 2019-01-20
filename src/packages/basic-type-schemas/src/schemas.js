@@ -6,6 +6,6 @@ export const ID_SCHEMA = PropTypes.oneOfType([
 ]);
 
 export const DIMENSIONS_SCHEMA = PropTypes.shape({
-  width: PropTypes.number,
-  height: PropTypes.number,
+  w: PropTypes.number,
+  h: PropTypes.number,
 });

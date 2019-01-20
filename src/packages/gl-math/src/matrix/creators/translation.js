@@ -39,9 +39,8 @@ export const translation = (w, {array: src}) => {
  */
 export const unrollTranslation = (matrixWidth, vectorWidth = matrixWidth) => {
   const code = `
-    const {array: src} = m1;
     ${timesToString(i => `dest[${i * (matrixWidth + 1)}] = 1;`, matrixWidth)}
-    ${timesToString(i => `dest[${matrixWidth * (i + 1) - 1}] = src[${i}];`, vectorWidth)}
+    ${timesToString(i => `dest[${matrixWidth * (i + 1) - 1}] = m1[${i}];`, vectorWidth)}
   `;
 
   return unrollMatrixOperation(

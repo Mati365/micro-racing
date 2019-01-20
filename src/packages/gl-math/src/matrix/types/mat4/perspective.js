@@ -7,7 +7,11 @@ import mat4 from './mat4';
  *  {@link} http://www.3dcpptutorials.sk/index.php?id=2
  *  {@link} https://computergraphics.stackexchange.com/questions/6365/inverse-value-in-a-perspective-matrix
  *
- * @param {Object}  config
+ * @param {Number}  fov Field of view(angle in radians)
+ * @param {Number}  aspect width / height
+ * @param {Number}  near
+ * @param {Number}  far
+ *
  * @returns {Matrix}
  *
  * @export

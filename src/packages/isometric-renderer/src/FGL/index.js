@@ -2,6 +2,7 @@ import * as R from 'ramda';
 
 import createDtRenderLoop from './createDtRenderLoop';
 import createMatrial from './Material/createMaterial';
+import createMesh from './Mesh/createMesh';
 
 import clearContext from './Viewport/clearContext';
 
@@ -42,6 +43,7 @@ const createRenderContext = (canvasElement) => {
         frame: createDtRenderLoop,
         material: createMatrial,
         clear: clearContext,
+        mesh: createMesh,
       },
     ),
   };

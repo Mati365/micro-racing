@@ -16,9 +16,12 @@ import {timesToString} from '../../utils';
  *  [0, 0, 1, vz]
  *  [0, 0, 0, 1]
  */
-const translation = (w, {array: src}) => {
+export const translation = (w, {array: src}) => {
   const m = createMatrix(w, w);
   const {array: dest} = m;
+
+  for (let i = w - 1; i >= 0; --i)
+    dest[i * (w + 1)] = 1;
 
   for (let i = src.length - 1; i >= 0; --i)
     dest[w * (i + 1) - 1] = src[i];
@@ -46,5 +49,3 @@ export const unrollTranslation = (matrixWidth, vectorWidth = matrixWidth) => {
     code,
   );
 };
-
-export default translation;

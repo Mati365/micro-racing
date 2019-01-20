@@ -1,3 +1,8 @@
 import createMatrixOptimizedOperations from '../createMatrixOptimizedOperations';
 
-export default createMatrixOptimizedOperations(3);
+export default createMatrixOptimizedOperations(
+  {
+    w: 3,
+    vector: 3,
+  },
+);

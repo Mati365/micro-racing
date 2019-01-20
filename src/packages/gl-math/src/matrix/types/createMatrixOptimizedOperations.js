@@ -1,6 +1,8 @@
 import {unrollSquareMatrix2DOperation} from '../compiler';
-import {unrollTranslation} from '../operations/translation';
 import {unrollIdentity} from '../operations/identity';
+
+import {unrollTranslation} from '../creators/translation';
+import {unrollScale} from '../creators/scale';
 
 import {addUnrollExecutor} from '../operations/add';
 import {multiplyUnrollExecutor} from '../operations/mul';
@@ -10,9 +12,10 @@ import createMatrix from '../createMatrix';
 /**
  * Creates object of unrolled square matrix operations
  *
- * @param {Number} w
+ * @param {Object} config
+ * @param {Object} additionalOperations
  */
-const createMatrixOptimizedOperations = (w, additionalOperations) => {
+const createMatrixOptimizedOperations = ({w, vector}, additionalOperations) => {
   const unroll = unrollSquareMatrix2DOperation(w);
   const create = m => createMatrix(w, w, m);
 
@@ -21,12 +24,16 @@ const createMatrixOptimizedOperations = (w, additionalOperations) => {
     {
       ...additionalOperations,
 
+      identity: unrollIdentity(w),
+
       mul: unroll(multiplyUnrollExecutor),
       add: unroll(addUnrollExecutor('+')),
       sub: unroll(addUnrollExecutor('-')),
 
-      translation: unrollTranslation(w, w),
-      identity: unrollIdentity(w),
+      from: {
+        translation: unrollTranslation(w, vector),
+        scale: unrollScale(w, vector),
+      },
     },
   );
 };

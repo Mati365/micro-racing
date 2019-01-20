@@ -2,20 +2,18 @@ import React from 'react';
 
 import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
 
-import {mat4} from '@pkg/gl-math';
+import {mat, mat4} from '@pkg/gl-math';
 import fgl from '@pkg/isometric-renderer';
 
-console.log(
-  mat4.ortho(
-    {
-      left: -1,
-      right: 1,
-      bottom: -1,
-      top: 1,
-      near: -1,
-      far: 1,
-    },
+mat.dump(
+  mat.from.scale(
+    4,
+    [2, 2, 2],
   ),
+);
+
+mat.dump(
+  mat4.from.scale([2, 2, 2]),
 );
 
 export default class GameCanvas extends React.Component {

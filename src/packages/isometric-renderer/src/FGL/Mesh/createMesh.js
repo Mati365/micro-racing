@@ -1,28 +1,18 @@
-import {removeNullValues} from '@pkg/basic-helpers';
-import {
-  createVertexBuffer,
-  createIndexBuffer,
-} from '../Buffer';
+import createMeshDescriptor from './createMeshDescriptor';
 
 /**
- * Creates mesh with VBO, IBO
+ * Creates renderable mesh instance
  *
  * @param {WebGLRenderingContext} gl
  * @param {FGLContext} fglContext
- *
- * @returns {MeshInfo}
  */
-const createMesh = gl => ({
-  vertices,
-  indices,
-  material,
-  drawMode = gl.STATIC_DRAW,
-}) => Object.freeze({
-  material,
-  buffers: removeNullValues({
-    vbo: vertices && createVertexBuffer(gl, vertices, drawMode),
-    ibo: indices && createIndexBuffer(gl, indices, drawMode),
-  }),
-});
+const createMesh = () => (description) => {
+  const {material} = createMeshDescriptor(description);
+
+  // mesh render method
+  return () => {
+    material.attach();
+  };
+};
 
 export default createMesh;

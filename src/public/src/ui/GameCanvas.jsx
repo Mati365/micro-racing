@@ -60,7 +60,7 @@ export default class GameCanvas extends React.Component {
       },
     );
 
-    const triangle = f.mesh(
+    f.mesh(
       {
         material: defaultMaterial,
         vertices: [
@@ -71,8 +71,6 @@ export default class GameCanvas extends React.Component {
         ],
       },
     );
-
-    console.log(triangle);
 
     f.frame(() => {
       f.clear();

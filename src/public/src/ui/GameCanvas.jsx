@@ -57,14 +57,6 @@ export default class GameCanvas extends React.Component {
             }
           `,
         },
-
-        attributes: {
-          inVertexPos: 'inVertexPos',
-        },
-
-        uniforms: {
-          mpMatrix: 'mpMatrix',
-        },
       },
     );
 
@@ -84,7 +76,6 @@ export default class GameCanvas extends React.Component {
 
     f.frame(() => {
       f.clear();
-      triangle();
     });
   }
 

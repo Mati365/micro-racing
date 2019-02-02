@@ -5,6 +5,7 @@ import createMatrial from './Material/createMaterial';
 import createMesh from './Mesh/createMesh';
 
 import clearContext from './Viewport/clearContext';
+import createFGLContext from './createFGLContext';
 
 /**
  * Get opengl context from element
@@ -30,16 +31,8 @@ const createRenderContext = (canvasElement) => {
   const gl = getElementWebGLContext(canvasElement);
 
   // it is mutable, save there saved between
-  // render calls shared variables, e.g. materialID
-  const fglContext = {
-    gl,
-
-    // prev is related to draw() meshes calls
-    prev: {
-      materialUUID: null,
-    },
-  };
-
+  // render calls shared variables, e.g. materialUUID
+  const fglContext = createFGLContext(gl);
   const bindSceneContext = R.mapObjIndexed(
     R.apply(
       R.__,

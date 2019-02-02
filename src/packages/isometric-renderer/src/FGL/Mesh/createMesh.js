@@ -1,3 +1,4 @@
+import {removeNullValues} from '@pkg/basic-helpers';
 import {
   createVertexBuffer,
   createIndexBuffer,
@@ -9,28 +10,19 @@ import {
  * @param {WebGLRenderingContext} gl
  * @param {FGLContext} fglContext
  *
- * @returns {Function}
+ * @returns {MeshInfo}
  */
-const createMesh = (gl, fglContext) => ({
+const createMesh = gl => ({
   vertices,
   indices,
   material,
   drawMode = gl.STATIC_DRAW,
-}) => {
-  const meshInfo = Object.freeze({
-    material,
+}) => Object.freeze({
+  material,
+  buffers: removeNullValues({
     vbo: vertices && createVertexBuffer(gl, vertices, drawMode),
     ibo: indices && createIndexBuffer(gl, indices, drawMode),
-  });
-
-  console.log(meshInfo, fglContext);
-
-  /**
-   * Return render invoker
-   *
-   * @returns
-   */
-  return () => {};
-};
+  }),
+});
 
 export default createMesh;

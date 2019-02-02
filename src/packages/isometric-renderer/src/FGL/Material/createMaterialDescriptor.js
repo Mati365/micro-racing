@@ -19,7 +19,7 @@ const assignObjectSelectors = selectors => (obj) => {
   return R.mapObjIndexed(
     (value, key) => ({
       ...value,
-      selector: selectors[key],
+      selector: selectors[key] || key,
     }),
     obj,
   );
@@ -39,8 +39,8 @@ const assignObjectSelectors = selectors => (obj) => {
  * @example
  *  {
  *    uuid,
- *    attributes: {attrib1: {type: 'mat3'}},
- *    uniforms:   {uniform2: {type: 'mat4'}}
+ *    attributes: {attrib1: 'mat3'},
+ *    uniforms:   {uniform2: R.prop('mat4')}
  *  }
  *
  * @export

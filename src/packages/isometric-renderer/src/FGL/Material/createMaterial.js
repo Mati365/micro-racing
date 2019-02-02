@@ -70,7 +70,7 @@ const createMaterial = (gl, fglContext = {}) => {
     const attachMaterial = () => {
       // do not attach again material
       // attaching shaders is very expensive
-      if (uuid !== fglContext.materialUUID)
+      if (uuid === fglContext.materialUUID)
         return false;
 
       // mount GL shader

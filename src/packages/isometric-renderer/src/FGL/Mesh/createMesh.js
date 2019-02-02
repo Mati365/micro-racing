@@ -15,10 +15,20 @@ const createMesh = (gl) => {
     const {material} = createContextDescriptor(description);
 
     // mesh render method
-    return (uniforms) => {
+    return (config) => {
       // attach shader
       material.attach();
-      uniforms && material.setUniforms(uniforms);
+
+      // each mesh can accept parameters
+      if (config) {
+        const {uniforms} = config;
+        if (uniforms)
+          material.setUniforms(uniforms);
+
+        // todo:
+        //  add material uniforms selector iterator
+        //  add unroll executor to them, for loop is slow
+      }
 
       // todo: render
     };

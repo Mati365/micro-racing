@@ -11,19 +11,12 @@ import * as R from 'ramda';
  * @returns {Object}
  */
 export const pickProgramParameters = ({
-  glMapper,
+  glMapperFn,
   glFlag,
 }) => (gl, program) => {
-  const mapperFn = ::gl[glMapper];
   const count = gl.getProgramParameter(program, gl[glFlag]);
-
   const attributes = R.times(
-    R.compose(
-      R.pick([
-        'type', 'size', 'name',
-      ]),
-      index => mapperFn(program, index),
-    ),
+    index => glMapperFn(gl, program, index),
     count,
   );
 
@@ -38,6 +31,39 @@ export const pickProgramParameters = ({
 };
 
 /**
+ * WebGL returns some prototype fields and other stuff,
+ * we dont need it - it will be better to clone it as basic
+ * JS object with some fields
+ */
+const pickBasicParameterProps = R.pick(
+  [
+    'type', 'size', 'name',
+  ],
+);
+
+/**
+ * Creates a mapper fn that picks info about type,
+ * loc, size etc uniform / attribute into plain JS object
+ *
+ * @param {Object}  config
+ */
+const locationVariableMapper = (
+  {
+    glInfoMethod,
+    glLocationMethod,
+  },
+) => (gl, program, index) => {
+  const variableInfo = pickBasicParameterProps(
+    ::gl[glInfoMethod](program, index),
+  );
+
+  return {
+    ...variableInfo,
+    loc: ::gl[glLocationMethod](program, variableInfo.name),
+  };
+};
+
+/**
  * Loads object of uniforms
  *
  * @export
@@ -45,7 +71,12 @@ export const pickProgramParameters = ({
 export const pickProgramUniforms = pickProgramParameters(
   {
     glFlag: 'ACTIVE_UNIFORMS',
-    glMapper: 'getActiveUniform',
+    glMapperFn: locationVariableMapper(
+      {
+        glInfoMethod: 'getActiveUniform',
+        glLocationMethod: 'getUniformLocation',
+      },
+    ),
   },
 );
 
@@ -57,6 +88,11 @@ export const pickProgramUniforms = pickProgramParameters(
 export const pickProgramAttributes = pickProgramParameters(
   {
     glFlag: 'ACTIVE_ATTRIBUTES',
-    glMapper: 'getActiveAttrib',
+    glMapperFn: locationVariableMapper(
+      {
+        glInfoMethod: 'getActiveAttrib',
+        glLocationMethod: 'getAttribLocation',
+      },
+    ),
   },
 );

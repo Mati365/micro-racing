@@ -62,7 +62,9 @@ export default class GameCanvas extends React.Component {
       f.clear();
       triangle(
         {
-          mpMatrix: mpMatrix.array,
+          uniforms: {
+            mpMatrix: mpMatrix.array,
+          },
         },
       );
     });

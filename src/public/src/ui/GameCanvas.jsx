@@ -3,10 +3,7 @@ import React from 'react';
 import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
 
 import fgl from '@pkg/isometric-renderer';
-// import {
-//   toRadians,
-//   mat4,
-// } from '@pkg/gl-math';
+import {mat4} from '@pkg/gl-math';
 
 export default class GameCanvas extends React.Component {
   static propTypes = {
@@ -16,21 +13,10 @@ export default class GameCanvas extends React.Component {
   canvasRef = React.createRef();
 
   componentDidMount() {
-    // const {dimensions} = this.props;
     const {current: canvasNode} = this.canvasRef;
+    const mpMatrix = mat4.from.translation([0, 0, -6]);
 
     const f = fgl(canvasNode);
-    // const mv = mat4.from.translation([0, 0, -6]);
-
-    // const projection = mat4();
-    // const perspective = mat4.perspective(
-    //   {
-    //     fov: toRadians(45),
-    //     aspect: dimensions.w / dimensions.h,
-    //     near: 0.1,
-    //     far: 100,
-    //   },
-    // );
 
     /**
      * @see {@link https://stackoverflow.com/questions/13780609/what-does-precision-mediump-float-mean}
@@ -60,7 +46,7 @@ export default class GameCanvas extends React.Component {
       },
     );
 
-    f.mesh(
+    const triangle = f.mesh(
       {
         material: defaultMaterial,
         vertices: [
@@ -74,6 +60,11 @@ export default class GameCanvas extends React.Component {
 
     f.frame(() => {
       f.clear();
+      triangle(
+        {
+          mpMatrix: mpMatrix.array,
+        },
+      );
     });
   }
 

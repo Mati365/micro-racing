@@ -24,6 +24,11 @@ module.exports = {
       'error',
       'never'
     ],
+    'no-restricted-syntax': [
+      'error',
+      'LabeledStatement',
+      'WithStatement',
+    ],
     'jsx-a11y/click-events-have-key-events': 0,
     'jsx-a11y/mouse-events-have-key-events': 0,
     'import/no-extraneous-dependencies': 0,

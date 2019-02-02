@@ -5,13 +5,23 @@ import createMeshDescriptor from './createMeshDescriptor';
  *
  * @param {WebGLRenderingContext} gl
  * @param {FGLContext} fglContext
+ *
+ * @returns {Function}
  */
-const createMesh = () => (description) => {
-  const {material} = createMeshDescriptor(description);
+const createMesh = (gl) => {
+  const createContextDescriptor = createMeshDescriptor(gl);
 
-  // mesh render method
-  return () => {
-    material.attach();
+  return (description) => {
+    const {material} = createContextDescriptor(description);
+
+    // mesh render method
+    return (uniforms) => {
+      // attach shader
+      material.attach();
+      uniforms && material.setUniforms(uniforms);
+
+      // todo: render
+    };
   };
 };
 

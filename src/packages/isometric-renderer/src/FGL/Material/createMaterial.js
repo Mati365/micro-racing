@@ -1,66 +1,37 @@
-import * as R from 'ramda';
-import {
-  createProgram,
-  compileShader,
-} from './Shader';
+import createMaterialDescriptor from './createMaterialDescriptor';
 
 /**
- * Maps object of uniforms/attributes/etc GL stuff
- * and adds `loc` propety to every uniform
- *
- * @param {String} glMapperName
- * @param {WebGLRenderingContext} gl
- * @param {WebGLProgram} program
- *
- * @returns {[name]: {loc, ...item}}
+ *@todo
+*  Maybe there will be used any non shader material?
+*  For example for lighting etc?
+*
+* @param {WebGLRenderingContext} gl
+* @param {Object} description
  */
-const glLocationMapper = glMapperName => (gl, program) => {
-  const getLocationFn = gl[glMapperName].bind(gl);
+const createMaterial = (gl) => {
+  const createContextMaterialDescriptor = createMaterialDescriptor(gl);
 
-  return R.ifElse(
-    R.is(Object),
-    R.mapObjIndexed(
-      (uniform, key) => ({
-        ...uniform,
-        loc: getLocationFn(program, key),
-      }),
-    ),
-    R.always(null),
-  );
-};
+  return (description) => {
+    const descriptor = createContextMaterialDescriptor(description);
 
-const glUniformLocationMapper = glLocationMapper('getUniformLocation');
-const glAttribLocationMapper = glLocationMapper('getAttribLocation');
+    /**
+     * @see
+     *  Loads material to GL context
+     */
+    const attachMaterial = () => {};
 
-/**
- * @todo
- *  Maybe there will be used any non shader material?
- *  For example for lighting etc?
- *
- * @param {WebGLRenderingContext} gl
- * @param {{shaders: {vertex, fragment}, uniforms}} config
- *
- * @export
- */
-const createMaterial = gl => ({
-  shaders: {
-    vertex,
-    fragment,
-  },
-  uniforms,
-}) => {
-  const program = createProgram(
-    gl,
-    [
-      vertex && compileShader(gl, gl.VERTEX_SHADER, vertex),
-      fragment && compileShader(gl, gl.FRAGMENT_SHADER, fragment),
-    ],
-  );
+    /**
+     * @see
+     *  Removes material from GL context
+     */
+    const detachMaterial = () => {};
 
-  return {
-    program,
-    uniforms: glUniformLocationMapper(gl, program)(uniforms),
-    attributes: glAttribLocationMapper(gl, program)(uniforms),
+    return {
+      descriptor,
+
+      attach: attachMaterial,
+      detach: detachMaterial,
+    };
   };
 };
 

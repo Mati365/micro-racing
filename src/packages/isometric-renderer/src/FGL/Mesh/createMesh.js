@@ -7,16 +7,30 @@ import {
  * Creates mesh with VBO, IBO
  *
  * @param {WebGLRenderingContext} gl
+ * @param {FGLContext} fglContext
  *
- * @returns {Number}
+ * @returns {Function}
  */
-const createMesh = gl => ({
-  drawMode = gl.STATIC_DRAW,
+const createMesh = (gl, fglContext) => ({
   vertices,
   indices,
-}) => Object.freeze({
-  vbo: vertices && createVertexBuffer(gl, vertices, drawMode),
-  ibo: indices && createIndexBuffer(gl, indices, drawMode),
-});
+  material,
+  drawMode = gl.STATIC_DRAW,
+}) => {
+  const meshInfo = Object.freeze({
+    material,
+    vbo: vertices && createVertexBuffer(gl, vertices, drawMode),
+    ibo: indices && createIndexBuffer(gl, indices, drawMode),
+  });
+
+  console.log(meshInfo, fglContext);
+
+  /**
+   * Return render invoker
+   *
+   * @returns
+   */
+  return () => {};
+};
 
 export default createMesh;

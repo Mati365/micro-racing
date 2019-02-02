@@ -4,12 +4,19 @@
  * @param {WebGLRenderingContext} gl      GL handle
  * @param {Number} type    Shader type
  * @param {String} source  Shader source code
+ * @param {String} precision  Float calculation precision
  *
  * @returns {WebGLShader}
  */
-const compileShader = (gl, type, source) => {
+const compileShader = gl => ({
+  type,
+  source,
+  version = 300,
+  precision = 'mediump',
+}) => {
   const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
+
+  gl.shaderSource(shader, `#version ${version} es\nprecision ${precision} float; ${source}`);
   gl.compileShader(shader);
 
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {

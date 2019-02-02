@@ -7,6 +7,7 @@ const OUTPUT_FOLDER = resolve(__dirname, '../dist');
 const resolveSource = folder => resolve(__dirname, `../src/${folder}`);
 
 module.exports = {
+  devtool: 'eval-source-map',
   entry: {
     main: resolveSource('public/src/index.jsx'),
   },

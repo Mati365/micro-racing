@@ -1,6 +1,8 @@
 /**
  * Compiles shader and return gl handle
  *
+ * @see {@link https://stackoverflow.com/questions/13780609/what-does-precision-mediump-float-mean}
+ *
  * @param {WebGLRenderingContext} gl      GL handle
  * @param {Number} type    Shader type
  * @param {String} source  Shader source code

@@ -4,9 +4,9 @@ import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
 
 import fgl from '@pkg/isometric-renderer';
 import {
-  // toRadians,
+  vec3,
   mat4,
-} from '@pkg/gl-math';
+} from '@pkg/gl-math/matrix';
 
 export default class GameCanvas extends React.Component {
   static propTypes = {
@@ -22,12 +22,12 @@ export default class GameCanvas extends React.Component {
     const f = fgl(canvasNode);
     const projection = mat4.ortho(
       {
-        left: 0,
-        right: dimensions.w,
-        top: 0,
-        bottom: dimensions.h,
         near: 0,
         far: 1,
+        top: 0,
+        left: 0,
+        right: dimensions.w,
+        bottom: dimensions.h,
       },
     );
 
@@ -37,6 +37,9 @@ export default class GameCanvas extends React.Component {
     );
 
     const mpMatrix = mat4.mul(projection, model);
+
+    console.log(vec3.len([1, 2, 3]));
+    console.log(vec3.normalize([1, 2, 3]));
 
     const defaultMaterial = f.material(
       {

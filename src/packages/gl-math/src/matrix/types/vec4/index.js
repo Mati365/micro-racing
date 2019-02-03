@@ -1,5 +1,3 @@
-import createMatrix from '../../createMatrix';
+import createVectorOptimizedOperations from '../createVectorOptimizedOperations';
 
-const create = m => createMatrix(4, 1, m);
-
-export default create;
+export default createVectorOptimizedOperations(4);

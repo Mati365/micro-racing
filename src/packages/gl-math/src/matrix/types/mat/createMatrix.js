@@ -13,12 +13,4 @@ const createMatrix = (w, h, m) => ({
   h,
 });
 
-/**
- * Creates vector matrix
- *
- * @param {Number} w
- * @param {Number|Number[]} m
- */
-export const createVector = (w, m) => createMatrix(w, 1, m);
-
 export default createMatrix;

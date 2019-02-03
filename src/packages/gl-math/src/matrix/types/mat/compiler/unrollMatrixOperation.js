@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 
+import {createSquare} from '../../../../utils';
 import createMatrix from '../createMatrix';
-import {createSquare} from '../../utils';
 
 /**
  * @see
@@ -23,8 +23,8 @@ const unrollMatrixOperation = (size, unrollOperation) => {
   const _createMatrix = createMatrix; // eslint-disable-line
   const compileFn = source => eval(`(function() {return ${source}})()`); // eslint-disable-line
 
-  return compileFn(`function(m1, m2) {
-    var result = _createMatrix(${resultSize.w}, ${resultSize.h});
+  return compileFn(`function(m1, m2, output) {
+    var result = output || _createMatrix(${resultSize.w}, ${resultSize.h});
     var dest = result.array;
 
     ${unrollOperation}

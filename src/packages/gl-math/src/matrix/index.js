@@ -1,12 +1,15 @@
-import create from './createMatrix';
-import dump from './dumpMatrix';
-import * as creators from './creators';
+import mat from './types/mat';
 
-export * from './operations';
+import mat4 from './types/mat4';
+import vec4 from './types/vec4';
 
-export const from = creators;
+import mat3 from './types/mat3';
+import vec3 from './types/vec3';
 
 export {
-  create,
-  dump,
+  mat,
+  mat4,
+  mat3,
+  vec4,
+  vec3,
 };

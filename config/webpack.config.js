@@ -22,6 +22,12 @@ module.exports = {
       resolve(__dirname, '../src'),
     ],
     alias: {
+      '@pkg/schemas': resolveSource('packages/basic-type-schemas/src/'),
+      '@pkg/resource-pack': resolveSource('packages/resource-pack/src/'),
+      '@pkg/gl-math': resolveSource('packages/gl-math/src/'),
+      '@pkg/basic-helpers': resolveSource('packages/basic-helpers/src/'),
+      '@pkg/isometric-renderer': resolveSource('packages/isometric-renderer/src/'),
+
       '@game/public': resolveSource('public/'),
       '@game/server': resolveSource('server/'),
     },

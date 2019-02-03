@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 
-import createSquare from '../../utils/createSquare';
+import createSquare from '../../../../utils/createSquare';
+
 import unrollMatrixOperation from './unrollMatrixOperation';
 import {unrollNestedArrayToVariables} from './unrollArrayToVariables';
 

@@ -24,6 +24,27 @@ export const unrollArrayToVariables = (variableNamePrefix, arrayVariableName) =>
 );
 
 /**
+ * Folds multiple variables from unrollArrayToVariables to single array
+ *
+ * @example
+ *  var a0=1, a1=2, a2=3;
+ *
+ *  // foldUnrolledToArray('a', 3) transoforms to:
+ *  [a0, a1, a2]
+ *
+ * @param {String} arrayNamePrefix
+ * @param {Number} w
+ * @param {Function} mapperFn
+ */
+export const foldUnrolledToArray = (arrayNamePrefix, w, mapperFn = R.identity) => R.compose(
+  str => `[${str}]`,
+  R.join(','),
+  R.times(
+    index => mapperFn(`${arrayNamePrefix}${index}`, index),
+  ),
+)(w);
+
+/**
  * Create nested path array accessor and execute unrollArrayToVariables.
  * It generates multiple variables from array that are placed in nested object.
  * Just syntax sugar

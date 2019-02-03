@@ -1,6 +1,6 @@
 import createMatrix from '../createMatrix';
 import {unrollMatrixOperation} from '../compiler';
-import {timesToString} from '../../utils';
+import {timesToString} from '../../../../utils';
 
 /**
  * Creates translation matrix

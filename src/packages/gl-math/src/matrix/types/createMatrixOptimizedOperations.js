@@ -1,13 +1,12 @@
-import {unrollSquareMatrix2DOperation} from '../compiler';
+import {unrollSquareMatrix2DOperation} from './mat/compiler';
+import createMatrix from './mat/createMatrix';
 
-import {unrollIdentity} from '../creators/identity';
-import {unrollTranslation} from '../creators/translation';
-import {unrollScaling} from '../creators/scaling';
+import {unrollIdentity} from './mat/creators/identity';
+import {unrollTranslation} from './mat/creators/translation';
+import {unrollScaling} from './mat/creators/scaling';
 
-import {addUnrollExecutor} from '../operations/add';
-import {multiplyUnrollExecutor} from '../operations/mul';
-
-import createMatrix from '../createMatrix';
+import {addUnrollExecutor} from './mat/operations/add';
+import {multiplyUnrollExecutor} from './mat/operations/mul';
 
 /**
  * Creates object of unrolled square matrix operations

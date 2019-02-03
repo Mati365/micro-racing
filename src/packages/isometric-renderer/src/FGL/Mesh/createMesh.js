@@ -12,10 +12,20 @@ const createMesh = (gl) => {
   const createContextDescriptor = createMeshDescriptor(gl);
 
   return (description) => {
-    const {material} = createContextDescriptor(description);
+    const {
+      buffers,
+      material,
+    } = createContextDescriptor(description);
+
+    const {loc: vboLoc} = material.info.attributes.inVertexPos;
 
     // mesh render method
     return (config) => {
+      // VBO bind
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vbo);
+      gl.vertexAttribPointer(vboLoc, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(vboLoc);
+
       // attach shader
       material.attach();
 
@@ -24,13 +34,11 @@ const createMesh = (gl) => {
         const {uniforms} = config;
         if (uniforms)
           material.setUniforms(uniforms);
-
-        // todo:
-        //  add material uniforms selector iterator
-        //  add unroll executor to them, for loop is slow
       }
 
-      // todo: render
+      // Render
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 3);
+      gl.disableVertexAttribArray(vboLoc);
     };
   };
 };

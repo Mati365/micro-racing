@@ -1,3 +1,5 @@
+import unrollVectorCreator from './vec/compiler/unrollVectorCreator';
+
 import {unrollLength} from './vec/operations/length';
 import {unrollNormalize} from './vec/operations/normalize';
 import {unrollLerp} from './vec/operations/lerp';
@@ -9,7 +11,7 @@ import {unrollLerp} from './vec/operations/lerp';
  * @param {Object} additionalOperations
  */
 const createVectorOptimizedOperations = (w, additionalOperations) => {
-  const create = data => new Float32Array(data, 0, w);
+  const create = unrollVectorCreator(w);
 
   return Object.assign(
     create,

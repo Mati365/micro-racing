@@ -1,3 +1,12 @@
 import createVectorOptimizedOperations from '../createVectorOptimizedOperations';
 
-export default createVectorOptimizedOperations(3);
+import cross from './operations/cross';
+import dot from './operations/dot';
+
+export default createVectorOptimizedOperations(
+  3,
+  {
+    cross,
+    dot,
+  },
+);

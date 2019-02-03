@@ -32,6 +32,8 @@ module.exports = {
     'jsx-a11y/click-events-have-key-events': 0,
     'jsx-a11y/mouse-events-have-key-events': 0,
     'import/no-extraneous-dependencies': 0,
+    'one-var': 0,
+    'one-var-declaration-per-line': 0,
     'no-plusplus': 0,
     'no-console': 0,
     'no-underscore-dangle': 0,

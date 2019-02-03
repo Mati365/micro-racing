@@ -40,6 +40,6 @@ export const unrollNormalize = w => unrollVectorOperation(
     if (sum > 0)
       sum = 1.0 / sum;
 
-    return new Float32Array(${foldUnrolledToArray('a', w, arrayItem => `${arrayItem}*sum`)});
+    return new Float32Array(${foldUnrolledToArray(w, index => `a${index}*sum`)});
   `,
 );

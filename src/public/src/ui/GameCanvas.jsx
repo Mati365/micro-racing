@@ -38,8 +38,9 @@ export default class GameCanvas extends React.Component {
 
     const mpMatrix = mat4.mul(projection, model);
 
-    console.log(vec3.len([1, 2, 3]));
-    console.log(vec3.normalize([1, 2, 3]));
+    const a = vec3([1, 1, 1]);
+    const b = vec3([3, 3, 3]);
+    console.log(vec3.lerp(a, b, 0.5));
 
     const defaultMaterial = f.material(
       {

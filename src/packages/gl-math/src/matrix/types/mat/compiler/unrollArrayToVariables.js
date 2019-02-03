@@ -29,18 +29,18 @@ export const unrollArrayToVariables = (variableNamePrefix, arrayVariableName) =>
  * @example
  *  var a0=1, a1=2, a2=3;
  *
- *  // foldUnrolledToArray('a', 3) transoforms to:
- *  [a0, a1, a2]
+ *  // foldUnrolledToArray(3, index => `a${index}`) transoforms to:
+ *  [a1, a2]
  *
  * @param {String} arrayNamePrefix
  * @param {Number} w
  * @param {Function} mapperFn
  */
-export const foldUnrolledToArray = (arrayNamePrefix, w, mapperFn = R.identity) => R.compose(
+export const foldUnrolledToArray = (w, mapperFn = R.identity) => R.compose(
   str => `[${str}]`,
   R.join(','),
   R.times(
-    index => mapperFn(`${arrayNamePrefix}${index}`, index),
+    index => mapperFn(index),
   ),
 )(w);
 

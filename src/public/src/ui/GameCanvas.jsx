@@ -32,17 +32,22 @@ export default class GameCanvas extends React.Component {
     );
 
     const model = mat4.mul(
-      mat4.from.translation([dimensions.w / 2 - 100, dimensions.h / 2 - 100, 0.0]),
+      mat4.from.translation([20, 20, 0.0]),
       mat4.from.scaling([200.0, 200.0, 0.0]),
     );
 
     const mpMatrix = mat4.mul(projection, model);
     const color = vec4(1, 0, 0, 1);
-    const triangle = f.mesh.triangle();
+    const terrainWireframe = f.mesh.plainTerrainWireframe(
+      {
+        w: 4,
+        h: 4,
+      },
+    );
 
     f.frame(() => {
       f.clear();
-      triangle(
+      terrainWireframe(
         {
           uniforms: {
             mpMatrix: mpMatrix.array,

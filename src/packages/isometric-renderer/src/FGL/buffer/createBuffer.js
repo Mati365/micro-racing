@@ -26,7 +26,12 @@ const createBuffer = (
   gl.bindBuffer(type, buffer);
   gl.bufferData(type, data, usage);
 
-  return buffer;
+  return {
+    type,
+    usage,
+    handle: buffer,
+    length: data.length,
+  };
 };
 
 export default R.curry(createBuffer);

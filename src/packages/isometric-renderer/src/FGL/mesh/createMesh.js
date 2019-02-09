@@ -1,6 +1,23 @@
 import createMeshDescriptor from './createMeshDescriptor';
 
 /**
+ * @param {WebGLRenderingContext} gl
+ * @param {BufferDescriptor} bufferDescriptor
+ * @param {Number} attribLoc
+ */
+const bindBufferAttrib = (gl, bufferDescriptor, attribLoc) => {
+  const {
+    type,
+    handle,
+    components,
+  } = bufferDescriptor;
+
+  gl.bindBuffer(type, handle);
+  gl.vertexAttribPointer(attribLoc, components.singleLength, components.type, false, 0, 0);
+  gl.enableVertexAttribArray(attribLoc);
+};
+
+/**
  * Creates renderable mesh instance
  *
  * @param {WebGLRenderingContext} gl
@@ -13,19 +30,25 @@ const createMesh = (gl) => {
 
   return (description) => {
     const {
-      buffers,
+      buffers: {
+        vbo,
+        ibo,
+      },
       material,
       renderMode,
     } = createContextDescriptor(description);
 
+    // cached buffer attrib locations
     const {loc: vboLoc} = material.info.attributes.inVertexPos;
 
     // mesh render method
     return (config) => {
       // VBO bind
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vbo);
-      gl.vertexAttribPointer(vboLoc, 3, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(vboLoc);
+      bindBufferAttrib(gl, vbo, vboLoc);
+
+      // IBO bind
+      if (ibo)
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo.handle);
 
       // attach shader
       material.attach();
@@ -38,7 +61,20 @@ const createMesh = (gl) => {
       }
 
       // Render
-      gl.drawArrays(renderMode, 0, 3);
+      if (ibo) {
+        const {
+          type: componentsType,
+          count: verticesCount,
+        } = ibo.components;
+
+        gl.drawElements(renderMode, verticesCount, componentsType, 0);
+      } else {
+        const {count: verticesCount} = vbo.components;
+
+        gl.drawArrays(renderMode, 0, verticesCount);
+      }
+
+      // disable VBO
       gl.disableVertexAttribArray(vboLoc);
     };
   };

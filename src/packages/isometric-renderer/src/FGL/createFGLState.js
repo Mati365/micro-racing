@@ -1,3 +1,5 @@
+import createContextFlags from './constants/createContextFlags';
+
 /**
  * Creates blank shared between engine functions context.
  *
@@ -8,11 +10,12 @@
  *
  * @param {WebGLRenderingContext} gl
  *
- * @returns {FGLContext}
+ * @returns {FGLState}
  */
-const createFGLContext = gl => ({
+const createFGLState = gl => ({
+  flags: createContextFlags(gl),
   materialUUID: null,
   gl,
 });
 
-export default createFGLContext;
+export default createFGLState;

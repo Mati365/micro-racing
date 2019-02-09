@@ -46,15 +46,17 @@ const createMaterialUniformSetters = (gl) => {
 *  For example for lighting etc?
 *
 * @param {WebGLRenderingContext} gl
-* @param {FGLContext} fglContext
+* @param {FGL} fgl
 
 * @param {Object} description
 */
-const createMaterial = (gl, fglContext = {}) => {
+const createMaterial = (gl, fgl) => {
   const createContextDescriptor = createMaterialDescriptor(gl);
   const createContextUniformSetters = createMaterialUniformSetters(gl);
 
   return (description) => {
+    const {state: fglState} = fgl;
+
     const material = createContextDescriptor(description);
     const materialUniformSetters = createContextUniformSetters(material.uniforms);
     const {
@@ -70,7 +72,7 @@ const createMaterial = (gl, fglContext = {}) => {
     const attachMaterial = () => {
       // do not attach again material
       // attaching shaders is very expensive
-      if (uuid === fglContext.materialUUID)
+      if (uuid === fglState.materialUUID)
         return false;
 
       // mount GL shader

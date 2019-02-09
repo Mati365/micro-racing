@@ -9,7 +9,7 @@ import * as R from 'ramda';
  *
  * @param {WebGLRenderingContext} gl
  * @param {GLEnum} type
- * @param {GLEnum} mode
+ * @param {GLEnum} usage
  * @param {Float32Array|WebGLUnsignedShortArray} data
  *
  * @returns {Number}
@@ -18,13 +18,13 @@ const createBuffer = (
   gl,
   {
     type = gl.ARRAY_BUFFER,
-    drawMode = gl.STATIC_DRAW,
+    usage = gl.STATIC_DRAW,
     data,
   },
 ) => {
   const buffer = gl.createBuffer();
   gl.bindBuffer(type, buffer);
-  gl.bufferData(type, data, drawMode);
+  gl.bufferData(type, data, usage);
 
   return buffer;
 };

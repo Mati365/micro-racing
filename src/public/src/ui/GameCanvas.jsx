@@ -4,7 +4,7 @@ import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
 
 import fgl from '@pkg/isometric-renderer';
 import {
-  vec3,
+  vec4,
   mat4,
 } from '@pkg/gl-math/matrix';
 
@@ -37,47 +37,8 @@ export default class GameCanvas extends React.Component {
     );
 
     const mpMatrix = mat4.mul(projection, model);
-
-    console.log(vec3);
-
-    const a = vec3(1, 1, 1);
-    const b = vec3(3, 3, 3);
-    console.log(vec3.lerp(a, b, 0.5));
-
-    const defaultMaterial = f.material(
-      {
-        shaders: {
-          vertex: `
-            in vec4 inVertexPos;
-
-            uniform mat4 mpMatrix;
-
-            void main() {
-              gl_Position = inVertexPos * mpMatrix;
-            }
-          `,
-
-          fragment: `
-            out vec4 fragColor;
-
-            void main() {
-              fragColor = vec4(1.0, 1.0, 1.0, 1.0);
-            }
-          `,
-        },
-      },
-    );
-
-    const triangle = f.mesh(
-      {
-        material: defaultMaterial,
-        vertices: [
-          0.5, 0.0, 0.0,
-          0.0, 1.0, 0.0,
-          1.0, 1.0, 0.0,
-        ],
-      },
-    );
+    const color = vec4(1, 0, 0, 1);
+    const triangle = f.mesh.triangle();
 
     f.frame(() => {
       f.clear();
@@ -85,6 +46,7 @@ export default class GameCanvas extends React.Component {
         {
           uniforms: {
             mpMatrix: mpMatrix.array,
+            color,
           },
         },
       );

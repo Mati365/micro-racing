@@ -7,15 +7,15 @@ import createBuffer from './createBuffer';
  *
  * @param {WebGLRenderingContext} GL
  * @param {Array} vertices
- * @param {GLEnum} drawMode
+ * @param {GLEnum} usage
  *
  * @returns {Number}
  */
-const createVertexBuffer = (gl, vertices, drawMode = gl.STATIC_DRAW) => createBuffer(
+const createVertexBuffer = (gl, vertices, usage = gl.STATIC_DRAW) => createBuffer(
   gl,
   {
     data: new Float32Array(vertices),
-    drawMode,
+    usage,
   },
 );
 

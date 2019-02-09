@@ -7,16 +7,16 @@ import createBuffer from './createBuffer';
  *
  * @param {WebGLRenderingContext} GL
  * @param {Array} indices
- * @param {GLEnum} drawMode
+ * @param {GLEnum} usage
  *
  * @returns {Number}
  */
-const createIndexBuffer = (gl, indices, drawMode = gl.STATIC_DRAW) => createBuffer(
+const createIndexBuffer = (gl, indices, usage = gl.STATIC_DRAW) => createBuffer(
   gl,
   {
     type: gl.ELEMENT_ARRAY_BUFFER,
     data: new Uint16Array(indices),
-    drawMode,
+    usage,
   },
 );
 

@@ -2,7 +2,7 @@ import {removeNullValues} from '@pkg/basic-helpers';
 import {
   createVertexBuffer,
   createIndexBuffer,
-} from '../Buffer';
+} from '../buffer';
 
 /**
  * Creates information about mesh, allocates buffers and other stuff
@@ -16,12 +16,16 @@ const createMeshDescriptor = gl => ({
   vertices,
   indices,
   material,
-  drawMode = gl.STATIC_DRAW,
+
+  // gl low level flags
+  renderMode = gl.TRIANGLE_STRIP,
+  usage = gl.STATIC_DRAW,
 }) => Object.freeze({
   material,
+  renderMode,
   buffers: removeNullValues({
-    vbo: vertices && createVertexBuffer(gl, vertices, drawMode),
-    ibo: indices && createIndexBuffer(gl, indices, drawMode),
+    vbo: vertices && createVertexBuffer(gl, vertices, usage),
+    ibo: indices && createIndexBuffer(gl, indices, usage),
   }),
 });
 

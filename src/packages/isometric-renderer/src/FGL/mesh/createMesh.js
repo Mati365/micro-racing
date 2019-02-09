@@ -15,6 +15,7 @@ const createMesh = (gl) => {
     const {
       buffers,
       material,
+      renderMode,
     } = createContextDescriptor(description);
 
     const {loc: vboLoc} = material.info.attributes.inVertexPos;
@@ -37,7 +38,7 @@ const createMesh = (gl) => {
       }
 
       // Render
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 3);
+      gl.drawArrays(renderMode, 0, 3);
       gl.disableVertexAttribArray(vboLoc);
     };
   };

@@ -3,6 +3,10 @@ import unrollVectorCreator from './vec/compiler/unrollVectorCreator';
 import {unrollLength} from './vec/operations/length';
 import {unrollNormalize} from './vec/operations/normalize';
 import {unrollLerp} from './vec/operations/lerp';
+import {
+  unrollAdd,
+  unrollSub,
+} from './vec/operations/add';
 
 /**
  * Creates object of unrolled square vector operations
@@ -17,6 +21,9 @@ const createVectorOptimizedOperations = (w, additionalOperations) => {
     create,
     {
       ...additionalOperations,
+
+      add: unrollAdd(w),
+      sub: unrollSub(w),
 
       len: unrollLength(w),
       lerp: unrollLerp(w),

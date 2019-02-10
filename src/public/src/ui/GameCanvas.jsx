@@ -17,26 +17,14 @@ export default class GameCanvas extends React.Component {
   canvasRef = React.createRef();
 
   componentDidMount() {
-    // const {dimensions} = this.props;
     const {current: canvasNode} = this.canvasRef;
 
     const f = fgl(canvasNode);
-
-    // const projection = mat4.ortho(
-    //   {
-    //     near: 0,
-    //     far: 1,
-    //     top: 0,
-    //     left: 0,
-    //     right: dimensions.w,
-    //     bottom: dimensions.h,
-    //   },
-    // );
     const projection = mat4.from.identity();
 
     const model = mat4.mul(
-      mat4.from.scaling([0.25, 0.25, 1.0]),
-      mat4.from.translation([0.0, 0.0, 0.0]),
+      mat4.from.scaling([1.0, 1.0, 1.0]),
+      mat4.from.translation([0.0, 0.0, 0.5]),
     );
 
     const DIST = Math.sqrt(1 / 3.0);
@@ -46,7 +34,7 @@ export default class GameCanvas extends React.Component {
         mat4.lookAt(
           {
             eye: vec3(DIST, DIST, DIST),
-            at: vec3(0, 0, 0.0),
+            at: vec3(0.0, 0.0, 0.0),
             up: vec3(0.0, 0.0, 1.0), // Z axis is UP
           },
         ),
@@ -54,16 +42,15 @@ export default class GameCanvas extends React.Component {
       ),
     );
 
-    const color = vec4(1, 0, 0, 1);
+    const color = vec4(0.2, 0.2, 0.2, 1);
     const terrainWireframe = f.mesh.plainTerrainWireframe(
       {
-        w: 4,
-        h: 4,
+        w: 6,
+        h: 6,
       },
     );
 
     f.frame(() => {
-      f.clear();
       terrainWireframe(
         {
           uniforms: {

@@ -1,39 +1,28 @@
 import * as R from 'ramda';
 
-import createDtRenderLoop from './createDtRenderLoop';
 import createMatrial from './material/createMaterial';
-
 import createMesh from './mesh/createMesh';
 import {
   meshes,
   materials,
 } from './predefined';
 
-import clearContext from './viewport/clearContext';
 import createFGLState from './createFGLState';
-
-/**
- * Get opengl context from element
- *
- * @param {HTMLElement} element
- * @return {WebGLRenderingContext}
- */
-const getElementWebGLContext = (element) => {
-  const gl = element?.getContext('webgl2', {antialias: false});
-  if (!gl)
-    throw new Error('WebGL2 context is null! Scene cannot be initialized!');
-
-  return gl;
-};
+import {
+  pickGlContext,
+  createDtRenderLoop,
+} from './viewport';
 
 /**
  * Create global engine context
  *
  * @param {HTMLElement} canvasHandle
+ * @param {Object} glContextFlags
+ *
  * @return {FGLContext}
  */
-const createRenderContext = (canvasElement) => {
-  const gl = getElementWebGLContext(canvasElement);
+const createRenderContext = (canvasElement, glContextFlags) => {
+  const gl = pickGlContext(canvasElement)(glContextFlags);
 
   // see: it is mutable
   const state = createFGLState(gl);
@@ -55,7 +44,6 @@ const createRenderContext = (canvasElement) => {
         {
           frame: createDtRenderLoop,
           material: createMatrial,
-          clear: clearContext,
           mesh: createMesh,
         },
       ),

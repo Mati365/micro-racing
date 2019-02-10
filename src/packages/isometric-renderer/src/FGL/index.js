@@ -1,5 +1,7 @@
 import * as R from 'ramda';
 
+import * as COLORS from './constants/colors';
+
 import createMatrial from './material/createMaterial';
 import createMesh from './mesh/createMesh';
 import {
@@ -12,6 +14,10 @@ import {
   pickGlContext,
   createDtRenderLoop,
 } from './viewport';
+
+export {
+  COLORS,
+};
 
 /**
  * Create global engine context
@@ -37,7 +43,12 @@ const createRenderContext = (canvasElement, glContextFlags) => {
     {
       // shared between engine flags
       state,
-      flags: state.flags,
+
+      // pick shared constants
+      ...R.pick(
+        ['flags', 'colors'],
+        state,
+      ),
 
       // creators
       ...bindObjectSceneContext(

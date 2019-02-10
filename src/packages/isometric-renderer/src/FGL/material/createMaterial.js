@@ -58,7 +58,7 @@ const createMaterial = (gl, fgl) => {
     const {state: fglState} = fgl;
 
     const material = createContextDescriptor(description);
-    const materialUniformSetters = createContextUniformSetters(material.uniforms);
+    const materialUniformSetters = createContextUniformSetters(material.uniforms || {});
     const {
       uuid,
       program,

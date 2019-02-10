@@ -1,4 +1,5 @@
 import createContextFlags from './constants/createContextFlags';
+import * as COLORS from './constants/colors';
 
 /**
  * Creates blank shared between engine functions context.
@@ -14,6 +15,8 @@ import createContextFlags from './constants/createContextFlags';
  */
 const createFGLState = gl => ({
   flags: createContextFlags(gl),
+  colors: COLORS,
+
   materialUUID: null,
   gl,
 });

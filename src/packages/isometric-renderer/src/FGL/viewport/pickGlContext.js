@@ -20,7 +20,7 @@ const getElementWebGLContext = (element) => {
  * @returns {WebGLRenderingContext}
  */
 const pickGlContext = element => ({
-  depth = 1,
+  depth = 0,
   color = [0.0, 0.0, 0.0, 1.0],
 } = {}) => {
   const gl = getElementWebGLContext(element);
@@ -32,7 +32,7 @@ const pickGlContext = element => ({
   gl.clearDepth(depth);
 
   gl.enable(gl.DEPTH_TEST);
-  gl.depthFunc(gl.LEQUAL);
+  gl.depthFunc(gl.GEQUAL);
 
   return gl;
 };

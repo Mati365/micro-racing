@@ -17,40 +17,42 @@ export default class GameCanvas extends React.Component {
   canvasRef = React.createRef();
 
   componentDidMount() {
-    const {dimensions} = this.props;
+    // const {dimensions} = this.props;
     const {current: canvasNode} = this.canvasRef;
 
     const f = fgl(canvasNode);
 
-    const projection = mat4.ortho(
-      {
-        near: 0,
-        far: 1,
-        top: 0,
-        left: 0,
-        right: dimensions.w,
-        bottom: dimensions.h,
-      },
-    );
+    // const projection = mat4.ortho(
+    //   {
+    //     near: 0,
+    //     far: 1,
+    //     top: 0,
+    //     left: 0,
+    //     right: dimensions.w,
+    //     bottom: dimensions.h,
+    //   },
+    // );
+    const projection = mat4.from.identity();
 
-    const DIST = 10;
     const model = mat4.mul(
-      mat4.mul(
-        mat4.from.translation([320, 320, 0.0]),
-        mat4.from.scaling([200.0, 200.0, 0.0]),
-      ),
-      mat4.lookAt(
-        {
-          eye: vec3(DIST, DIST, DIST),
-          at: vec3(0.0, 0.0, 0.0),
-          up: vec3(0.0, 0.0, 1.0),
-        },
-      ),
+      mat4.from.scaling([0.25, 0.25, 1.0]),
+      mat4.from.translation([0.0, 0.0, 0.0]),
     );
 
-    const mpMatrix = mat4.mul(projection, model);
-
-    console.log(mpMatrix);
+    const DIST = Math.sqrt(1 / 3.0);
+    const mpMatrix = mat4.mul(
+      projection,
+      mat4.mul(
+        mat4.lookAt(
+          {
+            eye: vec3(DIST, DIST, DIST),
+            at: vec3(0, 0, 0.0),
+            up: vec3(0.0, 0.0, 1.0), // Z axis is UP
+          },
+        ),
+        model,
+      ),
+    );
 
     const color = vec4(1, 0, 0, 1);
     const terrainWireframe = f.mesh.plainTerrainWireframe(

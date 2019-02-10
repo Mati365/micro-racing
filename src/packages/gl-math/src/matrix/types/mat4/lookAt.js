@@ -9,9 +9,11 @@ import vec3 from '../vec3';
  * @returns {Mat4}
  */
 const lookAt = ({eye, at, up}) => {
-  const zAxis = vec3.normalize(vec3.sub(eye, at)); // normalize(eye - at)
-  const xAxis = vec3.normalize(vec3.cross(zAxis, up)); // normalize(cross(zaxis, up))
+  let zAxis = vec3.normalize(vec3.sub(eye, at)); // normalize(eye - at)
+  const xAxis = vec3.normalize(vec3.cross(up, zAxis)); // normalize(cross(zaxis, up))
   const yAxis = vec3.cross(xAxis, zAxis); // cross(xaxis, zaxis)
+
+  zAxis = vec3.negate(zAxis);
 
   return mat4([
     xAxis[0], xAxis[1], xAxis[2], -vec3.dot(xAxis, eye),

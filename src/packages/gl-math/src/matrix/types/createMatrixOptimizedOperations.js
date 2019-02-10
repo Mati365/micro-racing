@@ -14,14 +14,14 @@ import {multiplyUnrollExecutor} from './mat/operations/mul';
  * @param {Object} config
  * @param {Object} additionalOperations
  */
-const createMatrixOptimizedOperations = ({w, vector}, additionalOperations) => {
+const createMatrixOptimizedOperations = ({w, vector}, {operations, creators} = {}) => {
   const unroll = unrollSquareMatrix2DOperation(w);
   const create = m => createMatrix(w, w, m);
 
   return Object.assign(
     create,
     {
-      ...additionalOperations,
+      ...operations,
 
       mul: unroll(multiplyUnrollExecutor),
       add: unroll(addUnrollExecutor('+')),
@@ -31,6 +31,8 @@ const createMatrixOptimizedOperations = ({w, vector}, additionalOperations) => {
         translation: unrollTranslation(w, vector),
         scaling: unrollScaling(w, vector),
         identity: unrollIdentity(w),
+
+        ...creators,
       },
     },
   );

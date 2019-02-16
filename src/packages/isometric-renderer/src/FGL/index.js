@@ -2,7 +2,10 @@ import * as R from 'ramda';
 
 import * as COLORS from './constants/colors';
 
-import createMatrial from './material/createMaterial';
+import {
+  createShaderMaterial,
+} from './material/types';
+
 import createMesh from './mesh/createMesh';
 import {
   meshes,
@@ -34,8 +37,14 @@ const createRenderContext = (canvasElement, glContextFlags) => {
   const state = createFGLState(gl);
   const fgl = {};
 
+  // attaches GL / FGL global state to each function
   const bindSceneContext = R.flip(R.apply)([gl, fgl]);
-  const bindObjectSceneContext = R.mapObjIndexed(bindSceneContext);
+  const bindObjectSceneContext = R.mapObjIndexed(
+    R.when(
+      R.is(Function),
+      bindSceneContext,
+    ),
+  );
 
   // Object.assign due to shared fglContext between callers
   Object.assign(
@@ -54,8 +63,15 @@ const createRenderContext = (canvasElement, glContextFlags) => {
       ...bindObjectSceneContext(
         {
           frame: createDtRenderLoop,
-          material: createMatrial,
           mesh: createMesh,
+        },
+      ),
+
+      // different material types, for solid color material
+      // will be slightly different
+      material: bindObjectSceneContext(
+        {
+          shader: createShaderMaterial,
         },
       ),
     },

@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import createMaterialDescriptor from './createMaterialDescriptor';
+import createShaderMaterialDescriptor from './createShaderMaterialDescriptor';
 
 /**
  * Maps uniform gl constant to setter
@@ -50,8 +50,8 @@ const createMaterialUniformSetters = (gl) => {
 
 * @param {Object} description
 */
-const createMaterial = (gl, fgl) => {
-  const createContextDescriptor = createMaterialDescriptor(gl);
+const createShaderMaterial = (gl, fgl) => {
+  const createContextDescriptor = createShaderMaterialDescriptor(gl);
   const createContextUniformSetters = createMaterialUniformSetters(gl);
 
   return (description) => {
@@ -108,4 +108,4 @@ const createMaterial = (gl, fgl) => {
   };
 };
 
-export default createMaterial;
+export default createShaderMaterial;

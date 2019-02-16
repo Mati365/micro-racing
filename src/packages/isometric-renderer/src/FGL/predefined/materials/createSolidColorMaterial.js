@@ -1,4 +1,4 @@
-const createSolidColorMaterial = fgl => fgl.material(
+const createSolidColorMaterial = fgl => fgl.material.shader(
   {
     shaders: {
       vertex: `

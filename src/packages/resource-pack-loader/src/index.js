@@ -1,0 +1,90 @@
+import * as R from 'ramda';
+import {pairs, of} from 'rxjs';
+import {scan, flatMap} from 'rxjs/operators';
+
+import promiseLoadImage from './helpers/promiseLoadImage';
+
+export const DEFAULT_LOADERS = [
+  {
+    test: R.test(/\.(png|jpe?g)$/),
+    loader: promiseLoadImage,
+  },
+];
+
+/**
+ * Iterates over loaders array
+ *
+ * @param {Array} loaders
+ * @param {String} path
+ *
+ * @returns {Function|Null}
+ */
+const findPathLoader = loaders => path => R.compose(
+  R.unless(
+    R.isNil,
+    R.prop('loader'),
+  ),
+  R.find(
+    ({test}) => test(path),
+  ),
+)(loaders);
+
+/**
+ * Load resources from path
+ *
+ * @param {Loader[]}  loaders
+ * @param {String}    path
+ *
+ * @returns {Promise|Null}
+ */
+export const loadResource = loaders => path => R.compose(
+  R.when(
+    R.is(Function),
+    R.applyTo(path),
+  ),
+  findPathLoader(loaders),
+)(path);
+
+
+/**
+ * Creates asynchronous resource loader,
+ * it accept array of loaders and creates function
+ * that can load pack of data
+ */
+const createResourcePackLoader = (loaders = DEFAULT_LOADERS) => {
+  const packLoader = loadResource(loaders);
+
+  return (resources) => {
+    const totalResources = R.keys(resources).length;
+    if (!totalResources) {
+      return of(
+        {
+          resources: {},
+          percentage: 1.0,
+        },
+      );
+    }
+
+    return (
+      pairs(resources)
+        .pipe(
+          flatMap(
+            async ([key, path]) => [key, await packLoader(path)],
+          ),
+          scan(
+            (acc, [key, value]) => ({
+              ...acc,
+              percentage: ((R.keys(acc?.resources || {}).length + 1) / totalResources),
+              resources: {
+                ...acc?.resources,
+                [key]: value,
+              },
+            }),
+            {},
+          ),
+        )
+    );
+  };
+};
+
+export default createResourcePackLoader;

@@ -73,10 +73,16 @@ module.exports = {
           loader: 'babel-loader',
           options: {
             presets: [
-              '@babel/preset-env', // polyfill for new browser
+              // polyfill for new browser
+              '@babel/preset-env',
               '@babel/preset-react', // react jsx compiler
             ],
             plugins: [
+              ['@babel/plugin-transform-runtime',
+                {
+                  regenerator: true,
+                },
+              ],
               '@babel/plugin-proposal-nullish-coalescing-operator',
               '@babel/plugin-proposal-optional-chaining',
               '@babel/plugin-proposal-logical-assignment-operators',

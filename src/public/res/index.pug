@@ -10,7 +10,7 @@ html(lang='pl')
         padding: 0;
       }
 
-      #app-root {
+      .flex-centered {
         display: flex;
         width: inherit;
         height: inherit;
@@ -18,9 +18,10 @@ html(lang='pl')
         justify-content: center;
       }
 
-      #app-root canvas {
+      .app-root canvas {
         image-rendering: pixelated;
       }
 
   body
-    main#app-root
+    .flex-centered
+      main#app-root

@@ -9,13 +9,17 @@ import {
   mat4,
 } from '@pkg/gl-math/matrix';
 
-const attachEngine = (canvas) => {
+const attachEngine = (virtualResolution, dimensions, canvas) => {
   const f = fgl(canvas);
-
-  const DIST = Math.sqrt(1 / 3.0);
+  const DIST = Math.sqrt(1.0 / 3.0);
 
   const camera = mat4.from.translation([0.0, 0.0, 0.5]);
-  const mpMatrix = mat4.mul(
+  const projection = mat4.mul(
+    mat4.from.scaling([
+      virtualResolution.w / dimensions.w,
+      virtualResolution.h / dimensions.h,
+      1.0,
+    ]),
     mat4.lookAt(
       {
         eye: vec3(DIST, DIST, DIST),
@@ -23,6 +27,10 @@ const attachEngine = (canvas) => {
         up: vec3(0.0, 0.0, 1.0), // Z axis is UP
       },
     ),
+  );
+
+  const mpMatrix = mat4.mul(
+    projection,
     camera,
   );
 
@@ -35,7 +43,6 @@ const attachEngine = (canvas) => {
 
   const box = f.mesh.box();
   const pyramid = f.mesh.pyramid();
-
   f.frame(() => {
     terrainWireframe(
       {
@@ -104,16 +111,24 @@ export default class GameCanvas extends React.Component {
   canvasRef = React.createRef();
 
   async componentDidMount() {
+    const {dimensions} = this.props;
+
     const resources = await createResourcePackLoader()(
       {
-        car: 'https://www.clipartmax.com/png/middle/181-1818141_170-clip-art-at-clker-car-2d-top-view-png.png',
-        magic: 'https://cdn.theatlantic.com/assets/media/img/mt/2018/09/AP_18255638666993/lead_720_405.jpg',
+        grass: 'https://opengameart.org/sites/default/files/styles/medium/public/0_0.png',
       },
     ).toPromise();
 
     console.log(resources);
 
-    attachEngine(this.canvasRef.current);
+    attachEngine(
+      {
+        w: 640,
+        h: 480,
+      },
+      dimensions,
+      this.canvasRef.current,
+    );
   }
 
   render() {

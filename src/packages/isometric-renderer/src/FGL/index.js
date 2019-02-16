@@ -3,7 +3,7 @@ import * as R from 'ramda';
 import * as COLORS from './constants/colors';
 
 import {createShaderMaterial} from './material/types';
-import createTexture2D from './texture/createTexture2D';
+import texture2D from './texture/texture2D';
 
 import createMesh from './mesh/createMesh';
 import {
@@ -63,7 +63,7 @@ const createRenderContext = (canvasElement, glContextFlags) => {
         {
           frame: createDtRenderLoop,
           mesh: createMesh,
-          createTexture2D,
+          texture2D,
         },
       ),
 

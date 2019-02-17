@@ -66,9 +66,11 @@ const createTexMesh = async (f) => {
       material,
       renderMode: f.flags.TRIANGLES,
       textures: [
-        f.texture2D({
-          image: sandImage,
-        }),
+        f.texture2D(
+          {
+            image: sandImage,
+          },
+        ),
       ],
       vertices: [
         [0.0, 1.0, 0.0],
@@ -122,17 +124,17 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
       },
     );
 
-    // spriteMesh(
-    //   {
-    //     uniforms: {
-    //       color: f.colors.ORANGE,
-    //       mpMatrix: mat4.mul(
-    //         mpMatrix,
-    //         mat4.from.translation([0.0, 0.0, 0.005]),
-    //       ).array,
-    //     },
-    //   },
-    // );
+    spriteMesh(
+      {
+        uniforms: {
+          color: f.colors.ORANGE,
+          mpMatrix: mat4.mul(
+            mpMatrix,
+            mat4.from.translation([0.0, 0.0, 0.005]),
+          ).array,
+        },
+      },
+    );
 
     box(
       {

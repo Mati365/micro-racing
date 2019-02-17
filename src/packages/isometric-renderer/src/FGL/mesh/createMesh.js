@@ -1,22 +1,5 @@
 import createMeshDescriptor from './createMeshDescriptor';
-
-/**
- * @param {WebGLRenderingContext} gl
- * @param {BufferDescriptor} bufferDescriptor
- * @param {Number} attribLoc
- */
-const bindBufferAttrib = (gl, bufferDescriptor, attribLoc) => {
-  const {
-    type,
-    handle,
-    components,
-  } = bufferDescriptor;
-
-  gl.bindBuffer(type, handle);
-  gl.vertexAttribPointer(attribLoc, components.singleLength, components.type, false, 0, 0);
-  gl.enableVertexAttribArray(attribLoc);
-};
-
+import bindBufferAttrib from '../buffer/bindBufferAttrib';
 
 /**
  * Attaches parameters from mesh descriptors passed
@@ -28,9 +11,18 @@ const bindBufferAttrib = (gl, bufferDescriptor, attribLoc) => {
  * @param {MeshDescriptor} descriptor
  * @param {Material} material
  */
-const attachShaderParameters = ({uniforms}, material) => {
+const attachShaderParameters = (
+  {
+    uniforms,
+    textures,
+  },
+  material,
+) => {
   if (uniforms)
     material.setUniforms(uniforms);
+
+  if (textures)
+    material.setTextures(textures);
 };
 
 /**
@@ -54,12 +46,12 @@ const createMeshRenderer = (gl, meshDescriptor) => {
   } = meshDescriptor;
 
   // cached buffer attrib locations
-  const {loc: vboLoc} = material.info.attributes.inVertexPos;
+  const {loc: vertexBufferLoc} = material.info.attributes.inVertexPos;
 
   // mesh render method
   return (dynamicDescriptor) => {
     // VBO bind
-    bindBufferAttrib(gl, vbo, vboLoc);
+    bindBufferAttrib(gl, vbo, vertexBufferLoc);
 
     // IBO bind
     if (ibo)
@@ -91,7 +83,7 @@ const createMeshRenderer = (gl, meshDescriptor) => {
     }
 
     // disable VBO
-    gl.disableVertexAttribArray(vboLoc);
+    gl.disableVertexAttribArray(vertexBufferLoc);
   };
 };
 

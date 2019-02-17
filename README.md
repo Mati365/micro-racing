@@ -4,6 +4,7 @@
 online 2D multiplayer go-carts racing game
 
 ### Goals
+- Use monorepo, separated logic
 - Create tiny matrix math library
 - Create 3D isometric WebGL 2.0 functional wrapper(it should handle depth sorting and other stuff)
 - Car steering logic

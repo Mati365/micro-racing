@@ -3,5 +3,13 @@
 # kart-racing
 online 2D multiplayer go-carts racing game
 
+### Goals
+- Create tiny matrix math library
+- Create 3D isometric WebGL 2.0 functional wrapper(it should handle depth sorting and other stuff)
+- Car steering logic
+- Procedural generated racetrack
+- Bots using Neural Network for AI(see neural-cars)
+- Multiplayer
+
 ## License
 [Attribution-NonCommercial-ShareAlike 4.0 International](https://github.com/Mati365/kart-racing/blob/master/LICENSE.md)

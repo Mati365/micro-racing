@@ -17,6 +17,84 @@ const bindBufferAttrib = (gl, bufferDescriptor, attribLoc) => {
   gl.enableVertexAttribArray(attribLoc);
 };
 
+
+/**
+ * Attaches parameters from mesh descriptors passed
+ * when mesh renders,
+ *
+ * @example
+ *  mesh({uniforms: {}})
+ *
+ * @param {MeshDescriptor} descriptor
+ * @param {Material} material
+ */
+const attachShaderParameters = ({uniforms}, material) => {
+  if (uniforms)
+    material.setUniforms(uniforms);
+};
+
+/**
+ * Creates function that renders mesh based on config
+ *
+ * @param {WebGLRenderingContext} gl
+ * @param {meshDescriptor} meshDescriptor
+ *
+ * @param {Object} dynamicDescriptor
+ *
+ * @returns {Function}
+ */
+const createMeshRenderer = (gl, meshDescriptor) => {
+  const {
+    buffers: {
+      vbo,
+      ibo,
+    },
+    material,
+    renderMode,
+  } = meshDescriptor;
+
+  // cached buffer attrib locations
+  const {loc: vboLoc} = material.info.attributes.inVertexPos;
+
+  // mesh render method
+  return (dynamicDescriptor) => {
+    // VBO bind
+    bindBufferAttrib(gl, vbo, vboLoc);
+
+    // IBO bind
+    if (ibo)
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo.handle);
+
+    // attach shader
+    material.attach();
+
+    // each mesh can accept parameters
+    // from dynamic render function call and default
+    // parameters from config
+    attachShaderParameters(meshDescriptor, material);
+    dynamicDescriptor && attachShaderParameters(dynamicDescriptor, material);
+
+    // Render
+    if (ibo) {
+      // Using indices buffer
+      const {
+        type: componentsType,
+        count: verticesCount,
+      } = ibo.components;
+
+      gl.drawElements(renderMode, verticesCount, componentsType, 0);
+    } else {
+      // Using only vertex buffer
+      const {count: verticesCount} = vbo.components;
+
+      gl.drawArrays(renderMode, 0, verticesCount);
+    }
+
+    // disable VBO
+    gl.disableVertexAttribArray(vboLoc);
+  };
+};
+
 /**
  * Creates renderable mesh instance
  *
@@ -25,59 +103,9 @@ const bindBufferAttrib = (gl, bufferDescriptor, attribLoc) => {
  *
  * @returns {Function}
  */
-const createMesh = (gl) => {
-  const createContextDescriptor = createMeshDescriptor(gl);
-
-  return (description) => {
-    const {
-      buffers: {
-        vbo,
-        ibo,
-      },
-      material,
-      renderMode,
-    } = createContextDescriptor(description);
-
-    // cached buffer attrib locations
-    const {loc: vboLoc} = material.info.attributes.inVertexPos;
-
-    // mesh render method
-    return (config) => {
-      // VBO bind
-      bindBufferAttrib(gl, vbo, vboLoc);
-
-      // IBO bind
-      if (ibo)
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo.handle);
-
-      // attach shader
-      material.attach();
-
-      // each mesh can accept parameters
-      if (config) {
-        const {uniforms} = config;
-        if (uniforms)
-          material.setUniforms(uniforms);
-      }
-
-      // Render
-      if (ibo) {
-        const {
-          type: componentsType,
-          count: verticesCount,
-        } = ibo.components;
-
-        gl.drawElements(renderMode, verticesCount, componentsType, 0);
-      } else {
-        const {count: verticesCount} = vbo.components;
-
-        gl.drawArrays(renderMode, 0, verticesCount);
-      }
-
-      // disable VBO
-      gl.disableVertexAttribArray(vboLoc);
-    };
-  };
-};
+const createMesh = gl => description => createMeshRenderer(
+  gl,
+  createMeshDescriptor(gl)(description),
+);
 
 export default createMesh;

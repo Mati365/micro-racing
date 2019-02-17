@@ -39,6 +39,7 @@ const assignObjectSelectors = selectors => (obj) => {
  * @example
  *  {
  *    uuid,
+ *    program
  *    attributes: {attrib1: 'mat3'},
  *    uniforms:   {uniform2: R.prop('mat4')}
  *  }

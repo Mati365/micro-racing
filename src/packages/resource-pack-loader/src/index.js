@@ -50,6 +50,11 @@ export const loadResource = loaders => path => R.compose(
  * Creates asynchronous resource loader,
  * it accept array of loaders and creates function
  * that can load pack of data
+ *
+ * @param {Array} loaders
+ * @param {Object} resources
+ *
+ * @returns {Object}
  */
 const createResourcePackLoader = (loaders = DEFAULT_LOADERS) => {
   const packLoader = loadResource(loaders);
@@ -84,6 +89,28 @@ const createResourcePackLoader = (loaders = DEFAULT_LOADERS) => {
           ),
         )
     );
+  };
+};
+
+/**
+ * Creates loader that loads single resource
+ *
+ * @param {Array} loaders
+ * @param {String} path
+ *
+ * @returns {Any}
+ */
+export const createSingleResourceLoader = (loaders = DEFAULT_LOADERS) => {
+  const loaderPack = createResourcePackLoader(loaders);
+
+  return async (path) => {
+    const {resources} = await loaderPack(
+      {
+        current: path,
+      },
+    ).toPromise();
+
+    return resources.current;
   };
 };
 

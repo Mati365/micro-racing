@@ -44,7 +44,8 @@
     "raw-loader": "^0.5.1",
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "^3.1.9"
+    "webpack-dev-server": "^3.1.9",
+    "file-loader": "^3.0.1"
   },
   "scripts": {
     "develop": "env NODE_ENV=development npx webpack-dev-server --config=config/webpack.config.js --mode=development",

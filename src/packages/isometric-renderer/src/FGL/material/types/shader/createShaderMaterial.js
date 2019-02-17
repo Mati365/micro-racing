@@ -7,6 +7,8 @@ import createShaderMaterialDescriptor from './createShaderMaterialDescriptor';
  *
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getActiveUniform}
  *
+ * @param {WebGLRenderingContext} gl
+ *
  * @todo
  *  Add support for UBO(Uniform Buffer Object)
  */
@@ -27,6 +29,17 @@ const createGLSLUniformSetterMap = gl => ({
 });
 
 /**
+ * Creates pair - GLenum -> uniformName for tex fields
+ *
+ * @param {WebGLRenderingContext} gl
+ */
+export const createGLSLTexUniforms = gl => [
+  [gl.TEXTURE0, 'tex0'],
+  [gl.TEXTURE1, 'tex1'],
+  [gl.TEXTURE2, 'tex2'],
+];
+
+/**
  * Creates predefined uniform object
  *
  * @param {WebGLRenderingContext} gl
@@ -41,18 +54,26 @@ const createMaterialUniformSetters = (gl) => {
 };
 
 /**
- *@todo
-*  Maybe there will be used any non shader material?
-*  For example for lighting etc?
-*
-* @param {WebGLRenderingContext} gl
-* @param {FGL} fgl
-
-* @param {Object} description
-*/
+ * @todo
+ *  Maybe there will be used any non shader material?
+ *  For example for lighting etc?
+ *
+ * @param {WebGLRenderingContext} gl
+ * @param {FGL} fgl
+ * @param {Object} description
+ *
+ * @example
+ *  {
+ *    info, // MaterialDescriptor
+ *    attach(),
+ *    setUniforms(),
+ *    setTextures()
+ *  }
+ */
 const createShaderMaterial = (gl, fgl) => {
   const createContextDescriptor = createShaderMaterialDescriptor(gl);
   const createContextUniformSetters = createMaterialUniformSetters(gl);
+  const texSlotsIndices = createGLSLTexUniforms(gl);
 
   return (description) => {
     const {state: fglState} = fgl;
@@ -63,6 +84,40 @@ const createShaderMaterial = (gl, fgl) => {
       uuid,
       program,
     } = material;
+
+    /**
+     * Sets single uniform
+     *
+     * @param {String} key
+     * @param {Any} value
+     */
+    const setMaterialUniform = (key, value) => {
+      const setter = materialUniformSetters[key];
+
+      if (!setter)
+        return;
+
+      // set uniform
+      setter(value);
+    };
+
+    /**
+     * Attaches array of textures to material
+     *
+     * @param {Array} textures
+     */
+    const setMaterialTextures = (textures) => {
+      if (!textures || !textures.length)
+        return;
+
+      for (let i = 0; i < textures.length; ++i) {
+        const [glTextureFlag, uniformName] = texSlotsIndices[i];
+
+        gl.activeTexture(glTextureFlag);
+        gl.bindTexture(gl.TEXTURE_2D, textures[i]);
+        setMaterialUniform(uniformName, i);
+      }
+    };
 
     /**
      * Loads material to GL context
@@ -88,15 +143,8 @@ const createShaderMaterial = (gl, fgl) => {
      */
     const setMaterialUniforms = (uniforms) => {
       for (const key in uniforms) {
-        if (Object.prototype.hasOwnProperty.call(uniforms, key)) {
-          const setter = materialUniformSetters[key];
-
-          if (!setter)
-            return;
-
-          // set uniform
-          setter(uniforms[key]);
-        }
+        if (Object.prototype.hasOwnProperty.call(uniforms, key))
+          setMaterialUniform(key, uniforms[key]);
       }
     };
 
@@ -104,6 +152,7 @@ const createShaderMaterial = (gl, fgl) => {
       info: material,
       attach: attachMaterial,
       setUniforms: setMaterialUniforms,
+      setTextures: setMaterialTextures,
     };
   };
 };

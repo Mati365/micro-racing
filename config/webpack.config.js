@@ -28,6 +28,7 @@ module.exports = {
       '@pkg/basic-helpers': resolveSource('packages/basic-helpers/src/'),
       '@pkg/isometric-renderer': resolveSource('packages/isometric-renderer/src/'),
 
+      '@game/res': resolveSource('public/res/'),
       '@game/public': resolveSource('public/'),
       '@game/server': resolveSource('server/'),
     },
@@ -65,6 +66,15 @@ module.exports = {
         options: {
           emitError: false,
         },
+      },
+      {
+        test: /\.(png|jpg|gif)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {},
+          },
+        ],
       },
       {
         test: /\.jsx?$/,

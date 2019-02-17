@@ -18,7 +18,6 @@ const createSolidColorMaterial = fgl => fgl.material.shader(
 
         void main() {
           fragColor = color;
-          // fragColor = vec4(gl_FragCoord.z); // depth buffer test
         }
       `,
     },

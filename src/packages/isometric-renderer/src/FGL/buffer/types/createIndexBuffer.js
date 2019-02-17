@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import createBuffer from './createBuffer';
+import createBuffer from '../createBuffer';
 
 /**
  * Creates OpenGL indices buffer

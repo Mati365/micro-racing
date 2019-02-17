@@ -2,68 +2,17 @@ import React from 'react';
 
 import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
 
-import fgl from '@pkg/isometric-renderer';
+import fgl, {createIsometricProjection} from '@pkg/isometric-renderer';
 import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
-import {
-  vec3,
-  mat4,
-} from '@pkg/gl-math/matrix';
+import {mat4} from '@pkg/gl-math/matrix';
 
 import sandImageUrl from '@game/res/img/sand.jpg';
 
-const createIsometricProjection = (virtualResolution, dimensions) => {
-  const DIST = Math.sqrt(1.0 / 3.0);
-
-  return mat4.mul(
-    mat4.from.scaling(
-      [
-        virtualResolution.w / dimensions.w,
-        virtualResolution.h / dimensions.h,
-        1.0,
-      ],
-    ),
-    mat4.lookAt(
-      {
-        eye: vec3(DIST, DIST, DIST),
-        at: vec3(0.0, 0.0, 0.0),
-        up: vec3(0.0, 0.0, 1.0), // Z axis is UP(window), depth testing
-      },
-    ),
-  );
-};
-
 const createTexMesh = async (f) => {
   const sandImage = await createSingleResourceLoader()(sandImageUrl);
-
-  const material = f.material.shader(
-    {
-      shaders: {
-        vertex: `
-          in vec4 inVertexPos;
-
-          uniform mat4 mpMatrix;
-
-          void main() {
-            gl_Position = inVertexPos * mpMatrix;
-          }
-        `,
-
-        fragment: `
-          out vec4 fragColor;
-
-          uniform vec4 color;
-
-          void main() {
-            fragColor = color;
-          }
-        `,
-      },
-    },
-  );
-
   const mesh = f.mesh(
     {
-      material,
+      material: f.material.textureSprite,
       renderMode: f.flags.TRIANGLES,
       textures: [
         f.texture2D(
@@ -80,6 +29,15 @@ const createTexMesh = async (f) => {
         [0.0, 1.0, 0.0],
         [1.0, 1.0, 0.0],
         [1.0, 0.0, 0.0],
+      ],
+      uv: [
+        [0.0, 1.0],
+        [1.0, 0.0],
+        [0.0, 0.0],
+
+        [0.0, 1.0],
+        [1.0, 1.0],
+        [1.0, 0.0],
       ],
     },
   );
@@ -106,8 +64,6 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
 
 
   const spriteMesh = await createTexMesh(f);
-  console.log(spriteMesh);
-
   const box = f.mesh.box();
   const pyramid = f.mesh.pyramid();
 
@@ -127,7 +83,7 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
     spriteMesh(
       {
         uniforms: {
-          color: f.colors.ORANGE,
+          color: f.colors.BLACK,
           mpMatrix: mat4.mul(
             mpMatrix,
             mat4.from.translation([0.0, 0.0, 0.005]),

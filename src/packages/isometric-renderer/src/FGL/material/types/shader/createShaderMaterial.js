@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 
+import {TEX_UNIFORM} from '../../../constants/predefinedShaderParams';
 import createShaderMaterialDescriptor from './createShaderMaterialDescriptor';
 
 /**
@@ -26,6 +27,8 @@ const createGLSLUniformSetterMap = gl => ({
   [gl.FLOAT_MAT2]: loc => array => gl.uniformMatrix2fv(loc, false, array),
   [gl.FLOAT_MAT3]: loc => array => gl.uniformMatrix3fv(loc, false, array),
   [gl.FLOAT_MAT4]: loc => array => gl.uniformMatrix4fv(loc, false, array),
+
+  [gl.SAMPLER_2D]: loc => value => gl.uniform1i(loc, value),
 });
 
 /**
@@ -34,9 +37,9 @@ const createGLSLUniformSetterMap = gl => ({
  * @param {WebGLRenderingContext} gl
  */
 export const createGLSLTexUniforms = gl => [
-  [gl.TEXTURE0, 'tex0'],
-  [gl.TEXTURE1, 'tex1'],
-  [gl.TEXTURE2, 'tex2'],
+  [gl.TEXTURE0, TEX_UNIFORM[0]],
+  [gl.TEXTURE1, TEX_UNIFORM[1]],
+  [gl.TEXTURE2, TEX_UNIFORM[2]],
 ];
 
 /**

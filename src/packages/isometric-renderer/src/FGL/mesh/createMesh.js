@@ -1,3 +1,8 @@
+import {
+  IN_UV_POS_ATTRIB,
+  IN_VERTEX_POS_ATTRIB,
+} from '../constants/predefinedShaderParams';
+
 import createMeshDescriptor from './createMeshDescriptor';
 import bindBufferAttrib from '../buffer/bindBufferAttrib';
 
@@ -40,25 +45,31 @@ const createMeshRenderer = (gl, meshDescriptor) => {
     buffers: {
       vbo,
       ibo,
+      uv,
     },
     material,
     renderMode,
   } = meshDescriptor;
 
   // cached buffer attrib locations
-  const {loc: vertexBufferLoc} = material.info.attributes.inVertexPos;
+  const {loc: vertexBufferLoc} = material.info.attributes[IN_VERTEX_POS_ATTRIB];
+  const {loc: uvBufferLoc} = material.info.attributes[IN_UV_POS_ATTRIB] || {};
 
   // mesh render method
   return (dynamicDescriptor) => {
+    // attach shader
+    material.attach();
+
     // VBO bind
     bindBufferAttrib(gl, vbo, vertexBufferLoc);
+
+    // texture UV
+    if (uv)
+      bindBufferAttrib(gl, uv, uvBufferLoc);
 
     // IBO bind
     if (ibo)
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo.handle);
-
-    // attach shader
-    material.attach();
 
     // each mesh can accept parameters
     // from dynamic render function call and default

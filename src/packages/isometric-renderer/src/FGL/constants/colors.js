@@ -1,5 +1,7 @@
 import {vec4} from '@pkg/gl-math/matrix';
 
+export const BLACK = vec4(0.0, 0.0, 0.0, 1.0);
+
 export const RED = vec4(1.0, 0.0, 0.0, 1.0);
 
 export const GREEN = vec4(0.0, 1.0, 0.0, 1.0);

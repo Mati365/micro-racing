@@ -4,6 +4,7 @@ import * as COLORS from './constants/colors';
 
 import {createShaderMaterial} from './material/types';
 import texture2D from './texture/texture2D';
+import tileTexture2D from './texture/tileTexture2D';
 
 import createMesh from './mesh/createMesh';
 import createMeshBatch from './mesh/createMeshBatch';
@@ -66,6 +67,7 @@ const createRenderContext = (canvasElement, glContextFlags) => {
           frame: createDtRenderLoop,
           mesh: createMesh,
           texture2D,
+          tileTexture2D,
         },
       ),
 

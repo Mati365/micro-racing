@@ -75,7 +75,7 @@ const createMaterialDescriptor = (gl) => {
         fragment && compiler(
           {
             type: gl.FRAGMENT_SHADER,
-            precision: 'lowp',
+            precision: 'mediump',
             source: fragment,
           },
         ),

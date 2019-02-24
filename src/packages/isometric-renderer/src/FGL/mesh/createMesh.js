@@ -29,7 +29,7 @@ const createMeshRenderer = (gl, meshDescriptor) => {
   } = meshDescriptor;
 
   // cached buffer attrib locations
-  const {loc: vertexBufferLoc} = material.info.attributes[IN_VERTEX_POS_ATTRIB];
+  const {loc: vertexBufferLoc} = material.info.attributes[IN_VERTEX_POS_ATTRIB] || {};
   const {loc: uvBufferLoc} = material.info.attributes[IN_UV_POS_ATTRIB] || {};
 
   /**
@@ -100,7 +100,7 @@ const createMeshRenderer = (gl, meshDescriptor) => {
     // it should be a bit faster than two comparators
     if (dynamicDescriptor) {
       attachShaderMaterialParameters(material, dynamicDescriptor);
-      drawVertexBuffer(DynamicsCompressorNode.instances);
+      drawVertexBuffer(dynamicDescriptor.instances);
     } else
       drawVertexBuffer();
 

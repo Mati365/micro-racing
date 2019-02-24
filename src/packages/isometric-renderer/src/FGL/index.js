@@ -6,6 +6,8 @@ import {createShaderMaterial} from './material/types';
 import texture2D from './texture/texture2D';
 
 import createMesh from './mesh/createMesh';
+import createMeshBatch from './mesh/createMeshBatch';
+
 import {
   meshes,
   materials,
@@ -76,6 +78,9 @@ const createRenderContext = (canvasElement, glContextFlags) => {
       ),
     },
   );
+
+  // batch multiple mesh renders calls into one
+  fgl.mesh.batch = bindSceneContext(createMeshBatch);
 
   // assign predefined meshes / materials
   R.forEachObjIndexed(

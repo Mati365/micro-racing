@@ -3,47 +3,47 @@ import React from 'react';
 import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
 
 import fgl, {createIsometricProjection} from '@pkg/isometric-renderer';
-import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
+// import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
 import {mat4} from '@pkg/gl-math/matrix';
 
-import atlasImageUrl from '@game/res/img/atlas.png';
+// import atlasImageUrl from '@game/res/img/atlas.png';
 
-const createTexMesh = async (f) => {
-  const atlasImage = await createSingleResourceLoader()(atlasImageUrl);
-  const mesh = f.mesh(
-    {
-      material: f.material.textureSprite,
-      renderMode: f.flags.TRIANGLES,
-      textures: [
-        f.texture2D(
-          {
-            image: atlasImage,
-          },
-        ),
-      ],
-      vertices: [
-        [0.0, 1.0, 0.0],
-        [1.0, 0.0, 0.0],
-        [0.0, 0.0, 0.0],
+// const createTexMesh = async (f) => {
+//   const atlasImage = await createSingleResourceLoader()(atlasImageUrl);
+//   const mesh = f.mesh(
+//     {
+//       material: f.material.textureSprite,
+//       renderMode: f.flags.TRIANGLES,
+//       textures: [
+//         f.texture2D(
+//           {
+//             image: atlasImage,
+//           },
+//         ),
+//       ],
+//       vertices: [
+//         [0.0, 1.0, 0.0],
+//         [1.0, 0.0, 0.0],
+//         [0.0, 0.0, 0.0],
 
-        [0.0, 1.0, 0.0],
-        [1.0, 1.0, 0.0],
-        [1.0, 0.0, 0.0],
-      ],
-      uv: [
-        [0.0, 1.0],
-        [1.0, 0.0],
-        [0.0, 0.0],
+//         [0.0, 1.0, 0.0],
+//         [1.0, 1.0, 0.0],
+//         [1.0, 0.0, 0.0],
+//       ],
+//       uv: [
+//         [0.0, 1.0],
+//         [1.0, 0.0],
+//         [0.0, 0.0],
 
-        [0.0, 1.0],
-        [1.0, 1.0],
-        [1.0, 0.0],
-      ],
-    },
-  );
+//         [0.0, 1.0],
+//         [1.0, 1.0],
+//         [1.0, 0.0],
+//       ],
+//     },
+//   );
 
-  return mesh;
-};
+//   return mesh;
+// };
 
 const attachEngine = async (virtualResolution, dimensions, canvas) => {
   const f = fgl(canvas);
@@ -62,10 +62,14 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
     },
   );
 
-
-  const spriteMesh = await createTexMesh(f);
   const box = f.mesh.box();
   const pyramid = f.mesh.pyramid();
+
+  const boxBatch = f.mesh.batch(
+    {
+      mesh: box,
+    },
+  );
 
   f.frame(() => {
     terrainWireframe(
@@ -80,19 +84,7 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
       },
     );
 
-    spriteMesh(
-      {
-        uniforms: {
-          color: f.colors.BLACK,
-          mpMatrix: mat4.mul(
-            mpMatrix,
-            mat4.from.translation([0.0, 0.0, 0.005]),
-          ).array,
-        },
-      },
-    );
-
-    box(
+    boxBatch.batch(
       {
         uniforms: {
           color: f.colors.GREEN,
@@ -107,7 +99,7 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
       },
     );
 
-    box(
+    boxBatch.batch(
       {
         uniforms: {
           color: f.colors.RED,
@@ -121,6 +113,8 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
         },
       },
     );
+
+    boxBatch();
 
     pyramid(
       {

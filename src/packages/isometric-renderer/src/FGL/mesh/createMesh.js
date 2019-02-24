@@ -3,32 +3,9 @@ import {
   IN_VERTEX_POS_ATTRIB,
 } from '../constants/predefinedShaderParams';
 
+import attachShaderMaterialParameters from '../material/types/shader/attachShaderMaterialParameters';
 import createMeshDescriptor from './createMeshDescriptor';
 import bindBufferAttrib from '../buffer/bindBufferAttrib';
-
-/**
- * Attaches parameters from mesh descriptors passed
- * when mesh renders,
- *
- * @example
- *  mesh({uniforms: {}})
- *
- * @param {MeshDescriptor} descriptor
- * @param {Material} material
- */
-const attachShaderParameters = (
-  {
-    uniforms,
-    textures,
-  },
-  material,
-) => {
-  if (uniforms)
-    material.setUniforms(uniforms);
-
-  if (textures)
-    material.setTextures(textures);
-};
 
 /**
  * Creates function that renders mesh based on config
@@ -47,7 +24,6 @@ const createMeshRenderer = (gl, meshDescriptor) => {
       ibo,
       uv,
     },
-    instances,
     material,
     renderMode,
   } = meshDescriptor;
@@ -57,6 +33,7 @@ const createMeshRenderer = (gl, meshDescriptor) => {
   const {loc: uvBufferLoc} = material.info.attributes[IN_UV_POS_ATTRIB] || {};
 
   /**
+   * @see
    * Attaches material before render
    */
   const attachBuffers = () => {
@@ -77,13 +54,22 @@ const createMeshRenderer = (gl, meshDescriptor) => {
     // each mesh can accept parameters
     // from dynamic render function call and default
     // parameters from config
-    attachShaderParameters(meshDescriptor, material);
+    attachShaderMaterialParameters(material, meshDescriptor);
   };
 
   /**
+   * @see
+   * Disables buffers
+   */
+  const detachBuffers = () => {
+    gl.disableVertexAttribArray(vertexBufferLoc);
+  };
+
+  /**
+   * @see
    * Renders mesh
    */
-  const drawBuffers = () => {
+  const drawVertexBuffer = (instances) => {
     if (ibo) {
       // Using indices buffer
       const {
@@ -110,19 +96,27 @@ const createMeshRenderer = (gl, meshDescriptor) => {
   // mesh render method
   const render = (dynamicDescriptor) => {
     attachBuffers();
-    dynamicDescriptor && attachShaderParameters(dynamicDescriptor, material);
 
-    drawBuffers();
+    // it should be a bit faster than two comparators
+    if (dynamicDescriptor) {
+      attachShaderMaterialParameters(material, dynamicDescriptor);
+      drawVertexBuffer(DynamicsCompressorNode.instances);
+    } else
+      drawVertexBuffer();
 
-    // disable VBO
-    gl.disableVertexAttribArray(vertexBufferLoc);
+    detachBuffers();
   };
 
   Object.assign(
     render,
     {
+      // variables
+      meshDescriptor,
+
+      // methods
       attachBuffers,
-      drawBuffers,
+      detachBuffers,
+      drawVertexBuffer,
     },
   );
 

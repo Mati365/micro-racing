@@ -47,6 +47,7 @@ const createMeshRenderer = (gl, meshDescriptor) => {
       ibo,
       uv,
     },
+    instances,
     material,
     renderMode,
   } = meshDescriptor;
@@ -55,8 +56,10 @@ const createMeshRenderer = (gl, meshDescriptor) => {
   const {loc: vertexBufferLoc} = material.info.attributes[IN_VERTEX_POS_ATTRIB];
   const {loc: uvBufferLoc} = material.info.attributes[IN_UV_POS_ATTRIB] || {};
 
-  // mesh render method
-  return (dynamicDescriptor) => {
+  /**
+   * Attaches material before render
+   */
+  const attachBuffers = () => {
     // attach shader
     material.attach();
 
@@ -75,9 +78,12 @@ const createMeshRenderer = (gl, meshDescriptor) => {
     // from dynamic render function call and default
     // parameters from config
     attachShaderParameters(meshDescriptor, material);
-    dynamicDescriptor && attachShaderParameters(dynamicDescriptor, material);
+  };
 
-    // Render
+  /**
+   * Renders mesh
+   */
+  const drawBuffers = () => {
     if (ibo) {
       // Using indices buffer
       const {
@@ -85,17 +91,42 @@ const createMeshRenderer = (gl, meshDescriptor) => {
         count: verticesCount,
       } = ibo.components;
 
-      gl.drawElements(renderMode, verticesCount, componentsType, 0);
+      if (instances)
+        gl.drawElementsInstanced(renderMode, verticesCount, componentsType, 0, instances);
+      else
+        gl.drawElements(renderMode, verticesCount, componentsType, 0);
     } else {
       // Using only vertex buffer
       const {count: verticesCount} = vbo.components;
 
-      gl.drawArrays(renderMode, 0, verticesCount);
+      // instanced rendering
+      if (instances)
+        gl.drawArraysInstanced(renderMode, 0, verticesCount, instances);
+      else
+        gl.drawArrays(renderMode, 0, verticesCount);
     }
+  };
+
+  // mesh render method
+  const render = (dynamicDescriptor) => {
+    attachBuffers();
+    dynamicDescriptor && attachShaderParameters(dynamicDescriptor, material);
+
+    drawBuffers();
 
     // disable VBO
     gl.disableVertexAttribArray(vertexBufferLoc);
   };
+
+  Object.assign(
+    render,
+    {
+      attachBuffers,
+      drawBuffers,
+    },
+  );
+
+  return render;
 };
 
 /**

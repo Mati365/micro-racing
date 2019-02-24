@@ -6,10 +6,10 @@ import fgl, {createIsometricProjection} from '@pkg/isometric-renderer';
 import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
 import {mat4} from '@pkg/gl-math/matrix';
 
-import sandImageUrl from '@game/res/img/sand.jpg';
+import atlasImageUrl from '@game/res/img/atlas.png';
 
 const createTexMesh = async (f) => {
-  const sandImage = await createSingleResourceLoader()(sandImageUrl);
+  const atlasImage = await createSingleResourceLoader()(atlasImageUrl);
   const mesh = f.mesh(
     {
       material: f.material.textureSprite,
@@ -17,7 +17,7 @@ const createTexMesh = async (f) => {
       textures: [
         f.texture2D(
           {
-            image: sandImage,
+            image: atlasImage,
           },
         ),
       ],

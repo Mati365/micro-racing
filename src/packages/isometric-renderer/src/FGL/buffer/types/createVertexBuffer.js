@@ -13,6 +13,7 @@ import createBuffer from '../createBuffer';
  * @param {Array} vertices
  * @param {GLEnum} usage
  * @param {Number} prefferedSingleVertexLength
+ * @param {Number} vertexAttribDivisor
  *
  * @returns {BufferDescriptor}
  */
@@ -21,6 +22,7 @@ const createVertexBuffer = (
   vertices,
   usage = gl.STATIC_DRAW,
   prefferedSingleVertexLength = null,
+  vertexAttribDivisor = null,
 ) => {
   if (!vertices || !vertices.length)
     throw new Error('createVertexBuffer: not vertices provided!');
@@ -37,6 +39,8 @@ const createVertexBuffer = (
   // create buffer
   const data = new Float32Array(R.unnest(vertices));
   return {
+    vertexAttribDivisor,
+
     // used to bind buffer
     // todo: add more basic buffer creator?
     components: {

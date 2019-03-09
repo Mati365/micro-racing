@@ -13,8 +13,12 @@ const attachShaderMaterialParameters = (
   {
     uniforms,
     textures,
+    buffers,
   },
 ) => {
+  if (buffers)
+    material.setAttributes(buffers);
+
   if (uniforms)
     material.setUniforms(uniforms);
 

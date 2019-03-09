@@ -2,6 +2,7 @@ import * as R from 'ramda';
 
 import {TEX_UNIFORM} from '../../../constants/predefinedShaderParams';
 import createShaderMaterialDescriptor from './createShaderMaterialDescriptor';
+import bindBufferAttrib from '../../../buffer/bindBufferAttrib';
 
 /**
  * Maps uniform gl constant to setter
@@ -151,9 +152,28 @@ const createShaderMaterial = (gl, fgl) => {
       }
     };
 
+    /**
+     * Loads attributes object into mesh
+     *
+     * @param {Buffer} attributes
+     */
+    const setMaterialAttributes = (attributes) => {
+      for (const key in attributes) {
+        if (Object.prototype.hasOwnProperty.call(attributes, key)) {
+          const attributeDescription = material.attributes[key];
+          if (!attributeDescription)
+            continue;
+
+          bindBufferAttrib(gl, attributes[key], attributeDescription.loc);
+        }
+      }
+    };
+
     return {
       info: material,
       attach: attachMaterial,
+
+      setAttributes: setMaterialAttributes,
       setUniforms: setMaterialUniforms,
       setTextures: setMaterialTextures,
     };

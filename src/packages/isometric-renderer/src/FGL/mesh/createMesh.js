@@ -3,7 +3,7 @@ import {
   IN_VERTEX_POS_ATTRIB,
 } from '../constants/predefinedShaderParams';
 
-import attachShaderMaterialParameters from '../material/types/shader/attachShaderMaterialParameters';
+import attachShaderMaterialParameters from './utils/attachShaderMaterialParameters';
 import createMeshDescriptor from './createMeshDescriptor';
 import bindBufferAttrib from '../buffer/bindBufferAttrib';
 
@@ -11,7 +11,7 @@ import bindBufferAttrib from '../buffer/bindBufferAttrib';
  * Creates function that renders mesh based on config
  *
  * @param {WebGLRenderingContext} gl
- * @param {meshDescriptor} meshDescriptor
+ * @param {MeshDescriptor} meshDescriptor
  *
  * @param {Object} dynamicDescriptor
  *
@@ -19,11 +19,9 @@ import bindBufferAttrib from '../buffer/bindBufferAttrib';
  */
 const createMeshRenderer = (gl, meshDescriptor) => {
   const {
-    buffers: {
-      vbo,
-      ibo,
-      uv,
-    },
+    vbo,
+    ibo,
+    uv,
     material,
     renderMode,
   } = meshDescriptor;

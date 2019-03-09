@@ -25,14 +25,14 @@ const createTerrain = async (f) => {
       texTile,
       size: {
         w: 5,
-        h: 1,
+        h: 5,
       },
       items: [
-        {uv: [0, 0]},
-        {uv: [0, 0]},
-        {uv: [0, 0]},
-        {uv: [0, 0]},
-        {uv: [0, 0]},
+        {uv: [2, 0]}, {uv: [2, 0]}, {uv: [2, 0]}, {uv: [0, 0]}, {uv: [0, 0]},
+        {uv: [0, 0]}, {uv: [1, 0]}, {uv: [0, 0]}, {uv: [0, 0]}, {uv: [0, 0]},
+        {uv: [0, 0]}, {uv: [1, 0]}, {uv: [0, 0]}, {uv: [0, 0]}, {uv: [0, 0]},
+        {uv: [0, 0]}, {uv: [0, 0]}, {uv: [0, 0]}, {uv: [0, 0]}, {uv: [0, 0]},
+        {uv: [0, 0]}, {uv: [0, 0]}, {uv: [0, 0]}, {uv: [0, 0]}, {uv: [0, 0]},
       ],
     },
   );
@@ -71,7 +71,7 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
           color: f.colors.DARK_GRAY,
           mpMatrix: mat4.mul(
             mpMatrix,
-            mat4.from.translation([0.0, 0.0, -0.005]),
+            mat4.from.translation([0.0, 0.0, 0.0]),
           ).array,
         },
       },
@@ -82,7 +82,7 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
         uniforms: {
           mpMatrix: mat4.mul(
             mpMatrix,
-            mat4.from.translation([0.0, 0.0, -0.005]),
+            mat4.from.translation([0.0, 0.0, 0.0]),
           ).array,
         },
       },
@@ -96,7 +96,7 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
             mpMatrix,
             mat4.mul(
               mat4.from.scaling([0.2, 0.2, 0.3]),
-              mat4.from.translation([2.0, 2.0, 0.0]),
+              mat4.from.translation([2.0, 2.0, -0.01]),
             ),
           ).array,
         },
@@ -111,7 +111,7 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
             mpMatrix,
             mat4.mul(
               mat4.from.scaling([0.2, 0.2, 0.3]),
-              mat4.from.translation([3, 4, 0.0]),
+              mat4.from.translation([3, 4, -0.01]),
             ),
           ).array,
         },
@@ -128,7 +128,7 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
             mpMatrix,
             mat4.mul(
               mat4.from.scaling([0.2, 0.2, 0.3]),
-              mat4.from.translation([3, 2, 0.0]),
+              mat4.from.translation([3, 2, -0.01]),
             ),
           ).array,
         },

@@ -87,14 +87,14 @@ const createRenderContext = (canvasElement, glContextFlags) => {
   // assign predefined meshes / materials
   R.forEachObjIndexed(
     (fn, meshName) => {
-      fgl.mesh[meshName] = fn(fgl);
+      fgl.mesh[meshName] = fn(fgl, gl);
     },
     meshes,
   );
 
   R.forEachObjIndexed(
     (fn, materialName) => {
-      fgl.material[materialName] = fn(fgl);
+      fgl.material[materialName] = fn(fgl, gl);
     },
     materials,
   );

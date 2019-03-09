@@ -1,4 +1,4 @@
-import attachShaderMaterialParameters from '../material/types/shader/attachShaderMaterialParameters';
+import attachShaderMaterialParameters from './utils/attachShaderMaterialParameters';
 
 /**
  * Reduces bindBuffer() calls rate to mesh()

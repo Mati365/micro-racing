@@ -33,14 +33,12 @@ const createMeshDescriptor = gl => ({
     ...options,
     material,
     renderMode,
-    buffers: removeNullValues(
-      {
-        uv: uv && createVertexBuffer(gl, uv, usage, 2),
-        vbo: vertices && createVertexBuffer(gl, vertices, usage),
-        ibo: indices && createIndexBuffer(gl, indices, usage),
-        ...buffers,
-      },
-    ),
+
+    uv: uv && createVertexBuffer(gl, uv, usage, 2),
+    vbo: vertices && createVertexBuffer(gl, vertices, usage),
+    ibo: indices && createIndexBuffer(gl, indices, usage),
+
+    buffers: removeNullValues(buffers),
   },
 );
 

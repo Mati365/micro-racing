@@ -5,7 +5,7 @@ import {
 
   pickProgramUniforms,
   pickProgramAttributes,
-} from '../../shader';
+} from './utils';
 
 /**
  * Assign to each object selector specified in selectors object

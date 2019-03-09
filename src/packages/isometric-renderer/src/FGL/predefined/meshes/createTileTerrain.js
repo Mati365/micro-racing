@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import {createVertexBuffer} from '../../buffer/types';
 
 export const createTexAtlasMaterial = fgl => fgl.material.shader(
   {
@@ -7,19 +8,22 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
         in vec4 inVertexPos;
         in vec2 inUVPos;
 
+        // external VBOs
+        in vec2 inPosTileOffset;
+        in vec2 inUvTileOffset;
+
         // to frag shader
         out vec2 vUVPos;
-        flat out int vInstanceID;
+        out vec2 vUVOffset;
 
         uniform mat4 mpMatrix;
-        uniform vec2 posTileOffsets[100];
         uniform vec2 uvTileSize;
 
         void main() {
-          vec2 offset = uvTileSize * posTileOffsets[gl_InstanceID];
-          gl_Position = (inVertexPos + vec4(offset, 0, 0)) * mpMatrix;
+          vec2 offset = uvTileSize * inPosTileOffset;
 
-          vInstanceID = gl_InstanceID;
+          gl_Position = (inVertexPos + vec4(offset, 0, 0)) * mpMatrix;
+          vUVOffset = inUvTileOffset;
           vUVPos = inUVPos;
         }
       `,
@@ -27,17 +31,16 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
       fragment: `
         out vec4 fragColor;
         in vec2 vUVPos;
-        flat in int vInstanceID;
+        in vec2 vUVOffset;
 
         // atlas texture
         uniform sampler2D tex0;
 
         // offsets
         uniform vec2 uvTileSize;
-        uniform vec2 uvTileOffsets[100];
 
         void main() {
-          fragColor = texture(tex0, vUVPos + (uvTileOffsets[vInstanceID] * uvTileSize));
+          fragColor = texture(tex0, vUVPos + (vUVOffset * uvTileSize));
         }
       `,
     },
@@ -59,6 +62,7 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
  */
 const createTileTerrain = (fgl) => {
   const material = createTexAtlasMaterial(fgl);
+  const {gl} = fgl.state;
 
   return ({
     texTile,
@@ -78,20 +82,14 @@ const createTileTerrain = (fgl) => {
       [uvSize.w, 0.0],
     ];
 
-    const tileOffsets = R.compose(
-      R.unnest,
-      R.times(
-        index => ([
-          index % size.w,
-          Number.parseInt(index / size.w, 10),
-        ]),
-      ),
+    // used in instancing
+    const uvOffsets = R.pluck('uv')(items);
+    const tileOffsets = R.times(
+      index => ([
+        index % size.w,
+        Number.parseInt(index / size.w, 10),
+      ]),
     )(instances);
-
-    const uvOffsets = R.compose(
-      R.unnest,
-      R.pluck('uv'),
-    )(items);
 
     const mesh = fgl.mesh(
       {
@@ -100,23 +98,30 @@ const createTileTerrain = (fgl) => {
         textures: [
           texTile.texture, // tex0
         ],
+
+        // required mesh buffers
+        uv,
         vertices: R.map(
           R.append(0.0),
           uv,
         ),
-        uv,
+
+        // external attributes / unfiroms
+        buffers: {
+          inPosTileOffset: createVertexBuffer(gl, tileOffsets, gl.STATIC_DRAW, 2, 1),
+          inUvTileOffset: createVertexBuffer(gl, uvOffsets, gl.STATIC_DRAW, 2, 1),
+        },
         uniforms: {
           uvTileSize: [
             uvSize.w,
             uvSize.h,
           ],
-          'posTileOffsets[0]': tileOffsets,
-          'uvTileOffsets[0]': uvOffsets,
         },
       },
     );
 
     return (descriptor) => {
+      // todo: remove destructuring!
       mesh(
         {
           ...descriptor,

@@ -10,7 +10,7 @@ import atlasImageUrl from '@game/res/img/atlas.png';
 
 const createTerrain = async (f) => {
   const atlasImage = await createSingleResourceLoader()(atlasImageUrl);
-  const tile = f.tileTexture2D(
+  const texTile = f.tileTexture2D(
     {
       atlasImage,
       size: {
@@ -20,11 +20,20 @@ const createTerrain = async (f) => {
     },
   );
 
-  console.log(tile);
-
   return f.mesh.tileTerrain(
     {
-      tile,
+      texTile,
+      size: {
+        w: 5,
+        h: 1,
+      },
+      items: [
+        {uv: [0, 0]},
+        {uv: [0, 0]},
+        {uv: [0, 0]},
+        {uv: [0, 0]},
+        {uv: [0, 0]},
+      ],
     },
   );
 };

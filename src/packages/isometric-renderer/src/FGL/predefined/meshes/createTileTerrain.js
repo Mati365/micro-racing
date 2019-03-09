@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-const createTexAtlasMaterial = fgl => fgl.material.shader(
+export const createTexAtlasMaterial = fgl => fgl.material.shader(
   {
     shaders: {
       vertex: `
@@ -44,11 +44,30 @@ const createTexAtlasMaterial = fgl => fgl.material.shader(
   },
 );
 
-const createTileMap = (fgl) => {
+/**
+ * @see
+ *  Map is generally static VBO
+ *
+ * @param {FGL} fgl
+ * @param {Object} map
+ *
+ * @example
+ *  items = [
+ *    {uv: [0, 0]},
+ *    ...
+ *  ]
+ */
+const createTileTerrain = (fgl) => {
   const material = createTexAtlasMaterial(fgl);
 
-  return ({tile}) => {
-    const {uvSize} = tile;
+  return ({
+    texTile,
+    size,
+    items,
+  }) => {
+    const {uvSize} = texTile;
+    const instances = Math.max(items.length, size.w * size.h);
+
     const uv = [
       [0.0, uvSize.h],
       [uvSize.w, 0.0],
@@ -59,12 +78,27 @@ const createTileMap = (fgl) => {
       [uvSize.w, 0.0],
     ];
 
+    const tileOffsets = R.compose(
+      R.unnest,
+      R.times(
+        index => ([
+          index % size.w,
+          Number.parseInt(index / size.w, 10),
+        ]),
+      ),
+    )(instances);
+
+    const uvOffsets = R.compose(
+      R.unnest,
+      R.pluck('uv'),
+    )(items);
+
     const mesh = fgl.mesh(
       {
         material,
         renderMode: fgl.flags.TRIANGLES,
         textures: [
-          tile.texture, // tex0
+          texTile.texture, // tex0
         ],
         vertices: R.map(
           R.append(0.0),
@@ -72,21 +106,12 @@ const createTileMap = (fgl) => {
         ),
         uv,
         uniforms: {
-          uvTileSize: [uvSize.w, uvSize.h],
-          'posTileOffsets[0]': [
-            0, 0,
-            1, 0,
-            1, 1,
-            1, 2,
-            2, 0,
+          uvTileSize: [
+            uvSize.w,
+            uvSize.h,
           ],
-          'uvTileOffsets[0]': [
-            1, 0,
-            1, 0,
-            0, 0,
-            0, 0,
-            1, 0,
-          ],
+          'posTileOffsets[0]': tileOffsets,
+          'uvTileOffsets[0]': uvOffsets,
         },
       },
     );
@@ -95,11 +120,11 @@ const createTileMap = (fgl) => {
       mesh(
         {
           ...descriptor,
-          instances: 5,
+          instances,
         },
       );
     };
   };
 };
 
-export default createTileMap;
+export default createTileTerrain;

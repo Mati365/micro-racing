@@ -4,7 +4,8 @@
 online 2D multiplayer go-carts racing game
 
 ## Screens
-![Isometric engine](/doc/screens/isometric-engine.png?raw=true "Isometric engine")
+![Isometric engine](/doc/screens/isometric-engine.png?raw=true "Isometric engine")<br />
+Preview of Functional WebGL 2.0 Isometric Engine(FGL) with depth test and mesh instancing support
 
 ### Goals
 - Use monorepo, separated logic

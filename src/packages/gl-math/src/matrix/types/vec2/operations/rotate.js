@@ -1,3 +1,5 @@
+import Vector from '../../vec/classes/Vector';
+
 /**
  * @see https://matthew-brett.github.io/teaching/rotation_2d.html
  */
@@ -6,10 +8,10 @@ const rotateVec2 = (angle, v) => {
   const sA = Math.sin(angle);
   const cA = Math.cos(angle);
 
-  return {
-    x: (cA * x) - (sA * y),
-    y: (sA * x) + (cA * y),
-  };
+  return new Vector([
+    (cA * x) - (sA * y),
+    (sA * x) + (cA * y),
+  ]);
 };
 
 export default rotateVec2;

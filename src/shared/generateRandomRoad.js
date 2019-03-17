@@ -12,7 +12,9 @@ import catmull from '@pkg/catmull';
  *
  * @returns {Number}
  */
-const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+export const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+export const getRandomAngle = () => Math.random() * 2 * Math.PI;
 
 /**
  * Gets array of points on certain area
@@ -65,10 +67,11 @@ export const dropNearPoints = ({minDistance}) => (points) => {
   const buffer = [...points];
 
   for (let i = 0; i < buffer.length;) {
-    if (vec2.dist(buffer[i], buffer[(i + 1) % buffer.length]) >= minDistance)
+    const nextIndex = (i + 1) % buffer.length;
+    if (vec2.dist(buffer[i], buffer[nextIndex]) >= minDistance)
       i++;
     else
-      buffer.splice(i, 1);
+      buffer.splice(nextIndex, 1);
   }
 
   return buffer;
@@ -82,8 +85,33 @@ export const dropNearPoints = ({minDistance}) => (points) => {
  * @returns {vec2[]}
  */
 const addRandomCurves = ({every, curveSize}) => (points) => {
-  console.log(every, curveSize);
-  return points;
+  const buffer = [];
+
+  for (let i = 0; i < points.length; ++i) {
+    const [current, next] = [points[i], points[(i + 1) % points.length]];
+    buffer.push(current);
+
+    for (let j = every; j < 1.0; j += every) {
+      const mid = vec2.lerp(j, current, next);
+      const offset = vec2.mul(
+        getRandomNumber(
+          curveSize[0],
+          curveSize[1],
+        ),
+        vec2.normalize(
+          vec2.orthogonal(
+            vec2.sub(current, next),
+          ),
+        ),
+      );
+
+      const point = vec2.add(mid, offset);
+      point.added = true;
+      buffer.push(point);
+    }
+  }
+
+  return buffer;
 };
 
 /**
@@ -92,32 +120,31 @@ const addRandomCurves = ({every, curveSize}) => (points) => {
  * @param {Rect} area
  */
 const generateRandomRoad = (area) => {
-  const margin = 100;
   const points = R.compose(
     addRandomCurves(
       {
         every: 0.5,
-        curveSize: [margin / 2, margin],
+        curveSize: [-100, 100],
       },
     ),
     dropNearPoints(
       {
-        minDistance: margin,
+        minDistance: 100,
       },
     ),
     convexHull,
     generateAreaPoints(
       {
-        x: margin,
-        y: margin,
+        x: 100,
+        y: 100,
       },
-      30,
+      20,
     ),
   )(area);
 
   const interpolatedPoints = catmull(
     {
-      step: 0.1,
+      step: 0.2,
     },
   )(points);
 

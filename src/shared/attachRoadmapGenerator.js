@@ -11,10 +11,10 @@ import generateRandomRoad from './generateRandomRoad';
  * @param {vec2[]} points
  */
 const renderPoints = (color, withIndices, ctx) => R.addIndex(R.forEach)(
-  ({x, y}, index) => {
+  ({x, y, added}, index) => {
     ctx.beginPath();
     ctx.arc(x, y, 3, 0, 2 * Math.PI);
-    ctx.fillStyle = color;
+    ctx.fillStyle = added ? '#0000ff' : color;
     ctx.fill();
 
     if (withIndices) {
@@ -70,8 +70,8 @@ const attachRoadmapGenerator = (area, ref) => {
   ctx.fillRect(0, 0, area.w, area.h);
 
   renderLoopedLines('#FFFFFF', 2, ctx)(interpolatedPoints);
-  renderPoints('#FF0000', true, ctx)(interpolatedPoints);
-  renderPoints('#00FF00', true, ctx)(points);
+  renderPoints('#FF0000', false, ctx)(interpolatedPoints);
+  renderPoints('#00FF00', false, ctx)(points);
 };
 
 export default attachRoadmapGenerator;

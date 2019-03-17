@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import '../classes/Vector';
 
 /**
  * Creates function that takes Nth params(w)
@@ -14,11 +15,12 @@ import * as R from 'ramda';
  */
 const unrollVectorCreator = (w) => {
   const args = R.times(index => `a${index}`, w);
+
   return (
     /* eslint-disable no-new-func */
     new Function(
       ...args,
-      `return new Float32Array([${R.join(',', args)}], 0, ${w})`,
+      `return new __Vector([${R.join(',', args)}], 0, ${w})`,
     )
     /* eslint-enable no-new-func */
   );

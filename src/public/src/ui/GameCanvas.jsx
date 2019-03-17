@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef, useEffect} from 'react';
 
 import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
 
@@ -7,6 +7,7 @@ import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
 import {mat4} from '@pkg/gl-math/matrix';
 
 import atlasImageUrl from '@game/res/img/atlas.png';
+import attachRoadmapGenerator from '@game/shared/attachRoadmapGenerator';
 
 const createTerrain = async (f) => {
   const atlasImage = await createSingleResourceLoader()(atlasImageUrl);
@@ -137,35 +138,53 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
   });
 };
 
-export default class GameCanvas extends React.Component {
-  static propTypes = {
-    dimensions: DIMENSIONS_SCHEMA.isRequired,
-  };
+const GameCanvas = ({dimensions}) => {
+  const canvasRef = useRef();
+  const roadRef = useRef();
 
-  canvasRef = React.createRef();
+  useEffect(
+    () => {
+      attachEngine(
+        {
+          w: 640,
+          h: 550,
+        },
+        dimensions,
+        canvasRef.current,
+      );
 
-  async componentDidMount() {
-    const {dimensions} = this.props;
+      attachRoadmapGenerator(
+        dimensions,
+        roadRef.current,
+      );
+    },
+    [],
+  );
 
-    attachEngine(
-      {
-        w: 640,
-        h: 550,
-      },
-      dimensions,
-      this.canvasRef.current,
-    );
-  }
-
-  render() {
-    const {dimensions} = this.props;
-
-    return (
+  return (
+    <>
       <canvas
-        ref={this.canvasRef}
+        ref={canvasRef}
         width={dimensions.w}
         height={dimensions.h}
       />
-    );
-  }
-}
+
+      <canvas
+        ref={roadRef}
+        width={dimensions.w}
+        height={dimensions.h}
+        style={{
+          marginLeft: 10,
+        }}
+      />
+    </>
+  );
+};
+
+GameCanvas.displayName = 'GameCanvas';
+
+GameCanvas.propTypes = {
+  dimensions: DIMENSIONS_SCHEMA,
+};
+
+export default GameCanvas;

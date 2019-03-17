@@ -42,7 +42,7 @@ export const unrollMul = (w, number = null) => {
       'vec1',
     ],
     `
-      return new Float32Array(${operations});
+      return new __Vector(${operations});
     `,
   );
   /* eslint-enable no-new-func */

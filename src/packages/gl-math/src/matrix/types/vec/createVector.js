@@ -1,3 +1,5 @@
+import Vector from './classes/Vector';
+
 /**
  * Creates vector with provided size
  *
@@ -5,6 +7,6 @@
  *
  * @returns {Matrix}
  */
-const createVector = w => new Float32Array(w);
+const createVector = w => new Vector(w);
 
 export default createVector;

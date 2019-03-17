@@ -35,7 +35,7 @@ export const unrollAdd = (w, sign = 1) => {
     'vec1',
     'vec2',
     `
-      return new Float32Array(${operations});
+      return new __Vector(${operations});
     `,
   );
   /* eslint-enable no-new-func */

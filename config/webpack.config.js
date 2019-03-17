@@ -31,6 +31,7 @@ module.exports = {
       '@game/res': resolveSource('public/res/'),
       '@game/public': resolveSource('public/'),
       '@game/server': resolveSource('server/'),
+      '@game/shared': resolveSource('shared/'),
     },
   },
   plugins: [

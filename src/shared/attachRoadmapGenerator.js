@@ -1,56 +1,5 @@
 import * as R from 'ramda';
-
-import {vec2} from '@pkg/gl-math/matrix';
-import convexHull from '@pkg/convex-hull';
-
-/**
- * Returns random int between min and max, includes min and max
- *
- * @param {Number} min
- * @param {Number} max
- *
- * @returns {Number}
- */
-const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
-/**
- * Gets array of points on certain area
- *
- * @param {Size} areaSize
- * @param {Point} border
- *
- * @returns {Array[]} points
- */
-const getRandomPoint = (border, areaSize) => {
-  const cx = areaSize.w / 2;
-  const cy = areaSize.h / 2;
-
-  return vec2(
-    cx + getRandomNumber(-cx + border.x, cx - border.x),
-    cy + getRandomNumber(-cy + border.y, cy - border.y),
-  );
-};
-
-/**
- * Creates array of points on racing map
- *
- * @param {Size} area
- * @param {Number} randomPointsCount
- *
- * @param {Point} border
- *
- * @returns {Array}
- */
-export const generateAreaPoints = R.curry(
-  (border, randomPointsCount, area) => {
-    const points = R.times(
-      R.partial(getRandomPoint, [border, area]),
-      randomPointsCount,
-    );
-
-    return points;
-  },
-);
+import generateRandomRoad from './generateRandomRoad';
 
 /**
  * Renders array of points
@@ -101,18 +50,6 @@ const renderLoopedLines = (color, width, ctx) => (points) => {
 };
 
 /**
- * Makes lines more curvy
- *
- * @param {Object} config
- *
- * @param {vec2[]} points
- */
-const catmull = ({step}) => (points) => {
-  console.log(step);
-  return points;
-};
-
-/**
  * Renders map to canvas
  *
  * @see
@@ -122,29 +59,19 @@ const catmull = ({step}) => (points) => {
  * @param {HTMLElement} ref
  */
 const attachRoadmapGenerator = (area, ref) => {
-  const points = R.compose(
-    catmull(
-      {
-        step: 0.1,
-      },
-    ),
-    convexHull,
-    generateAreaPoints(
-      {
-        x: 40,
-        y: 40,
-      },
-      30,
-    ),
-  )(area);
+  const {
+    interpolatedPoints,
+    points,
+  } = generateRandomRoad(area);
 
   const ctx = ref.getContext('2d');
 
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, area.w, area.h);
 
-  renderLoopedLines('#FFFFFF', 2, ctx)(points);
-  renderPoints('#FF0000', true, ctx)(points);
+  renderLoopedLines('#FFFFFF', 2, ctx)(interpolatedPoints);
+  renderPoints('#FF0000', true, ctx)(interpolatedPoints);
+  renderPoints('#00FF00', true, ctx)(points);
 };
 
 export default attachRoadmapGenerator;

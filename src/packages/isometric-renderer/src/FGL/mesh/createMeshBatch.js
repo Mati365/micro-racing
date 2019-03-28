@@ -11,7 +11,9 @@ import attachShaderMaterialParameters from './utils/attachShaderMaterialParamete
  */
 const createMeshBatch = () => (
   {
-    mesh,
+    mesh: {
+      instance: mesh,
+    },
   },
 ) => {
   let buffer = [];
@@ -33,20 +35,16 @@ const createMeshBatch = () => (
       meshDescriptor: {
         material,
       },
-      drawVertexBuffer,
-      attachBuffers,
-      detachBuffers,
     } = mesh;
 
-    attachBuffers();
+    mesh.attachBuffers();
 
     for (let i = 0, n = buffer.length; i < n; ++i) {
       attachShaderMaterialParameters(material, buffer[i]);
-      drawVertexBuffer();
+      mesh.drawVertexBuffer();
     }
 
     buffer = [];
-    detachBuffers();
   };
 
   return Object.assign(

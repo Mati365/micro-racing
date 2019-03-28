@@ -2,7 +2,10 @@ import * as R from 'ramda';
 import {pairs, of} from 'rxjs';
 import {scan, flatMap} from 'rxjs/operators';
 
-import promiseLoadImage from './helpers/promiseLoadImage';
+import {
+  promiseLoadImage,
+  promiseLoadTextFile,
+} from './helpers';
 
 export const DEFAULT_LOADERS = [
   {
@@ -38,9 +41,10 @@ const findPathLoader = loaders => path => R.compose(
  * @returns {Promise|Null}
  */
 export const loadResource = loaders => path => R.compose(
-  R.when(
+  R.applyTo(path),
+  R.unless(
     R.is(Function),
-    R.applyTo(path),
+    R.always(promiseLoadTextFile),
   ),
   findPathLoader(loaders),
 )(path);

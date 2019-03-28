@@ -12,7 +12,10 @@ const bindBufferAttrib = (gl, bufferDescriptor, attribLoc) => {
   } = bufferDescriptor;
 
   gl.bindBuffer(type, handle);
-  gl.vertexAttribPointer(attribLoc, components.singleLength, components.type, false, 0, 0);
+
+  if (components.singleLength)
+    gl.vertexAttribPointer(attribLoc, components.singleLength, components.type, false, 0, 0);
+
   if (vertexAttribDivisor)
     gl.vertexAttribDivisor(attribLoc, vertexAttribDivisor);
 

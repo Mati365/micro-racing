@@ -9,6 +9,8 @@ import tileTexture2D from './texture/tileTexture2D';
 import createMesh from './mesh/createMesh';
 import createMeshBatch from './mesh/createMeshBatch';
 
+import * as meshLoaders from './loaders/mesh';
+
 import {
   meshes,
   materials,
@@ -54,6 +56,9 @@ const createRenderContext = (canvasElement, glContextFlags) => {
     {
       // shared between engine flags
       state,
+      loaders: {
+        mesh: meshLoaders,
+      },
 
       // pick shared constants
       ...R.pick(

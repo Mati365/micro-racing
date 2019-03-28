@@ -30,7 +30,6 @@ const createMeshDescriptor = gl => ({
   ...options
 }) => Object.freeze(
   {
-    ...options,
     material,
     renderMode,
 
@@ -39,6 +38,7 @@ const createMeshDescriptor = gl => ({
     ibo: indices && createIndexBuffer(gl, indices, usage),
 
     buffers: removeNullValues(buffers),
+    ...options,
   },
 );
 

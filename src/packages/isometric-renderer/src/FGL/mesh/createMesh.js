@@ -8,42 +8,46 @@ import createMeshDescriptor from './createMeshDescriptor';
 import bindBufferAttrib from '../buffer/bindBufferAttrib';
 
 /**
- * Creates function that renders mesh based on config
+ * Do not use factory object, it consumes too much memory
  *
- * @param {WebGLRenderingContext} gl
- * @param {MeshDescriptor} meshDescriptor
- *
- * @param {Object} dynamicDescriptor
- *
- * @returns {Function}
+ * @export
  */
-const createMeshRenderer = (gl, meshDescriptor) => {
-  const {
-    vbo,
-    ibo,
-    uv,
-    material,
-    renderMode,
-  } = meshDescriptor;
-
-  // cached buffer attrib locations
-  const {loc: vertexBufferLoc} = material.info.attributes[IN_VERTEX_POS_ATTRIB] || {};
-  const {loc: uvBufferLoc} = material.info.attributes[IN_UV_POS_ATTRIB] || {};
+export class MeshRenderer {
+  constructor(gl, meshDescriptor) {
+    this.gl = gl;
+    this.meshDescriptor = meshDescriptor;
+  }
 
   /**
-   * @see
-   * Attaches material before render
+   * @export
    */
-  const attachBuffers = () => {
+  attachBuffers() {
+    const {
+      meshDescriptor,
+      gl,
+    } = this;
+
+    const {
+      vbo,
+      ibo,
+      uv,
+      material,
+    } = meshDescriptor;
+
+    const {attributes} = material.info;
+
     // attach shader
     material.attach();
 
     // VBO bind
+    const {loc: vertexBufferLoc} = attributes[IN_VERTEX_POS_ATTRIB];
     bindBufferAttrib(gl, vbo, vertexBufferLoc);
 
     // texture UV
-    if (uv)
+    if (uv) {
+      const {loc: uvBufferLoc} = attributes[IN_UV_POS_ATTRIB];
       bindBufferAttrib(gl, uv, uvBufferLoc);
+    }
 
     // IBO bind
     if (ibo)
@@ -53,21 +57,25 @@ const createMeshRenderer = (gl, meshDescriptor) => {
     // from dynamic render function call and default
     // parameters from config
     attachShaderMaterialParameters(material, meshDescriptor);
-  };
+  }
 
   /**
-   * @see
-   * Disables buffers
+   * Render bound to mesh material buffer
+   *
+   * @param {Number} instances
    */
-  const detachBuffers = () => {
-    gl.disableVertexAttribArray(vertexBufferLoc);
-  };
+  drawVertexBuffer(instances) {
+    const {
+      meshDescriptor,
+      gl,
+    } = this;
 
-  /**
-   * @see
-   * Renders mesh
-   */
-  const drawVertexBuffer = (instances) => {
+    const {
+      vbo,
+      ibo,
+      renderMode,
+    } = meshDescriptor;
+
     if (ibo) {
       // Using indices buffer
       const {
@@ -89,37 +97,24 @@ const createMeshRenderer = (gl, meshDescriptor) => {
       else
         gl.drawArrays(renderMode, 0, verticesCount);
     }
-  };
+  }
 
-  // mesh render method
-  const render = (dynamicDescriptor) => {
-    attachBuffers();
+  /**
+   * @param {Object} dynamicDescriptor
+   */
+  render(dynamicDescriptor) {
+    this.attachBuffers();
 
     // it should be a bit faster than two comparators
     if (dynamicDescriptor) {
+      const {material} = this.meshDescriptor;
+
       attachShaderMaterialParameters(material, dynamicDescriptor);
-      drawVertexBuffer(dynamicDescriptor.instances);
+      this.drawVertexBuffer(dynamicDescriptor.instances);
     } else
-      drawVertexBuffer();
-
-    detachBuffers();
-  };
-
-  Object.assign(
-    render,
-    {
-      // variables
-      meshDescriptor,
-
-      // methods
-      attachBuffers,
-      detachBuffers,
-      drawVertexBuffer,
-    },
-  );
-
-  return render;
-};
+      this.drawVertexBuffer();
+  }
+}
 
 /**
  * Creates renderable mesh instance
@@ -129,9 +124,11 @@ const createMeshRenderer = (gl, meshDescriptor) => {
  *
  * @returns {Function}
  */
-const createMesh = gl => description => createMeshRenderer(
-  gl,
-  createMeshDescriptor(gl)(description),
-);
+const createMesh = gl => (description) => {
+  const mesh = new MeshRenderer(gl, createMeshDescriptor(gl)(description));
+  const renderer = mesh.render.bind(mesh);
+  renderer.instance = mesh;
+  return renderer;
+};
 
 export default createMesh;

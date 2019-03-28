@@ -69,7 +69,7 @@ module.exports = {
         },
       },
       {
-        test: /\.(png|jpg|gif)$/,
+        test: /\.(png|jpg|gif|obj)$/,
         use: [
           {
             loader: 'file-loader',
@@ -94,6 +94,7 @@ module.exports = {
                   regenerator: true,
                 },
               ],
+              '@babel/plugin-transform-named-capturing-groups-regex',
               '@babel/plugin-proposal-nullish-coalescing-operator',
               '@babel/plugin-proposal-optional-chaining',
               '@babel/plugin-proposal-logical-assignment-operators',

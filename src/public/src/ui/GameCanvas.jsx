@@ -6,6 +6,7 @@ import fgl, {createIsometricProjection} from '@pkg/isometric-renderer';
 import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
 import {mat4} from '@pkg/gl-math/matrix';
 
+import cubeObjUrl from '@game/res/model/box/mesh.obj';
 import atlasImageUrl from '@game/res/img/atlas.png';
 import attachRoadmapGenerator from '@game/shared/attachRoadmapGenerator';
 
@@ -41,6 +42,13 @@ const createTerrain = async (f) => {
 
 const attachEngine = async (virtualResolution, dimensions, canvas) => {
   const f = fgl(canvas);
+
+  // Meshes
+  console.log(f.loaders.mesh.obj(
+    await createSingleResourceLoader()(cubeObjUrl),
+  ));
+
+  // Matrices
   const projection = createIsometricProjection(virtualResolution, dimensions);
   const camera = mat4.from.translation([0.0, 0.0, 0.5]);
 
@@ -184,6 +192,13 @@ GameCanvas.displayName = 'GameCanvas';
 
 GameCanvas.propTypes = {
   dimensions: DIMENSIONS_SCHEMA,
+};
+
+GameCanvas.defaultProps = {
+  dimensions: {
+    w: 640,
+    h: 550,
+  },
 };
 
 export default GameCanvas;

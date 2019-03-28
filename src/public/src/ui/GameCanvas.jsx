@@ -44,9 +44,14 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
   const projection = createIsometricProjection(virtualResolution, dimensions);
   const camera = mat4.from.translation([0.0, 0.0, 0.5]);
 
-  const mpMatrix = mat4.mul(
-    projection,
+  const mpMatrix = mat4.compose.mul(
+    mat4.from.scaling([
+      0.2,
+      0.2,
+      0.2,
+    ]),
     camera,
+    projection,
   );
 
   const terrainWireframe = f.mesh.plainTerrainWireframe(
@@ -72,7 +77,7 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
           color: f.colors.DARK_GRAY,
           mpMatrix: mat4.mul(
             mpMatrix,
-            mat4.from.translation([0.0, 0.0, 0.0]),
+            mat4.from.scaling([5.0, 5.0, 1.0]),
           ).array,
         },
       },
@@ -83,7 +88,7 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
         uniforms: {
           mpMatrix: mat4.mul(
             mpMatrix,
-            mat4.from.translation([0.0, 0.0, 0.0]),
+            mat4.from.scaling([5.0, 5.0, 1.0]),
           ).array,
         },
       },
@@ -93,12 +98,10 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
       {
         uniforms: {
           color: f.colors.GREEN,
-          mpMatrix: mat4.mul(
+          mpMatrix: mat4.compose.mul(
+            mat4.from.translation([2.0, 2.0, -0.01]),
+            mat4.from.scaling([1.0, 1.0, 1.5]),
             mpMatrix,
-            mat4.mul(
-              mat4.from.scaling([0.2, 0.2, 0.3]),
-              mat4.from.translation([2.0, 2.0, -0.01]),
-            ),
           ).array,
         },
       },
@@ -108,12 +111,10 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
       {
         uniforms: {
           color: f.colors.RED,
-          mpMatrix: mat4.mul(
+          mpMatrix: mat4.compose.mul(
+            mat4.from.translation([3, 4, -0.01]),
+            mat4.from.scaling([1.0, 1.0, 1.5]),
             mpMatrix,
-            mat4.mul(
-              mat4.from.scaling([0.2, 0.2, 0.3]),
-              mat4.from.translation([3, 4, -0.01]),
-            ),
           ).array,
         },
       },
@@ -125,12 +126,10 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
       {
         uniforms: {
           color: f.colors.YELLOW,
-          mpMatrix: mat4.mul(
+          mpMatrix: mat4.compose.mul(
+            mat4.from.translation([3, 2, -0.01]),
+            mat4.from.scaling([1.0, 1.0, 1.5]),
             mpMatrix,
-            mat4.mul(
-              mat4.from.scaling([0.2, 0.2, 0.3]),
-              mat4.from.translation([3, 2, -0.01]),
-            ),
           ).array,
         },
       },

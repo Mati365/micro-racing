@@ -2,15 +2,18 @@ const createTextureSpriteMaterial = fgl => fgl.material.shader(
   {
     shaders: {
       vertex: `
-        in vec4 inVertexPos;
-        in vec2 inUVPos;
+        layout(location = 0) in vec3 position;
+        layout(location = 1) in vec3 normal;
+        layout(location = 2) in vec2 uv;
+        layout(location = 3) in int mtl;
 
         uniform mat4 mpMatrix;
+
         out vec2 vUVPos;
 
         void main() {
-          gl_Position = inVertexPos * mpMatrix;
-          vUVPos = inUVPos;
+          gl_Position = vec4(position, 1.0) * mpMatrix;
+          vUVPos = uv;
         }
       `,
 

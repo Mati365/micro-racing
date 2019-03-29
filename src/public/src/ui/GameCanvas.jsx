@@ -7,6 +7,8 @@ import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
 import {mat4} from '@pkg/gl-math/matrix';
 
 import cubeObjUrl from '@game/res/model/box/mesh.obj';
+import cubeTextureUrl from '@game/res/model/box/tex.png';
+
 import atlasImageUrl from '@game/res/img/atlas.png';
 import attachRoadmapGenerator from '@game/shared/attachRoadmapGenerator';
 
@@ -40,13 +42,30 @@ const createTerrain = async (f) => {
   );
 };
 
+const createTexturedBox = async (f) => {
+  const {vao} = f.loaders.mesh.obj(
+    await createSingleResourceLoader()(cubeObjUrl),
+  );
+
+  const image = await createSingleResourceLoader()(cubeTextureUrl);
+  return f.mesh(
+    {
+      renderMode: f.flags.TRIANGLES,
+      material: f.material.textureSprite,
+      textures: [
+        f.texture2D(
+          {
+            image,
+          },
+        ),
+      ],
+      vao,
+    },
+  );
+};
+
 const attachEngine = async (virtualResolution, dimensions, canvas) => {
   const f = fgl(canvas);
-
-  // Meshes
-  console.log(f.loaders.mesh.obj(
-    await createSingleResourceLoader()(cubeObjUrl),
-  ));
 
   // Matrices
   const projection = createIsometricProjection(virtualResolution, dimensions);
@@ -69,14 +88,15 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
     },
   );
 
+  const texturedBox = await createTexturedBox(f);
   const terrain = await createTerrain(f);
   const pyramid = f.mesh.pyramid();
-  const box = f.mesh.box();
-  const boxBatch = f.mesh.batch(
-    {
-      mesh: box,
-    },
-  );
+  // const box = f.mesh.box();
+  // const boxBatch = f.mesh.batch(
+  //   {
+  //     mesh: box,
+  //   },
+  // );
 
   f.frame(() => {
     terrainWireframe(
@@ -102,41 +122,54 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
       },
     );
 
-    boxBatch.batch(
+    // boxBatch.batch(
+    //   {
+    //     uniforms: {
+    //       color: f.colors.GREEN,
+    //       mpMatrix: mat4.compose.mul(
+    //         mat4.from.translation([2.0, 2.0, -0.01]),
+    //         mat4.from.scaling([1.0, 1.0, 1.5]),
+    //         mpMatrix,
+    //       ).array,
+    //     },
+    //   },
+    // );
+
+    // boxBatch.batch(
+    //   {
+    //     uniforms: {
+    //       color: f.colors.RED,
+    //       mpMatrix: mat4.compose.mul(
+    //         mat4.from.translation([3, 4, -0.01]),
+    //         mat4.from.scaling([1.0, 1.0, 1.5]),
+    //         mpMatrix,
+    //       ).array,
+    //     },
+    //   },
+    // );
+
+    // boxBatch();
+
+    texturedBox(
       {
         uniforms: {
-          color: f.colors.GREEN,
+          // color: f.colors.YELLOW,
           mpMatrix: mat4.compose.mul(
-            mat4.from.translation([2.0, 2.0, -0.01]),
-            mat4.from.scaling([1.0, 1.0, 1.5]),
+            mat4.from.scaling([0.5, 0.5, 0.5]),
+            mat4.from.translation([0, 2, -1]),
             mpMatrix,
           ).array,
         },
       },
     );
-
-    boxBatch.batch(
-      {
-        uniforms: {
-          color: f.colors.RED,
-          mpMatrix: mat4.compose.mul(
-            mat4.from.translation([3, 4, -0.01]),
-            mat4.from.scaling([1.0, 1.0, 1.5]),
-            mpMatrix,
-          ).array,
-        },
-      },
-    );
-
-    boxBatch();
 
     pyramid(
       {
         uniforms: {
           color: f.colors.YELLOW,
           mpMatrix: mat4.compose.mul(
-            mat4.from.translation([3, 2, -0.01]),
             mat4.from.scaling([1.0, 1.0, 1.5]),
+            mat4.from.translation([3, 2, -0.01]),
             mpMatrix,
           ).array,
         },

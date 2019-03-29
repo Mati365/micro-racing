@@ -28,6 +28,7 @@ export class MeshRenderer {
     } = this;
 
     const {
+      vao,
       vbo,
       ibo,
       uv,
@@ -39,9 +40,15 @@ export class MeshRenderer {
     // attach shader
     material.attach();
 
+    // VAO bind
+    if (vao)
+      gl.bindVertexArray(vao.handle);
+
     // VBO bind
-    const {loc: vertexBufferLoc} = attributes[IN_VERTEX_POS_ATTRIB];
-    bindBufferAttrib(gl, vbo, vertexBufferLoc);
+    if (vbo) {
+      const {loc: vertexBufferLoc} = attributes[IN_VERTEX_POS_ATTRIB];
+      bindBufferAttrib(gl, vbo, vertexBufferLoc);
+    }
 
     // texture UV
     if (uv) {
@@ -72,6 +79,7 @@ export class MeshRenderer {
 
     const {
       vbo,
+      vao,
       ibo,
       renderMode,
     } = meshDescriptor;
@@ -89,7 +97,7 @@ export class MeshRenderer {
         gl.drawElements(renderMode, verticesCount, componentsType, 0);
     } else {
       // Using only vertex buffer
-      const {count: verticesCount} = vbo.components;
+      const {count: verticesCount} = (vbo || vao).components;
 
       // instanced rendering
       if (instances)
@@ -97,6 +105,17 @@ export class MeshRenderer {
       else
         gl.drawArrays(renderMode, 0, verticesCount);
     }
+  }
+
+  /**
+   * Cleanup VAOs and etc.
+   */
+  detachBuffers() {
+    const {gl} = this;
+    const {vao} = this.meshDescriptor;
+
+    if (vao)
+      gl.bindVertexArray(null);
   }
 
   /**
@@ -113,6 +132,8 @@ export class MeshRenderer {
       this.drawVertexBuffer(dynamicDescriptor.instances);
     } else
       this.drawVertexBuffer();
+
+    this.detachBuffers();
   }
 }
 

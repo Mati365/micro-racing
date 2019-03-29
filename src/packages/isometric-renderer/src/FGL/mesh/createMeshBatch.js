@@ -44,6 +44,7 @@ const createMeshBatch = () => (
       mesh.drawVertexBuffer();
     }
 
+    mesh.detachBuffers();
     buffer = [];
   };
 

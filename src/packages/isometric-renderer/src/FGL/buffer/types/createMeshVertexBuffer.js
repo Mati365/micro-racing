@@ -2,13 +2,26 @@ import * as R from 'ramda';
 
 import createBuffer from '../createBuffer';
 
-export const PACKED_STRUCT_LENGTH = 12;
-export const PACKED_STRUCT_BYTES_LENGTH = PACKED_STRUCT_LENGTH * 4;
+//      POS             NORMAL          UV           MTL
+// {vec3 [f][f][f]}{vec3 [f][f][f]}{vec2 [f][f]}{int [int32]}
+export const PACKED_STRUCT_BYTES_LENGTH = 9 * 4;
 
 export const VERTEX_GLSL_LOC = 0;
 export const NORMAL_GLSL_LOC = 1;
 export const UV_GLSL_LOC = 2;
 export const MTL_GLSL_LOC = 3;
+
+export const packVertexDescriptor = ({v, uv, n, materialIndex}) => ([
+  ...v,
+  ...n,
+  ...uv,
+  materialIndex || 0,
+]);
+
+export const packVertices = R.compose(
+  R.unnest,
+  R.map(packVertexDescriptor),
+);
 
 /**
  * @see
@@ -26,13 +39,20 @@ export const MTL_GLSL_LOC = 3;
  *  totalSize: 12
  */
 const createMeshVertexBuffer = (gl, vertices, usage = gl.STATIC_DRAW) => {
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+
+  // VBO generate
   const buffer = createBuffer(
     gl,
     {
-      data: new Float32Array(vertices),
+      data: new Float32Array(
+        packVertices(vertices),
+      ),
       usage,
     },
   );
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer.handle);
 
   // VEC3 VERTEX
   gl.vertexAttribPointer(VERTEX_GLSL_LOC, 3, gl.FLOAT, false, PACKED_STRUCT_BYTES_LENGTH, 0);
@@ -50,12 +70,15 @@ const createMeshVertexBuffer = (gl, vertices, usage = gl.STATIC_DRAW) => {
   gl.vertexAttribPointer(MTL_GLSL_LOC, 1, gl.INT, false, PACKED_STRUCT_BYTES_LENGTH, 8 * 4);
   gl.enableVertexAttribArray(MTL_GLSL_LOC);
 
+  gl.bindVertexArray(null);
+
   return {
     components: {
       type: gl.FLOAT,
       count: vertices.length,
     },
-    ...buffer,
+    handle: vao,
+    vbo: buffer,
   };
 };
 

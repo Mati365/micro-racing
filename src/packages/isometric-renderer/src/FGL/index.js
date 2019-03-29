@@ -57,7 +57,7 @@ const createRenderContext = (canvasElement, glContextFlags) => {
       // shared between engine flags
       state,
       loaders: {
-        mesh: meshLoaders,
+        mesh: bindObjectSceneContext(meshLoaders),
       },
 
       // pick shared constants

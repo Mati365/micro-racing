@@ -89,14 +89,14 @@ class Track {
     path.push(
       createCurveHandlerPoint(
         vec2.add(
-          vec2(0, 30),
+          vec2(-30, 0),
           vec,
         ),
       ),
 
       createCurveHandlerPoint(
         vec2.add(
-          vec2(0, -30),
+          vec2(30, 0),
           vec,
         ),
       ),
@@ -104,15 +104,13 @@ class Track {
   }
 
   updatePointPos(index, vec) {
+    const {path} = this;
     const item = this.path[index];
     if (!item)
       return;
 
-    const {path} = this;
-    item.point = vec;
-
-    // make previous / next curve handler act as mirror
     if (item.type === TRACK_POINTS.CURVE_HANDLER) {
+      // make previous / next curve handler act as mirror
       const mirrorItem = getSiblingCurveHandler(index, path);
       const parentItem = getSiblingParentPoint(index, path);
 
@@ -127,7 +125,20 @@ class Track {
           delta,
         );
       }
+    } else if (item.type === TRACK_POINTS.PATH_POINT) {
+      // update elements position when point moves
+      // [item] [handler] [handler]
+      const [firstHandler, secondHandler] = [path[index + 1], path[index + 2]];
+      const delta = vec2.sub(
+        item.point,
+        firstHandler.point,
+      );
+
+      firstHandler.point = vec2.add(vec, delta);
+      secondHandler.point = vec2.sub(vec, delta);
     }
+
+    item.point = vec;
   }
 
   findPathPoint(margin, pos) {

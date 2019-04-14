@@ -1,5 +1,9 @@
 import * as R from 'ramda';
-import generateRandomRoad from './generateRandomRoad';
+
+// import {vec2} from '@pkg/gl-math/matrix';
+import expandPath from './expandPath';
+// import deCasteljau from './deCasteljau';
+// import generateRandomRoad from './generateRandomRoad';
 
 /**
  * Renders array of points
@@ -10,7 +14,7 @@ import generateRandomRoad from './generateRandomRoad';
  *
  * @param {vec2[]} points
  */
-const renderPoints = (color, withIndices, ctx) => R.addIndex(R.forEach)(
+export const renderPoints = (color, withIndices, ctx) => R.addIndex(R.forEach)(
   ({x, y, added}, index) => {
     ctx.beginPath();
     ctx.arc(x, y, 3, 0, 2 * Math.PI);
@@ -31,7 +35,7 @@ const renderPoints = (color, withIndices, ctx) => R.addIndex(R.forEach)(
  *
  * @param {vec2[]} points
  */
-const renderLoopedLines = (color, width, ctx) => (points) => {
+export const renderLines = (color, width, loop, ctx) => (points) => {
   const origin = points[0];
 
   ctx.beginPath();
@@ -45,7 +49,9 @@ const renderLoopedLines = (color, width, ctx) => (points) => {
     ctx.lineTo(x, y);
   }
 
-  ctx.lineTo(origin.x, origin.y);
+  if (loop)
+    ctx.lineTo(origin.x, origin.y);
+
   ctx.stroke();
 };
 
@@ -58,20 +64,27 @@ const renderLoopedLines = (color, width, ctx) => (points) => {
  * @param {Size} area
  * @param {HTMLElement} ref
  */
-const attachRoadmapGenerator = (area, ref) => {
-  const {
-    interpolatedPoints,
-    points,
-  } = generateRandomRoad(area);
-
+const attachRoadmapGenerator = (area, ref, points = []) => {
   const ctx = ref.getContext('2d');
 
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, area.w, area.h);
 
-  renderLoopedLines('#FFFFFF', 2, ctx)(interpolatedPoints);
-  renderPoints('#FF0000', false, ctx)(interpolatedPoints);
-  renderPoints('#00FF00', false, ctx)(points);
+  if (R.isEmpty(points))
+    return;
+
+  renderLines('#333333', 2, false, ctx)(points);
+  renderPoints('#FF0000', false, ctx)(points);
+
+  if (points.length > 2) {
+    const [leftPoints, rightPoints] = expandPath(20, points);
+
+    renderPoints('#00FF00', false, ctx)(leftPoints);
+    renderPoints('#00FF00', false, ctx)(rightPoints);
+
+    renderLines('#ffffff', 2, false, ctx)(leftPoints);
+    renderLines('#ffffff', 2, false, ctx)(rightPoints);
+  }
 };
 
 export default attachRoadmapGenerator;

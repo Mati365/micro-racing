@@ -10,7 +10,7 @@ import cubeObjUrl from '@game/res/model/box/mesh.obj';
 import cubeTextureUrl from '@game/res/model/box/tex.png';
 
 import atlasImageUrl from '@game/res/img/atlas.png';
-import attachRoadmapGenerator from '@game/shared/attachRoadmapGenerator';
+import EditorCanvas from './EditorCanvas';
 
 const createTerrain = async (f) => {
   const atlasImage = await createSingleResourceLoader()(atlasImageUrl);
@@ -156,7 +156,7 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
           // color: f.colors.YELLOW,
           mpMatrix: mat4.compose.mul(
             mat4.from.scaling([0.5, 0.5, 0.5]),
-            mat4.from.translation([0, 2, -1]),
+            mat4.from.translation([2, 2, -1]),
             mpMatrix,
           ).array,
         },
@@ -180,7 +180,6 @@ const attachEngine = async (virtualResolution, dimensions, canvas) => {
 
 const GameCanvas = ({dimensions}) => {
   const canvasRef = useRef();
-  const roadRef = useRef();
 
   useEffect(
     () => {
@@ -191,11 +190,6 @@ const GameCanvas = ({dimensions}) => {
         },
         dimensions,
         canvasRef.current,
-      );
-
-      attachRoadmapGenerator(
-        dimensions,
-        roadRef.current,
       );
     },
     [],
@@ -209,14 +203,7 @@ const GameCanvas = ({dimensions}) => {
         height={dimensions.h}
       />
 
-      <canvas
-        ref={roadRef}
-        width={dimensions.w}
-        height={dimensions.h}
-        style={{
-          marginLeft: 10,
-        }}
-      />
+      <EditorCanvas dimensions={dimensions} />
     </>
   );
 };

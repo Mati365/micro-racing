@@ -6,6 +6,7 @@ import React, {
 } from 'react';
 
 import {vec2} from '@pkg/gl-math/matrix';
+import deCasteljau from './utils/deCasteljau';
 
 const isPointInsideRect = (point, rect) => (
   point.x > rect.x
@@ -134,8 +135,8 @@ class Track {
         firstHandler.point,
       );
 
-      firstHandler.point = vec2.add(vec, delta);
-      secondHandler.point = vec2.sub(vec, delta);
+      firstHandler.point = vec2.sub(vec, delta);
+      secondHandler.point = vec2.add(vec, delta);
     }
 
     item.point = vec;
@@ -184,6 +185,43 @@ const renderTrack = (ctx, area, track) => {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, area.w, area.h);
 
+  // Render curve lines
+  //    +0           +1              +2          +3           +4            +5          +6
+  // [normal] [handler before]  [handler after] [normal] [handler before] [normal] [handler before]
+  if (path.length >= 6) {
+    let points = [];
+
+    for (let j = 0; j < path.length - 3; j += 3) {
+      points = points.concat(
+        deCasteljau(
+          {
+            step: 0.05,
+
+            points: [
+              path[j].point, // A
+              path[j + 3].point, // B
+            ],
+
+            handlers: [
+              path[j + 2].point, // A top handler
+              path[j + 4].point, // B top handler
+            ],
+          },
+        ),
+      );
+    }
+
+    for (let i = points.length - 1; i >= 0; --i) {
+      const [x, y] = points[i];
+
+      ctx.fillStyle = '#0000ff';
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+  }
+
+  // Render points
   for (let i = path.length - 1; i >= 0; --i) {
     const {active, point, type} = path[i];
     const [x, y] = point;

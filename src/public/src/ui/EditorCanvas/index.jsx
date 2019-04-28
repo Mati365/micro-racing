@@ -6,13 +6,14 @@ import React, {
 } from 'react';
 
 import {vec2} from '@pkg/gl-math/matrix';
-import deCasteljau from './utils/deCasteljau';
 
 import Track, {
   TRACK_POINTS,
-  CHUNK_SIZE,
   getHandlerSiblingParentPoint,
 } from './Track';
+
+import triangularizePath from './utils/triangularizePath';
+import interpolateEditorPath from './interpolateEditorPath';
 
 const relativeEventPos = (e) => {
   const bounds = e.target.getBoundingClientRect();
@@ -21,6 +22,33 @@ const relativeEventPos = (e) => {
     e.clientX - bounds.x,
     e.clientY - bounds.y,
   );
+};
+
+const drawPoints = (color, r, points, ctx) => {
+  for (let i = points.length - 1; i >= 0; --i) {
+    const [x, y] = points[i];
+
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+};
+
+const drawTriangles = (color, lineWidth, triangles, ctx) => {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+
+  for (let i = triangles.length - 1; i >= 0; --i) {
+    const {a, b, c} = triangles[i];
+
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(c.x, c.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.lineTo(a.x, a.y);
+    ctx.stroke();
+  }
 };
 
 /**
@@ -32,64 +60,35 @@ const relativeEventPos = (e) => {
  * @param {Rect} area
  * @param {Track} track
  */
-const renderTrack = (ctx, {area, step = 0.05}, track) => {
+const renderTrack = (ctx, {area, step = 0.2}, track) => {
   const {path, realPointsLength} = track;
+  const looped = realPointsLength > 2;
 
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, area.w, area.h);
 
   // Render curve lines
-  //    +0           +1              +2          +3           +4            +5          +6
-  // [normal] [handler before]  [handler after] [normal] [handler before] [normal] [handler before]
   if (realPointsLength >= 2) {
-    let points = [];
-
-    for (let j = 0; j < path.length - CHUNK_SIZE; j += CHUNK_SIZE) {
-      points = points.concat(
-        deCasteljau(
-          {
-            step,
-
-            points: [
-              path[j].point, // A
-              path[j + CHUNK_SIZE].point, // B
-            ],
-
-            handlers: [
-              path[j + CHUNK_SIZE - 1].point, // A top handler
-              path[j + CHUNK_SIZE + 1].point, // B top handler
-            ],
-          },
-        ),
-      );
-    }
-
-    // loop, connects last to first
-    points = points.concat(
-      deCasteljau(
-        {
-          step,
-
-          points: [
-            path[0].point, // A
-            path[path.length - CHUNK_SIZE].point, // B
-          ],
-
-          handlers: [
-            path[1].point, // B top handler
-            path[path.length - 1].point, // A top handler
-          ],
-        },
-      ),
+    const interpolated = interpolateEditorPath(
+      {
+        step,
+        loop: realPointsLength > 2,
+      },
+      path,
     );
 
-    for (let i = points.length - 1; i >= 0; --i) {
-      const [x, y] = points[i];
+    drawPoints('#0000ff', 3, interpolated, ctx);
 
-      ctx.fillStyle = '#0000ff';
-      ctx.beginPath();
-      ctx.arc(x, y, 3, 0, 2 * Math.PI);
-      ctx.fill();
+    if (looped) {
+      const {outerPath, triangles} = triangularizePath(
+        {
+          width: 50,
+        },
+        interpolated,
+      );
+
+      drawTriangles('#333333', 1, triangles, ctx);
+      drawPoints('#0000ff', 3, outerPath, ctx);
     }
   }
 
@@ -98,6 +97,8 @@ const renderTrack = (ctx, {area, step = 0.05}, track) => {
   for (let i = path.length - 1; i >= 0; --i) {
     const {focused, active, point, type} = path[i];
     const [x, y] = point;
+
+    ctx.lineWidth = 1;
 
     if (type === TRACK_POINTS.CURVE_HANDLER) {
       // draw line between parent

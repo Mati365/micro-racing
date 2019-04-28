@@ -44,7 +44,7 @@ const deCasteljau = (
 
   for (let t = 0.0; t <= 1.0; t += step) {
     const p0 = vec2.lerp(t, A, cA); // lerp between curve handler A and cA
-    const p1 = vec2.lerp(t, cA, cB); // lerp between curve handler B and cB
+    const p1 = vec2.lerp(t, cA, cB); // lerp between curve handler cA and cB
     const p2 = vec2.lerp(t, cB, B); // lerp between curve handler B and cB
 
     reduced.push(
@@ -58,25 +58,6 @@ const deCasteljau = (
   }
 
   return reduced;
-};
-
-export const quadraticBeizer = mapperParams => (points) => {
-  const srcPointsCount = points.length;
-
-  let curvedPoints = []; // output
-  const mapper = deCasteljau(mapperParams);
-
-  for (let i = 0; i < srcPointsCount - 2; i += 2) {
-    const p0 = points[i];
-    const p1 = points[i + 1]; // <---- current
-    const p2 = points[i + 2];
-
-    curvedPoints = curvedPoints.concat(
-      mapper(p0, p1, p2),
-    );
-  }
-
-  return curvedPoints;
 };
 
 export default deCasteljau;

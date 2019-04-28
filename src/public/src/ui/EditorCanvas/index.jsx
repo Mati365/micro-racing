@@ -8,12 +8,11 @@ import React, {
 import {vec2} from '@pkg/gl-math/matrix';
 import deCasteljau from './utils/deCasteljau';
 
-const isPointInsideRect = (point, rect) => (
-  point.x > rect.x
-    && point.x < rect.x + rect.w
-    && point.y > rect.y
-    && point.y < rect.y + rect.h
-);
+import Track, {
+  TRACK_POINTS,
+  CHUNK_SIZE,
+  getHandlerSiblingParentPoint,
+} from './Track';
 
 const relativeEventPos = (e) => {
   const bounds = e.target.getBoundingClientRect();
@@ -25,152 +24,6 @@ const relativeEventPos = (e) => {
 };
 
 /**
- * Point creators
- */
-export const TRACK_POINTS = {
-  CURVE_HANDLER: 1,
-  PATH_POINT: 2,
-};
-
-const createTypedTrackPoint = type => point => ({
-  type,
-  point,
-});
-
-const createPoint = createTypedTrackPoint(TRACK_POINTS.PATH_POINT);
-const createCurveHandlerPoint = createTypedTrackPoint(TRACK_POINTS.CURVE_HANDLER);
-
-/**
- * @see
- * Path layout:
- * [item] [handler] [handler] [item] [handler] [handler]
- *
- * Fast find sibling handler
- */
-const getSiblingCurveHandler = (index, path) => {
-  const next = path[index + 1];
-  if (next?.type === TRACK_POINTS.CURVE_HANDLER)
-    return next;
-
-  const prev = path[index - 1];
-  if (prev?.type === TRACK_POINTS.CURVE_HANDLER)
-    return prev;
-
-  return null;
-};
-
-/**
- * Fast find sibling handler
- */
-const getSiblingParentPoint = (index, path) => {
-  const next = path[index - 1];
-  if (next?.type === TRACK_POINTS.PATH_POINT)
-    return next;
-
-  const prev = path[index - 2];
-  if (prev?.type === TRACK_POINTS.PATH_POINT)
-    return prev;
-
-  return null;
-};
-/**
- * Hold whole track related data shit
- */
-class Track {
-  path = [];
-
-  appendPoint(vec) {
-    const {path} = this;
-
-    path.push(
-      createPoint(vec),
-    );
-
-    /** Appends two curve handlers */
-    path.push(
-      createCurveHandlerPoint(
-        vec2.add(
-          vec2(-30, 0),
-          vec,
-        ),
-      ),
-
-      createCurveHandlerPoint(
-        vec2.add(
-          vec2(30, 0),
-          vec,
-        ),
-      ),
-    );
-  }
-
-  updatePointPos(index, vec) {
-    const {path} = this;
-    const item = this.path[index];
-    if (!item)
-      return;
-
-    if (item.type === TRACK_POINTS.CURVE_HANDLER) {
-      // make previous / next curve handler act as mirror
-      const mirrorItem = getSiblingCurveHandler(index, path);
-      const parentItem = getSiblingParentPoint(index, path);
-
-      if (mirrorItem && parentItem) {
-        const delta = vec2.sub(
-          parentItem.point,
-          vec,
-        );
-
-        mirrorItem.point = vec2.add(
-          parentItem.point,
-          delta,
-        );
-      }
-    } else if (item.type === TRACK_POINTS.PATH_POINT) {
-      // update elements position when point moves
-      // [item] [handler] [handler]
-      const [firstHandler, secondHandler] = [path[index + 1], path[index + 2]];
-      const delta = vec2.sub(
-        item.point,
-        firstHandler.point,
-      );
-
-      firstHandler.point = vec2.sub(vec, delta);
-      secondHandler.point = vec2.add(vec, delta);
-    }
-
-    item.point = vec;
-  }
-
-  findPathPoint(margin, pos) {
-    const {path} = this;
-    const index = R.findIndex(
-      ({point}) => (
-        isPointInsideRect(
-          pos,
-          {
-            x: point.x - margin,
-            y: point.y - margin,
-            w: margin * 2,
-            h: margin * 2,
-          },
-        )
-      ),
-      this.path,
-    );
-
-    return (
-      index === -1
-        ? null
-        : {
-          item: path[index],
-          index,
-        }
-    );
-  }
-}
-
-/**
  * It should be outside track, track is just container holding
  * data and adds data to it. Functional bassed approach should
  * be slow
@@ -179,8 +32,8 @@ class Track {
  * @param {Rect} area
  * @param {Track} track
  */
-const renderTrack = (ctx, area, track) => {
-  const {path} = track;
+const renderTrack = (ctx, {area, step = 0.05}, track) => {
+  const {path, realPointsLength} = track;
 
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, area.w, area.h);
@@ -188,28 +41,47 @@ const renderTrack = (ctx, area, track) => {
   // Render curve lines
   //    +0           +1              +2          +3           +4            +5          +6
   // [normal] [handler before]  [handler after] [normal] [handler before] [normal] [handler before]
-  if (path.length >= 6) {
+  if (realPointsLength >= 2) {
     let points = [];
 
-    for (let j = 0; j < path.length - 3; j += 3) {
+    for (let j = 0; j < path.length - CHUNK_SIZE; j += CHUNK_SIZE) {
       points = points.concat(
         deCasteljau(
           {
-            step: 0.05,
+            step,
 
             points: [
               path[j].point, // A
-              path[j + 3].point, // B
+              path[j + CHUNK_SIZE].point, // B
             ],
 
             handlers: [
-              path[j + 2].point, // A top handler
-              path[j + 4].point, // B top handler
+              path[j + CHUNK_SIZE - 1].point, // A top handler
+              path[j + CHUNK_SIZE + 1].point, // B top handler
             ],
           },
         ),
       );
     }
+
+    // loop, connects last to first
+    points = points.concat(
+      deCasteljau(
+        {
+          step,
+
+          points: [
+            path[0].point, // A
+            path[path.length - CHUNK_SIZE].point, // B
+          ],
+
+          handlers: [
+            path[1].point, // B top handler
+            path[path.length - 1].point, // A top handler
+          ],
+        },
+      ),
+    );
 
     for (let i = points.length - 1; i >= 0; --i) {
       const [x, y] = points[i];
@@ -222,18 +94,14 @@ const renderTrack = (ctx, area, track) => {
   }
 
   // Render points
+  // -1 is loop trick
   for (let i = path.length - 1; i >= 0; --i) {
-    const {active, point, type} = path[i];
+    const {focused, active, point, type} = path[i];
     const [x, y] = point;
-    const color = (
-      active
-        ? '#00ff00'
-        : '#ff0000'
-    );
 
     if (type === TRACK_POINTS.CURVE_HANDLER) {
       // draw line between parent
-      const parent = getSiblingParentPoint(i, path);
+      const parent = getHandlerSiblingParentPoint(i, path);
 
       // dirty hack - prevent overlapping parent point and render it again
       if (parent) {
@@ -255,6 +123,15 @@ const renderTrack = (ctx, area, track) => {
       ctx.stroke();
       ctx.fill();
     } else {
+      // get active color
+      let color = null;
+      if (active)
+        color = '#00ff00';
+      else if (focused)
+        color = '#ffff00';
+      else
+        color = '#ff0000';
+
       // normal circle of path
       ctx.fillStyle = color;
       ctx.beginPath();
@@ -279,9 +156,12 @@ class TrackEditor {
 
   draggingElement = null;
 
+  focusedElement = null;
+
   constructor() {
     this.handlers = {
       click: this.onClickItemAdd,
+      keydown: this.onKeydown,
       mousemove: this.onDragMove,
       mousedown: this.onDragStart,
       mouseup: this.onDragEnd,
@@ -322,6 +202,15 @@ class TrackEditor {
     this.render();
   }
 
+  setFocused(point) {
+    // focus is not cleared after drag
+    if (this.focused)
+      this.focused.item.focused = false;
+
+    this.focused = point;
+    point.item.focused = true;
+  }
+
   /**
    * Append item handler
    */
@@ -345,6 +234,8 @@ class TrackEditor {
     this.draggingElement = trackPoint;
     if (trackPoint) {
       trackPoint.item.active = true;
+
+      this.setFocused(trackPoint);
       this.render();
     }
   };
@@ -386,6 +277,18 @@ class TrackEditor {
     );
   };
 
+  onKeydown = (e) => {
+    const {track, focused} = this;
+
+    // delete
+    if (e.keyCode === 46 && focused) {
+      track.removePoint(
+        focused.item,
+      );
+      this.render();
+    }
+  };
+
   render() {
     const {
       track,
@@ -398,7 +301,13 @@ class TrackEditor {
     ctx.fillRect(0, 0, dimensions.w, dimensions.h);
 
     // draw board
-    renderTrack(ctx, dimensions, track);
+    renderTrack(
+      ctx,
+      {
+        area: dimensions,
+      },
+      track,
+    );
   }
 }
 
@@ -431,6 +340,7 @@ const EditorCanvas = ({dimensions}) => {
   return (
     <canvas
       ref={roadRef}
+      tabIndex={-1}
       width={dimensions.w}
       height={dimensions.h}
       style={{

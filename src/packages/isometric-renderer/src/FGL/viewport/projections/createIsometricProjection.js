@@ -16,7 +16,7 @@ const createIsometricProjection = (virtualResolution, dimensions) => {
       [
         virtualResolution.w / dimensions.w,
         virtualResolution.h / dimensions.h,
-        1.0,
+        0.01, // prevent z-depth truncating
       ],
     ),
     mat4.lookAt(

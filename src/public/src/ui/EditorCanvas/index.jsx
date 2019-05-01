@@ -5,7 +5,7 @@ import React, {
   useMemo,
 } from 'react';
 
-import {vec2} from '@pkg/gl-math/matrix';
+import {relativeEventPos} from '@pkg/basic-helpers';
 
 import Track, {
   TRACK_POINTS,
@@ -16,15 +16,6 @@ import Track, {
 import triangularizePath from './utils/triangularizePath';
 import interpolateEditorPath from './interpolateEditorPath';
 import generateRandomRoad from './utils/generateRandomRoad';
-
-const relativeEventPos = (e) => {
-  const bounds = e.target.getBoundingClientRect();
-
-  return vec2(
-    e.clientX - bounds.x,
-    e.clientY - bounds.y,
-  );
-};
 
 const drawPoints = (color, r, points, ctx) => {
   for (let i = points.length - 1; i >= 0; --i) {
@@ -139,6 +130,9 @@ const renderTrack = (ctx, {area, step = 0.2}, track) => {
       ctx.beginPath();
       ctx.arc(x, y, 3, 0, 2 * Math.PI);
       ctx.fill();
+
+      // print index
+      ctx.fillText(`#${Number.parseInt(i / CHUNK_SIZE, 10)}`, x, y - 10);
     }
   }
 };
@@ -245,7 +239,7 @@ class TrackEditor {
    */
   onDragStart = (e) => {
     const {track} = this;
-    const trackPoint = track.findPathPoint(5, relativeEventPos(e)) || null;
+    const trackPoint = track.findPathPoint(10, relativeEventPos(e)) || null;
 
     this.draggingElement = trackPoint;
     if (trackPoint) {
@@ -360,7 +354,7 @@ const EditorCanvas = ({dimensions}) => {
       width={dimensions.w}
       height={dimensions.h}
       style={{
-        marginLeft: 10,
+        outline: 0,
       }}
     />
   );

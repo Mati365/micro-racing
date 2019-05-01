@@ -4,7 +4,7 @@ import mat4 from '../mat4';
  * Creates rotation mat4 matrix
  *
  * @see
- *  http://marcin.kielczewski.pracownik.put.poznan.pl/ZSP02.pdf
+ *  https://gamedev.stackexchange.com/a/57597
  *
  * @param {Vec3} vec3
  *
@@ -17,30 +17,22 @@ const rotation = (vec3) => {
   const cosY = Math.cos(y), sinY = Math.sin(y);
   const cosZ = Math.cos(z), sinZ = Math.sin(z);
 
+  // cos(y)cos(z)  -cos(x)sin(z) + sin(x)sin(y)cos(z)   sin(x)sin(z) + cos(x)sin(y)cos(z)
+  // cos(y)sin(z)   cos(x)cos(z) + sin(x)sin(y)sin(z)  -sin(x)cos(z) + cos(x)sin(y)sin(z)
+  // -sin(y)         sin(x)cos(y)                        cos(x)cos(y)
+
   return mat4([
     // first row
-    cosZ * cosY,
-    cosZ * sinY * sinX - sinZ * cosX,
-    cosZ * sinY * cosX + sinZ * sinX,
-    0.0,
+    cosZ * cosY, -cosX * sinZ + sinX * sinY * cosZ, sinX * sinZ + cosX * sinY * cosZ, 0.0,
 
     // second row
-    sinZ * cosY,
-    sinZ * sinY * sinX + cosZ * cosX,
-    sinZ * sinY * cosX - cosZ * sinX,
-    0.0,
+    cosY * sinZ, cosX * cosZ + sinX * sinY * sinZ, -sinX * cosZ + cosX * sinY * sinZ, 0.0,
 
-    // thrid row
-    -sinX,
-    cosY * sinX,
-    cosY * sinX,
-    0.0,
+    // third row
+    -sinY, sinX * cosY, cosX * cosY, 0.0,
 
     // fourth row
-    0.0,
-    0.0,
-    0.0,
-    1.0,
+    0.0, 0.0, 0.0, 1.0,
   ]);
 };
 

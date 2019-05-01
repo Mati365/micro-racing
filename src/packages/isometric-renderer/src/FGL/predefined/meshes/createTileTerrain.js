@@ -17,10 +17,10 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
         out vec2 vUVOffset;
 
         uniform mat4 mpMatrix;
-        uniform vec2 uvTileSize;
+        uniform vec2 tileSize;
 
         void main() {
-          vec2 offset = uvTileSize * inPosTileOffset;
+          vec2 offset = tileSize * inPosTileOffset;
 
           gl_Position = (inVertexPos + vec4(offset, 0, 0)) * mpMatrix;
           vUVOffset = inUvTileOffset;
@@ -112,6 +112,10 @@ const createTileTerrain = (fgl) => {
           inUvTileOffset: createVertexBuffer(gl, uvOffsets, gl.STATIC_DRAW, 2, 1),
         },
         uniforms: {
+          tileSize: [
+            1.0 / size.w,
+            1.0 / size.h,
+          ],
           uvTileSize: [
             uvSize.w,
             uvSize.h,

@@ -7,7 +7,7 @@ ReactDOM.render(
   <GameCanvas
     dimensions={{
       w: 640,
-      h: 640,
+      h: 480,
     }}
   />,
   document.getElementById('app-root'),

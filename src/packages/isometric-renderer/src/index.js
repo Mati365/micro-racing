@@ -1,2 +1,2 @@
 export {default} from './FGL';
-export {default as createIsometricProjection} from './createIsometricProjection';
+export {default as createIsometricScene} from './createIsometricScene';

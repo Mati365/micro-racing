@@ -2,34 +2,7 @@ import * as R from 'ramda';
 
 import {vec2} from '@pkg/gl-math/matrix';
 import convexHull from '@pkg/convex-hull';
-
-/**
- * Returns random int between min and max, includes min and max
- *
- * @param {Number} min
- * @param {Number} max
- *
- * @returns {Number}
- */
-export const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
-/**
- * Gets array of points on certain area
- *
- * @param {Size} areaSize
- * @param {Point} border
- *
- * @returns {Array[]} points
- */
-const getRandomPoint = (border, areaSize) => {
-  const cx = areaSize.w / 2;
-  const cy = areaSize.h / 2;
-
-  return vec2(
-    cx + getRandomNumber(-cx + border.x, cx - border.x),
-    cy + getRandomNumber(-cy + border.y, cy - border.y),
-  );
-};
+import {getRandomPoint} from '@pkg/basic-helpers/base/random';
 
 /**
  * Creates array of points on racing map

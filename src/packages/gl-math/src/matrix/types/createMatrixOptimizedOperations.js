@@ -23,9 +23,8 @@ const compose = (createFn, operationFn) => (m1, m2, m3, m4) => {
     if (m3) {
       dest = operationFn(m3, dest, dest);
 
-      if (m4) {
+      if (m4)
         dest = operationFn(m4, dest, dest);
-      }
     }
   }
 

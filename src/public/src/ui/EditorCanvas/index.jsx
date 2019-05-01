@@ -9,11 +9,13 @@ import {vec2} from '@pkg/gl-math/matrix';
 
 import Track, {
   TRACK_POINTS,
+  CHUNK_SIZE,
   getHandlerSiblingParentPoint,
 } from './Track';
 
 import triangularizePath from './utils/triangularizePath';
 import interpolateEditorPath from './interpolateEditorPath';
+import generateRandomRoad from './utils/generateRandomRoad';
 
 const relativeEventPos = (e) => {
   const bounds = e.target.getBoundingClientRect();
@@ -80,15 +82,14 @@ const renderTrack = (ctx, {area, step = 0.2}, track) => {
     drawPoints('#0000ff', 3, interpolated, ctx);
 
     if (looped) {
-      const {outerPath, triangles} = triangularizePath(
+      const {triangles} = triangularizePath(
         {
-          width: 50,
+          width: 20,
         },
         interpolated,
       );
 
-      drawTriangles('#333333', 1, triangles, ctx);
-      drawPoints('#0000ff', 3, outerPath, ctx);
+      drawTriangles('#222222', 1, triangles, ctx);
     }
   }
 
@@ -153,11 +154,11 @@ class TrackEditor {
 
   dimensions = null;
 
-  track = new Track;
+  track = null;
 
   draggingElement = null;
 
-  focusedElement = null;
+  focused = null;
 
   constructor() {
     this.handlers = {
@@ -192,6 +193,9 @@ class TrackEditor {
     this.canvas = canvas;
     this.dimensions = dimensions;
     this.ctx = canvas.getContext('2d');
+    this.track = new Track(
+      generateRandomRoad(dimensions),
+    );
 
     // first render
     this.mapCanvasHandlers(canvas, false);
@@ -199,7 +203,18 @@ class TrackEditor {
   }
 
   appendTrackPoint(vec) {
-    this.track.appendPoint(vec);
+    const insertIndex = (
+      this.focused
+        ? this.focused.index + CHUNK_SIZE
+        : null
+    );
+
+    this.setFocused(
+      this.track.appendPoint(
+        vec,
+        insertIndex,
+      ),
+    );
     this.render();
   }
 

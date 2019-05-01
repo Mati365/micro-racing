@@ -1,4 +1,3 @@
-
 import vec2 from '@pkg/gl-math/matrix/types/vec2';
 
 export const quadraticBeizerLine = (p0, p1, p2, t) => {
@@ -10,7 +9,7 @@ export const quadraticBeizerLine = (p0, p1, p2, t) => {
   );
 };
 
-const deCasteljau2Points = (p0, p1, p2, t) => {
+export const deCasteljau2Points = (p0, p1, p2, t) => {
   const q = vec2.lerp(t, p0, p1);
   const r = vec2.lerp(t, p1, p2);
   const p = vec2.lerp(t, q, r);
@@ -27,9 +26,13 @@ const deCasteljau2Points = (p0, p1, p2, t) => {
  * @param {Vec2} p1
  * @param {Vec2} p2
  */
-const deCasteljau = (
+export const deCasteljau = (
   {
     step,
+    inclusive = {
+      left: true,
+      right: false,
+    },
     points: [
       A,
       B,
@@ -42,7 +45,11 @@ const deCasteljau = (
 ) => {
   const reduced = [];
 
-  for (let t = 0.0; t <= 1.0; t += step) {
+  for (
+    let t = inclusive.left ? 0.0 : step;
+    inclusive.right ? t <= 1.0 : t < 1.0;
+    t += step
+  ) {
     const p0 = vec2.lerp(t, A, cA); // lerp between curve handler A and cA
     const p1 = vec2.lerp(t, cA, cB); // lerp between curve handler cA and cB
     const p2 = vec2.lerp(t, cB, B); // lerp between curve handler B and cB
@@ -59,5 +66,3 @@ const deCasteljau = (
 
   return reduced;
 };
-
-export default deCasteljau;

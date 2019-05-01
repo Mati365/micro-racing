@@ -65,13 +65,28 @@ export const getHandlerSiblingParentPoint = (index, path) => {
 };
 
 /**
+ * Getter from tack item
+ *
+ * @param {Vec2} item
+ * @param {Number} index
+ */
+export const createPathPoint = (item, index) => ({
+  item,
+  index,
+});
+
+/**
  * Hold whole track related data shit
  */
 export default class Track {
   path = [];
 
-  constructor(autoposCurveHandlers = true) {
+  constructor(
+    points = [],
+    autoposCurveHandlers = true,
+  ) {
     this.autoposCurveHandlers = autoposCurveHandlers;
+    R.forEach(::this.appendPoint, points);
   }
 
   /**
@@ -86,23 +101,26 @@ export default class Track {
    * Append point with path to path
    *
    * @param {Vec2} vec
+   * @param {Number} index
    */
-  appendPoint(vec) {
+  appendPoint(vec, index) {
     const {autoposCurveHandlers, path} = this;
-
-    path.push(
-      createPoint(vec),
-    );
+    const point = createPoint(vec);
+    const insertIndex = R.defaultTo(path.length, index);
 
     /** Appends two curve handlers */
-    path.push(
+    path.splice(
+      insertIndex,
+      0,
+
+      // items
+      point,
       createCurveHandlerPoint(
         vec2.add(
           vec2(-30, 0),
           vec,
         ),
       ),
-
       createCurveHandlerPoint(
         vec2.add(
           vec2(30, 0),
@@ -113,6 +131,8 @@ export default class Track {
 
     if (autoposCurveHandlers)
       this.updateHandlersPos();
+
+    return createPathPoint(point, insertIndex);
   }
 
   /**
@@ -243,10 +263,7 @@ export default class Track {
     return (
       index === -1
         ? null
-        : {
-          item: path[index],
-          index,
-        }
+        : createPathPoint(path[index], index)
     );
   }
 }

@@ -1,5 +1,6 @@
+import {deCasteljau} from '@pkg/beizer-lines';
+
 import {CHUNK_SIZE} from './Track';
-import deCasteljau from './utils/deCasteljau';
 
 /**
  * Add more curvy lines to editor map

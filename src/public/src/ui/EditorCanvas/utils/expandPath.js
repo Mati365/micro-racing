@@ -1,3 +1,5 @@
+import * as R from 'ramda';
+
 import vec2 from '@pkg/gl-math/matrix/types/vec2';
 
 /**
@@ -32,17 +34,32 @@ const expandPath = (width, path) => {
     );
 
     reduced.push(
-      vec2.add(
-        path[i],
-        vec2.mul(
-          -width,
-          orthogonalVec,
+      [
+        // inner
+        vec2.sub(
+          path[i],
+          vec2.mul(
+            -width,
+            orthogonalVec,
+          ),
         ),
-      ),
+
+        // outer
+        vec2.add(
+          path[i],
+          vec2.mul(
+            -width,
+            orthogonalVec,
+          ),
+        ),
+      ],
     );
   }
 
-  return reduced;
+  return [
+    R.map(R.nth(0), reduced),
+    R.map(R.nth(1), reduced),
+  ];
 };
 
 export default expandPath;

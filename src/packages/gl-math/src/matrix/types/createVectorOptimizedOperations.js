@@ -5,6 +5,7 @@ import {unrollLength} from './vec/operations/length';
 import {unrollNormalize} from './vec/operations/normalize';
 import {unrollLerp} from './vec/operations/lerp';
 import {unrollMul} from './vec/operations/mul';
+import {unrollDiv} from './vec/operations/div';
 import {unrollDistance} from './vec/operations/distance';
 import {
   unrollAdd,
@@ -28,6 +29,7 @@ const createVectorOptimizedOperations = (w, additionalOperations) => {
       add: unrollAdd(w),
       sub: unrollSub(w),
       mul: unrollMul(w),
+      div: unrollDiv(w),
       negate: unrollMul(w, -1),
       dist: unrollDistance(w),
 

@@ -1,4 +1,5 @@
 const {resolve} = require('path');
+const R = require('ramda');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -21,18 +22,21 @@ module.exports = {
       resolve(__dirname, '../node_modules'),
       resolve(__dirname, '../src'),
     ],
-    alias: {
-      '@pkg/schemas': resolveSource('packages/basic-type-schemas/src/'),
-      '@pkg/resource-pack': resolveSource('packages/resource-pack/src/'),
-      '@pkg/gl-math': resolveSource('packages/gl-math/src/'),
-      '@pkg/basic-helpers': resolveSource('packages/basic-helpers/src/'),
-      '@pkg/isometric-renderer': resolveSource('packages/isometric-renderer/src/'),
-
-      '@game/res': resolveSource('public/res/'),
-      '@game/public': resolveSource('public/'),
-      '@game/server': resolveSource('server/'),
-      '@game/shared': resolveSource('shared/'),
-    },
+    alias: R.mapObjIndexed(
+      resolveSource,
+      {
+        '@pkg/schemas': 'packages/basic-type-schemas/src/',
+        '@pkg/resource-pack': 'packages/resource-pack/src/',
+        '@pkg/gl-math': 'packages/gl-math/src/',
+        '@pkg/basic-helpers': 'packages/basic-helpers/src/',
+        '@pkg/isometric-renderer': 'packages/isometric-renderer/src/',
+        '@pkg/ctx': 'packages/ctx-utils/src',
+        '@game/res': 'public/res/',
+        '@game/public': 'public/',
+        '@game/server': 'server/',
+        '@game/shared': 'shared/',
+      },
+    ),
   },
   plugins: [
     new HtmlWebpackPlugin(

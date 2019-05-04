@@ -1,14 +1,11 @@
 const MAX_FRAME_RATE = 60;
 
 /**
- * Create delta time render loop based on window.requestAnimFrame
+ * Creates plain requestAnimation wrapper
  *
- * @todo
- *  Add performance measure functions?
- *
- * @param {Function}  fn  Render function
+ * @param {Function} fn
  */
-const createDtRenderLoop = gl => (fn) => {
+export const createAnimationFrameRenderer = (fn) => {
   const maxFrameTime = 1000 / MAX_FRAME_RATE;
   let lastFrame = null;
 
@@ -22,9 +19,6 @@ const createDtRenderLoop = gl => (fn) => {
     );
     lastFrame = timeStamp;
 
-    // flush gl
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
     // exec frame
     fn(delta);
 
@@ -34,5 +28,22 @@ const createDtRenderLoop = gl => (fn) => {
 
   window.requestAnimationFrame(renderFrame);
 };
+
+/**
+ * Create delta time render loop based
+ * on window.requestAnimFrame with GL clearing
+ *
+ * @todo
+ *  Add performance measure functions?
+ *
+ * @param {Function}  fn  Render function
+ */
+const createDtRenderLoop = gl => fn => createAnimationFrameRenderer(
+  (delta) => {
+    // flush gl
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    fn(delta);
+  },
+);
 
 export default createDtRenderLoop;

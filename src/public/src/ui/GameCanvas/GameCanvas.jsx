@@ -10,7 +10,8 @@ import {
 
 import atlasImageUrl from '@game/res/img/atlas.png';
 
-import EditorCanvas from '../EditorCanvas';
+// import EditorCanvas from '../EditorCanvas';
+import PhysicsCanvas from '../PhysicsCanvas';
 
 import generateTerrain from './utils/generateTerrain';
 import createTexturedCar, {CAR_COLORS} from './utils/createTexturedCar';
@@ -165,7 +166,9 @@ const GameCanvas = ({dimensions}) => {
         height={dimensions.h}
       />
 
-      <EditorCanvas dimensions={dimensions} />
+      {/* <EditorCanvas dimensions={dimensions} /> */}
+
+      <PhysicsCanvas dimensions={dimensions} />
     </div>
   );
 };

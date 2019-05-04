@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import '../classes/Vector';
+import '../../../../classes/Vector';
 
 /**
  * Creates function that takes Nth params(w)

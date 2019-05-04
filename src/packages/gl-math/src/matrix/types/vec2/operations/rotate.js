@@ -1,4 +1,4 @@
-import Vector from '../../vec/classes/Vector';
+import Vector from '../../../../classes/Vector';
 
 /**
  * @see https://matthew-brett.github.io/teaching/rotation_2d.html

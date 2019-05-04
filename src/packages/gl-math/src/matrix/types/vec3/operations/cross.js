@@ -1,4 +1,4 @@
-import Vector from '../../vec/classes/Vector';
+import Vector from '../../../../classes/Vector';
 
 /**
  * Performs cross operation of two vectors

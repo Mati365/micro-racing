@@ -1,4 +1,4 @@
-import Vector from './classes/Vector';
+import Vector from '../../../classes/Vector';
 
 /**
  * Creates vector with provided size

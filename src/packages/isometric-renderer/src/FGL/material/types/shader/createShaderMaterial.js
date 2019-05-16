@@ -20,6 +20,7 @@ const createGLSLUniformSetterMap = gl => ({
   [gl.FLOAT_VEC3]: loc => array => gl.uniform3fv(loc, array),
   [gl.FLOAT_VEC4]: loc => array => gl.uniform4fv(loc, array),
 
+  [gl.BOOL]: loc => value => gl.uniform1i(loc, value),
   [gl.INT]: loc => value => gl.uniform1i(loc, value),
   [gl.INT_VEC2]: loc => array => gl.uniform2iv(loc, array),
   [gl.INT_VEC3]: loc => array => gl.uniform3iv(loc, array),
@@ -146,9 +147,20 @@ const createShaderMaterial = (gl, fgl) => {
      *  Optimize, add unrolling?
      */
     const setMaterialUniforms = (uniforms) => {
-      for (const key in uniforms) {
-        if (Object.prototype.hasOwnProperty.call(uniforms, key))
-          setMaterialUniform(key, uniforms[key]);
+      for (const key in uniforms)
+        setMaterialUniform(key, uniforms[key]);
+    };
+
+    /**
+     * Loads uniform buffers into program
+     */
+    const setMaterialUniformBuffers = (ubo) => {
+      for (const key in ubo) {
+        const uboDescription = material.ubo[key];
+        if (!uboDescription)
+          continue;
+
+        gl.bindBufferBase(gl.UNIFORM_BUFFER, uboDescription.loc, ubo[key].handle);
       }
     };
 
@@ -159,13 +171,11 @@ const createShaderMaterial = (gl, fgl) => {
      */
     const setMaterialAttributes = (attributes) => {
       for (const key in attributes) {
-        if (Object.prototype.hasOwnProperty.call(attributes, key)) {
-          const attributeDescription = material.attributes[key];
-          if (!attributeDescription)
-            continue;
+        const attributeDescription = material.attributes[key];
+        if (!attributeDescription)
+          continue;
 
-          bindBufferAttrib(gl, attributes[key], attributeDescription.loc);
-        }
+        bindBufferAttrib(gl, attributes[key], attributeDescription.loc);
       }
     };
 
@@ -176,6 +186,7 @@ const createShaderMaterial = (gl, fgl) => {
       setAttributes: setMaterialAttributes,
       setUniforms: setMaterialUniforms,
       setTextures: setMaterialTextures,
+      setUniformBuffers: setMaterialUniformBuffers,
     };
   };
 };

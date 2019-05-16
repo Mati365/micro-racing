@@ -25,6 +25,7 @@ const createBuffer = (
   const buffer = gl.createBuffer();
   gl.bindBuffer(type, buffer);
   gl.bufferData(type, data, usage);
+  gl.bindBuffer(type, null);
 
   return {
     type,

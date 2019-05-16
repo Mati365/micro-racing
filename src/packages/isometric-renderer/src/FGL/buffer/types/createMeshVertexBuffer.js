@@ -67,7 +67,7 @@ const createMeshVertexBuffer = (gl, vertices, usage = gl.STATIC_DRAW) => {
   gl.enableVertexAttribArray(UV_GLSL_LOC);
 
   // INT MTL_INDEX, offset = 8
-  gl.vertexAttribPointer(MTL_GLSL_LOC, 1, gl.INT, false, PACKED_STRUCT_BYTES_LENGTH, 8 * 4);
+  gl.vertexAttribPointer(MTL_GLSL_LOC, 1, gl.FLOAT, false, PACKED_STRUCT_BYTES_LENGTH, 8 * 4);
   gl.enableVertexAttribArray(MTL_GLSL_LOC);
 
   gl.bindVertexArray(null);

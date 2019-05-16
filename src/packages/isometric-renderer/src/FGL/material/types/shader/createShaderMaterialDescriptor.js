@@ -5,6 +5,7 @@ import {
 
   pickProgramUniforms,
   pickProgramAttributes,
+  pickProgramUniformBlocks,
 } from './utils';
 
 /**
@@ -59,6 +60,7 @@ const createMaterialDescriptor = (gl) => {
     },
     attributes,
     uniforms,
+    ubo,
   }) => {
     const compiler = compileShader(gl);
     const program = createProgram(
@@ -96,6 +98,12 @@ const createMaterialDescriptor = (gl) => {
       uniforms: R.compose(
         assignObjectSelectors(uniforms),
         pickProgramUniforms,
+      )(gl, program),
+
+      // shader uniforms
+      ubo: R.compose(
+        assignObjectSelectors(ubo),
+        pickProgramUniformBlocks,
       )(gl, program),
     };
   };

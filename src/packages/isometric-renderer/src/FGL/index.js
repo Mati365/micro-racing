@@ -16,6 +16,7 @@ import {
   materials,
 } from './predefined';
 
+import getTexturedMeshFrom from './loaders/mesh/utils/getTexturedMeshFrom';
 import createFGLState from './createFGLState';
 import {
   pickGlContext,
@@ -57,7 +58,10 @@ const createRenderContext = (canvasElement, glContextFlags) => {
       // shared between engine flags
       state,
       loaders: {
-        mesh: bindObjectSceneContext(meshLoaders),
+        mesh: {
+          ...bindObjectSceneContext(meshLoaders),
+          from: getTexturedMeshFrom(fgl, gl),
+        },
       },
 
       // pick shared constants

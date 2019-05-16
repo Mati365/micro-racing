@@ -17,26 +17,16 @@ const CARS_URLS = {
   [CAR_COLORS.RED]: redCarUrl,
 };
 
-const createTexturedCar = f => async (color) => {
-  const {vao} = f.loaders.mesh.obj(
-    await createSingleResourceLoader()(CARS_URLS[color]),
-  );
-
-  const image = await createSingleResourceLoader()(carTextureUrl);
-  return f.mesh(
-    {
-      renderMode: f.flags.TRIANGLES,
-      material: f.material.textureSprite,
-      textures: [
-        f.texture2D(
-          {
-            image,
-          },
-        ),
-      ],
-      vao,
+const createTexturedCar = f => async color => f.loaders.mesh.from(
+  {
+    loader: 'obj',
+    loaderData: {
+      source: await createSingleResourceLoader()(CARS_URLS[color]),
     },
-  );
-};
+    textures: [
+      await createSingleResourceLoader()(carTextureUrl),
+    ],
+  },
+);
 
 export default createTexturedCar;

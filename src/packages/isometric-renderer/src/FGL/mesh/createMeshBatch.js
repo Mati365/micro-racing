@@ -16,7 +16,7 @@ const createMeshBatch = () => (
     },
   },
 ) => {
-  let buffer = [];
+  const buffer = [];
 
   /**
    * Attaches data to mesh
@@ -45,7 +45,7 @@ const createMeshBatch = () => (
     }
 
     mesh.detachBuffers();
-    buffer = [];
+    buffer.length = 0;
   };
 
   return Object.assign(

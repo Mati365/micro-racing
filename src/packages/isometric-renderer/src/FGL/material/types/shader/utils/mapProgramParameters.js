@@ -35,10 +35,14 @@ export const pickProgramParameters = ({
  * we dont need it - it will be better to clone it as basic
  * JS object with some fields
  */
-const pickBasicParameterProps = R.pick(
-  [
-    'type', 'size', 'name',
-  ],
+const pickBasicParameterProps = R.ifElse(
+  R.is(String),
+  R.objOf('name'),
+  R.pick(
+    [
+      'type', 'size', 'name',
+    ],
+  ),
 );
 
 /**
@@ -53,7 +57,7 @@ const locationVariableMapper = (
     glLocationMethod,
   },
 ) => (gl, program, index) => {
-  const variableInfo = pickBasicParameterProps(
+  const variableInfo = glInfoMethod && pickBasicParameterProps(
     ::gl[glInfoMethod](program, index),
   );
 
@@ -79,6 +83,24 @@ export const pickProgramUniforms = pickProgramParameters(
     ),
   },
 );
+
+/**
+ * Loads object of uniforms
+ *
+ * @export
+ */
+export const pickProgramUniformBlocks = pickProgramParameters(
+  {
+    glFlag: 'ACTIVE_UNIFORM_BLOCKS',
+    glMapperFn: locationVariableMapper(
+      {
+        glInfoMethod: 'getActiveUniformBlockName',
+        glLocationMethod: 'getUniformBlockIndex',
+      },
+    ),
+  },
+);
+
 
 /**
  * Loads object of attributes

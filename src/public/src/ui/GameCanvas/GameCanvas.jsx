@@ -15,6 +15,7 @@ import PhysicsCanvas from '../PhysicsCanvas';
 
 import generateTerrain from './utils/generateTerrain';
 import createTexturedCar, {CAR_COLORS} from './utils/createTexturedCar';
+import createTexturedTree from './utils/createTexturedTree';
 
 const attachEngine = async (aspectRatio, canvas) => {
   const {f, frame} = createIsometricScene(
@@ -33,6 +34,7 @@ const attachEngine = async (aspectRatio, canvas) => {
 
   const redCar = await createTexturedCar(f)(CAR_COLORS.RED);
   const blueCar = await createTexturedCar(f)(CAR_COLORS.BLUE);
+  const tree = await createTexturedTree(f);
 
   const terrain = await generateTerrain(f)(
     {
@@ -94,6 +96,24 @@ const attachEngine = async (aspectRatio, canvas) => {
     );
 
     boxBatch();
+
+    tree(
+      {
+        uniforms: {
+          // color: f.colors.YELLOW,
+          mpMatrix: mat4.compose.mul(
+            mat4.from.rotation([
+              0,
+              0,
+              toRadians(180),
+            ]),
+            mat4.from.scaling([0.25, 0.25, -0.25]),
+            mat4.from.translation([4, 6, -2]),
+            mpMatrix,
+          ).array,
+        },
+      },
+    );
 
     redCar(
       {

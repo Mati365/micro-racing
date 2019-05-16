@@ -11,6 +11,7 @@ import {
   unrollAdd,
   unrollSub,
 } from './vec/operations/add';
+import composeOperations from './composeOperations';
 
 /**
  * Creates object of unrolled square vector operations
@@ -20,13 +21,14 @@ import {
  */
 const createVectorOptimizedOperations = (w, additionalOperations) => {
   const create = unrollVectorCreator(w);
+  const unrolledAdd = unrollAdd(w);
 
   return Object.assign(
     create,
     {
       ...additionalOperations,
 
-      add: unrollAdd(w),
+      add: unrolledAdd,
       sub: unrollSub(w),
       mul: unrollMul(w),
       div: unrollDiv(w),
@@ -36,6 +38,10 @@ const createVectorOptimizedOperations = (w, additionalOperations) => {
       len: unrollLength(w),
       lerp: unrollLerp(w),
       normalize: unrollNormalize(w),
+
+      compose: {
+        add: composeOperations(unrolledAdd),
+      },
 
       toMatrix: vec => createMatrix(1, w, vec),
     },

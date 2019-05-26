@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 
-import {vec2} from '@pkg/gl-math';
+import {vec2, toRadians} from '@pkg/gl-math';
 import {createAnimationFrameRenderer} from '@pkg/isometric-renderer/FGL/viewport/createDtRenderLoop';
 
 import Car from './Objects/Car';
@@ -17,6 +17,22 @@ export default class PhysicsBoard {
         size: vec2(32, 64),
       },
     );
+
+    canvas.addEventListener('keydown', (e) => {
+      const rotateSpeed = toRadians(5);
+
+      switch (e.keyCode) {
+        case 37:
+          this.car.body.turn(-rotateSpeed);
+          break;
+
+        case 39:
+          this.car.body.turn(rotateSpeed);
+          break;
+
+        default:
+      }
+    });
 
     return this;
   }

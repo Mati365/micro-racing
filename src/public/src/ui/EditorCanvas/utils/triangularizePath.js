@@ -1,4 +1,4 @@
-import {triangle} from '@pkg/gl-math/classes';
+import {Triangle} from '@pkg/gl-math/classes';
 import expandPath from './expandPath';
 
 /**
@@ -15,13 +15,13 @@ const triangularizePath = ({width}, path) => {
     const nextIndex = (i + 1) % path.length;
 
     triangles.push(
-      triangle(
+      new Triangle(
         innerPath[i],
         outerPath[i],
         outerPath[nextIndex],
       ),
 
-      triangle(
+      new Triangle(
         outerPath[nextIndex],
         innerPath[i],
         innerPath[nextIndex],

@@ -1,6 +1,6 @@
-import {toRadians, vec2, clamp} from '@pkg/gl-math';
+import {clamp, lerp, toRadians, vec2} from '@pkg/gl-math';
 
-const GRAVITY = 9.81;
+// const GRAVITY = 9.81;
 
 /**
  * We want to push car to up if force is positive number
@@ -32,23 +32,22 @@ export default class CarPhysicsBody {
       velocity = vec2(0, 0),
 
       // rotations
-      angle = toRadians(30),
-      steerAngle = toRadians(-30), // relative to root angle
+      angle = toRadians(0),
+      steerAngle = toRadians(30), // relative to root angle
+      maxSteerAngle = toRadians(30),
 
       // left top corner
       pos = vec2(0, 0),
       size = vec2(0, 0),
+      massCenter = vec2(0.5, 0.5),
 
       // size of wheel relative to size
       wheelSize = vec2(0.2, 0.25),
 
-      // relative to pos
-      massCenter = vec2(0.5, 0.5),
-
       // distance between axle and mass center
       // normalized to size and mass center
       axles = {
-        front: -0.2,
+        front: -0.3,
         rear: 0.3,
       },
     } = {},
@@ -61,8 +60,9 @@ export default class CarPhysicsBody {
 
     this.angle = angle;
     this.steerAngle = steerAngle;
+    this.maxSteerAngle = maxSteerAngle;
 
-    this.massCenter = massCenter;
+    this.massCenter = vec2(0.5, 0.5 + lerp());
     this.size = size;
     this.pos = pos;
 
@@ -70,17 +70,6 @@ export default class CarPhysicsBody {
     this.axles = axles;
     this.wheelSize = wheelSize;
     this.wheelBase = axles.rear - axles.front;
-
-    // // gearbox
-    // this.gearsRatio = {
-    //   1: 2.66,
-    //   2: 1.78,
-    //   3: 1.30,
-    //   4: 1.0,
-    //   5: 0.74,
-    //   6: 0.50,
-    //   R: 2.90,
-    // };
 
     // todo: maybe adding support for more than 4 wheels will be good?
     this.wheels = [
@@ -92,84 +81,95 @@ export default class CarPhysicsBody {
     ];
   }
 
+  turn(delta) {
+    this.steerAngle = clamp(
+      -this.maxSteerAngle,
+      this.maxSteerAngle,
+      this.steerAngle + delta,
+    );
+  }
+
   update(delta) {
-    const {
-      angle, mass, velocity,
-      braking, wheelBase, axles,
-    } = this;
+    // const {mass, braking, velocity, weight, axles, wheelBase} = this;
 
-    const weight = GRAVITY * mass;
-    const unitCarDirection = vec2.normalize(
-      vec2.fromScalar(
-        // car is rotated, fromScalar function is accepting angle
-        // from -------- instead of ---|
-        1,
-        angle + CANVAS_ROTATION_SUFFIX,
-      ),
-    );
+    // const fTraction = vec2.mul(
+    //   40,
+    //   unitCarDirection,
+    // );
 
-    const fTraction = vec2.mul(
-      20,
-      unitCarDirection,
-    );
+    // // BRAKING
+    // const brakingConst = 50;
+    // const fBraking = (
+    //   braking
+    //     ? vec2.mul(-brakingConst, unitCarDirection)
+    //     : vec2(0, 0)
+    // );
 
-    // BRAKING
-    const brakingConst = 50;
-    const fBraking = (
-      braking
-        ? vec2.mul(-brakingConst, unitCarDirection)
-        : vec2(0, 0)
-    );
+    // /**
+    //  * AIR
+    //  *
+    //  * non arcade style:
+    //  * F(drag) = 0.5 * Cd * frontalArea * rho * (v ^ 2)
+    //  *
+    //  * rho = 1.29 // air density
+    //  * frontalArea = 2.2 // 2.2 m^2
+    //  * Cd = 0.3
+    //  *
+    //  * Cdrag = 0.5 * 0.3 * 2.2 * 1.29
+    //  * Crr = 30 * Cdrag
+    //  */
+    // const aerodynamicDragConst = 5;
+    // const fAeroDrag = vec2.mul(
+    //   -aerodynamicDragConst * vec2.len(velocity),
+    //   velocity,
+    // );
 
-    /**
-     * AIR
-     *
-     * non arcade style:
-     * F(drag) = 0.5 * Cd * frontalArea * rho * (v ^ 2)
-     *
-     * rho = 1.29 // air density
-     * frontalArea = 2.2 // 2.2 m^2
-     * Cd = 0.3
-     *
-     * Cdrag = 0.5 * 0.3 * 2.2 * 1.29
-     * Crr = 30 * Cdrag
-     */
-    const aerodynamicDragConst = 5;
-    const fAeroDrag = vec2.mul(
-      -aerodynamicDragConst * vec2.len(velocity),
-      velocity,
-    );
+    // // Rolling
+    // const rollingDragConst = 30;
+    // const fRollingDrag = vec2.mul(
+    //   -rollingDragConst,
+    //   velocity,
+    // );
 
-    // Rolling
-    const rollingDragConst = 30;
-    const fRollingDrag = vec2.mul(
-      -rollingDragConst,
-      velocity,
-    );
+    // TOTAL
+    // const F = vec2.compose.add(
+    //   fTraction,
+    //   fBraking,
+    //   // fAeroDrag,
+    //   // fRollingDrag,
+    // );
+    // const F = fTraction;
+
+    // // update velocity and pos
+    // this.acceleration = vec2.div(mass, F);
+    // this.velocity = vec2.add(
+    //   this.velocity,
+    //   vec2.mul(delta, this.acceleration),
+    // );
+
+    // this.pos = vec2.add(
+    //   this.pos,
+    //   vec2.mul(delta, this.velocity),
+    // );
 
     // Weight transfer and axles weights
     // calculate axles weights
-    const frontAxleWeight = (-axles.front / wheelBase) * weight;
-    const rearAxleWeight = (axles.rear / wheelBase) * weight;
+    // const frontAxleWeight = (-axles.front / wheelBase) * weight;
+    // const rearAxleWeight = (axles.rear / wheelBase) * weight;
+    const Speed = 2;
 
-    // TOTAL
-    const F = vec2.compose.add(
-      fTraction,
-      fBraking,
-      fAeroDrag,
-      fRollingDrag,
+    const rotateRadius = this.wheelBase * this.size.y / Math.sin(this.steerAngle);
+    const angularVelocity = Speed / rotateRadius;
+    this.angle += angularVelocity * delta;
+
+    // const weight = GRAVITY * mass;
+    const unitCarDirection = vec2.fromScalar(
+      // car is rotated, fromScalar function is accepting angle
+      // from -------- instead of ---|
+      Speed,
+      this.angle + CANVAS_ROTATION_SUFFIX,
     );
 
-    // update velocity and pos
-    this.acceleration = vec2.div(mass, F);
-    this.velocity = vec2.add(
-      this.velocity,
-      vec2.mul(delta, this.acceleration),
-    );
-
-    this.pos = vec2.add(
-      this.pos,
-      vec2.mul(delta, this.velocity),
-    );
+    this.pos = vec2.add(this.pos, unitCarDirection);
   }
 }

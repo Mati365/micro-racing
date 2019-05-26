@@ -80,7 +80,7 @@ const renderTrack = (ctx, {area, step = 0.2}, track) => {
         interpolated,
       );
 
-      drawTriangles('#222222', 1, triangles, ctx);
+      drawTriangles('#666', 1, triangles, ctx);
     }
   }
 

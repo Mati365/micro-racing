@@ -1,4 +1,7 @@
-import {clamp, lerp, toRadians, vec2} from '@pkg/gl-math';
+import {
+  clamp, lerp,
+  toRadians, vec2,
+} from '@pkg/gl-math';
 
 // const GRAVITY = 9.81;
 
@@ -27,9 +30,7 @@ const makeWheel = (x, y, steering = false) => ({
 export default class CarPhysicsBody {
   constructor(
     {
-      mass = 1500,
-
-      velocity = vec2(0, 0),
+      maxSpeed = 5,
 
       // rotations
       angle = toRadians(0),
@@ -52,19 +53,17 @@ export default class CarPhysicsBody {
       },
     } = {},
   ) {
-    this.braking = false;
-    this.mass = mass;
-    this.angularVelocity = 0;
-    this.velocity = velocity;
-    this.acceleration = 0;
-
     this.angle = angle;
     this.steerAngle = steerAngle;
+    this.actualSteerAngle = steerAngle;
     this.maxSteerAngle = maxSteerAngle;
 
     this.massCenter = vec2(0.5, 0.5 + lerp());
     this.size = size;
     this.pos = pos;
+
+    this.speed = 0;
+    this.maxSpeed = maxSpeed;
 
     // wheelBase is distance betwen axles
     this.axles = axles;
@@ -82,94 +81,35 @@ export default class CarPhysicsBody {
   }
 
   turn(delta) {
+    const {maxSteerAngle, steerAngle} = this;
+
     this.steerAngle = clamp(
-      -this.maxSteerAngle,
-      this.maxSteerAngle,
-      this.steerAngle + delta,
+      -maxSteerAngle,
+      maxSteerAngle,
+      steerAngle + delta,
     );
   }
 
+  speedUp(delta) {
+    const {maxSpeed, speed} = this;
+
+    this.speed = clamp(0, maxSpeed, speed + delta);
+  }
+
+
   update(delta) {
-    // const {mass, braking, velocity, weight, axles, wheelBase} = this;
+    const {speed} = this;
+    if (!speed)
+      return;
 
-    // const fTraction = vec2.mul(
-    //   40,
-    //   unitCarDirection,
-    // );
+    const carDirection = vec2.fromScalar(speed, this.angle + CANVAS_ROTATION_SUFFIX);
 
-    // // BRAKING
-    // const brakingConst = 50;
-    // const fBraking = (
-    //   braking
-    //     ? vec2.mul(-brakingConst, unitCarDirection)
-    //     : vec2(0, 0)
-    // );
+    this.actualSteerAngle = lerp(this.actualSteerAngle, this.steerAngle, 0.2 / speed);
 
-    // /**
-    //  * AIR
-    //  *
-    //  * non arcade style:
-    //  * F(drag) = 0.5 * Cd * frontalArea * rho * (v ^ 2)
-    //  *
-    //  * rho = 1.29 // air density
-    //  * frontalArea = 2.2 // 2.2 m^2
-    //  * Cd = 0.3
-    //  *
-    //  * Cdrag = 0.5 * 0.3 * 2.2 * 1.29
-    //  * Crr = 30 * Cdrag
-    //  */
-    // const aerodynamicDragConst = 5;
-    // const fAeroDrag = vec2.mul(
-    //   -aerodynamicDragConst * vec2.len(velocity),
-    //   velocity,
-    // );
+    const rotateRadius = this.wheelBase * this.size.y / Math.sin(this.actualSteerAngle);
+    const angularVelocity = vec2.len(carDirection) / rotateRadius * (this.speed > 2 ? 0.85 : 1.0);
 
-    // // Rolling
-    // const rollingDragConst = 30;
-    // const fRollingDrag = vec2.mul(
-    //   -rollingDragConst,
-    //   velocity,
-    // );
-
-    // TOTAL
-    // const F = vec2.compose.add(
-    //   fTraction,
-    //   fBraking,
-    //   // fAeroDrag,
-    //   // fRollingDrag,
-    // );
-    // const F = fTraction;
-
-    // // update velocity and pos
-    // this.acceleration = vec2.div(mass, F);
-    // this.velocity = vec2.add(
-    //   this.velocity,
-    //   vec2.mul(delta, this.acceleration),
-    // );
-
-    // this.pos = vec2.add(
-    //   this.pos,
-    //   vec2.mul(delta, this.velocity),
-    // );
-
-    // Weight transfer and axles weights
-    // calculate axles weights
-    // const frontAxleWeight = (-axles.front / wheelBase) * weight;
-    // const rearAxleWeight = (axles.rear / wheelBase) * weight;
-    const Speed = 2;
-
-    const rotateRadius = this.wheelBase * this.size.y / Math.sin(this.steerAngle);
-    const angularVelocity = Speed / rotateRadius;
     this.angle += angularVelocity * delta;
-
-    // const weight = GRAVITY * mass;
-    const unitCarDirection = vec2.fromScalar(
-      // car is rotated, fromScalar function is accepting angle
-      // from -------- instead of ---|
-      Speed,
-      this.angle + CANVAS_ROTATION_SUFFIX,
-    );
-
-    this.pos = vec2.add(this.pos, unitCarDirection);
+    this.pos = vec2.add(this.pos, carDirection);
   }
 }

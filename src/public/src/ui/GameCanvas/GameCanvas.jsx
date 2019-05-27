@@ -3,10 +3,7 @@ import React, {useRef, useEffect} from 'react';
 import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
 
 import {createIsometricScene} from '@pkg/isometric-renderer';
-import {
-  toRadians,
-  mat4,
-} from '@pkg/gl-math';
+import {toRadians} from '@pkg/gl-math';
 
 import atlasImageUrl from '@game/res/img/atlas.png';
 
@@ -25,144 +22,101 @@ const attachEngine = async (aspectRatio, canvas) => {
     },
   );
 
-  const terrainWireframe = f.mesh.plainTerrainWireframe(
-    {
-      w: 20,
-      h: 20,
-    },
-  );
-
-  const redCar = await createTexturedCar(f)(CAR_COLORS.RED);
-  const blueCar = await createTexturedCar(f)(CAR_COLORS.BLUE);
-  const tree = await createTexturedTree(f);
-
-  const terrain = await generateTerrain(f)(
-    {
-      atlasImageUrl,
-      atlasSize: {
-        w: 5,
-        h: 5,
-      },
-      size: {
-        w: 10,
-        h: 10,
-      },
-    },
-  );
-
-  const pyramid = f.mesh.pyramid();
-  const box = f.mesh.box();
-  const boxBatch = f.mesh.batch(
-    {
-      mesh: box,
-    },
-  );
-
-  frame((dt, mpMatrix) => {
-    terrainWireframe(
+  const scene = f.createSceneBuffer();
+  scene
+    .chain
+    .createNode(
       {
+        mesh: f.mesh.plainTerrainWireframe(
+          {
+            w: 20,
+            h: 20,
+          },
+        ),
         uniforms: {
           color: f.colors.DARK_GRAY,
-          mpMatrix: mat4.mul(
-            mpMatrix,
-            mat4.from.scaling([20.0, 20.0, 1.0]),
-          ).array,
+        },
+        transform: {
+          scale: [20.0, 20.0, 1.0],
         },
       },
-    );
-
-    terrain(
-      {
-        uniforms: {
-          mpMatrix: mat4.mul(
-            mpMatrix,
-            mat4.from.scaling([10.0, 10.0, 1.0]),
-          ).array,
+    )
+    .createNode(
+      async () => ({
+        mesh: await generateTerrain(f)(
+          {
+            atlasImageUrl,
+            atlasSize: {
+              w: 5,
+              h: 5,
+            },
+            size: {
+              w: 10,
+              h: 10,
+            },
+          },
+        ),
+        transform: {
+          scale: [10.0, 10.0, 1.0],
         },
-      },
-    );
-
-    boxBatch.batch(
+      }),
+    )
+    .createNode(
       {
+        mesh: f.mesh.box(),
         uniforms: {
           color: f.colors.GREEN,
-          mpMatrix: mat4.compose.mul(
-            mat4.from.scaling([1.0, 1.0, 1.5]),
-            mat4.from.translation([6.0, 6.0, -0.01]),
-            mpMatrix,
-          ).array,
+        },
+        transform: {
+          scale: [1.0, 1.0, 1.5],
+          translate: [6, 6, -0.01],
         },
       },
-    );
-
-    boxBatch();
-
-    tree(
+    )
+    .createNode(
       {
-        uniforms: {
-          // color: f.colors.YELLOW,
-          mpMatrix: mat4.compose.mul(
-            mat4.from.rotation([
-              0,
-              0,
-              toRadians(180),
-            ]),
-            mat4.from.scaling([0.25, 0.25, -0.25]),
-            mat4.from.translation([4, 6, -2]),
-            mpMatrix,
-          ).array,
-        },
-      },
-    );
-
-    redCar(
-      {
-        uniforms: {
-          // color: f.colors.YELLOW,
-          mpMatrix: mat4.compose.mul(
-            mat4.from.rotation([
-              0,
-              0,
-              toRadians(180),
-            ]),
-            mat4.from.scaling([0.25, 0.25, -0.25]),
-            mat4.from.translation([2, 2, -2]),
-            mpMatrix,
-          ).array,
-        },
-      },
-    );
-
-    blueCar(
-      {
-        uniforms: {
-          // color: f.colors.YELLOW,
-          mpMatrix: mat4.compose.mul(
-            mat4.from.rotation([
-              0,
-              0,
-              toRadians(180),
-            ]),
-            mat4.from.scaling([0.25, 0.25, -0.25]),
-            mat4.from.translation([2, 4, -2]),
-            mpMatrix,
-          ).array,
-        },
-      },
-    );
-    pyramid(
-      {
+        mesh: f.mesh.pyramid(),
         uniforms: {
           color: f.colors.YELLOW,
-          mpMatrix: mat4.compose.mul(
-            mat4.from.scaling([1.0, 1.0, 1.5]),
-            mat4.from.translation([0, 0, -0.01]),
-            mpMatrix,
-          ).array,
+        },
+        transform: {
+          scale: [1.0, 1.0, 1.5],
+          translate: [0, 0, -0.01],
         },
       },
+    )
+    .createNode(
+      async () => ({
+        mesh: await createTexturedCar(f)(CAR_COLORS.RED),
+        transform: {
+          rotate: [0, 0, toRadians(180)],
+          scale: [0.25, 0.25, -0.25],
+          translate: [3, 3, -0.65],
+        },
+      }),
+    )
+    .createNode(
+      async () => ({
+        mesh: await createTexturedCar(f)(CAR_COLORS.BLUE),
+        transform: {
+          rotate: [0, 0, toRadians(180)],
+          scale: [0.2, 0.25, -0.25],
+          translate: [3, 4.5, -0.65],
+        },
+      }),
+    )
+    .createNode(
+      async () => ({
+        mesh: await createTexturedTree(f),
+        transform: {
+          rotate: [0, 0, toRadians(180)],
+          scale: [0.25, 0.25, -0.25],
+          translate: [4, 6, -2],
+        },
+      }),
     );
-  });
+
+  frame(scene.render);
 };
 
 const GameCanvas = ({dimensions}) => {

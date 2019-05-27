@@ -17,6 +17,8 @@ import {
 } from './predefined';
 
 import getTexturedMeshFrom from './loaders/mesh/utils/getTexturedMeshFrom';
+
+import createSceneBuffer from './scene/createSceneBuffer';
 import createFGLState from './createFGLState';
 import {
   pickGlContext,
@@ -63,6 +65,9 @@ const createRenderContext = (canvasElement, glContextFlags) => {
           from: getTexturedMeshFrom(fgl, gl),
         },
       },
+
+      // non related creators
+      createSceneBuffer,
 
       // pick shared constants
       ...R.pick(

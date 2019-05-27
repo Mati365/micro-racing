@@ -52,9 +52,7 @@ const createIsometricScene = (
    */
   const frame = (fn) => {
     f.frame(
-      (delta) => {
-        fn(delta, matrices.mpMatrix, context);
-      },
+      delta => fn(delta, matrices.mpMatrix, context),
     );
   };
 

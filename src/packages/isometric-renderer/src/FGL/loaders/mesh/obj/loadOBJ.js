@@ -29,7 +29,12 @@ const flipUV = ([x, y]) => ([
  *
  * @returns {LoaderDescriptor}
  */
-const loadOBJ = gl => ({source, mtl}) => {
+const loadOBJ = gl => ({
+  source,
+  mtl,
+  normalize, // w, h, z
+  axis = [1, 1, 1],
+}) => {
   const materials = loadMTL(mtl);
   const lineTokens = generateLineTokens(source);
 
@@ -78,21 +83,75 @@ const loadOBJ = gl => ({source, mtl}) => {
     lineTokens,
   );
 
+  // todo: Move to separate methods?
+  // create borders
+  const corners = {
+    topLeft: [Infinity, -Infinity, -Infinity],
+    bottomRight: [-Infinity, Infinity, Infinity],
+  };
+
+  const {
+    topLeft,
+    bottomRight,
+  } = corners;
+
   const vertices = R.map(
-    ({v, uv, n, materialIndex}) => ({
-      v: info.vertices[+v - 1],
-      uv: flipUV(info.uv[+uv - 1] || [0, 0]),
-      n: info.normals[+n - 1],
-      materialIndex,
-    }),
+    ({v, uv, n, materialIndex}) => {
+      const vertex = info.vertices[+v - 1];
+
+      // TOP LEFT
+      topLeft[0] = Math.min(topLeft[0], vertex[0]);
+      topLeft[1] = Math.max(topLeft[1], vertex[1]);
+      topLeft[2] = Math.max(topLeft[2], vertex[2]);
+
+      // BOTTOM LEFT
+      bottomRight[0] = Math.max(bottomRight[0], vertex[0]);
+      bottomRight[1] = Math.min(bottomRight[1], vertex[1]);
+      bottomRight[2] = Math.min(bottomRight[2], vertex[2]);
+
+      return {
+        v: [
+          vertex[0] * axis[0],
+          vertex[1] * axis[1],
+          vertex[2] * axis[2],
+        ],
+        uv: flipUV(info.uv[+uv - 1] || [0, 0]),
+        n: info.normals[+n - 1],
+        materialIndex,
+      };
+    },
     info.faces,
   );
 
-  return {
-    vao: createMeshVertexBuffer(gl, vertices),
-    materials,
+  // normalize vertices
+  let size = {
+    w: bottomRight[0] - topLeft[0],
+    h: topLeft[1] - bottomRight[1],
+    z: topLeft[2] - bottomRight[2],
+  };
 
-    // todo
+  if (normalize) {
+    const normalizeSize = size[normalize];
+    size = {
+      w: size.w / normalizeSize,
+      h: size.h / normalizeSize,
+      z: size.z / normalizeSize,
+    };
+
+    for (let i = vertices.length - 1; i >= 0; --i) {
+      const vertex = vertices[i];
+      vertex.v = [
+        vertex.v[0] / normalizeSize,
+        vertex.v[1] / normalizeSize,
+        vertex.v[2] / normalizeSize,
+      ];
+    }
+  }
+
+  return {
+    vao: createMeshVertexBuffer(gl, vertices, normalize),
+    materials,
+    size,
     textures: [],
   };
 };

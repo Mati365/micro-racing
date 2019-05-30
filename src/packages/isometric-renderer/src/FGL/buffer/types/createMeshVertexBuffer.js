@@ -38,7 +38,7 @@ export const packVertices = R.compose(
  *  }
  *  totalSize: 12
  */
-const createMeshVertexBuffer = (gl, vertices, usage = gl.STATIC_DRAW) => {
+const createMeshVertexBuffer = (gl, vertices, normalize, usage = gl.STATIC_DRAW) => {
   const vao = gl.createVertexArray();
   gl.bindVertexArray(vao);
 

@@ -11,6 +11,7 @@ const getTexturedMeshFrom = (f, gl) => async (
   },
 ) => {
   const {
+    size,
     vao,
     materials,
     textures: loaderTextures,
@@ -29,6 +30,7 @@ const getTexturedMeshFrom = (f, gl) => async (
 
   return f.mesh(
     {
+      size,
       renderMode: f.flags.TRIANGLES,
       material: f.material.textureSprite,
       textures: shaderTextures,

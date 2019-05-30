@@ -67,7 +67,7 @@ const createRenderContext = (canvasElement, glContextFlags) => {
       },
 
       // non related creators
-      createSceneBuffer,
+      createSceneBuffer: R.partial(createSceneBuffer, [fgl]),
 
       // pick shared constants
       ...R.pick(

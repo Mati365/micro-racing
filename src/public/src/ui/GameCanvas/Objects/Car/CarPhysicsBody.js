@@ -3,8 +3,6 @@ import {
   toRadians, vec2,
 } from '@pkg/gl-math';
 
-// const GRAVITY = 9.81;
-
 /**
  * We want to push car to up if force is positive number
  * so add 270 degrees
@@ -22,10 +20,6 @@ const makeWheel = (x, y, steering = false) => ({
  * @see https://github.com/nadako/cars/blob/gh-pages/Car.hx
  *
  * @see https://github.com/spacejack/carphysics2d/blob/master/marco/Cardemo.c
- *
- * @description
- * - Sideslip angle (BETA) is angle between velocity and car angle
- *
  */
 export default class CarPhysicsBody {
   constructor(
@@ -41,9 +35,6 @@ export default class CarPhysicsBody {
       pos = vec2(0, 0),
       size = vec2(0, 0),
       massCenter = vec2(0.5, 0.5),
-
-      // size of wheel relative to size
-      wheelSize = vec2(0.2, 0.25),
 
       // distance between axle and mass center
       // normalized to size and mass center
@@ -67,7 +58,6 @@ export default class CarPhysicsBody {
 
     // wheelBase is distance betwen axles
     this.axles = axles;
-    this.wheelSize = wheelSize;
     this.wheelBase = axles.rear - axles.front;
 
     // todo: maybe adding support for more than 4 wheels will be good?

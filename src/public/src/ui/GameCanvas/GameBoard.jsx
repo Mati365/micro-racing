@@ -85,7 +85,7 @@ const createBasicScene = (f) => {
         transform: {
           rotate: [0, 0, toRadians(180)],
           scale: [1.5, 1.5, 1.5],
-          translate: [3, 3, -0.65],
+          translate: [3, 3, 0.0],
         },
       }),
     )
@@ -128,7 +128,7 @@ export default class GameBoard {
           transform: {
             rotate: [0, 0, toRadians(180)],
             scale: [1.25, 1.25, 1.25],
-            translate: [3, 4.5, -0.65],
+            translate: [3, 4.5, 0.0],
           },
         },
       ),
@@ -157,7 +157,7 @@ export default class GameBoard {
 
     // space
     if (keyMap[32])
-      car.body.speedUp(0.1 * delta);
+      car.body.speedUp(0.001 * delta);
 
     scene.update(delta);
   }

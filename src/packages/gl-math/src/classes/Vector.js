@@ -6,6 +6,14 @@ export default class Vector extends Float32Array {
   get z() { return this[2]; }
 
   get w() { return this[3]; }
+
+  set x(v) { this[0] = v; }
+
+  set y(v) { this[1] = v; }
+
+  set z(v) { this[2] = v; }
+
+  set w(v) { this[3] = v; }
 }
 
 // unroll operation global scope fix

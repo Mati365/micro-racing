@@ -1,4 +1,5 @@
-import {mat4} from '@pkg/gl-math';
+import * as R from 'ramda';
+import {vec3, mat4} from '@pkg/gl-math';
 
 export default class SceneNode {
   constructor({
@@ -15,8 +16,16 @@ export default class SceneNode {
     this.uniforms = uniforms;
 
     this.matrix = matrix;
-    this.transform = transform;
-    this.transformCache = null; // matrix * transform
+    this.transform = R.mapObjIndexed(
+      R.unless(
+        R.isNil,
+        R.apply(vec3),
+      ),
+      transform,
+    );
+
+    // matrix cache for transform
+    this.transformCache = null;
 
     // just for reduce GC
     this.renderConfig = {
@@ -63,8 +72,8 @@ export default class SceneNode {
 
     if (rotate && scale && translate) {
       matrix = mat4.compose.mul(
-        mat4.from.rotation(rotate),
         mat4.from.scaling(scale),
+        mat4.from.rotation(rotate),
         mat4.from.translation(translate),
         matrix,
       );
@@ -90,22 +99,27 @@ export default class SceneNode {
    *
    * @param {Mat4} transformMatrix
    */
-  applyTransform(transformMatrix, reset = false) {
+  applyTransformMatrix(transformMatrix, reset = false) {
     const matrix = (
       reset
         ? transformMatrix
         : mat4.mul(this.transformations.matrix, transformMatrix)
     );
 
-    this.transformations = {
+    this.transform = {
       rotate: null,
       scale: null,
       translate: null,
       matrix,
     };
-    this._updateTransformCache();
+    this.updateTransformCache();
 
     return this;
+  }
+
+  applyTransformations(transform) {
+    this.transform = transform;
+    this.updateTransformCache();
   }
 
   render(delta, mpMatrix) {

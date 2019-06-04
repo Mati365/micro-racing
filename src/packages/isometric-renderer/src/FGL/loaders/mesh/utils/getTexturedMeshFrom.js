@@ -8,6 +8,9 @@ const getTexturedMeshFrom = (f, gl) => async (
     loader = 'obj',
     loaderData,
     textures = [],
+    uniforms,
+    ubo,
+    ...params
   },
 ) => {
   const {
@@ -36,6 +39,7 @@ const getTexturedMeshFrom = (f, gl) => async (
       textures: shaderTextures,
       uniforms: {
         textured: !R.isEmpty(shaderTextures),
+        ...uniforms,
       },
       ubo: {
         materialsBlock: createUBO(
@@ -44,8 +48,10 @@ const getTexturedMeshFrom = (f, gl) => async (
             data: packMaterialsBuffer(materials),
           },
         ),
+        ...ubo,
       },
       vao,
+      ...params,
     },
   );
 };

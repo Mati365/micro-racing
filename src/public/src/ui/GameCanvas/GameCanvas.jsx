@@ -3,6 +3,8 @@ import React, {useRef, useEffect} from 'react';
 import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
 import {useGameBoard} from './GameBoard';
 
+import EditorCanvas from '../EditorCanvas';
+
 const GameCanvas = ({dimensions}) => {
   const canvasRef = useRef();
   const game = useGameBoard();
@@ -24,12 +26,13 @@ const GameCanvas = ({dimensions}) => {
   return (
     <div>
       <canvas
+        tabIndex={-1}
         ref={canvasRef}
         width={dimensions.w}
         height={dimensions.h}
       />
 
-      {/* <EditorCanvas dimensions={dimensions} /> */}
+      <EditorCanvas dimensions={dimensions} />
     </div>
   );
 };

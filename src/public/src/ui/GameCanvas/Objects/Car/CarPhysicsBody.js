@@ -24,11 +24,11 @@ const makeWheel = (x, y, steering = false) => ({
 export default class CarPhysicsBody {
   constructor(
     {
-      maxSpeed = 5,
+      maxSpeed = 0.1,
 
       // rotations
       angle = toRadians(0),
-      steerAngle = toRadians(30), // relative to root angle
+      steerAngle = toRadians(20), // relative to root angle
       maxSteerAngle = toRadians(30),
 
       // left top corner
@@ -53,7 +53,7 @@ export default class CarPhysicsBody {
     this.size = size;
     this.pos = pos;
 
-    this.speed = 0;
+    this.speed = 0.0;
     this.maxSpeed = maxSpeed;
 
     // wheelBase is distance betwen axles
@@ -88,16 +88,19 @@ export default class CarPhysicsBody {
 
 
   update(delta) {
-    const {speed} = this;
+    const {speed, maxSpeed} = this;
     if (!speed)
       return;
 
-    const carDirection = vec2.fromScalar(speed, this.angle + CANVAS_ROTATION_SUFFIX);
+    const deltaSpeed = speed * delta;
+    const carDirection = vec2.fromScalar(deltaSpeed, this.angle + CANVAS_ROTATION_SUFFIX);
 
-    this.actualSteerAngle = lerp(this.actualSteerAngle, this.steerAngle, 0.2 / speed);
+    this.actualSteerAngle = lerp(this.actualSteerAngle, this.steerAngle, 0.02 * delta);
 
     const rotateRadius = this.wheelBase * this.size.y / Math.sin(this.actualSteerAngle);
-    const angularVelocity = vec2.len(carDirection) / rotateRadius * (this.speed > 2 ? 0.85 : 1.0);
+    const angularVelocity = vec2.len(carDirection) / rotateRadius * (
+      speed / maxSpeed > 0.7 ? 0.85 : 1.0
+    );
 
     this.angle += angularVelocity * delta;
     this.pos = vec2.add(this.pos, carDirection);

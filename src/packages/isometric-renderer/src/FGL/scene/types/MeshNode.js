@@ -1,7 +1,17 @@
 import {Size, BoundingRect} from '@pkg/gl-math';
 import SceneNode from './SceneNode';
+import MeshWireframe from './MeshWireframe';
 
 export default class MeshNode extends SceneNode {
+  wireframe = null;
+
+  constructor(config) {
+    super(config);
+
+    if (config.f)
+      this.wireframe = new MeshWireframe(config.f, this);
+  }
+
   updateTransformCache() {
     super.updateTransformCache();
 
@@ -28,5 +38,19 @@ export default class MeshNode extends SceneNode {
 
   get meshDescriptor() {
     return this.renderer.instance.meshDescriptor;
+  }
+
+  update() {
+    const {wireframe} = this;
+
+    // updated linked meshes
+    wireframe && wireframe.update();
+  }
+
+  render(delta, mpMatrix) {
+    const {wireframe} = this;
+
+    wireframe && wireframe.render(delta, mpMatrix);
+    super.render(delta, mpMatrix);
   }
 }

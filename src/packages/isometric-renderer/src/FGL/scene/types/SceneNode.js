@@ -3,19 +3,16 @@ import {vec3, mat4} from '@pkg/gl-math';
 
 export default class SceneNode {
   constructor({
-    matrix = mat4.from.identity(),
-    transform = {
-      rotate: null,
-      scale: null,
-      translate: null,
-    },
+    matrix = mat4.from.identity(), // executed before transforms
+    transform = null,
     uniforms = {},
     renderer,
-  }) {
+    attributes,
+  } = {}) {
     this.renderer = renderer;
     this.uniforms = uniforms;
-
     this.matrix = matrix;
+
     this.transform = R.mapObjIndexed(
       R.unless(
         R.isNil,
@@ -33,6 +30,9 @@ export default class SceneNode {
     };
 
     this.updateTransformCache();
+
+    // third party flag fields
+    Object.assign(this, attributes);
   }
 
   /**
@@ -67,27 +67,39 @@ export default class SceneNode {
    * Mutliply matrix based on transfer parameters
    */
   updateTransformCache() {
-    const {rotate, scale, translate} = this.transform;
+    const {transform} = this;
     let {matrix} = this;
+    if (!transform) {
+      this.transformCache = null;
+      return;
+    }
 
-    if (rotate && scale && translate) {
+    const {rotate, scale, translate} = transform;
+
+    // cache matrices
+    const scaleMatrix = scale && mat4.from.scaling(scale);
+    const rotateMatrix = rotate && mat4.from.rotation(rotate);
+    const translateMatrix = translate && mat4.from.translation(translate);
+
+    if (scaleMatrix && rotateMatrix && translateMatrix) {
       matrix = mat4.compose.mul(
-        mat4.from.scaling(scale),
-        mat4.from.rotation(rotate),
-        mat4.from.translation(translate),
+        scaleMatrix,
+        rotateMatrix,
+        translateMatrix,
         matrix,
       );
     } else {
-      if (rotate)
-        matrix = mat4.mul(mat4.from.rotation(rotate), matrix);
+      if (rotateMatrix)
+        matrix = mat4.mul(rotateMatrix, matrix);
 
-      if (scale)
-        matrix = mat4.mul(mat4.from.scaling(scale), matrix);
+      if (scaleMatrix)
+        matrix = mat4.mul(scaleMatrix, matrix);
 
-      if (translate)
-        matrix = mat4.mul(mat4.from.translation(translate), matrix);
+      if (translateMatrix)
+        matrix = mat4.mul(translateMatrix, matrix);
     }
 
+    // write cache
     this.transformCache = matrix;
   }
 
@@ -103,15 +115,10 @@ export default class SceneNode {
     const matrix = (
       reset
         ? transformMatrix
-        : mat4.mul(this.transformations.matrix, transformMatrix)
+        : mat4.mul(transformMatrix, this.matrix)
     );
 
-    this.transform = {
-      rotate: null,
-      scale: null,
-      translate: null,
-      matrix,
-    };
+    this.matrix = matrix;
     this.updateTransformCache();
 
     return this;
@@ -128,10 +135,11 @@ export default class SceneNode {
     } = this;
 
     renderConfig.delta = delta;
-    renderConfig.uniforms.mpMatrix = mat4.mul(
-      mpMatrix,
-      transformCache,
-    ).array;
+    renderConfig.uniforms.mpMatrix = (
+      transformCache
+        ? mat4.mul(mpMatrix, transformCache).array
+        : mpMatrix
+    );
 
     renderer(renderConfig);
   }

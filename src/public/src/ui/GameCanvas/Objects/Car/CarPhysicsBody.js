@@ -28,7 +28,7 @@ export default class CarPhysicsBody {
 
       // rotations
       angle = toRadians(0),
-      steerAngle = toRadians(20), // relative to root angle
+      steerAngle = toRadians(0), // relative to root angle
       maxSteerAngle = toRadians(30),
 
       // left top corner
@@ -95,7 +95,11 @@ export default class CarPhysicsBody {
     const deltaSpeed = speed * delta;
     const carDirection = vec2.fromScalar(deltaSpeed, this.angle + CANVAS_ROTATION_SUFFIX);
 
-    this.actualSteerAngle = lerp(this.actualSteerAngle, this.steerAngle, 0.02 * delta);
+    this.actualSteerAngle = lerp(
+      this.actualSteerAngle,
+      this.steerAngle,
+      0.5 * delta,
+    );
 
     const rotateRadius = this.wheelBase * this.size.y / Math.sin(this.actualSteerAngle);
     const angularVelocity = vec2.len(carDirection) / rotateRadius * (

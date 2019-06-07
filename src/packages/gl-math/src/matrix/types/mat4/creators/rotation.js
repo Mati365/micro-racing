@@ -1,4 +1,5 @@
 import mat4 from '../mat4';
+import {identity} from '../../mat/creators/identity';
 
 /**
  * Creates rotation mat4 matrix
@@ -12,6 +13,9 @@ import mat4 from '../mat4';
  */
 const rotation = (vec3) => {
   const [x, y, z] = vec3;
+
+  if (x === 0 && y === 0 && z === 0)
+    return identity(4);
 
   const cosX = Math.cos(x), sinX = Math.sin(x);
   const cosY = Math.cos(y), sinY = Math.sin(y);

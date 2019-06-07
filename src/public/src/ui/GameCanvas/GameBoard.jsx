@@ -5,6 +5,7 @@ import atlasImageUrl from '@game/res/img/atlas.png';
 import {toRadians} from '@pkg/gl-math';
 
 import {createIsometricScene} from '@pkg/isometric-renderer';
+import {MeshNode} from '@pkg/isometric-renderer/FGL/scene/types';
 
 import generateTerrain from './utils/generateTerrain';
 import createTexturedCar, {CAR_COLORS} from './utils/createTexturedCar';
@@ -14,6 +15,11 @@ import Car from './Objects/Car';
 
 const ROTATE_CAR_SPEED = toRadians(1);
 
+/**
+ * Blender config:
+ * -Y forward
+ * Z up
+ */
 const createBasicScene = (f) => {
   const scene = f.createSceneBuffer();
   scene
@@ -83,20 +89,21 @@ const createBasicScene = (f) => {
         ...sceneParams,
         renderer: await createTexturedCar(f)(CAR_COLORS.RED),
         transform: {
-          rotate: [0, 0, toRadians(180)],
+          rotate: [0, 0, toRadians(90)],
           scale: [1.5, 1.5, 1.5],
           translate: [3, 3, 0.0],
         },
       }),
     )
     .createNode(
-      async () => ({
+      async () => new MeshNode({
         renderer: await createTexturedTree(f),
         transform: {
           rotate: [0, 0, toRadians(180)],
-          scale: [0.25, 0.25, -0.25],
-          translate: [4, 6, -2],
+          scale: [0.25, 0.25, 0.25],
+          translate: [4, 6, 0],
         },
+        f,
       }),
     );
 
@@ -126,7 +133,7 @@ export default class GameBoard {
           ...sceneParams,
           renderer: await createTexturedCar(this.engine.f)(CAR_COLORS.BLUE),
           transform: {
-            rotate: [0, 0, toRadians(180)],
+            rotate: [0, 0, toRadians(135)],
             scale: [1.25, 1.25, 1.25],
             translate: [3, 4.5, 0.0],
           },

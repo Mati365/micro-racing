@@ -2,6 +2,7 @@ import * as R from 'ramda';
 
 import {createVertexBuffer} from '../../buffer/types';
 import {glsl} from '../../material/types';
+import basicDiffuseLight from '../materials/glsl/basicDiffuseLight';
 
 export const createTexAtlasMaterial = fgl => fgl.material.shader(
   {
@@ -15,9 +16,11 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
         in vec2 inUvTileOffset;
 
         // to frag shader
+        out vec3 vPos;
         out vec2 vUVPos;
         out vec2 vUVOffset;
 
+        uniform mat4 mMatrix;
         uniform mat4 mpMatrix;
         uniform vec2 tileSize;
 
@@ -25,6 +28,8 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
           vec2 offset = tileSize * inPosTileOffset;
 
           gl_Position = (inVertexPos + vec4(offset, 0, 0)) * mpMatrix;
+
+          vPos = vec3((inVertexPos + vec4(offset, 0, 0)) * mMatrix);
           vUVOffset = inUvTileOffset;
           vUVPos = inUVPos;
         }
@@ -32,6 +37,8 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
 
       fragment: glsl`
         out vec4 fragColor;
+
+        in vec3 vPos;
         in vec2 vUVPos;
         in vec2 vUVOffset;
 
@@ -41,8 +48,17 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
         // offsets
         uniform vec2 uvTileSize;
 
+        ${basicDiffuseLight}
+
         void main() {
-          fragColor = texture(tex0, vUVPos + (vUVOffset * uvTileSize));
+          vec4 color = texture(tex0, vUVPos + (vUVOffset * uvTileSize));
+          vec3 lightPos = vec3(0, 0, -3.0);
+
+          fragColor = color * calcDiffuseLight(
+            lightPos - vPos, // light vector
+            vec3(0, 0, -1), // normal
+            1.0 // intense
+          );
         }
       `,
     },

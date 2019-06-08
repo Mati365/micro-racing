@@ -18,7 +18,7 @@ const ROTATE_CAR_SPEED = toRadians(1);
 /**
  * Blender config:
  * -Y forward
- * Z up
+ * -Z up
  */
 const createBasicScene = (f) => {
   const scene = f.createSceneBuffer();
@@ -133,9 +133,9 @@ export default class GameBoard {
           ...sceneParams,
           renderer: await createTexturedCar(this.engine.f)(CAR_COLORS.BLUE),
           transform: {
-            rotate: [0, 0, toRadians(135)],
+            rotate: [0, 0, toRadians(-75)],
             scale: [1.25, 1.25, 1.25],
-            translate: [3, 4.5, 0.0],
+            translate: [2, 4.5, 0.0],
           },
         },
       ),
@@ -162,9 +162,13 @@ export default class GameBoard {
     else if (keyMap[39])
       car.body.turn(ROTATE_CAR_SPEED * delta);
 
-    // space
-    if (keyMap[32])
+    // w
+    if (keyMap[87])
       car.body.speedUp(0.001 * delta);
+
+    // s
+    if (keyMap[83])
+      car.body.speedUp(-0.001 * delta);
 
     scene.update(delta);
   }

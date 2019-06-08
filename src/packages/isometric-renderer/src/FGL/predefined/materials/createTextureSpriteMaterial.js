@@ -1,4 +1,5 @@
 import {glsl} from '../../material/types';
+import basicDiffuseLight from './glsl/basicDiffuseLight';
 
 export const MAX_MATERIALS_COUNT = 4;
 
@@ -32,15 +33,32 @@ const createTextureSpriteMaterial = fgl => fgl.material.shader(
         layout(location = 2) in vec2 uv;
         layout(location = 3) in float mtl;
 
+        uniform mat4 mMatrix;
         uniform mat4 mpMatrix;
 
         out vec2 vUVPos;
+        out vec4 vLight;
+
         flat out float mtlIndexF;
 
+        ${basicDiffuseLight}
+
         void main() {
-          gl_Position = vec4(position, 1.0) * mpMatrix;
+          vec4 castedPos = vec4(position, 1.0);
+
+          gl_Position = castedPos * mpMatrix;
           vUVPos = uv;
           mtlIndexF = mtl;
+
+          // lighting
+          vec3 lightPos = vec3(0, 0, 0.0);
+          vec3 modelVertexPos = vec3(castedPos * mMatrix);
+
+          vLight = calcDiffuseLight(
+            lightPos - modelVertexPos, // light vector
+            normal * inverse(transpose(mat3(mMatrix))), // rotated normal
+            1.0 // intense
+          );
         }
       `,
 
@@ -48,6 +66,7 @@ const createTextureSpriteMaterial = fgl => fgl.material.shader(
         #define MAX_MATERIALS_COUNT ${MAX_MATERIALS_COUNT}
 
         in vec2 vUVPos;
+        in vec4 vLight;
         flat in float mtlIndexF;
 
         out vec4 fragColor;
@@ -81,7 +100,7 @@ const createTextureSpriteMaterial = fgl => fgl.material.shader(
           if (textured)
             color *= texture(tex0, vUVPos);
 
-          fragColor = color;
+          fragColor = color * vLight;
         }
       `,
     },

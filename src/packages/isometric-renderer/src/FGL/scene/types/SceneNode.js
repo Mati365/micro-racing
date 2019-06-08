@@ -134,13 +134,16 @@ export default class SceneNode {
       transformCache, renderer, renderConfig,
     } = this;
 
-    renderConfig.delta = delta;
-    renderConfig.uniforms.mpMatrix = (
-      transformCache
-        ? mat4.mul(mpMatrix, transformCache).array
-        : mpMatrix
-    );
+    const {uniforms} = renderConfig;
+    if (transformCache) {
+      uniforms.mMatrix = transformCache.array;
+      uniforms.mpMatrix = mat4.mul(mpMatrix, transformCache).array;
+    } else {
+      uniforms.mMatrix = null;
+      uniforms.mpMatrix = mpMatrix;
+    }
 
+    renderConfig.delta = delta;
     renderer(renderConfig);
   }
 }

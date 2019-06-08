@@ -23,7 +23,6 @@ const createTexturedCar = f => async color => f.loaders.mesh.from(
     loaderData: {
       source: await createSingleResourceLoader()(CARS_URLS[color]),
       normalize: 'h',
-      axis: [1, 1, -1],
     },
     textures: [
       await createSingleResourceLoader()(carTextureUrl),

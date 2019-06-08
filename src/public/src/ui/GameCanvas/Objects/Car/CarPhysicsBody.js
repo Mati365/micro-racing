@@ -83,7 +83,7 @@ export default class CarPhysicsBody {
   speedUp(delta) {
     const {maxSpeed, speed} = this;
 
-    this.speed = clamp(0, maxSpeed, speed + delta);
+    this.speed = clamp(-maxSpeed, maxSpeed, speed + delta);
   }
 
 
@@ -97,7 +97,7 @@ export default class CarPhysicsBody {
 
     this.actualSteerAngle = lerp(
       this.actualSteerAngle,
-      this.steerAngle,
+      this.steerAngle * Math.sign(speed),
       0.5 * delta,
     );
 

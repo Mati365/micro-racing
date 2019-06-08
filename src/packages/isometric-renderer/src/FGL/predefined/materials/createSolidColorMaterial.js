@@ -1,7 +1,9 @@
+import {glsl} from '../../material/types';
+
 const createSolidColorMaterial = fgl => fgl.material.shader(
   {
     shaders: {
-      vertex: `
+      vertex: glsl`
         in vec4 inVertexPos;
 
         uniform mat4 mpMatrix;
@@ -11,7 +13,7 @@ const createSolidColorMaterial = fgl => fgl.material.shader(
         }
       `,
 
-      fragment: `
+      fragment: glsl`
         out vec4 fragColor;
 
         uniform vec4 color;

@@ -1,1 +1,2 @@
-export {default as createShaderMaterial} from './shader/createShaderMaterial'; // eslint-disable-line
+export {default as createShaderMaterial} from './shader/createShaderMaterial';
+export {default as glsl} from './shader/glsl';

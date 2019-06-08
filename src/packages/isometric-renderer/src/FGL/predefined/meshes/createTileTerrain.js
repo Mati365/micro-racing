@@ -1,10 +1,12 @@
 import * as R from 'ramda';
+
 import {createVertexBuffer} from '../../buffer/types';
+import {glsl} from '../../material/types';
 
 export const createTexAtlasMaterial = fgl => fgl.material.shader(
   {
     shaders: {
-      vertex: `
+      vertex: glsl`
         in vec4 inVertexPos;
         in vec2 inUVPos;
 
@@ -28,7 +30,7 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
         }
       `,
 
-      fragment: `
+      fragment: glsl`
         out vec4 fragColor;
         in vec2 vUVPos;
         in vec2 vUVOffset;

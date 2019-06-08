@@ -1,3 +1,5 @@
+import {glsl} from '../../material/types';
+
 export const MAX_MATERIALS_COUNT = 4;
 
 export const MATERIAL_STRUCT_SIZEOF = 64;
@@ -24,7 +26,7 @@ export const packMaterialsBuffer = (materials) => {
 const createTextureSpriteMaterial = fgl => fgl.material.shader(
   {
     shaders: {
-      vertex: `
+      vertex: glsl`
         layout(location = 0) in vec3 position;
         layout(location = 1) in vec3 normal;
         layout(location = 2) in vec2 uv;
@@ -42,7 +44,7 @@ const createTextureSpriteMaterial = fgl => fgl.material.shader(
         }
       `,
 
-      fragment: `
+      fragment: glsl`
         #define MAX_MATERIALS_COUNT ${MAX_MATERIALS_COUNT}
 
         in vec2 vUVPos;

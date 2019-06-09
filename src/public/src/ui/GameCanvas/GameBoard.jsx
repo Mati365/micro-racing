@@ -24,6 +24,13 @@ const createBasicScene = (f) => {
   const scene = f.createSceneBuffer();
   scene
     .chain
+    .createLight(
+      {
+        pos: [2, 2, -1.0],
+        diffuseColor: [1, 1, 1],
+        diffuseIntensity: 1.0,
+      },
+    )
     .createNode(
       {
         renderer: f.mesh.plainTerrainWireframe(

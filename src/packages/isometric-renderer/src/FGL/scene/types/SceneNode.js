@@ -1,6 +1,17 @@
 import * as R from 'ramda';
 import {vec3, mat4} from '@pkg/gl-math';
 
+/**
+ * @see
+ *  Wraps renderer function with dynamicDescription and provides to it:
+ *  - uniforms
+ *    // matrices
+ *    + invMMatrix
+ *    + mMatrix
+ *    + mpMatrix
+ *    // lights
+ *    + lighting (bool)
+ */
 export default class SceneNode {
   constructor({
     matrix = mat4.from.identity(), // executed before transforms
@@ -146,10 +157,12 @@ export default class SceneNode {
   render(delta, mpMatrix) {
     const {
       invTransformCache, transformCache,
-      renderer, renderConfig,
+      scene, renderer, renderConfig,
     } = this;
 
     const {uniforms} = renderConfig;
+
+    // matrices
     if (transformCache) {
       uniforms.invMMatrix = invTransformCache.array;
       uniforms.mMatrix = transformCache.array;
@@ -159,6 +172,9 @@ export default class SceneNode {
       uniforms.mMatrix = null;
       uniforms.mpMatrix = mpMatrix;
     }
+
+    if (scene)
+      scene.assignSceneRenderConfig(renderConfig);
 
     renderConfig.delta = delta;
     renderer(renderConfig);

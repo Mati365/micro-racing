@@ -15,3 +15,5 @@ export const YELLOW = vec4(1, 0.984, 0.701, 1.0);
 export const DARK_GRAY = vec4(0.2, 0.2, 0.2, 1.0);
 
 export const TRANSPARENT = vec4(0.0, 0.0, 0.0, 1.0);
+
+export const PURPLE = vec4(0.5, 0.0, 0.5, 1.0);

@@ -154,13 +154,24 @@ const createShaderMaterial = (gl, fgl) => {
     /**
      * Loads uniform buffers into program
      */
+    R.forEachObjIndexed(
+      ({loc}) => {
+        gl.uniformBlockBinding(program, loc, loc);
+      },
+      material.ubo,
+    );
+
     const setMaterialUniformBuffers = (ubo) => {
       for (const key in ubo) {
         const uboDescription = material.ubo[key];
         if (!uboDescription)
           continue;
 
-        gl.bindBufferBase(gl.UNIFORM_BUFFER, uboDescription.loc, ubo[key].handle);
+        gl.bindBufferBase(
+          gl.UNIFORM_BUFFER,
+          uboDescription.loc,
+          ubo[key].handle,
+        );
       }
     };
 

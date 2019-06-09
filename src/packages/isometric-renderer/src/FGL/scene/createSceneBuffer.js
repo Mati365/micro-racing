@@ -1,5 +1,8 @@
 import * as R from 'ramda';
+
 import SceneNode from './types/SceneNode';
+import {LightsSceneManager} from '../predefined/materials/glsl/lights';
+import {LightNode} from './types';
 
 const chainMethods = (context) => {
   const boundContext = {};
@@ -18,12 +21,48 @@ const chainMethods = (context) => {
 class SceneBuffer {
   constructor(f) {
     this.f = f;
+
+    // lists
     this.list = [];
+    this.lights = new LightsSceneManager(
+      {
+        f,
+      },
+    );
+
+    // used in creator
     this.chain = chainMethods(
       {
         createNode: ::this.createNode,
+        createLight: ::this.createLight,
       },
     );
+  }
+
+  /**
+   * GL Context
+   */
+  assignSceneRenderConfig(renderConfig) {
+    const {lights} = this;
+
+    renderConfig.uniforms.lighting = !lights.empty;
+    renderConfig.ubo.lightsBlock = lights.ubo;
+  }
+
+  /**
+   * Node list accessors
+   */
+  createLight(light) {
+    this.createNode(
+      new LightNode(
+        {
+          f: this.f,
+          light,
+        },
+      ),
+    );
+
+    return this;
   }
 
   async createNode(nodeConfig) {
@@ -54,6 +93,9 @@ class SceneBuffer {
     return node;
   }
 
+  /**
+   * SceneNode methods
+   */
   update(delta) {
     const {list} = this;
 

@@ -2,7 +2,9 @@ import * as R from 'ramda';
 
 import {createVertexBuffer} from '../../buffer/types';
 import {glsl} from '../../material/types';
-import basicDiffuseLight from '../materials/glsl/basicDiffuseLight';
+import {
+  calcLightingFragment,
+} from '../materials/glsl/lights';
 
 export const createTexAtlasMaterial = fgl => fgl.material.shader(
   {
@@ -16,49 +18,47 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
         in vec2 inUvTileOffset;
 
         // to frag shader
-        out vec3 vPos;
         out vec2 vUVPos;
         out vec2 vUVOffset;
+        out vec4 vLightColor;
 
+        uniform mat3 invMMatrix;
         uniform mat4 mMatrix;
         uniform mat4 mpMatrix;
         uniform vec2 tileSize;
 
+        ${calcLightingFragment}
+
+        const vec3 normal = vec3(0, 0, -1);
+
         void main() {
           vec2 offset = tileSize * inPosTileOffset;
+          vec4 offsetVertexPos = inVertexPos + vec4(offset, 0, 0);
 
-          gl_Position = (inVertexPos + vec4(offset, 0, 0)) * mpMatrix;
+          gl_Position = offsetVertexPos * mpMatrix;
 
-          vPos = vec3((inVertexPos + vec4(offset, 0, 0)) * mMatrix);
           vUVOffset = inUvTileOffset;
           vUVPos = inUVPos;
+
+          vec3 vPos = vec3(offsetVertexPos * mMatrix);
+          vLightColor = vec4(calcLighting(normal, vPos), 1.0);
         }
       `,
 
       fragment: glsl`
         out vec4 fragColor;
 
-        in vec3 vPos;
         in vec2 vUVPos;
         in vec2 vUVOffset;
+        in vec4 vLightColor;
 
-        // atlas texture
-        uniform sampler2D tex0;
-
-        // offsets
-        uniform vec2 uvTileSize;
-
-        ${basicDiffuseLight}
+        uniform sampler2D tex0; // atlas texture
+        uniform vec2 uvTileSize; // offsets
 
         void main() {
           vec4 color = texture(tex0, vUVPos + (vUVOffset * uvTileSize));
-          vec3 lightPos = vec3(0, 0, -3.0);
 
-          fragColor = color * calcDiffuseLight(
-            lightPos - vPos, // light vector
-            vec3(0, 0, -1), // normal
-            1.0 // intense
-          );
+          fragColor = color * vLightColor;
         }
       `,
     },
@@ -143,13 +143,8 @@ const createTileTerrain = (fgl) => {
     );
 
     return (descriptor) => {
-      // todo: remove destructuring!
-      mesh(
-        {
-          ...descriptor,
-          instances,
-        },
-      );
+      descriptor.instances = instances;
+      mesh(descriptor);
     };
   };
 };

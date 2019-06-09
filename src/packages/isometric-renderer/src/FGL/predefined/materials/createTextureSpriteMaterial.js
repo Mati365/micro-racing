@@ -1,5 +1,5 @@
 import {glsl} from '../../material/types';
-import basicDiffuseLight from './glsl/basicDiffuseLight';
+import {calcLightingFragment} from './glsl/lights';
 
 export const MAX_MATERIALS_COUNT = 4;
 
@@ -33,75 +33,66 @@ const createTextureSpriteMaterial = fgl => fgl.material.shader(
         layout(location = 2) in vec2 uv;
         layout(location = 3) in float mtl;
 
+        out vec2 vUVPos;
+        out vec4 vLightColor;
+
         uniform mat3 invMMatrix;
         uniform mat4 mMatrix;
         uniform mat4 mpMatrix;
 
-        out vec2 vUVPos;
-        out vec4 vLight;
+        ${calcLightingFragment}
 
-        flat out float mtlIndexF;
+        struct Material {
+          vec4 ambient; // 16B, offset: 0
+          vec4 diffuse; // 16B, offset: 16,
+          vec4 specular; // 16B, offset: 32
+          float transparent; // 4B, offset: 48,
+          float shine; // 4B, offset: 52,
+          // +8B unused
+        };
 
-        ${basicDiffuseLight}
+        layout(std140) uniform materialsBlock {
+          Material materials[${MAX_MATERIALS_COUNT}];
+        };
 
         void main() {
           vec4 castedPos = vec4(position, 1.0);
 
           gl_Position = castedPos * mpMatrix;
           vUVPos = uv;
-          mtlIndexF = mtl;
+
+          // Material color
+          int materialIndex = int(mtl);
+          if (materialIndex != -1) {
+            Material _mtl = materials[materialIndex];
+            vLightColor = _mtl.ambient * _mtl.diffuse;
+          } else
+            vLightColor = vec4(1.0, 1.0, 1.0, 1.0);
 
           // lighting
-          vec3 lightPos = vec3(0, 0, -2.0);
           vec3 modelVertexPos = vec3(castedPos * mMatrix);
-
-          vLight = calcDiffuseLight(
-            lightPos - modelVertexPos, // light vector
-            invMMatrix * normal,
+          vLightColor *= vec4(
+            calcLighting(invMMatrix * normal, modelVertexPos),
             1.0 // intense
           );
         }
       `,
 
       fragment: glsl`
-        #define MAX_MATERIALS_COUNT ${MAX_MATERIALS_COUNT}
-
         in vec2 vUVPos;
-        in vec4 vLight;
-        flat in float mtlIndexF;
+        in vec4 vLightColor;
 
         out vec4 fragColor;
-
-        struct Material {
-          vec4 ambient; // 12B + 4B unused, offset: 0
-          vec4 diffuse; // 12B + 4B unused, offset: 16,
-          vec4 specular; // 12B + 4B unused, offset: 32
-          float transparent; // 4B, offset: 48,
-          float shine; // 4B, offset: 52,
-          // +8B unused
-        };
 
         uniform bool textured;
         uniform sampler2D tex0;
 
-        layout(std140) uniform materialsBlock {
-          Material materials[MAX_MATERIALS_COUNT];
-        };
-
         void main() {
-          vec4 color;
-          int mtlIndex = int(mtlIndexF);
-
-          if (mtlIndex != -1) {
-            Material mtl = materials[mtlIndex];
-            color = mtl.ambient * mtl.diffuse;
-          } else
-            color = vec4(1.0, 1.0, 1.0, 1.0);
-
+          vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
           if (textured)
             color *= texture(tex0, vUVPos);
 
-          fragColor = color * vLight;
+          fragColor = color * vLightColor;
         }
       `,
     },

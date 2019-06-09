@@ -1,5 +1,23 @@
 import * as R from 'ramda';
 
+class BufferWrapper {
+  constructor(gl, type, usage, handle, length) {
+    this.gl = gl;
+    this.type = type;
+    this.usage = usage;
+    this.handle = handle;
+    this.length = length;
+  }
+
+  update(destOffset, src, srcOffset, length) {
+    const {gl, type} = this;
+
+    gl.bindBuffer(type, this.handle);
+    gl.bufferSubData(type, destOffset, src, srcOffset, length);
+    gl.bindBuffer(type, null);
+  }
+}
+
 /**
  * Creates OpenGL buffer
  *
@@ -20,6 +38,7 @@ const createBuffer = (
     type = gl.ARRAY_BUFFER,
     usage = gl.STATIC_DRAW,
     data,
+    length,
   },
 ) => {
   const buffer = gl.createBuffer();
@@ -27,12 +46,13 @@ const createBuffer = (
   gl.bufferData(type, data, usage);
   gl.bindBuffer(type, null);
 
-  return {
+  return new BufferWrapper(
+    gl,
     type,
     usage,
-    handle: buffer,
-    length: data.length,
-  };
+    buffer,
+    length || data.length,
+  );
 };
 
 export default R.curry(createBuffer);

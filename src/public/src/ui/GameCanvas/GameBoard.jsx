@@ -26,8 +26,22 @@ const createBasicScene = (f) => {
     .chain
     .createLight(
       {
-        pos: [2, 2, -1.0],
+        pos: [7, 6, -1],
         diffuseColor: [1, 1, 1],
+        diffuseIntensity: 0.7,
+      },
+    )
+    .createLight(
+      {
+        pos: [2, 8, -1],
+        diffuseColor: [1, 0, 1],
+        diffuseIntensity: 0.7,
+      },
+    )
+    .createLight(
+      {
+        pos: [2, 2, -1],
+        diffuseColor: [1, 1, 0],
         diffuseIntensity: 1.0,
       },
     )

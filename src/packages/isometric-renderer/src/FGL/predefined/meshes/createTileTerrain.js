@@ -20,14 +20,13 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
         // to frag shader
         out vec2 vUVPos;
         out vec2 vUVOffset;
-        out vec4 vLightColor;
+        out vec3 vPos;
+        out vec3 vNormal;
 
         uniform mat3 invMMatrix;
         uniform mat4 mMatrix;
         uniform mat4 mpMatrix;
         uniform vec2 tileSize;
-
-        ${calcLightingFragment}
 
         const vec3 normal = vec3(0, 0, -1);
 
@@ -40,8 +39,8 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
           vUVOffset = inUvTileOffset;
           vUVPos = inUVPos;
 
-          vec3 vPos = vec3(offsetVertexPos * mMatrix);
-          vLightColor = vec4(calcLighting(normal, vPos), 1.0);
+          vPos = vec3(offsetVertexPos * mMatrix);
+          vNormal = normal;
         }
       `,
 
@@ -50,15 +49,19 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
 
         in vec2 vUVPos;
         in vec2 vUVOffset;
-        in vec4 vLightColor;
+
+        in vec3 vPos;
+        in vec3 vNormal;
 
         uniform sampler2D tex0; // atlas texture
         uniform vec2 uvTileSize; // offsets
 
+        ${calcLightingFragment}
+
         void main() {
           vec4 color = texture(tex0, vUVPos + (vUVOffset * uvTileSize));
 
-          fragColor = color * vLightColor;
+          fragColor = color * vec4(calcLighting(vNormal, vPos), 1.0);
         }
       `,
     },

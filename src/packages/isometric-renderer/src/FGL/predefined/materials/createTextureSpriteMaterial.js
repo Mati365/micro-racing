@@ -34,11 +34,37 @@ const createTextureSpriteMaterial = fgl => fgl.material.shader(
         layout(location = 3) in float mtl;
 
         out vec2 vUVPos;
-        out vec4 vLightColor;
+        out vec3 vPos;
+        out vec3 vNormal;
+        flat out float vMaterial;
 
         uniform mat3 invMMatrix;
         uniform mat4 mMatrix;
         uniform mat4 mpMatrix;
+
+        void main() {
+          vec4 castedPos = vec4(position, 1.0);
+
+          gl_Position = castedPos * mpMatrix;
+          vUVPos = uv;
+
+          // lighting
+          vPos = vec3(castedPos * mMatrix);
+          vNormal = invMMatrix * normal;
+          vMaterial = mtl;
+        }
+      `,
+
+      fragment: glsl`
+        in vec2 vUVPos;
+        in vec3 vPos;
+        in vec3 vNormal;
+        flat in float vMaterial;
+
+        out vec4 fragColor;
+
+        uniform bool textured;
+        uniform sampler2D tex0;
 
         ${calcLightingFragment}
 
@@ -56,43 +82,22 @@ const createTextureSpriteMaterial = fgl => fgl.material.shader(
         };
 
         void main() {
-          vec4 castedPos = vec4(position, 1.0);
-
-          gl_Position = castedPos * mpMatrix;
-          vUVPos = uv;
-
           // Material color
-          int materialIndex = int(mtl);
+          int materialIndex = int(vMaterial);
           if (materialIndex != -1) {
             Material _mtl = materials[materialIndex];
-            vLightColor = _mtl.ambient * _mtl.diffuse;
+            fragColor = _mtl.ambient * _mtl.diffuse;
           } else
-            vLightColor = vec4(1.0, 1.0, 1.0, 1.0);
+            fragColor = vec4(1.0, 1.0, 1.0, 1.0);
 
-          // lighting
-          vec3 modelVertexPos = vec3(castedPos * mMatrix);
-          vLightColor *= vec4(
-            calcLighting(invMMatrix * normal, modelVertexPos),
+          // Texture color
+          if (textured)
+            fragColor *= texture(tex0, vUVPos);
+
+          fragColor *= vec4(
+            calcLighting(vNormal, vPos),
             1.0 // intense
           );
-        }
-      `,
-
-      fragment: glsl`
-        in vec2 vUVPos;
-        in vec4 vLightColor;
-
-        out vec4 fragColor;
-
-        uniform bool textured;
-        uniform sampler2D tex0;
-
-        void main() {
-          vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-          if (textured)
-            color *= texture(tex0, vUVPos);
-
-          fragColor = color * vLightColor;
         }
       `,
     },

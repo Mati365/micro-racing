@@ -101,6 +101,7 @@ export default class SceneNode {
 
     // write cache
     this.transformCache = matrix;
+    this.invTransformCache = mat4.inverse(matrix, this.invTransformCache);
   }
 
   /**
@@ -131,14 +132,17 @@ export default class SceneNode {
 
   render(delta, mpMatrix) {
     const {
-      transformCache, renderer, renderConfig,
+      invTransformCache, transformCache,
+      renderer, renderConfig,
     } = this;
 
     const {uniforms} = renderConfig;
     if (transformCache) {
+      uniforms.invMMatrix = invTransformCache.array;
       uniforms.mMatrix = transformCache.array;
       uniforms.mpMatrix = mat4.mul(mpMatrix, transformCache).array;
     } else {
+      uniforms.invMMatrix = null;
       uniforms.mMatrix = null;
       uniforms.mpMatrix = mpMatrix;
     }

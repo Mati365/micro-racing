@@ -33,6 +33,7 @@ const createTextureSpriteMaterial = fgl => fgl.material.shader(
         layout(location = 2) in vec2 uv;
         layout(location = 3) in float mtl;
 
+        uniform mat3 invMMatrix;
         uniform mat4 mMatrix;
         uniform mat4 mpMatrix;
 
@@ -56,7 +57,7 @@ const createTextureSpriteMaterial = fgl => fgl.material.shader(
 
           vLight = calcDiffuseLight(
             lightPos - modelVertexPos, // light vector
-            normal * inverse(transpose(mat3(mMatrix))), // rotated normal
+            invMMatrix * normal,
             1.0 // intense
           );
         }

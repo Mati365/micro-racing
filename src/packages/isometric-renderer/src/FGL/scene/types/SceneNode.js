@@ -5,14 +5,25 @@ export default class SceneNode {
   constructor({
     matrix = mat4.from.identity(), // executed before transforms
     transform = null,
+    scene = null,
     uniforms = {},
+    ubo = {},
     renderer,
     attributes,
   } = {}) {
+    this.scene = scene;
     this.renderer = renderer;
     this.uniforms = uniforms;
+    this.ubo = ubo;
     this.matrix = matrix;
 
+    // just for reduce GC
+    this.renderConfig = {
+      uniforms: this.uniforms,
+      ubo: this.ubo,
+    };
+
+    // matrix cache for transform
     this.transform = R.mapObjIndexed(
       R.unless(
         R.isNil,
@@ -20,19 +31,21 @@ export default class SceneNode {
       ),
       transform,
     );
-
-    // matrix cache for transform
     this.transformCache = null;
-
-    // just for reduce GC
-    this.renderConfig = {
-      uniforms: this.uniforms,
-    };
+    this.invTransformCache = null;
 
     this.updateTransformCache();
 
     // third party flag fields
     Object.assign(this, attributes);
+  }
+
+  /**
+   * @todo
+   *  Flush cache?
+   */
+  setScene(scene) {
+    this.scene = scene;
   }
 
   /**

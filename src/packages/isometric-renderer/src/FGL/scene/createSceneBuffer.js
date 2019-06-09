@@ -15,23 +15,25 @@ const chainMethods = (context) => {
   return boundContext.current;
 };
 
-/**
- * Render list of nodes on scene
- *
- * @todo
- *  Add camera support!
- */
-const createSceneBuffer = (f) => {
-  const list = [];
-  const context = {};
+class SceneBuffer {
+  constructor(f) {
+    this.f = f;
+    this.list = [];
+    this.chain = chainMethods(
+      {
+        createNode: ::this.createNode,
+      },
+    );
+  }
 
-  const createNode = async (nodeConfig) => {
+  async createNode(nodeConfig) {
+    const {f, list} = this;
     const sceneParams = {
       f,
     };
 
     if (R.is(Function, nodeConfig)) {
-      return createNode(
+      return this.createNode(
         await nodeConfig(sceneParams),
       );
     }
@@ -47,35 +49,28 @@ const createSceneBuffer = (f) => {
         )
     );
 
+    node.setScene(this);
     list.push(node);
     return node;
-  };
+  }
 
-  const render = (delta, mpMatrix) => {
-    for (let i = 0, len = list.length; i < len; ++i)
-      list[i].render(delta, mpMatrix);
-  };
+  update(delta) {
+    const {list} = this;
 
-  const update = (delta) => {
     for (let i = 0, len = list.length; i < len; ++i) {
       const item = list[i];
       item.update && item.update(delta);
     }
-  };
+  }
 
-  Object.assign(
-    context,
-    {
-      createNode,
-      render,
-      update,
-    },
-  );
+  render(delta, mpMatrix) {
+    const {list} = this;
 
-  return {
-    ...context,
-    chain: chainMethods(context),
-  };
-};
+    for (let i = 0, len = list.length; i < len; ++i)
+      list[i].render(delta, mpMatrix);
+  }
+}
+
+const createSceneBuffer = (...args) => new SceneBuffer(...args);
 
 export default createSceneBuffer;

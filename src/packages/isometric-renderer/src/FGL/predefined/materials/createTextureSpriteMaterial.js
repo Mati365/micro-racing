@@ -52,7 +52,7 @@ const createTextureSpriteMaterial = fgl => fgl.material.shader(
           mtlIndexF = mtl;
 
           // lighting
-          vec3 lightPos = vec3(0, 0, 0.0);
+          vec3 lightPos = vec3(0, 0, -2.0);
           vec3 modelVertexPos = vec3(castedPos * mMatrix);
 
           vLight = calcDiffuseLight(

@@ -1,5 +1,5 @@
 import SceneNode from './SceneNode';
-import {Light} from '../../predefined/materials/glsl/lights';
+import {Light} from '../../predefined/lighting';
 
 export default class LightNode extends SceneNode {
   constructor({f, light}) {

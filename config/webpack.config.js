@@ -31,6 +31,7 @@ module.exports = {
         '@pkg/basic-helpers': 'packages/basic-helpers/src/',
         '@pkg/isometric-renderer': 'packages/isometric-renderer/src/',
         '@pkg/ctx': 'packages/ctx-utils/src',
+        '@pkg/struct-pack': 'packages/struct-pack/src/',
         '@game/res': 'public/res/',
         '@game/public': 'public/',
         '@game/server': 'server/',

@@ -1,0 +1,8 @@
+{
+  "name": "@pkg/struct-pack",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "dependencies": {
+    "rxjs": "^6.4.0"
+  }
+}

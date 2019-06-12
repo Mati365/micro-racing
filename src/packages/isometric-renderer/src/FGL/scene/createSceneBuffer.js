@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 
 import SceneNode from './types/SceneNode';
-import {LightsSceneManager} from '../predefined/materials/glsl/lights';
+import {LightsSceneManager} from '../predefined/lighting';
 import {LightNode} from './types';
 
 const chainMethods = (context) => {

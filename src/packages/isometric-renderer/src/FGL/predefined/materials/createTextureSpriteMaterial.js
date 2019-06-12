@@ -1,5 +1,5 @@
 import {glsl} from '../../material/types';
-import {calcLightingFragment} from './glsl/lights';
+import {calcLightingFragment} from '../lighting';
 
 export const MAX_MATERIALS_COUNT = 4;
 

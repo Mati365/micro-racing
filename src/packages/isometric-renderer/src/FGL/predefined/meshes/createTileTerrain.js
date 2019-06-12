@@ -2,9 +2,7 @@ import * as R from 'ramda';
 
 import {createVertexBuffer} from '../../buffer/types';
 import {glsl} from '../../material/types';
-import {
-  calcLightingFragment,
-} from '../materials/glsl/lights';
+import {calcLightingFragment} from '../lighting';
 
 export const createTexAtlasMaterial = fgl => fgl.material.shader(
   {

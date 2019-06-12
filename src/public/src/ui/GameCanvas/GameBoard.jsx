@@ -1,9 +1,10 @@
 import {useMemo} from 'react';
 
+import {LIGHT_TYPES} from '@pkg/isometric-renderer/FGL/predefined/lighting';
+
 import atlasImageUrl from '@game/res/img/atlas.png';
 
 import {toRadians} from '@pkg/gl-math';
-
 import {createIsometricScene} from '@pkg/isometric-renderer';
 import {MeshNode} from '@pkg/isometric-renderer/FGL/scene/types';
 
@@ -28,6 +29,15 @@ const createBasicScene = (f) => {
       {
         pos: [7, 6, -1],
         diffuseColor: [1, 1, 1],
+        diffuseIntensity: 0.7,
+      },
+    )
+    .createLight(
+      {
+        type: LIGHT_TYPES.SPOTLIGHT,
+        pos: [6, 2, -1],
+        direction: [1, 1, 0],
+        diffuseColor: [0, 1, 0],
         diffuseIntensity: 0.7,
       },
     )

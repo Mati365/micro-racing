@@ -1,7 +1,8 @@
 import * as R from 'ramda';
 
 import getIndexByName from '@pkg/basic-helpers/list/getIndexByName';
-import createMeshVertexBuffer from '../../../buffer/types/createMeshVertexBuffer';
+import createMeshVertexBuffer from '../../../../buffer/types/createMeshVertexBuffer';
+import {MeshMaterial} from '../../../materials/createTexturedMeshMaterial';
 
 import loadMTL from './loadMTL';
 import {
@@ -150,7 +151,7 @@ const loadOBJ = gl => ({
 
   return {
     vao: createMeshVertexBuffer(gl, vertices, normalize),
-    materials,
+    materials: materials.map(material => new MeshMaterial(material)),
     size,
     textures: [],
   };

@@ -9,14 +9,14 @@ import tileTexture2D from './texture/tileTexture2D';
 import createMesh from './mesh/createMesh';
 import createMeshBatch from './mesh/createMeshBatch';
 
-import * as meshLoaders from './loaders/mesh';
+import * as meshLoaders from './predefined/loaders/mesh';
 
 import {
   meshes,
   materials,
 } from './predefined';
 
-import getTexturedMeshFrom from './loaders/mesh/utils/getTexturedMeshFrom';
+import getTexturedMeshFrom from './predefined/loaders/mesh/utils/getTexturedMeshFrom';
 
 import createSceneBuffer from './scene/createSceneBuffer';
 import createFGLState from './createFGLState';

@@ -1,2 +1,2 @@
 export {default as solidColor} from './createSolidColorMaterial';
-export {default as textureSprite} from './createTextureSpriteMaterial';
+export {default as texturedMesh} from './createTexturedMeshMaterial';

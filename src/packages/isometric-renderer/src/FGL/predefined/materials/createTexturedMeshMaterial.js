@@ -1,30 +1,47 @@
+import {
+  toGLSLTypeDef,
+  createPackedStruct,
+} from '@pkg/struct-pack';
+
 import {glsl} from '../../material/types';
 import {calcLightingFragment} from '../lighting';
 
 export const MAX_MATERIALS_COUNT = 4;
 
-export const MATERIAL_STRUCT_SIZEOF = 64;
+export const MeshMaterial = createPackedStruct(
+  {
+    fields: {
+      ambient: 'vec4',
+      diffuse: 'vec4',
+      specular: 'vec4',
+      transparent: 'float',
+      shine: 'float',
+    },
+  },
+);
+
+export const MeshMaterialBlock = createPackedStruct(
+  {
+    defs: {
+      Material: MeshMaterial,
+    },
+    fields: {
+      materials: `Material[${MAX_MATERIALS_COUNT}]`,
+    },
+  },
+);
 
 export const packMaterialsBuffer = (materials) => {
-  const buffer = new Float32Array(MAX_MATERIALS_COUNT * MATERIAL_STRUCT_SIZEOF);
+  const buffer = new Float32Array(MeshMaterialBlock.binary.size / 4);
   const count = Math.min(MAX_MATERIALS_COUNT, materials.length);
 
-  for (let i = 0, offset = 0; i < count; ++i, offset += MATERIAL_STRUCT_SIZEOF / 4) {
-    const {
-      ambient, diffuse, specular,
-      transparent, shine,
-    } = materials[i];
-
-    buffer.set(ambient, offset);
-    buffer.set(diffuse, offset + 4);
-    buffer.set(specular, offset + 8);
-    buffer.set([transparent, shine], offset + 12);
-  }
+  for (let i = 0, offset = 0; i < count; ++i, offset += MeshMaterial.binary.size / 4)
+    materials[i].pack(buffer, offset);
 
   return buffer;
 };
 
-const createTextureSpriteMaterial = fgl => fgl.material.shader(
+const createTexturedMeshMaterial = fgl => fgl.material.shader(
   {
     shaders: {
       vertex: glsl`
@@ -69,16 +86,11 @@ const createTextureSpriteMaterial = fgl => fgl.material.shader(
         ${calcLightingFragment}
 
         struct Material {
-          vec4 ambient; // 16B, offset: 0
-          vec4 diffuse; // 16B, offset: 16,
-          vec4 specular; // 16B, offset: 32
-          float transparent; // 4B, offset: 48,
-          float shine; // 4B, offset: 52,
-          // +8B unused
+          ${toGLSLTypeDef(MeshMaterial)}
         };
 
         layout(std140) uniform materialsBlock {
-          Material materials[${MAX_MATERIALS_COUNT}];
+          ${toGLSLTypeDef(MeshMaterialBlock)}
         };
 
         void main() {
@@ -104,4 +116,4 @@ const createTextureSpriteMaterial = fgl => fgl.material.shader(
   },
 );
 
-export default createTextureSpriteMaterial;
+export default createTexturedMeshMaterial;

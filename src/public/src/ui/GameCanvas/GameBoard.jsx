@@ -1,12 +1,12 @@
 import {useMemo} from 'react';
 
-import {LIGHT_TYPES} from '@pkg/isometric-renderer/FGL/predefined/lighting';
+import {LIGHT_TYPES} from '@pkg/isometric-renderer/FGL/engine/lighting';
 
 import atlasImageUrl from '@game/res/img/atlas.png';
 
 import {toRadians} from '@pkg/gl-math';
 import {createIsometricScene} from '@pkg/isometric-renderer';
-import {MeshNode} from '@pkg/isometric-renderer/FGL/scene/types';
+import {MeshNode} from '@pkg/isometric-renderer/FGL/engine/scene/types';
 
 import generateTerrain from './utils/generateTerrain';
 import createTexturedCar, {CAR_COLORS} from './utils/createTexturedCar';

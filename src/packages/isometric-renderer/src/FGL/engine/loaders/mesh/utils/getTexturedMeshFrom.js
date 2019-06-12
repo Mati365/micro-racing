@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import {createUBO} from '../../../../buffer/types';
+import {createUBO} from '../../../../core/buffer/types';
 import {packMaterialsBuffer} from '../../../materials/createTexturedMeshMaterial';
 
 const getTexturedMeshFrom = (f, gl) => async (

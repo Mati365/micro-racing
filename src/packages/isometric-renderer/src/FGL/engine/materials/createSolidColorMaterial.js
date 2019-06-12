@@ -1,4 +1,4 @@
-import {glsl} from '../../material/types';
+import {glsl} from '../../core/material/types';
 
 const createSolidColorMaterial = fgl => fgl.material.shader(
   {

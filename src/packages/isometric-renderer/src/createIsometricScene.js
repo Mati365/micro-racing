@@ -2,7 +2,7 @@ import {mat4} from '@pkg/gl-math/matrix';
 import getDOMElementSize from '@pkg/basic-helpers/base/getDOMElementSize';
 
 import fgl from './FGL';
-import createIsometricProjection from './FGL/viewport/projections/createIsometricProjection';
+import createIsometricProjection from './FGL/core/viewport/projections/createIsometricProjection';
 
 /**
  * Creates FGL instance that makes viewport isometric,

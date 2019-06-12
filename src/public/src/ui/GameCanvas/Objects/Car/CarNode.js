@@ -5,7 +5,7 @@ import {
   SceneNode,
   MeshNode,
   MeshWireframe,
-} from '@pkg/isometric-renderer/FGL/scene';
+} from '@pkg/isometric-renderer/FGL/engine/scene';
 
 import CarPhysicsBody from './CarPhysicsBody';
 

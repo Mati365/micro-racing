@@ -1,29 +1,30 @@
 import * as R from 'ramda';
 
-import * as COLORS from './constants/colors';
+// CORE
+import * as COLORS from './core/constants/colors';
 
-import {createShaderMaterial} from './material/types';
-import texture2D from './texture/texture2D';
-import tileTexture2D from './texture/tileTexture2D';
+import {createShaderMaterial} from './core/material/types';
+import texture2D from './core/texture/texture2D';
+import tileTexture2D from './core/texture/tileTexture2D';
 
-import createMesh from './mesh/createMesh';
-import createMeshBatch from './mesh/createMeshBatch';
+import createMesh from './core/mesh/createMesh';
+import createMeshBatch from './core/mesh/createMeshBatch';
+import createFGLState from './core/createFGLState';
+import {
+  pickGlContext,
+  createDtRenderLoop,
+} from './core/viewport';
 
-import * as meshLoaders from './predefined/loaders/mesh';
+// ENGINE
+import * as meshLoaders from './engine/loaders/mesh';
+
+import getTexturedMeshFrom from './engine/loaders/mesh/utils/getTexturedMeshFrom';
+import createSceneBuffer from './engine/scene/createSceneBuffer';
 
 import {
   meshes,
   materials,
-} from './predefined';
-
-import getTexturedMeshFrom from './predefined/loaders/mesh/utils/getTexturedMeshFrom';
-
-import createSceneBuffer from './scene/createSceneBuffer';
-import createFGLState from './createFGLState';
-import {
-  pickGlContext,
-  createDtRenderLoop,
-} from './viewport';
+} from './engine';
 
 export {
   COLORS,

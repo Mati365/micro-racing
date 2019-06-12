@@ -4,7 +4,7 @@ import {
   createPackedStruct,
 } from '@pkg/struct-pack';
 
-import {glsl} from '../../material/types';
+import {glsl} from '../../core/material/types';
 
 export const MAX_LIGHTS_COUNT = 8;
 

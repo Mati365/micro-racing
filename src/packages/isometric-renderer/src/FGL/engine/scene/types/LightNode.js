@@ -1,5 +1,5 @@
 import SceneNode from './SceneNode';
-import {Light} from '../../predefined/lighting';
+import {Light} from '../../lighting';
 
 export default class LightNode extends SceneNode {
   constructor({f, light}) {

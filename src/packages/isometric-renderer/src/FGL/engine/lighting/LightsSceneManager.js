@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import createUBO from '../../buffer/types/createUBO';
+import createUBO from '../../core/buffer/types/createUBO';
 import {
   LightsBlock,
   Light,

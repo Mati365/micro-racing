@@ -13,6 +13,7 @@ export const MAX_LIGHTS_COUNT = 8;
  */
 export const LIGHT_TYPES = {
   POINT: 1,
+  SPOTLIGHT: 2,
 };
 
 export const Light = createPackedStruct(
@@ -40,6 +41,12 @@ export const Light = createPackedStruct(
         type: 'float',
         default: LIGHT_TYPES.POINT,
       },
+
+
+      // for directional ligth
+      direction: 'vec3',
+      cutOff: 'float',
+      outerCutOff: 'float',
     },
   },
 );
@@ -76,15 +83,36 @@ export const calcLightingFragment = glsl`
 
     for (int i = int(lightsCount) - 1; i >= 0; --i) {
       Light light = lights[i];
-      vec3 lightVector = normalize(light.pos - vPos);
+      int type = int(light.type);
 
+      vec3 lightVector = normalize(light.pos - vPos);
       vec3 diffuse = light.diffuseColor * clamp(
         dot(normalizedNormal, lightVector) * light.diffuseIntensity,
         0.0,
         1.0
       );
 
-      color += diffuse;
+      switch (type) {
+        // POINT LIGHT
+        case ${LIGHT_TYPES.POINT}:
+          color += diffuse;
+          break;
+
+        // SPOTLIGHT
+        case ${LIGHT_TYPES.SPOTLIGHT}:
+          float theta = dot(-light.direction, lightVector);
+
+          if (theta >= light.cutOff) {
+            float epsilon = light.outerCutOff - light.cutOff;
+            float intensity = clamp(
+              (theta - light.cutOff) / epsilon,
+              0.0, 1.0
+            );
+
+            color += diffuse * intensity;
+          }
+          break;
+      }
     }
 
     return color;

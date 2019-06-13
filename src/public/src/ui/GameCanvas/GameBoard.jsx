@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 
-import {LIGHT_TYPES} from '@pkg/isometric-renderer/FGL/engine/lighting';
+// import {LIGHT_TYPES} from '@pkg/isometric-renderer/FGL/engine/lighting';
 
 import atlasImageUrl from '@game/res/img/atlas.png';
 
@@ -27,17 +27,8 @@ const createBasicScene = (f) => {
     .chain
     .createLight(
       {
-        pos: [7, 6, -1],
+        pos: [7, 6, -7],
         diffuseColor: [1, 1, 1],
-        diffuseIntensity: 0.7,
-      },
-    )
-    .createLight(
-      {
-        type: LIGHT_TYPES.SPOTLIGHT,
-        pos: [6, 2, -1],
-        direction: [1, 1, 0],
-        diffuseColor: [0, 1, 0],
         diffuseIntensity: 0.7,
       },
     )

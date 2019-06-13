@@ -18,7 +18,7 @@ const BASE_ALIGN = {
  */
 const MATCH_ARRAY_INDEX_REGEX = /\[(\d+)\]/g;
 
-const isArray = R.is(Array);
+const isArray = item => item && R.is(Object, item) && 'length' in item;
 
 const getTypeItemsCount = R.juxt(
   [
@@ -99,7 +99,7 @@ const parseStruct = ({fields, defs}) => {
    */
   const pack = (obj, dest, offset = 0) => {
     if (!dest)
-      dest = new Float32Array[size];
+      dest = new Float32Array(size);
 
     if (!offset)
       offset = 0;

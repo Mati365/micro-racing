@@ -49,7 +49,7 @@ export default class CarPhysicsBody {
     this.actualSteerAngle = steerAngle;
     this.maxSteerAngle = maxSteerAngle;
 
-    this.massCenter = vec2(0.5, 0.5 + lerp());
+    this.massCenter = vec2(0.5, 0.5);
     this.size = size;
     this.pos = pos;
 

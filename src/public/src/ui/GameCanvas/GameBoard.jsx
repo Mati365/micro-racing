@@ -1,7 +1,5 @@
 import {useMemo} from 'react';
 
-// import {LIGHT_TYPES} from '@pkg/isometric-renderer/FGL/engine/lighting';
-
 import atlasImageUrl from '@game/res/img/atlas.png';
 
 import {toRadians} from '@pkg/gl-math';
@@ -163,6 +161,7 @@ export default class GameBoard {
       ),
     );
 
+    this.scene.camera.target = this.car;
     this.engine.frame(
       (delta, mpMatrix) => {
         this.update(delta);

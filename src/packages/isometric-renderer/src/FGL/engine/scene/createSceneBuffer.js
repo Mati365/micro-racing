@@ -1,8 +1,13 @@
 import * as R from 'ramda';
 
+import {mat4} from '@pkg/gl-math';
+
 import SceneNode from './types/SceneNode';
 import {LightsSceneManager} from '../lighting';
-import {LightNode} from './types';
+import {
+  CameraNode,
+  LightNode,
+} from './types';
 
 const chainMethods = (context) => {
   const boundContext = {};
@@ -35,6 +40,14 @@ class SceneBuffer {
       {
         createNode: ::this.createNode,
         createLight: ::this.createLight,
+      },
+    );
+
+    // very simple camera
+    this.camera = new CameraNode(
+      {
+        target: null,
+        pos: null,
       },
     );
   }
@@ -106,7 +119,15 @@ class SceneBuffer {
   }
 
   render(delta, mpMatrix) {
-    const {list} = this;
+    const {list, camera} = this;
+
+    camera.render(delta, mpMatrix);
+    if (camera.transformCache) {
+      mpMatrix = mat4.mul(
+        mat4.from.translation([0, 0.75, 0]),
+        mat4.mul(mpMatrix, camera.transformCache),
+      );
+    }
 
     for (let i = 0, len = list.length; i < len; ++i)
       list[i].render(delta, mpMatrix);

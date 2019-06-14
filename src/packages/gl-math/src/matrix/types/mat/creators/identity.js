@@ -1,4 +1,5 @@
 import createMatrix from '../createMatrix';
+import cloneMatrix from '../cloneMatrix';
 
 /**
  * @param {Number} w
@@ -30,5 +31,5 @@ export const identity = (w) => {
 export const unrollIdentity = (w) => {
   const SOURCE_MATRIX = Object.freeze(identity(w));
 
-  return () => SOURCE_MATRIX;
+  return () => cloneMatrix(SOURCE_MATRIX);
 };

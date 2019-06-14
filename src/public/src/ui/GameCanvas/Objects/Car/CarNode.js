@@ -52,9 +52,9 @@ class CarNodeWireframe extends MeshWireframe {
     const {meshWheels} = this;
     const {rotate, translate, body} = this.sceneNode;
 
-    const carTransformMatrix = mat4.compose.mul(
+    const carTransformMatrix = mat4.mutable.translate(
+      translate,
       mat4.from.rotation(rotate),
-      mat4.from.translation(translate),
     );
 
     for (let i = meshWheels.length - 1; i >= 0; --i) {
@@ -65,17 +65,18 @@ class CarNodeWireframe extends MeshWireframe {
           : [0, 0, 0]
       );
 
-      wheelMesh.applyTransformMatrix(
-        mat4.mul(
-          mat4.compose.mul(
-            mat4.from.rotation(wheelRotate),
-            wheelMesh.inCarPositionMatrix,
-            carTransformMatrix,
-          ),
-          wheelMesh.scalingMatrix,
-        ),
-        true,
+      // flow:
+      // -> scale
+      // -> rotate around steering
+      // -> move to inner car position
+      // -> rotate / translate to car coordinates
+      const wheelTransform = mat4.compose.mul(
+        mat4.mutable.rotate(wheelRotate, mat4.from.identity()),
+        wheelMesh.inCarPositionMatrix,
+        carTransformMatrix,
       );
+      mat4.mul(wheelTransform, wheelMesh.scalingMatrix, wheelTransform);
+      wheelMesh.applyTransformMatrix(wheelTransform, true);
     }
 
     super.update();

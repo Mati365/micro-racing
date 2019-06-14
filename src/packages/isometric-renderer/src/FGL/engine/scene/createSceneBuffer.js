@@ -1,7 +1,5 @@
 import * as R from 'ramda';
 
-import {mat4} from '@pkg/gl-math';
-
 import SceneNode from './types/SceneNode';
 import {LightsSceneManager} from '../lighting';
 import {
@@ -122,15 +120,8 @@ class SceneBuffer {
     const {list, camera} = this;
 
     camera.render(delta, mpMatrix);
-    if (camera.transformCache) {
-      mpMatrix = mat4.mul(
-        mat4.from.translation([0, 0.75, 0]),
-        mat4.mul(mpMatrix, camera.transformCache),
-      );
-    }
-
     for (let i = 0, len = list.length; i < len; ++i)
-      list[i].render(delta, mpMatrix);
+      list[i].render(delta, camera.mpMatrix);
   }
 }
 

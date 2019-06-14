@@ -1,4 +1,4 @@
-import mat4 from './mat4';
+import mat4 from '../mat4';
 
 /**
  * Creates blank viewport matrix

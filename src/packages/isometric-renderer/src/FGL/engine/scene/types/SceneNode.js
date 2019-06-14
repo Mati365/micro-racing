@@ -42,8 +42,15 @@ export default class SceneNode {
       ),
       transform,
     );
-    this.transformCache = null;
-    this.invTransformCache = null;
+
+    this.cache = {
+      // transforms
+      transform: null,
+      invTransform: null,
+
+      // render config
+      mpTransform: mat4(),
+    };
 
     this.updateTransformCache();
 
@@ -91,7 +98,7 @@ export default class SceneNode {
    * Mutliply matrix based on transfer parameters
    */
   updateTransformCache() {
-    const {transform} = this;
+    const {transform, cache} = this;
     let {matrix} = this;
     if (!transform) {
       this.transformCache = null;
@@ -100,32 +107,24 @@ export default class SceneNode {
 
     const {rotate, scale, translate} = transform;
 
-    // cache matrices
-    const scaleMatrix = scale && mat4.from.scaling(scale);
-    const rotateMatrix = rotate && mat4.from.rotation(rotate);
-    const translateMatrix = translate && mat4.from.translation(translate);
+    if (rotate || scale || translate) {
+      const _matrix = mat4.clone(matrix);
 
-    if (scaleMatrix && rotateMatrix && translateMatrix) {
-      matrix = mat4.compose.mul(
-        scaleMatrix,
-        rotateMatrix,
-        translateMatrix,
-        matrix,
-      );
-    } else {
-      if (rotateMatrix)
-        matrix = mat4.mul(rotateMatrix, matrix);
+      if (scale)
+        mat4.mutable.scale(scale, _matrix);
 
-      if (scaleMatrix)
-        matrix = mat4.mul(scaleMatrix, matrix);
+      if (rotate)
+        mat4.mutable.rotate(rotate, _matrix);
 
-      if (translateMatrix)
-        matrix = mat4.mul(translateMatrix, matrix);
+      if (translate)
+        mat4.mutable.translate(translate, _matrix);
+
+      matrix = _matrix;
     }
 
     // write cache
-    this.transformCache = matrix;
-    this.invTransformCache = mat4.inverse(matrix, this.invTransformCache);
+    cache.transform = matrix;
+    cache.invTransform = mat4.inverse(matrix, cache.invTransform);
   }
 
   /**
@@ -156,17 +155,23 @@ export default class SceneNode {
 
   render(delta, mpMatrix) {
     const {
-      invTransformCache, transformCache,
-      scene, renderer, renderConfig,
+      cache, scene, renderer, renderConfig,
     } = this;
 
     const {uniforms} = renderConfig;
+    const {
+      transform: transformCache,
+      invTransform: invTransformCache,
+
+      // only for reduce GC usage
+      mpTransform: mpTransformCache,
+    } = cache;
 
     // matrices
     if (transformCache) {
       uniforms.invMMatrix = invTransformCache.array;
       uniforms.mMatrix = transformCache.array;
-      uniforms.mpMatrix = mat4.mul(mpMatrix, transformCache).array;
+      uniforms.mpMatrix = mat4.mul(mpMatrix, transformCache, mpTransformCache).array;
     } else {
       uniforms.invMMatrix = null;
       uniforms.mMatrix = null;

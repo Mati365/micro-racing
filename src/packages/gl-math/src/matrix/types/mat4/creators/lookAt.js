@@ -1,5 +1,5 @@
-import mat4 from './mat4';
-import vec3 from '../vec3';
+import mat4 from '../mat4';
+import vec3 from '../../vec3';
 
 /**
  * @see {@link http://www.geertarien.com/blog/2017/07/30/breakdown-of-the-lookAt-function-in-OpenGL/}

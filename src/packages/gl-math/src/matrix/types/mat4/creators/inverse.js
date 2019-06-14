@@ -1,4 +1,4 @@
-import mat3 from '../mat3';
+import mat3 from '../../mat3';
 
 /**
  * @see {@link https://stackoverflow.com/a/18504573}

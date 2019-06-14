@@ -98,7 +98,6 @@ const createShaderMaterial = (gl, fgl) => {
      */
     const setMaterialUniform = (key, value) => {
       const setter = materialUniformSetters[key];
-
       if (!setter)
         return;
 

@@ -57,13 +57,13 @@ const generateRandomRoad = (area) => {
     convexHull,
     dropNearPoints(
       {
-        minDistance: 32,
+        minDistance: area.w * 0.05,
       },
     ),
     generateAreaPoints(
       {
-        x: 100,
-        y: 100,
+        x: area.w * 0.1,
+        y: area.h * 0.1,
       },
       20,
     ),

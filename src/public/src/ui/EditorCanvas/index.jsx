@@ -13,9 +13,10 @@ import Track, {
   getHandlerSiblingParentPoint,
 } from './Track';
 
-import triangularizePath from './utils/triangularizePath';
-import interpolateEditorPath from './interpolateEditorPath';
-import generateRandomRoad from './utils/generateRandomRoad';
+import {
+  triangularizePath,
+  generateRandomRoad,
+} from './utils';
 
 const drawPoints = (color, r, points, ctx) => {
   for (let i = points.length - 1; i >= 0; --i) {
@@ -62,12 +63,10 @@ const renderTrack = (ctx, {area, step = 0.2}, track) => {
 
   // Render curve lines
   if (realPointsLength >= 2) {
-    const interpolated = interpolateEditorPath(
+    const interpolated = track.getInterpolatedPathPoints(
       {
         step,
-        loop: realPointsLength > 2,
       },
-      path,
     );
 
     drawPoints('#0000ff', 3, interpolated, ctx);
@@ -154,7 +153,8 @@ class TrackEditor {
 
   focused = null;
 
-  constructor() {
+  constructor({track} = {}) {
+    this.track = track;
     this.handlers = {
       click: this.onClickItemAdd,
       keydown: this.onKeydown,
@@ -187,9 +187,12 @@ class TrackEditor {
     this.canvas = canvas;
     this.dimensions = dimensions;
     this.ctx = canvas.getContext('2d');
-    this.track = new Track(
-      generateRandomRoad(dimensions),
-    );
+
+    if (!this.track) {
+      this.track = new Track(
+        generateRandomRoad(dimensions),
+      );
+    }
 
     // first render
     this.mapCanvasHandlers(canvas, false);
@@ -321,8 +324,8 @@ class TrackEditor {
   }
 }
 
-const useTrackEditor = () => useMemo(
-  () => new TrackEditor,
+const useTrackEditor = initialConfig => useMemo(
+  () => new TrackEditor(initialConfig),
   [],
 );
 
@@ -331,9 +334,13 @@ const useTrackEditor = () => useMemo(
  *
  * @export
  */
-const EditorCanvas = ({dimensions}) => {
+const EditorCanvas = ({track, dimensions}) => {
   const roadRef = useRef();
-  const editor = useTrackEditor();
+  const editor = useTrackEditor(
+    {
+      track,
+    },
+  );
 
   useEffect(
     () => {

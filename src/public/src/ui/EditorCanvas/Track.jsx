@@ -1,6 +1,9 @@
 import * as R from 'ramda';
 import {vec2} from '@pkg/gl-math/matrix';
 
+import interpolateEditorPath from './interpolateEditorPath';
+import triangularizePath from './utils/triangularizePath';
+
 const isPointInsideRect = (point, rect) => (
   point.x > rect.x
     && point.x < rect.x + rect.w
@@ -264,6 +267,48 @@ export default class Track {
       index === -1
         ? null
         : createPathPoint(path[index], index)
+    );
+  }
+
+  /**
+   * Return beizer interpolated points
+   *
+   * @param {Object} config
+   *
+   * @see
+   *  Very slow!
+   */
+  getInterpolatedPathPoints(config) {
+    const {path, realPointsLength} = this;
+
+    return interpolateEditorPath(
+      {
+        step: 0.2,
+        loop: realPointsLength > 2,
+        chunkSize: CHUNK_SIZE,
+        selectorFn: R.prop('point'),
+        ...config,
+      },
+      path,
+    );
+  }
+
+  /**
+   * Get track triangles with path!
+   *
+   * @param {Object} config
+   *
+   * @see
+   *  Very slow!
+   */
+  getTriangularizedPath({triangleWidth, ...interpolateConfig}) {
+    const path = this.getInterpolatedPathPoints(interpolateConfig);
+
+    return triangularizePath(
+      {
+        width: triangleWidth,
+      },
+      path,
     );
   }
 }

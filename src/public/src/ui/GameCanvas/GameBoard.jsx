@@ -10,7 +10,10 @@ import generateTerrain from './utils/generateTerrain';
 import createTexturedCar, {CAR_COLORS} from './utils/createTexturedCar';
 import createTexturedTree from './utils/createTexturedTree';
 
-import Car from './Objects/Car';
+import {
+  CarNode,
+  RoadNode,
+} from './Objects';
 
 const ROTATE_CAR_SPEED = toRadians(1);
 
@@ -48,15 +51,15 @@ const createBasicScene = (f) => {
       {
         renderer: f.mesh.plainTerrainWireframe(
           {
-            w: 20,
-            h: 20,
+            w: 64,
+            h: 64,
           },
         ),
         uniforms: {
           color: f.colors.DARK_GRAY,
         },
         transform: {
-          scale: [20.0, 20.0, 1.0],
+          scale: [64.0, 64.0, 1.0],
         },
       },
     )
@@ -105,26 +108,30 @@ const createBasicScene = (f) => {
       },
     )
     .createNode(
-      async sceneParams => new Car({
-        ...sceneParams,
-        renderer: await createTexturedCar(f)(CAR_COLORS.RED),
-        transform: {
-          rotate: [0, 0, toRadians(90)],
-          scale: [1.5, 1.5, 1.5],
-          translate: [3, 3, 0.0],
+      async sceneParams => new CarNode(
+        {
+          ...sceneParams,
+          renderer: await createTexturedCar(f)(CAR_COLORS.RED),
+          transform: {
+            rotate: [0, 0, toRadians(90)],
+            scale: [1.5, 1.5, 1.5],
+            translate: [3, 3, 0.0],
+          },
         },
-      }),
+      ),
     )
     .createNode(
-      async () => new MeshNode({
-        renderer: await createTexturedTree(f),
-        transform: {
-          rotate: [0, 0, toRadians(180)],
-          scale: [0.25, 0.25, 0.25],
-          translate: [4, 6, 0],
+      async () => new MeshNode(
+        {
+          renderer: await createTexturedTree(f),
+          transform: {
+            rotate: [0, 0, toRadians(180)],
+            scale: [0.25, 0.25, 0.25],
+            translate: [4, 6, 0],
+          },
+          f,
         },
-        f,
-      }),
+      ),
     );
 
   return scene;
@@ -133,7 +140,7 @@ const createBasicScene = (f) => {
 export default class GameBoard {
   keyMap = {};
 
-  async setCanvas({canvas, dimensions, aspectRatio}) {
+  async setCanvas({canvas, dimensions, aspectRatio, track}) {
     this.canvas = canvas;
     this.dimensions = dimensions;
     this.engine = createIsometricScene(
@@ -146,12 +153,29 @@ export default class GameBoard {
     canvas.addEventListener('keydown', (e) => { this.keyMap[e.which] = true; }, true);
     canvas.addEventListener('keyup', (e) => { this.keyMap[e.which] = false; }, true);
 
-    this.scene = createBasicScene(this.engine.f);
+    const {f} = this.engine;
+    this.scene = createBasicScene(f);
+    this.scene.createNode(
+      () => new RoadNode(
+        {
+          f,
+          track,
+          uniforms: {
+            color: f.colors.RED,
+          },
+          transform: {
+            scale: [0.1, 0.1, 1.0],
+            translate: [1, -3, -0.01],
+          },
+        },
+      ),
+    );
+
     this.car = await this.scene.createNode(
-      async sceneParams => new Car(
+      async sceneParams => new CarNode(
         {
           ...sceneParams,
-          renderer: await createTexturedCar(this.engine.f)(CAR_COLORS.BLUE),
+          renderer: await createTexturedCar(f)(CAR_COLORS.BLUE),
           transform: {
             rotate: [0, 0, toRadians(-75)],
             scale: [1.25, 1.25, 1.25],
@@ -201,7 +225,7 @@ export default class GameBoard {
   }
 }
 
-export const useGameBoard = () => useMemo(
-  () => new GameBoard,
+export const useGameBoard = initialConfig => useMemo(
+  () => new GameBoard(initialConfig),
   [],
 );

@@ -1,6 +1,5 @@
+import * as R from 'ramda';
 import {deCasteljau} from '@pkg/beizer-lines';
-
-import {CHUNK_SIZE} from './Track';
 
 /**
  * Add more curvy lines to editor map
@@ -11,23 +10,26 @@ import {CHUNK_SIZE} from './Track';
  * @param {*} config
  * @param {*} path
  */
-const interpolateEditorPath = ({step, loop}, path) => {
+const interpolateEditorPath = ({
+  step,
+  loop,
+  chunkSize = 1,
+  selectorFn = R.identity,
+}, path) => {
   let points = [];
 
-  for (let j = 0; j < path.length - CHUNK_SIZE; j += CHUNK_SIZE) {
+  for (let j = 0; j < path.length - chunkSize - (+loop); j += chunkSize) {
     points = points.concat(
       deCasteljau(
         {
           step,
-
           points: [
-            path[j].point, // A
-            path[j + CHUNK_SIZE].point, // B
+            selectorFn(path[j]), // A
+            selectorFn(path[j + chunkSize]), // B
           ],
-
           handlers: [
-            path[j + CHUNK_SIZE - 1].point, // A top handler
-            path[j + CHUNK_SIZE + 1].point, // B top handler
+            selectorFn(path[j + chunkSize - 1]), // A top handler
+            selectorFn(path[j + chunkSize + 1]), // B top handler
           ],
         },
       ),
@@ -40,15 +42,13 @@ const interpolateEditorPath = ({step, loop}, path) => {
       deCasteljau(
         {
           step,
-
           points: [
-            path[path.length - CHUNK_SIZE].point, // B
-            path[0].point, // A
+            selectorFn(path[path.length - chunkSize]), // B
+            selectorFn(path[0]), // A
           ],
-
           handlers: [
-            path[path.length - 1].point, // A top handler
-            path[1].point, // B top handler
+            selectorFn(path[path.length - 1]), // A top handler
+            selectorFn(path[1]), // B top handler
           ],
         },
       ),
@@ -58,4 +58,4 @@ const interpolateEditorPath = ({step, loop}, path) => {
   return points;
 };
 
-export default interpolateEditorPath;
+export default R.curry(interpolateEditorPath);

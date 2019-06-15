@@ -1,3 +1,5 @@
+import * as R from 'ramda';
+
 import {Triangle} from '@pkg/gl-math/classes';
 import expandPath from './expandPath';
 
@@ -30,9 +32,11 @@ const triangularizePath = ({width}, path) => {
   }
 
   return {
+    path,
+    innerPath,
     outerPath,
     triangles,
   };
 };
 
-export default triangularizePath;
+export default R.curry(triangularizePath);

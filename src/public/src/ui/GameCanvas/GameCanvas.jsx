@@ -4,6 +4,17 @@ import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
 import {useGameBoard} from './GameBoard';
 
 import EditorCanvas from '../EditorCanvas';
+import Track from '../EditorCanvas/Track';
+import {generateRandomRoad} from '../EditorCanvas/utils';
+
+const track = new Track(
+  generateRandomRoad(
+    {
+      w: 640,
+      h: 480,
+    },
+  ),
+);
 
 const GameCanvas = ({dimensions}) => {
   const canvasRef = useRef();
@@ -17,6 +28,7 @@ const GameCanvas = ({dimensions}) => {
             canvas: canvasRef.current,
             aspectRatio: 1.16,
             dimensions,
+            track,
           },
         );
     },
@@ -32,7 +44,10 @@ const GameCanvas = ({dimensions}) => {
         height={dimensions.h}
       />
 
-      <EditorCanvas dimensions={dimensions} />
+      <EditorCanvas
+        dimensions={dimensions}
+        track={track}
+      />
     </div>
   );
 };

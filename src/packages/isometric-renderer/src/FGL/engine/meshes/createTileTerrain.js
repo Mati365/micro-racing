@@ -21,7 +21,6 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
         out vec3 vPos;
         out vec3 vNormal;
 
-        uniform mat3 invMMatrix;
         uniform mat4 mMatrix;
         uniform mat4 mpMatrix;
         uniform vec2 tileSize;

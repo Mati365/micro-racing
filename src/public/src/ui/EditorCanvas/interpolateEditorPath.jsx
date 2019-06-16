@@ -11,7 +11,7 @@ import {deCasteljau} from '@pkg/beizer-lines';
  * @param {*} path
  */
 const interpolateEditorPath = ({
-  step,
+  spacing = 10,
   loop,
   chunkSize = 1,
   selectorFn = R.identity,
@@ -22,7 +22,7 @@ const interpolateEditorPath = ({
     points = points.concat(
       deCasteljau(
         {
-          step,
+          spacing,
           points: [
             selectorFn(path[j]), // A
             selectorFn(path[j + chunkSize]), // B
@@ -41,7 +41,7 @@ const interpolateEditorPath = ({
     points = points.concat(
       deCasteljau(
         {
-          step,
+          spacing,
           points: [
             selectorFn(path[path.length - chunkSize]), // B
             selectorFn(path[0]), // A

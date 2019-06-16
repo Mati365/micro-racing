@@ -283,7 +283,7 @@ export default class Track {
 
     return interpolateEditorPath(
       {
-        step: 0.2,
+        spacing: 10,
         loop: realPointsLength > 2,
         chunkSize: CHUNK_SIZE,
         selectorFn: R.prop('point'),

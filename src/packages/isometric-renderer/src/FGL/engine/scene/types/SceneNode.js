@@ -158,6 +158,9 @@ export default class SceneNode {
       cache, scene, renderer, renderConfig,
     } = this;
 
+    if (!renderer)
+      return;
+
     const {uniforms} = renderConfig;
     const {
       transform: transformCache,

@@ -28,7 +28,7 @@ export const deCasteljau2Points = (p0, p1, p2, t) => {
  */
 export const deCasteljau = (
   {
-    step,
+    spacing = 10,
     inclusive = {
       left: true,
       right: false,
@@ -43,25 +43,37 @@ export const deCasteljau = (
     ],
   },
 ) => {
-  const reduced = [];
+  const fixedStep = spacing / 4.0 / vec2.dist(A, B);
 
-  for (
-    let t = inclusive.left ? 0.0 : step;
-    inclusive.right ? t <= 1.0 : t < 1.0;
-    t += step
-  ) {
+  const reduced = [];
+  let t = inclusive.left ? 0.0 : fixedStep;
+
+  let prevPoint = A;
+
+  while (inclusive.right ? t <= 1.0 : t < 1.0) {
+    t += fixedStep;
+
     const p0 = vec2.lerp(t, A, cA); // lerp between curve handler A and cA
     const p1 = vec2.lerp(t, cA, cB); // lerp between curve handler cA and cB
     const p2 = vec2.lerp(t, cB, B); // lerp between curve handler B and cB
 
-    reduced.push(
-      quadraticBeizerLine(
-        p0,
-        deCasteljau2Points(p0, p1, p2, t),
-        p2,
-        t,
-      ),
+    let point = quadraticBeizerLine(
+      p0,
+      deCasteljau2Points(p0, p1, p2, t),
+      p2,
+      t,
     );
+
+    const dist = vec2.dist(prevPoint, point);
+    if (dist >= spacing) {
+      const missDist = dist - spacing;
+      const prevPointVector = vec2.normalize(vec2.sub(prevPoint, point));
+
+      point = vec2.add(point, vec2.mul(missDist, prevPointVector));
+
+      prevPoint = point;
+      reduced.push(point);
+    }
   }
 
   return reduced;

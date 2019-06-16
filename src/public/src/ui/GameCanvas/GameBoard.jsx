@@ -26,27 +26,27 @@ const createBasicScene = (f) => {
   const scene = f.createSceneBuffer();
   scene
     .chain
-    .createLight(
-      {
-        pos: [7, 6, -7],
-        diffuseColor: [1, 1, 1],
-        diffuseIntensity: 0.7,
-      },
-    )
-    .createLight(
-      {
-        pos: [2, 8, -1],
-        diffuseColor: [1, 0, 1],
-        diffuseIntensity: 0.7,
-      },
-    )
-    .createLight(
-      {
-        pos: [2, 2, -1],
-        diffuseColor: [1, 1, 0],
-        diffuseIntensity: 1.0,
-      },
-    )
+    // .createLight(
+    //   {
+    //     pos: [7, 6, -7],
+    //     diffuseColor: [1, 1, 1],
+    //     diffuseIntensity: 0.7,
+    //   },
+    // )
+    // .createLight(
+    //   {
+    //     pos: [2, 8, -1],
+    //     diffuseColor: [1, 0, 1],
+    //     diffuseIntensity: 0.7,
+    //   },
+    // )
+    // .createLight(
+    //   {
+    //     pos: [2, 2, -1],
+    //     diffuseColor: [1, 1, 0],
+    //     diffuseIntensity: 1.0,
+    //   },
+    // )
     .createNode(
       {
         renderer: f.mesh.plainTerrainWireframe(
@@ -161,11 +161,11 @@ export default class GameBoard {
           f,
           track,
           uniforms: {
-            color: f.colors.RED,
+            color: f.colors.WHITE,
           },
           transform: {
             scale: [0.1, 0.1, 1.0],
-            translate: [1, -3, -0.01],
+            translate: [-15, -8, -0.01],
           },
         },
       ),

@@ -1,6 +1,33 @@
 import * as R from 'ramda';
 import {vec3, mat4} from '@pkg/gl-math';
 
+export const hasTransforms = (transform) => {
+  const {rotate, scale, translate} = transform;
+
+  return !!rotate || !!scale || !!translate;
+};
+
+/**
+ * Applies to matrix several transformations
+ *
+ * @param {Transforms} transform
+ * @param {Matrix} dest
+ */
+export const applyTransformsToMatrix = (transform, dest = mat4.identity()) => {
+  const {rotate, scale, translate} = transform;
+
+  if (scale)
+    mat4.mutable.scale(scale, dest);
+
+  if (rotate)
+    mat4.mutable.rotate(rotate, dest);
+
+  if (translate)
+    mat4.mutable.translate(translate, dest);
+
+  return dest;
+};
+
 /**
  * @see
  *  Wraps renderer function with dynamicDescription and provides to it:
@@ -105,22 +132,9 @@ export default class SceneNode {
       return;
     }
 
-    const {rotate, scale, translate} = transform;
-
-    if (rotate || scale || translate) {
-      const _matrix = mat4.clone(matrix);
-
-      if (scale)
-        mat4.mutable.scale(scale, _matrix);
-
-      if (rotate)
-        mat4.mutable.rotate(rotate, _matrix);
-
-      if (translate)
-        mat4.mutable.translate(translate, _matrix);
-
-      matrix = _matrix;
-    }
+    // creates matrix from transfrom properties
+    if (hasTransforms(transform))
+      matrix = applyTransformsToMatrix(transform, mat4.clone(matrix));
 
     // write cache
     cache.transform = matrix;

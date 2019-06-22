@@ -13,7 +13,6 @@ import {identity} from '../../mat/creators/identity';
  */
 const rotation = (vec3) => {
   const [x, y, z] = vec3;
-
   if (x === 0 && y === 0 && z === 0)
     return identity(4);
 

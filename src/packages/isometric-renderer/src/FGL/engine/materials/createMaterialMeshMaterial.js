@@ -41,7 +41,7 @@ export const packMaterialsBuffer = (materials) => {
   return buffer;
 };
 
-const createTexturedMeshMaterial = fgl => fgl.material.shader(
+const createMaterialMeshMaterial = fgl => fgl.material.shader(
   {
     shaders: {
       vertex: glsl`
@@ -116,4 +116,4 @@ const createTexturedMeshMaterial = fgl => fgl.material.shader(
   },
 );
 
-export default createTexturedMeshMaterial;
+export default createMaterialMeshMaterial;

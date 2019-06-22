@@ -18,7 +18,7 @@ import {
 // ENGINE
 import * as meshLoaders from './engine/loaders/mesh';
 
-import getTexturedMeshFrom from './engine/loaders/mesh/utils/getTexturedMeshFrom';
+import getMaterialMeshFrom from './engine/loaders/mesh/utils/getMaterialMeshFrom';
 import createSceneBuffer from './engine/scene/createSceneBuffer';
 
 import {
@@ -63,7 +63,7 @@ const createRenderContext = (canvasElement, glContextFlags) => {
       loaders: {
         mesh: {
           ...bindObjectSceneContext(meshLoaders),
-          from: getTexturedMeshFrom(fgl, gl),
+          from: getMaterialMeshFrom(fgl, gl),
         },
       },
 

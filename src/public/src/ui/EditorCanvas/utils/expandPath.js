@@ -15,13 +15,13 @@ const expandPath = (width, path) => {
     let deltaVec = null;
 
     const d1 = vec2.sub(
-      path[i - 1] || path[path.length - 1],
+      i - 1 < 0 ? path[path.length - 1] : path[i - 1],
       path[i],
     );
 
     const d2 = vec2.sub(
       path[i],
-      path[i + 1] || path[0],
+      i + 1 >= path.length ? path[0] : path[i + 1],
     );
 
     deltaVec = vec2(

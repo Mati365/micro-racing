@@ -73,13 +73,13 @@ const createBasicScene = (f) => {
               h: 5,
             },
             size: {
-              w: 10,
-              h: 10,
+              w: 64,
+              h: 64,
             },
           },
         ),
         transform: {
-          scale: [10.0, 10.0, 1.0],
+          scale: [64.0, 64.0, 1.0],
         },
       }),
     )
@@ -155,7 +155,8 @@ export default class GameBoard {
 
     const {f} = this.engine;
     this.scene = createBasicScene(f);
-    this.scene.createNode(
+
+    this.road = await this.scene.createNode(
       () => new RoadNode(
         {
           f,
@@ -165,7 +166,8 @@ export default class GameBoard {
           },
           transform: {
             scale: [0.1, 0.1, 1.0],
-            translate: [-15, -8, -0.01],
+            translate: [-2.0, -2.0, -0.01],
+            rotate: [0.0, 0.0, 0.0],
           },
         },
       ),

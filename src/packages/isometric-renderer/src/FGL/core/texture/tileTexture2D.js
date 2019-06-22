@@ -1,3 +1,5 @@
+import {vec2} from '@pkg/gl-math';
+
 /**
  * @param {WebGLRenderingContext} gl
  * @param {FGL} fgl
@@ -12,10 +14,10 @@ const tileTexture2D = (gl, fgl) => ({
     },
   ),
   size,
-  uvSize: {
-    w: 1.0 / size.w,
-    h: 1.0 / size.h,
-  },
+  uvSize: vec2(
+    1.0 / size.w,
+    1.0 / size.h,
+  ),
 });
 
 export default tileTexture2D;

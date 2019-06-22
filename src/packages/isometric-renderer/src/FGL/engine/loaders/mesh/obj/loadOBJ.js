@@ -2,7 +2,7 @@ import * as R from 'ramda';
 
 import getIndexByName from '@pkg/basic-helpers/list/getIndexByName';
 import createMeshVertexBuffer from '../../../../core/buffer/types/createMeshVertexBuffer';
-import {MeshMaterial} from '../../../materials/createTexturedMeshMaterial';
+import {MeshMaterial} from '../../../materials/createMaterialMeshMaterial';
 
 import loadMTL from './loadMTL';
 import {

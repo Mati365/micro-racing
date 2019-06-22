@@ -1,9 +1,9 @@
 import * as R from 'ramda';
 
 import {createUBO} from '../../../../core/buffer/types';
-import {packMaterialsBuffer} from '../../../materials/createTexturedMeshMaterial';
+import {packMaterialsBuffer} from '../../../materials/createMaterialMeshMaterial';
 
-const getTexturedMeshFrom = (f, gl) => async (
+const getMaterialMeshFrom = (f, gl) => async (
   {
     loader = 'obj',
     loaderData,
@@ -35,7 +35,7 @@ const getTexturedMeshFrom = (f, gl) => async (
     {
       size,
       renderMode: f.flags.TRIANGLES,
-      material: f.material.texturedMesh,
+      material: f.material.materialMesh,
       textures: shaderTextures,
       uniforms: {
         textured: !R.isEmpty(shaderTextures),
@@ -56,4 +56,4 @@ const getTexturedMeshFrom = (f, gl) => async (
   );
 };
 
-export default getTexturedMeshFrom;
+export default getMaterialMeshFrom;

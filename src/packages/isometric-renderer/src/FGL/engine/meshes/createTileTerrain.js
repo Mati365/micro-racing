@@ -1,5 +1,7 @@
 import * as R from 'ramda';
 
+import {vec2} from '@pkg/gl-math';
+
 import {createVertexBuffer} from '../../core/buffer/types';
 import {glsl} from '../../core/material/types';
 import {calcLightingFragment} from '../lighting';
@@ -28,8 +30,7 @@ export const createTexAtlasMaterial = fgl => fgl.material.shader(
         const vec3 normal = vec3(0, 0, -1);
 
         void main() {
-          vec2 offset = tileSize * inPosTileOffset;
-          vec4 offsetVertexPos = inVertexPos + vec4(offset, 0, 0);
+          vec4 offsetVertexPos = vec4(tileSize, 1.0, 1.0) * (inVertexPos + vec4(inPosTileOffset, 0, 0));
 
           gl_Position = offsetVertexPos * mpMatrix;
 
@@ -88,16 +89,30 @@ const createTileTerrain = (fgl) => {
     items,
   }) => {
     const {uvSize} = texTile;
-    const instances = Math.max(items.length, size.w * size.h);
+    const tileSize = vec2(
+      1.0 / size.w,
+      1.0 / size.h,
+    );
 
+    const instances = Math.max(items.length, size.w * size.h);
     const uv = [
-      [0.0, uvSize.h],
-      [uvSize.w, 0.0],
+      [0.0, uvSize.y],
+      [uvSize.x, 0.0],
       [0.0, 0.0],
 
-      [0.0, uvSize.h],
-      [uvSize.w, uvSize.h],
-      [uvSize.w, 0.0],
+      [0.0, uvSize.y],
+      [uvSize.x, uvSize.y],
+      [uvSize.x, 0.0],
+    ];
+
+    const vertices = [
+      [0.0, 1.0],
+      [1.0, 0.0],
+      [0.0, 0.0],
+
+      [0.0, 1.0],
+      [1.0, 1.0],
+      [1.0, 0.0],
     ];
 
     // used in instancing
@@ -119,10 +134,7 @@ const createTileTerrain = (fgl) => {
 
         // required mesh buffers
         uv,
-        vertices: R.map(
-          R.append(0.0),
-          uv,
-        ),
+        vertices,
 
         // external attributes / unfiroms
         buffers: {
@@ -130,14 +142,8 @@ const createTileTerrain = (fgl) => {
           inUvTileOffset: createVertexBuffer(gl, uvOffsets, gl.STATIC_DRAW, 2, 1),
         },
         uniforms: {
-          tileSize: [
-            1.0 / size.w,
-            1.0 / size.h,
-          ],
-          uvTileSize: [
-            uvSize.w,
-            uvSize.h,
-          ],
+          tileSize,
+          uvTileSize: uvSize,
         },
       },
     );

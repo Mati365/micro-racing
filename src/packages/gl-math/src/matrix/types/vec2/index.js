@@ -16,6 +16,6 @@ export default createVectorOptimizedOperations(
     fromScalar,
 
     toVec3(vec) { return vec3(vec[0], vec[1], 0); },
-    toVec4(vec) { return vec4(vec[0], vec[1], 0, 0); },
+    toVec4(vec) { return vec4(vec[0], vec[1], 0, 1.0); },
   },
 );

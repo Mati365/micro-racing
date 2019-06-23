@@ -41,6 +41,7 @@ export const applyTransformsToMatrix = (transform, dest = mat4.identity()) => {
  */
 export default class SceneNode {
   constructor({
+    initialCacheInit = true,
     matrix = mat4.from.identity(), // executed before transforms
     transform = null,
     scene = null,
@@ -54,6 +55,7 @@ export default class SceneNode {
     this.uniforms = uniforms;
     this.ubo = ubo;
     this.matrix = matrix;
+    this.wireframe = null;
 
     // just for reduce GC
     this.renderConfig = {
@@ -79,7 +81,8 @@ export default class SceneNode {
       mpTransform: mat4(),
     };
 
-    this.updateTransformCache();
+    if (initialCacheInit)
+      this.updateTransformCache();
 
     // third party flag fields
     Object.assign(this, attributes);
@@ -167,9 +170,17 @@ export default class SceneNode {
     this.updateTransformCache();
   }
 
+  update(delta) {
+    const {wireframe} = this;
+
+    if (wireframe && wireframe.update)
+      wireframe.update(delta);
+  }
+
   render(delta, mpMatrix) {
     const {
-      cache, scene, renderer, renderConfig,
+      wireframe, cache, scene,
+      renderer, renderConfig,
     } = this;
 
     if (!renderer)
@@ -199,6 +210,8 @@ export default class SceneNode {
       scene.assignSceneRenderConfig(renderConfig);
 
     renderConfig.delta = delta;
+
+    wireframe && wireframe.render(delta, mpMatrix);
     renderer(renderConfig);
   }
 }

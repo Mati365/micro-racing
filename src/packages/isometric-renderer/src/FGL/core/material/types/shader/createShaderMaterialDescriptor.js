@@ -69,7 +69,7 @@ const createMaterialDescriptor = (gl) => {
         vertex && compiler(
           {
             type: gl.VERTEX_SHADER,
-            precision: 'mediump',
+            precision: 'lowp',
             source: vertex,
           },
         ),

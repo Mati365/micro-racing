@@ -166,8 +166,7 @@ export default class GameBoard {
           },
           transform: {
             scale: [0.1, 0.1, 1.0],
-            translate: [-2.0, -2.0, -0.01],
-            rotate: [0.0, 0.0, 0.0],
+            translate: [0.0, 1.6, -0.01],
           },
         },
       ),
@@ -181,7 +180,7 @@ export default class GameBoard {
           transform: {
             rotate: [0, 0, toRadians(-75)],
             scale: [1.25, 1.25, 1.25],
-            translate: [2, 4.5, 0.0],
+            translate: this.road.transformedTrack.path[0], // [2, 4.5, 0.0],
           },
         },
       ),

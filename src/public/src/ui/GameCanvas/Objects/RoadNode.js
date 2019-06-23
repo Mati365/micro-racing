@@ -1,18 +1,14 @@
-import {vec2} from '@pkg/gl-math';
+import * as R from 'ramda';
+
+import {mat, vec2, vec4, vec3} from '@pkg/gl-math';
 import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
 
 import {SceneNode} from '@pkg/isometric-renderer/FGL/engine/scene';
 import raceTrackTextureUrl from '@game/res/img/race-track.png';
 
-const createRoadRenderer = f => async ({track}) => {
+const createRoadRenderer = f => async ({path: {triangles}}) => {
   const vertices = [];
   const uv = [];
-
-  const {triangles} = track.getTriangularizedPath(
-    {
-      triangleWidth: 20,
-    },
-  );
 
   triangles.forEach((triangle, index) => {
     vertices.push(
@@ -55,18 +51,87 @@ const createRoadRenderer = f => async ({track}) => {
   );
 };
 
-export default class RoadNode extends SceneNode {
-  constructor({track, ...config}) {
-    super(config);
+class RoadWireframe {
+  constructor(f, pathInfo) {
+    const {innerPath, path, outerPath} = pathInfo;
 
-    if (!config.renderer)
-      this.createRenderer(config.f, track);
+    this.meshes = R.map(
+      vertices => f.mesh(
+        {
+          renderMode: f.flags.LINE_LOOP,
+          material: f.material.solidColor,
+          vertices,
+          uniforms: {
+            color: f.colors.RED,
+          },
+          transform: {
+            translate: [0.0, 0.0, -0.01],
+          },
+        },
+      ),
+      [
+        innerPath,
+        path,
+        outerPath,
+      ],
+    );
   }
 
-  async createRenderer(f, track) {
+  render() {
+    const {meshes} = this;
+
+    for (let i = meshes.length - 1; i >= 0; --i)
+      meshes[i]();
+  }
+}
+
+export default class RoadNode extends SceneNode {
+  constructor({track, ...config}) {
+    super(
+      {
+        ...config,
+        initialCacheInit: false,
+      },
+    );
+    this.pathInfo = track.getTriangularizedPath(
+      {
+        triangleWidth: 20,
+      },
+    );
+
+    this.createRenderer(config.f, this.pathInfo);
+    this.updateTransformCache();
+
+    this.wireframe = new RoadWireframe(config.f, this.transformedTrack);
+  }
+
+  /**
+   * @see
+   *  It is really slow! Do not perform any cache update on RoadNode!
+   */
+  updateTransformCache() {
+    super.updateTransformCache();
+
+    const {transform: transformMatrix} = this.cache;
+    this.transformedTrack = R.mapObjIndexed(
+      R.map(
+        (point) => {
+          const output = mat.mul(
+            transformMatrix,
+            vec4.toMatrix(vec2.toVec4(point)),
+          ).array;
+
+          return vec3(output[0], output[1], output[2]);
+        },
+      ),
+      this.pathInfo,
+    );
+  }
+
+  async createRenderer(f, path) {
     this.renderer = await createRoadRenderer(f)(
       {
-        track,
+        path,
       },
     );
   }

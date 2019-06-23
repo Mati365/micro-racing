@@ -35,7 +35,6 @@ export const generateAreaPoints = R.curry(
  */
 export const dropNearPoints = ({minDistance}) => (points) => {
   const buffer = [...points];
-
   for (let i = 0; i < buffer.length;) {
     const nextIndex = (i + 1) % buffer.length;
     if (vec2.dist(buffer[i], buffer[nextIndex]) >= minDistance)
@@ -54,18 +53,18 @@ export const dropNearPoints = ({minDistance}) => (points) => {
  */
 const generateRandomRoad = (area) => {
   const points = R.compose(
-    convexHull,
     dropNearPoints(
       {
-        minDistance: area.w * 0.05,
+        minDistance: area.w * 0.15,
       },
     ),
+    convexHull,
     generateAreaPoints(
       {
         x: area.w * 0.1,
         y: area.h * 0.1,
       },
-      20,
+      32,
     ),
   )(area);
 

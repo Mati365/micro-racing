@@ -39,18 +39,4 @@ export default class MeshNode extends SceneNode {
   get meshDescriptor() {
     return this.renderer.instance.meshDescriptor;
   }
-
-  update() {
-    const {wireframe} = this;
-
-    // updated linked meshes
-    wireframe && wireframe.update();
-  }
-
-  render(delta, mpMatrix) {
-    const {wireframe} = this;
-
-    wireframe && wireframe.render(delta, mpMatrix);
-    super.render(delta, mpMatrix);
-  }
 }

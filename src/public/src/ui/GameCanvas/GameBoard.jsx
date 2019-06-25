@@ -2,7 +2,7 @@ import {useMemo} from 'react';
 
 import atlasImageUrl from '@game/res/img/atlas.png';
 
-import {toRadians} from '@pkg/gl-math';
+import {vec3, vec2, toRadians} from '@pkg/gl-math';
 import {createIsometricScene} from '@pkg/isometric-renderer';
 import {MeshNode} from '@pkg/isometric-renderer/FGL/engine/scene/types';
 
@@ -108,19 +108,6 @@ const createBasicScene = (f) => {
       },
     )
     .createNode(
-      async sceneParams => new CarNode(
-        {
-          ...sceneParams,
-          renderer: await createTexturedCar(f)(CAR_COLORS.RED),
-          transform: {
-            rotate: [0, 0, toRadians(90)],
-            scale: [1.5, 1.5, 1.5],
-            translate: [3, 3, 0.0],
-          },
-        },
-      ),
-    )
-    .createNode(
       async () => new MeshNode(
         {
           renderer: await createTexturedTree(f),
@@ -166,26 +153,69 @@ export default class GameBoard {
           },
           transform: {
             scale: [0.1, 0.1, 1.0],
-            translate: [0.0, 1.6, -0.01],
+            translate: [0.0, 0.0, -0.01],
           },
         },
       ),
     );
 
-    const startSegment = this.road.pathInfo.segments[0];
+    const {segments} = this.road.pathInfo;
     this.car = await this.scene.createNode(
       async sceneParams => new CarNode(
         {
           ...sceneParams,
           renderer: await createTexturedCar(f)(CAR_COLORS.BLUE),
           transform: {
-            rotate: [0, 0, startSegment.angle + toRadians(90)],
+            rotate: [0, 0, segments[0].angle],
             scale: [1.25, 1.25, 1.25],
-            translate: startSegment.point,
+            translate: segments[0].point,
           },
         },
       ),
     );
+
+    for (let i = 0; i < 4; i += 2) {
+      this.scene
+        .chain
+        .createNode(
+          async sceneParams => new CarNode(
+            {
+              ...sceneParams,
+              renderer: await createTexturedCar(f)(CAR_COLORS.RED),
+              transform: {
+                rotate: [0, 0, segments[i].angle],
+                scale: [1.5, 1.5, 1.5],
+                translate: vec3.add(
+                  segments[i].point,
+                  vec2.toVec3(
+                    vec2.fromScalar(segments[i].width / 2, segments[i].angle),
+                    0.0,
+                  ),
+                ),
+              },
+            },
+          ),
+        )
+        .createNode(
+          async sceneParams => new CarNode(
+            {
+              ...sceneParams,
+              renderer: await createTexturedCar(f)(CAR_COLORS.RED),
+              transform: {
+                rotate: [0, 0, segments[i].angle],
+                scale: [1.5, 1.5, 1.5],
+                translate: vec3.sub(
+                  segments[i].point,
+                  vec2.toVec3(
+                    vec2.fromScalar(segments[i].width / 2, segments[i].angle),
+                    0.0,
+                  ),
+                ),
+              },
+            },
+          ),
+        );
+    }
 
     this.scene.camera.target = this.car;
     this.engine.frame(

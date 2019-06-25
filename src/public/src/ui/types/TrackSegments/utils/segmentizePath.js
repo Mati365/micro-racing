@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import {vec2, vec3} from '@pkg/gl-math';
+import {vec2, vec3, toRadians} from '@pkg/gl-math';
 
 import {Triangle} from '@pkg/gl-math/classes';
 import expandPath from './expandPath';
@@ -11,8 +11,11 @@ export class TrackSegment {
     this.width = width;
     this.triangles = triangles;
     this.point = point;
+
     this.vector = vector;
-    this.angle = vec2.vectorAngle(vec2.normalize(vector));
+    this.normalizedVector = vec3.normalize(vector);
+
+    this.angle = vec2.vectorAngle(this.normalizedVector) + toRadians(90);
   }
 }
 

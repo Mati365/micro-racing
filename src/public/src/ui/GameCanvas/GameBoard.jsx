@@ -172,15 +172,16 @@ export default class GameBoard {
       ),
     );
 
+    const startSegment = this.road.pathInfo.segments[0];
     this.car = await this.scene.createNode(
       async sceneParams => new CarNode(
         {
           ...sceneParams,
           renderer: await createTexturedCar(f)(CAR_COLORS.BLUE),
           transform: {
-            rotate: [0, 0, toRadians(-75)],
+            rotate: [0, 0, startSegment.angle + toRadians(90)],
             scale: [1.25, 1.25, 1.25],
-            translate: this.road.transformedTrack.path[0], // [2, 4.5, 0.0],
+            translate: startSegment.point,
           },
         },
       ),

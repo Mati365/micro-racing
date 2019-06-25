@@ -1,8 +1,10 @@
 import * as R from 'ramda';
 import {vec2} from '@pkg/gl-math/matrix';
 
-import interpolateEditorPath from './interpolateEditorPath';
-import triangularizePath from './utils/triangularizePath';
+import {
+  interpolateEditorPath,
+  generateRandomPath,
+} from './utils';
 
 const isPointInsideRect = (point, rect) => (
   point.x > rect.x
@@ -81,7 +83,7 @@ export const createPathPoint = (item, index) => ({
 /**
  * Hold whole track related data shit
  */
-export default class Track {
+export default class TrackPath {
   path = [];
 
   constructor(
@@ -90,6 +92,12 @@ export default class Track {
   ) {
     this.autoposCurveHandlers = autoposCurveHandlers;
     R.forEach(::this.appendPoint, points);
+  }
+
+  static fromRandomPath(config) {
+    return new TrackPath(
+      generateRandomPath(config),
+    );
   }
 
   /**
@@ -288,25 +296,6 @@ export default class Track {
         chunkSize: CHUNK_SIZE,
         selectorFn: R.prop('point'),
         ...config,
-      },
-      path,
-    );
-  }
-
-  /**
-   * Get track triangles with path!
-   *
-   * @param {Object} config
-   *
-   * @see
-   *  Very slow!
-   */
-  getTriangularizedPath({triangleWidth, ...interpolateConfig}) {
-    const path = this.getInterpolatedPathPoints(interpolateConfig);
-
-    return triangularizePath(
-      {
-        width: triangleWidth,
       },
       path,
     );

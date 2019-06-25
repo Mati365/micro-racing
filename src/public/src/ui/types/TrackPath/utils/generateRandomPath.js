@@ -51,7 +51,7 @@ export const dropNearPoints = ({minDistance}) => (points) => {
  *
  * @param {Rect} area
  */
-const generateRandomRoad = (area) => {
+const generateRandomPath = (area) => {
   const points = R.compose(
     dropNearPoints(
       {
@@ -71,4 +71,4 @@ const generateRandomRoad = (area) => {
   return points;
 };
 
-export default generateRandomRoad;
+export default generateRandomPath;

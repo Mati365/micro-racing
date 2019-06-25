@@ -1,7 +1,20 @@
 import * as R from 'ramda';
 
+import {vec2, vec3} from '@pkg/gl-math';
+
 import {Triangle} from '@pkg/gl-math/classes';
 import expandPath from './expandPath';
+
+export class TrackSegment {
+  constructor(index, width, triangles, point, vector) {
+    this.index = index;
+    this.width = width;
+    this.triangles = triangles;
+    this.point = point;
+    this.vector = vector;
+    this.angle = vec2.vectorAngle(vec2.normalize(vector));
+  }
+}
 
 /**
  * Connect fourth points into triangle
@@ -9,14 +22,13 @@ import expandPath from './expandPath';
  * @param {Object} config
  * @param {Vector2D[]} path
  */
-const triangularizePath = ({width}, path) => {
+const segmentizePath = ({width}, path) => {
   const [innerPath, outerPath] = expandPath(width, path);
-  const triangles = [];
+  const segments = [];
 
   for (let i = 0; i < path.length; ++i) {
     const nextIndex = (i + 1) % path.length;
-
-    triangles.push(
+    const triangles = [
       new Triangle(
         innerPath[i],
         outerPath[i],
@@ -28,15 +40,25 @@ const triangularizePath = ({width}, path) => {
         innerPath[i],
         innerPath[nextIndex],
       ),
+    ];
+
+    segments.push(
+      new TrackSegment(
+        i,
+        width,
+        triangles,
+        path[i],
+        vec3.sub(path[nextIndex], path[i]),
+      ),
     );
   }
 
   return {
+    segments,
     path,
     innerPath,
     outerPath,
-    triangles,
   };
 };
 
-export default R.curry(triangularizePath);
+export default R.curry(segmentizePath);

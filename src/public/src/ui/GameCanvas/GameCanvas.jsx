@@ -4,16 +4,13 @@ import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
 import {useGameBoard} from './GameBoard';
 
 import EditorCanvas from '../EditorCanvas';
-import Track from '../EditorCanvas/Track';
-import {generateRandomRoad} from '../EditorCanvas/utils';
+import TrackPath from '../types/TrackPath';
 
-const track = new Track(
-  generateRandomRoad(
-    {
-      w: 640,
-      h: 480,
-    },
-  ),
+const track = TrackPath.fromRandomPath(
+  {
+    w: 640,
+    h: 480,
+  },
 );
 
 const GameCanvas = ({dimensions}) => {

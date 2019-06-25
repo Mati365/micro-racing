@@ -13,7 +13,7 @@ export const hasTransforms = (transform) => {
  * @param {Transforms} transform
  * @param {Matrix} dest
  */
-export const applyTransformsToMatrix = (transform, dest = mat4.identity()) => {
+export const applyTransformsToMatrix = (transform, dest = mat4.from.identity()) => {
   const {rotate, scale, translate} = transform;
 
   if (scale)

@@ -7,6 +7,8 @@ import vec4 from '../vec4';
 import rotate from './operations/rotate';
 import orthogonal from './operations/orthogonal';
 import fromScalar from './operations/fromScalar';
+import angleBetweenPoints from './operations/angleBetweenPoints';
+import vectorAngle from './operations/vectorAngle';
 
 export default createVectorOptimizedOperations(
   2,
@@ -14,8 +16,10 @@ export default createVectorOptimizedOperations(
     rotate,
     orthogonal,
     fromScalar,
+    angleBetweenPoints,
+    vectorAngle,
 
-    toVec3(vec) { return vec3(vec[0], vec[1], 0); },
-    toVec4(vec) { return vec4(vec[0], vec[1], 0, 1.0); },
+    toVec3(vec, z = 0.0) { return vec3(vec[0], vec[1], z); },
+    toVec4(vec, z = 0.0, w = 1.0) { return vec4(vec[0], vec[1], z, w); },
   },
 );

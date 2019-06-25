@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import vec2 from '@pkg/gl-math/matrix/types/vec2';
+import {vec2} from '@pkg/gl-math';
 
 /**
  * @param {Number} width
@@ -27,30 +27,38 @@ const expandPath = (width, path) => {
     deltaVec = vec2(
       (d1.x + d2.x) / 2,
       (d1.y + d2.y) / 2,
+      0.0,
     );
 
     const orthogonalVec = vec2.normalize(
       vec2.orthogonal(deltaVec),
     );
 
+    const z = path[i].z || 0;
     reduced.push(
       [
         // inner
-        vec2.sub(
-          path[i],
-          vec2.mul(
-            -width,
-            orthogonalVec,
+        vec2.toVec3(
+          vec2.sub(
+            path[i],
+            vec2.mul(
+              -width,
+              orthogonalVec,
+            ),
           ),
+          z,
         ),
 
         // outer
-        vec2.add(
-          path[i],
-          vec2.mul(
-            -width,
-            orthogonalVec,
+        vec2.toVec3(
+          vec2.add(
+            path[i],
+            vec2.mul(
+              -width,
+              orthogonalVec,
+            ),
           ),
+          z,
         ),
       ],
     );

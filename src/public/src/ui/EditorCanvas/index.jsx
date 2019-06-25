@@ -7,16 +7,13 @@ import React, {
 
 import {relativeEventPos} from '@pkg/basic-helpers';
 
-import Track, {
+import TrackPath, {
   TRACK_POINTS,
   CHUNK_SIZE,
   getHandlerSiblingParentPoint,
-} from './Track';
+} from '../types/TrackPath';
 
-import {
-  triangularizePath,
-  generateRandomRoad,
-} from './utils';
+import segmentizePath from '../types/TrackSegments/utils/segmentizePath';
 
 const drawPoints = (color, r, points, ctx) => {
   for (let i = points.length - 1; i >= 0; --i) {
@@ -72,14 +69,16 @@ const renderTrack = (ctx, {area, step = 0.2}, track) => {
     drawPoints('#0000ff', 3, interpolated, ctx);
 
     if (looped) {
-      const {triangles} = triangularizePath(
+      const {segments} = segmentizePath(
         {
           width: 20,
         },
         interpolated,
       );
 
-      drawTriangles('#666', 1, triangles, ctx);
+      segments.forEach((segment) => {
+        drawTriangles('#666', 1, segment.triangles, ctx);
+      });
     }
   }
 
@@ -188,11 +187,8 @@ class TrackEditor {
     this.dimensions = dimensions;
     this.ctx = canvas.getContext('2d');
 
-    if (!this.track) {
-      this.track = new Track(
-        generateRandomRoad(dimensions),
-      );
-    }
+    if (!this.track)
+      this.track = TrackPath.fromRandomPath(dimensions);
 
     // first render
     this.mapCanvasHandlers(canvas, false);

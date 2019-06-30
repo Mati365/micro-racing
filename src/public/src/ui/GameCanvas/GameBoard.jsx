@@ -241,11 +241,11 @@ export default class GameBoard {
 
     // w
     if (keyMap[87])
-      car.body.speedUp(0.001 * delta);
+      car.body.speedUp(0.002 * delta);
 
     // s
     if (keyMap[83])
-      car.body.speedUp(-0.001 * delta);
+      car.body.speedUp(-0.002 * delta);
 
     scene.update(delta);
   }

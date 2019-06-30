@@ -29,7 +29,7 @@ export default class CarPhysicsBody {
       // rotations
       angle = toRadians(0),
       steerAngle = toRadians(0), // relative to root angle
-      maxSteerAngle = toRadians(30),
+      maxSteerAngle = toRadians(20),
 
       // left top corner
       pos = vec2(0, 0),
@@ -39,8 +39,8 @@ export default class CarPhysicsBody {
       // distance between axle and mass center
       // normalized to size and mass center
       axles = {
-        front: -0.3,
-        rear: 0.3,
+        front: -0.5,
+        rear: 0.5,
       },
     } = {},
   ) {
@@ -88,7 +88,7 @@ export default class CarPhysicsBody {
 
 
   update(delta) {
-    const {speed, maxSpeed} = this;
+    const {speed} = this;
     if (!speed)
       return;
 
@@ -98,13 +98,11 @@ export default class CarPhysicsBody {
     this.actualSteerAngle = lerp(
       this.actualSteerAngle,
       this.steerAngle * Math.sign(speed),
-      0.5 * delta,
+      0.25 * delta,
     );
 
     const rotateRadius = this.wheelBase * this.size.y / Math.sin(this.actualSteerAngle);
-    const angularVelocity = vec2.len(carDirection) / rotateRadius * (
-      speed / maxSpeed > 0.7 ? 0.85 : 1.0
-    );
+    const angularVelocity = deltaSpeed / rotateRadius;
 
     this.angle += angularVelocity * delta;
     this.pos = vec2.add(this.pos, carDirection);

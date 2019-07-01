@@ -49,8 +49,8 @@ export default class CarPhysicsBody {
       // distance between axle and mass center
       // normalized to size and mass center
       axles = {
-        front: -1.2,
-        rear: 1.2,
+        front: -0.5,
+        rear: 0.5,
       },
     } = {},
   ) {
@@ -193,7 +193,7 @@ export default class CarPhysicsBody {
     );
 
     this.pos = vec2.add(
-      vec2.mul(delta, this.velocity),
+      vec2.mul(delta * 30, this.velocity),
       this.pos,
     );
 

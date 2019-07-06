@@ -13,7 +13,7 @@ export default class PhysicsBoard {
 
     this.car = new Car(
       {
-        pos: vec2(10, -10), // vec2(dimensions.w / 2, dimensions.h - 100),
+        pos: vec2(dimensions.w / 2, dimensions.h / 2),
         size: vec2(32, 64),
       },
     );

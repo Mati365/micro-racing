@@ -2,7 +2,7 @@ import {useMemo} from 'react';
 
 import atlasImageUrl from '@game/res/img/atlas.png';
 
-import {vec3, vec2, toRadians} from '@pkg/gl-math';
+import {toRadians} from '@pkg/gl-math';
 import {createIsometricScene} from '@pkg/isometric-renderer';
 import {MeshNode} from '@pkg/isometric-renderer/FGL/engine/scene/types';
 
@@ -174,48 +174,48 @@ export default class GameBoard {
       ),
     );
 
-    for (let i = 0; i < 4; i += 2) {
-      this.scene
-        .chain
-        .createNode(
-          async sceneParams => new CarNode(
-            {
-              ...sceneParams,
-              renderer: await createTexturedCar(f)(CAR_COLORS.RED),
-              transform: {
-                rotate: [0, 0, segments[i].angle],
-                scale: [1.5, 1.5, 1.5],
-                translate: vec3.add(
-                  segments[i].point,
-                  vec2.toVec3(
-                    vec2.fromScalar(segments[i].width / 2, segments[i].angle),
-                    0.0,
-                  ),
-                ),
-              },
-            },
-          ),
-        )
-        .createNode(
-          async sceneParams => new CarNode(
-            {
-              ...sceneParams,
-              renderer: await createTexturedCar(f)(CAR_COLORS.RED),
-              transform: {
-                rotate: [0, 0, segments[i].angle],
-                scale: [1.5, 1.5, 1.5],
-                translate: vec3.sub(
-                  segments[i].point,
-                  vec2.toVec3(
-                    vec2.fromScalar(segments[i].width / 2, segments[i].angle),
-                    0.0,
-                  ),
-                ),
-              },
-            },
-          ),
-        );
-    }
+    // for (let i = 0; i < 4; i += 2) {
+    //   this.scene
+    //     .chain
+    //     .createNode(
+    //       async sceneParams => new CarNode(
+    //         {
+    //           ...sceneParams,
+    //           renderer: await createTexturedCar(f)(CAR_COLORS.RED),
+    //           transform: {
+    //             rotate: [0, 0, segments[i].angle],
+    //             scale: [1.5, 1.5, 1.5],
+    //             translate: vec3.add(
+    //               segments[i].point,
+    //               vec2.toVec3(
+    //                 vec2.fromScalar(segments[i].width / 2, segments[i].angle),
+    //                 0.0,
+    //               ),
+    //             ),
+    //           },
+    //         },
+    //       ),
+    //     )
+    //     .createNode(
+    //       async sceneParams => new CarNode(
+    //         {
+    //           ...sceneParams,
+    //           renderer: await createTexturedCar(f)(CAR_COLORS.RED),
+    //           transform: {
+    //             rotate: [0, 0, segments[i].angle],
+    //             scale: [1.5, 1.5, 1.5],
+    //             translate: vec3.sub(
+    //               segments[i].point,
+    //               vec2.toVec3(
+    //                 vec2.fromScalar(segments[i].width / 2, segments[i].angle),
+    //                 0.0,
+    //               ),
+    //             ),
+    //           },
+    //         },
+    //       ),
+    //     );
+    // }
 
     this.scene.camera.target = this.car;
     this.engine.frame(
@@ -241,11 +241,11 @@ export default class GameBoard {
 
     // w
     if (keyMap[87])
-      car.body.speedUp(0.002 * delta);
+      car.body.speedUp(2 * delta);
 
     // s
     if (keyMap[83])
-      car.body.speedUp(-0.002 * delta);
+      car.body.speedUp(-2 * delta);
 
     scene.update(delta);
   }

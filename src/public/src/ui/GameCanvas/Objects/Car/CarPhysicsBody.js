@@ -1,18 +1,19 @@
-import {
-  clamp, lerp,
-  toRadians, vec2,
-} from '@pkg/gl-math';
+import {clamp, lerp, toRadians, vec2} from '@pkg/gl-math';
 
-/**
- * We want to push car to up if force is positive number
- * so add 270 degrees
- */
-const CANVAS_ROTATION_SUFFIX = 3 * Math.PI / 2;
+const GRAVITY = 9.81;
+
+const FRONT_TRAIN = 0;
 
 const makeWheel = (x, y, steering = false) => ({
   pos: vec2(x, y),
   steering,
 });
+
+const vec2rot = (angle, vec) => {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  return vec2(vec.x * sin + vec.y * cos, vec.x * cos - vec.y * sin);
+};
 
 /**
  * @see http://www.asawicki.info/Mirror/Car%20Physics%20for%20Games/Car%20Physics%20for%20Games.html
@@ -20,21 +21,30 @@ const makeWheel = (x, y, steering = false) => ({
  * @see https://github.com/nadako/cars/blob/gh-pages/Car.hx
  *
  * @see https://github.com/spacejack/carphysics2d/blob/master/marco/Cardemo.c
+ *
+ * @description
+ * - Sideslip angle (BETA) is angle between velocity and car angle
+ *
  */
 export default class CarPhysicsBody {
   constructor(
     {
-      maxSpeed = 0.1,
+      mass = 1500,
+
+      velocity = vec2(0, 0),
 
       // rotations
-      angle = toRadians(0),
+      angle = toRadians(45),
       steerAngle = toRadians(0), // relative to root angle
-      maxSteerAngle = toRadians(20),
+      maxSteerAngle = toRadians(45),
 
       // left top corner
       pos = vec2(0, 0),
       size = vec2(0, 0),
       massCenter = vec2(0.5, 0.5),
+
+      // size of wheel relative to size
+      wheelSize = vec2(0.2, 0.25),
 
       // distance between axle and mass center
       // normalized to size and mass center
@@ -44,20 +54,29 @@ export default class CarPhysicsBody {
       },
     } = {},
   ) {
+    this.braking = false;
+    this.mass = mass;
+    this.inertia = mass;
+    this.angularVelocity = 0;
+    this.velocity = velocity;
+    this.acceleration = 0;
+
     this.angle = angle;
     this.steerAngle = steerAngle;
-    this.actualSteerAngle = steerAngle;
     this.maxSteerAngle = maxSteerAngle;
 
-    this.massCenter = vec2(0.5, 0.5);
+    this.massCenter = vec2(0.5, 0.5 + lerp());
     this.size = size;
     this.pos = pos;
 
-    this.speed = 0.0;
-    this.maxSpeed = maxSpeed;
+    this.throttle = 0;
+    this.maxThrottle = 60;
+
+    this.brake = 0;
 
     // wheelBase is distance betwen axles
     this.axles = axles;
+    this.wheelSize = wheelSize;
     this.wheelBase = axles.rear - axles.front;
 
     // todo: maybe adding support for more than 4 wheels will be good?
@@ -68,43 +87,129 @@ export default class CarPhysicsBody {
       makeWheel(0, massCenter.y + axles.rear), // bottom left
       makeWheel(1, massCenter.y + axles.rear), // bottom right
     ];
+
+    // precomputed
+    this.weight = mass * GRAVITY;
+    this.axleWeights = {
+      front: -axles.front / this.wheelBase * this.weight,
+      rear: axles.rear / this.wheelBase * this.weight,
+    };
+
+    this.corneringStiffness = {
+      front: -8.0,
+      rear: -8.2,
+    };
+
+    this.maxGrip = 4.0;
+    this.resistance = 20.0;
+    this.drag = 2.2;
   }
 
   turn(delta) {
-    const {maxSteerAngle, steerAngle} = this;
-
     this.steerAngle = clamp(
-      -maxSteerAngle,
-      maxSteerAngle,
-      steerAngle + delta,
+      -this.maxSteerAngle,
+      this.maxSteerAngle,
+      this.steerAngle + delta,
     );
   }
 
   speedUp(delta) {
-    const {maxSpeed, speed} = this;
+    const {maxThrottle} = this;
 
-    this.speed = clamp(-maxSpeed, maxSpeed, speed + delta);
+    this.throttle = clamp(-maxThrottle, maxThrottle, this.throttle + delta);
   }
 
-
   update(delta) {
-    const {speed} = this;
-    if (!speed)
-      return;
+    delta = 0.01;
 
-    const deltaSpeed = speed * delta;
-    const carDirection = vec2.fromScalar(deltaSpeed, this.angle + CANVAS_ROTATION_SUFFIX);
+    const {
+      angle,
+      angularVelocity, velocity,
+      axles, maxGrip,
+      corneringStiffness, axleWeights,
+      throttle, brake, drag, resistance,
+      mass, inertia, steerAngle,
+    } = this;
 
-    this.actualSteerAngle = lerp(
-      this.actualSteerAngle,
-      this.steerAngle * Math.sign(speed),
-      0.25 * delta,
+    const worldVelocity = vec2rot(angle, velocity);
+    const slipAngles = {
+      front: 0.0,
+      rear: 0.0,
+    };
+
+    if (worldVelocity.x !== 0) {
+      const absVLong = Math.abs(worldVelocity.x);
+      slipAngles.front = (
+        Math.atan2(worldVelocity.y + angularVelocity * -axles.front, absVLong)
+          - (steerAngle * Math.sign(worldVelocity.x))
+      );
+
+      slipAngles.rear = Math.atan2(worldVelocity.y - angularVelocity * axles.rear, absVLong);
+    }
+
+    const frontCoef = 0.5 * FRONT_TRAIN;
+    const rearCoef = 1.0 - frontCoef;
+
+    const fLateral = {
+      front: vec2(
+        0,
+        Math.max(
+          -maxGrip,
+          Math.min(maxGrip, corneringStiffness.front * slipAngles.front),
+        ) * axleWeights.front,
+      ),
+      rear: vec2(
+        0,
+        Math.max(
+          -maxGrip,
+          Math.min(maxGrip, corneringStiffness.rear * slipAngles.rear),
+        ) * axleWeights.rear,
+      ),
+    };
+
+    const fTraction = vec2(
+      100 * (throttle * (rearCoef + frontCoef * Math.cos(steerAngle)) - brake * Math.sign(worldVelocity.x)), // eslint-disable-line max-len
+      100 * (throttle * frontCoef * Math.sin(steerAngle)),
     );
 
-    const rotateRadius = this.wheelBase * this.size.y / Math.sin(this.actualSteerAngle);
-    const angularVelocity = deltaSpeed / rotateRadius;
+    const fResistance = vec2(
+      -(resistance * worldVelocity.x + drag * worldVelocity.x * Math.abs(worldVelocity.x)),
+      -(resistance * worldVelocity.y + drag * worldVelocity.y * Math.abs(worldVelocity.y)),
+    );
 
-    this.angle += angularVelocity * delta;
-    this.pos = vec2.add(this.pos, carDirection);
+    const fCornering = vec2.add(
+      fLateral.rear,
+      vec2.mul(
+        Math.cos(steerAngle),
+        fLateral.front,
+      ),
+    );
+
+    const fTotal = vec2.add(
+      fTraction,
+      vec2.add(fCornering, fResistance),
+    );
+
+    const localAcceleration = vec2.div(mass, fTotal);
+    const acceleration = vec2rot(angle, localAcceleration);
+
+    this.velocity = vec2.add(
+      vec2.mul(delta, acceleration),
+      this.velocity,
+    );
+
+    this.pos = vec2.add(
+      vec2.mul(delta / 2, vec2(this.velocity.x, -this.velocity.y)),
+      this.pos,
+    );
+
+    const torque = -fLateral.rear.y * axles.rear + fLateral.front.y * -axles.front;
+    const angularAcceleration = torque / inertia;
+
+    // debugger;
+    this.angularVelocity += delta * angularAcceleration;
+    this.angle += delta * this.angularVelocity;
+
+    this.steerAngle = lerp(this.steerAngle, 0, 0.05);
   }
 }

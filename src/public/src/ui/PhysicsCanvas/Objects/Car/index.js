@@ -51,7 +51,7 @@ export default class Car {
     ctx.save();
     ctx.translate(
       pos.x + size.x / 2,
-      -pos.y + size.y / 2,
+      pos.y + size.y / 2,
     );
     ctx.rotate(angle);
     ctx.translate(

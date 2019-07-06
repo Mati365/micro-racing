@@ -1,5 +1,5 @@
 
-import {mat4, Size} from '@pkg/gl-math';
+import {mat4, Size, toRadians} from '@pkg/gl-math';
 
 import {
   SceneNode,
@@ -8,6 +8,8 @@ import {
 } from '@pkg/isometric-renderer/FGL/engine/scene';
 
 import CarPhysicsBody from './CarPhysicsBody';
+
+export const CAR_ANGLE_FIX = toRadians(90);
 
 class CarNodeWireframe extends MeshWireframe {
   constructor(f, sceneNode) {

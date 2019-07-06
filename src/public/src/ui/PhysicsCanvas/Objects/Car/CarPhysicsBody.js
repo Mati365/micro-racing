@@ -36,7 +36,7 @@ export default class CarPhysicsBody {
       // rotations
       angle = toRadians(45),
       steerAngle = toRadians(45), // relative to root angle
-      maxSteerAngle = toRadians(30),
+      maxSteerAngle = toRadians(45),
 
       // left top corner
       pos = vec2(0, 0),
@@ -70,7 +70,7 @@ export default class CarPhysicsBody {
     this.pos = pos;
 
     // controls
-    this.throttle = 80;
+    this.throttle = 10;
     this.brake = 0;
 
     // wheelBase is distance betwen axles
@@ -95,13 +95,13 @@ export default class CarPhysicsBody {
     };
 
     this.corneringStiffness = {
-      front: -5.0,
-      rear: -5.2,
+      front: -8.0,
+      rear: -8.2,
     };
 
-    this.maxGrip = 2.0;
-    this.resistance = 30.0;
-    this.drag = 2.0;
+    this.maxGrip = 20.0;
+    this.resistance = 10.0;
+    this.drag = 2.2;
   }
 
   turn(delta) {
@@ -193,7 +193,7 @@ export default class CarPhysicsBody {
     );
 
     this.pos = vec2.add(
-      vec2.mul(delta * 30, this.velocity),
+      vec2.mul(delta * 30, vec2(this.velocity.x, -this.velocity.y)),
       this.pos,
     );
 

@@ -70,7 +70,7 @@ export default class CarPhysicsBody {
     this.pos = pos;
 
     this.throttle = 0;
-    this.maxThrottle = 60;
+    this.maxThrottle = 90;
 
     this.brake = 0;
 
@@ -100,8 +100,8 @@ export default class CarPhysicsBody {
       rear: -10.2,
     };
 
-    this.maxGrip = 6.0;
-    this.resistance = 20.0;
+    this.maxGrip = 5.0;
+    this.resistance = 10.0;
     this.drag = 2.2;
   }
 
@@ -119,8 +119,8 @@ export default class CarPhysicsBody {
     this.throttle = clamp(-maxThrottle, maxThrottle, this.throttle + delta);
   }
 
-  update(delta) {
-    delta = 0.01;
+  update(dt) {
+    const delta = dt / 100;
 
     const {
       angle,
@@ -210,6 +210,7 @@ export default class CarPhysicsBody {
     this.angularVelocity += delta * angularAcceleration;
     this.angle += delta * this.angularVelocity;
 
-    this.steerAngle = lerp(this.steerAngle, 0, 0.05);
+    this.steerAngle = lerp(this.steerAngle, 0, 0.05 * dt);
+    this.throttle *= 0.9 * dt;
   }
 }

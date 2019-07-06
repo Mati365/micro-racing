@@ -29,7 +29,7 @@ const vec2rot = (angle, vec) => {
 export default class CarPhysicsBody {
   constructor(
     {
-      mass = 1500,
+      mass = 500,
 
       velocity = vec2(0, 0),
 
@@ -96,11 +96,11 @@ export default class CarPhysicsBody {
     };
 
     this.corneringStiffness = {
-      front: -8.0,
-      rear: -8.2,
+      front: -10.0,
+      rear: -10.2,
     };
 
-    this.maxGrip = 4.0;
+    this.maxGrip = 6.0;
     this.resistance = 20.0;
     this.drag = 2.2;
   }

@@ -65,7 +65,7 @@ export default class RoadNode extends SceneNode {
 
     this.pathInfo = new TrackSegments(
       {
-        segmentWidth: 2,
+        segmentWidth: 3,
         interpolatedPath: track.getInterpolatedPathPoints(),
         transform,
       },

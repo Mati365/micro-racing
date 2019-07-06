@@ -46,6 +46,7 @@ module.exports = {
     'no-continue': 0,
     'no-param-reassign': 0,
     'no-bitwise': 0,
+    'no-loop-func': 0,
     'guard-for-in': 0,
   },
   settings: {

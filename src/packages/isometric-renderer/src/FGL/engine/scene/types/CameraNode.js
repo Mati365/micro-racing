@@ -6,7 +6,7 @@ export default class Camera extends SceneNode {
   constructor({
     pos,
     target,
-    lerpSpeed = 0.1,
+    lerpSpeed = 0.45,
     viewportOffset = [0, 0.75, 0],
   }) {
     super(

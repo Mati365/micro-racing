@@ -25,8 +25,8 @@ const pickGlContext = element => ({
 } = {}) => {
   const gl = getElementWebGLContext(element);
 
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
   gl.clearColor(...color);
   gl.clearDepth(depth);

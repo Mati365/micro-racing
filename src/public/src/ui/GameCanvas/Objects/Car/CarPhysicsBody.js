@@ -198,7 +198,6 @@ export default class CarPhysicsBody {
       vec2.mul(delta, acceleration),
       this.velocity,
     );
-    this.speed = vec2.len(this.velocity);
 
     this.pos = vec2.add(
       vec2.mul(delta / 2, vec2(this.velocity.x, -this.velocity.y)),
@@ -213,5 +212,7 @@ export default class CarPhysicsBody {
 
     this.steerAngle = lerp(this.steerAngle, 0, 0.05 * dt);
     this.throttle *= 0.9 * dt;
+
+    this.corneringIntensity = vec2.len(fCornering) / 10000;
   }
 }

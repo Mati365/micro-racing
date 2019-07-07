@@ -50,15 +50,24 @@ class CarNodeWireframe extends MeshWireframe {
       ),
     );
 
-    this.wheelTrack = new WheelTrack(
-      {
-        f,
-      },
-    );
+    this.wheelTracks = [
+      null,
+      null,
+      new WheelTrack(
+        {
+          f,
+        },
+      ),
+      new WheelTrack(
+        {
+          f,
+        },
+      ),
+    ];
   }
 
   update() {
-    const {prevWheelTrackPos, wheelTrack, meshWheels} = this;
+    const {prevWheelTrackPos, wheelTracks, meshWheels} = this;
     const {rotate, translate, body} = this.sceneNode;
 
     const carTransformMatrix = mat4.mutable.translate(
@@ -92,8 +101,12 @@ class CarNodeWireframe extends MeshWireframe {
       wheelMesh.applyTransformMatrix(wheelTransform, true);
 
       // add segment to wheel
-      if (prevWheelTrackPos && !steering && vec2.dist(prevWheelTrackPos, translate) > 0.2) {
-        wheelTrack.track(wheelTransform);
+      const track = wheelTracks[i];
+      if (track
+          && body.corneringIntensity >= 0.7
+          && prevWheelTrackPos
+          && vec2.dist(prevWheelTrackPos, translate) > 0.05) {
+        track.track(wheelTransform);
         wheelTracked = true;
       }
     }
@@ -107,13 +120,18 @@ class CarNodeWireframe extends MeshWireframe {
   }
 
   render(delta, mpMatrix) {
-    const {wheelTrack, meshWheels} = this;
+    const {wheelTracks, meshWheels} = this;
 
     for (let i = meshWheels.length - 1; i >= 0; --i)
       meshWheels[i].render(delta, mpMatrix);
 
+    for (let i = wheelTracks.length - 1; i >= 0; --i) {
+      const wheelTrack = wheelTracks[i];
+      if (wheelTrack)
+        wheelTrack.render(delta, mpMatrix);
+    }
+
     super.render(delta, mpMatrix);
-    wheelTrack.render(delta, mpMatrix);
   }
 }
 

@@ -13,9 +13,11 @@ const createWheelTrackMaterial = fgl => R.memoizeWith(
       shaders: {
         vertex: glsl`
           in vec4 inVertexPos;
+          in float inAlpha;
 
           out vec3 vPos;
           out vec3 vNormal;
+          out float vAlpha;
 
           uniform mat4 mpMatrix;
 
@@ -24,6 +26,7 @@ const createWheelTrackMaterial = fgl => R.memoizeWith(
           void main() {
             gl_Position = inVertexPos * mpMatrix;
 
+            vAlpha = inAlpha;
             vPos = inVertexPos.xyz;
             vNormal = normal;
           }
@@ -32,6 +35,7 @@ const createWheelTrackMaterial = fgl => R.memoizeWith(
         fragment: glsl`
           in vec3 vPos;
           in vec3 vNormal;
+          in float vAlpha;
 
           out vec4 fragColor;
 
@@ -40,7 +44,7 @@ const createWheelTrackMaterial = fgl => R.memoizeWith(
           ${calcLightingFragment}
 
           void main() {
-            fragColor = color * vec4(calcLighting(vNormal, vPos), 1.0);
+            fragColor = vec4(color.xyz, vAlpha) * vec4(calcLighting(vNormal, vPos), 1.0);
           }
         `,
       },
@@ -57,7 +61,7 @@ export const SEGMENT_BYTE_SIZE = SEGMENT_SIZE * 4;
 export default class WheelTrack {
   constructor({
     f,
-    maxSegments = 128, // 2n + 1 to make stip triangle
+    maxSegments = 128,
   }) {
     const {gl} = f.state;
 
@@ -71,10 +75,19 @@ export default class WheelTrack {
 
     this.vbo = createVertexBuffer(
       gl,
-      Buffer.alloc(maxSegments * SEGMENT_SIZE),
+      new Float32Array(maxSegments * SEGMENT_SIZE),
       gl.DYNAMIC_DRAW,
       4,
     );
+
+    this.alphaArray = new Float32Array(maxSegments * 2);
+    this.alphaVBO = createVertexBuffer(
+      gl,
+      this.alphaArray,
+      gl.DYNAMIC_DRAW,
+      1,
+    );
+
     this.mesh = f
       .mesh(
         {
@@ -82,7 +95,10 @@ export default class WheelTrack {
           material: createWheelTrackMaterial(f)(),
           vbo: this.vbo,
           uniforms: {
-            color: vec4(0.0, 0.0, 0.0, 0.75),
+            color: f.colors.BLACK,
+          },
+          buffers: {
+            inAlpha: this.alphaVBO,
           },
           elementsCount: 0,
         },
@@ -98,12 +114,20 @@ export default class WheelTrack {
    * @param {Vec2} rightPoint
    */
   addTrackSegment(leftPoint, rightPoint) {
-    const {mesh: {meshDescriptor}, vbo} = this;
+    const {
+      mesh: {meshDescriptor},
+      vbo,
+      alphaArray,
+      alphaVBO,
+    } = this;
+
     const {elementsCount} = meshDescriptor;
     const {maxSegments, totalSegments} = this;
 
+    // append line to buffer
+    const offset = totalSegments % maxSegments;
     vbo.update(
-      (totalSegments % (maxSegments / 2)) * SEGMENT_BYTE_SIZE, // offset in bytes
+      offset * SEGMENT_BYTE_SIZE, // offset in bytes
       new Float32Array([
         ...leftPoint,
         ...rightPoint,
@@ -111,8 +135,20 @@ export default class WheelTrack {
       0, 8,
     );
 
+    // update buffer alpha
+    // console.log(offset);
+    for (let i = offset + 1, no = 0; i !== offset; ++no) {
+      i = (i + 1) % maxSegments;
+
+      const saturation = (no + maxSegments * 0.2) / maxSegments;
+      alphaArray[i * 2] = saturation;
+      alphaArray[i * 2 + 1] = saturation;
+    }
+    alphaVBO.update(0, alphaArray, 0, alphaArray.length);
+
+    // increment counters
     this.totalSegments++;
-    meshDescriptor.elementsCount = Math.min(elementsCount + 2, maxSegments);
+    meshDescriptor.elementsCount = Math.min(elementsCount + 2, maxSegments * 2);
   }
 
   /**
@@ -120,16 +156,20 @@ export default class WheelTrack {
    *
    * @param {Matrix} wheelTransform
    */
+  static rightWheelCornerMatrix = vec4.toMatrix(vec4(0.5, 0.0, -0.2, 1.0));
+
+  static leftWheelCornerMatrix = vec4.toMatrix(vec4(-0.5, 0.0, -0.2, 1.0));
+
   track(wheelTransform) {
     this.addTrackSegment(
       mat.mul(
         wheelTransform,
-        vec4.toMatrix(vec4(0.5, 0.0, -0.2, 1.0)),
+        WheelTrack.rightWheelCornerMatrix,
       ).array,
 
       mat.mul(
         wheelTransform,
-        vec4.toMatrix(vec4(-0.5, 0.0, -0.2, 1.0)),
+        WheelTrack.leftWheelCornerMatrix,
       ).array,
     );
   }
@@ -137,7 +177,7 @@ export default class WheelTrack {
   render(delta, mpMatrix) {
     const {gl, mesh, renderConfig} = this;
 
-    gl.lineWidth(2.5);
+    gl.lineWidth(2.0);
     renderConfig.uniforms.mpMatrix = mpMatrix.array;
     mesh.render(renderConfig);
     gl.lineWidth(1.0);

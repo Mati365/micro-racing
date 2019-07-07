@@ -82,14 +82,16 @@ export class MeshRenderer {
       vao,
       ibo,
       renderMode,
+      elementsCount,
     } = meshDescriptor;
+
+    if (elementsCount === 0)
+      return;
 
     if (ibo) {
       // Using indices buffer
-      const {
-        type: componentsType,
-        count: verticesCount,
-      } = ibo.components;
+      const {type: componentsType} = ibo.components;
+      const verticesCount = elementsCount || ibo.components.count;
 
       if (instances)
         gl.drawElementsInstanced(renderMode, verticesCount, componentsType, 0, instances);
@@ -97,7 +99,7 @@ export class MeshRenderer {
         gl.drawElements(renderMode, verticesCount, componentsType, 0);
     } else {
       // Using only vertex buffer
-      const {count: verticesCount} = (vbo || vao).components;
+      const verticesCount = elementsCount || (vbo || vao).components.count;
 
       // instanced rendering
       if (instances)

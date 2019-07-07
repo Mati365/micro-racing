@@ -28,18 +28,16 @@ const createMeshDescriptor = gl => ({
 
   // other flags such as {attributes, uniforms}
   ...options
-}) => Object.freeze(
-  {
-    material,
-    renderMode,
+}) => ({
+  material,
+  renderMode,
 
-    uv: uv && createVertexBuffer(gl, uv, usage, 2),
-    vbo: vertices && createVertexBuffer(gl, vertices, usage),
-    ibo: indices && createIndexBuffer(gl, indices, usage),
+  uv: uv && createVertexBuffer(gl, uv, usage, 2),
+  vbo: vertices && createVertexBuffer(gl, vertices, usage),
+  ibo: indices && createIndexBuffer(gl, indices, usage),
 
-    buffers: removeNullValues(buffers),
-    ...options,
-  },
-);
+  buffers: removeNullValues(buffers),
+  ...options,
+});
 
 export default createMeshDescriptor;

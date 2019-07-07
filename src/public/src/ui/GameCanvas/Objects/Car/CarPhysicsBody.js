@@ -29,7 +29,7 @@ const vec2rot = (angle, vec) => {
 export default class CarPhysicsBody {
   constructor(
     {
-      mass = 500,
+      mass = 250,
 
       velocity = vec2(0, 0),
 
@@ -59,6 +59,7 @@ export default class CarPhysicsBody {
     this.inertia = mass;
     this.angularVelocity = 0;
     this.velocity = velocity;
+    this.speed = vec2.len(velocity);
     this.acceleration = 0;
 
     this.angle = angle;
@@ -197,6 +198,7 @@ export default class CarPhysicsBody {
       vec2.mul(delta, acceleration),
       this.velocity,
     );
+    this.speed = vec2.len(this.velocity);
 
     this.pos = vec2.add(
       vec2.mul(delta / 2, vec2(this.velocity.x, -this.velocity.y)),
@@ -206,7 +208,6 @@ export default class CarPhysicsBody {
     const torque = -fLateral.rear.y * axles.rear + fLateral.front.y * -axles.front;
     const angularAcceleration = torque / inertia;
 
-    // debugger;
     this.angularVelocity += delta * angularAcceleration;
     this.angle += delta * this.angularVelocity;
 

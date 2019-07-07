@@ -27,7 +27,7 @@ const createVertexBuffer = (
   if (!vertices || !vertices.length)
     throw new Error('createVertexBuffer: not vertices provided!');
 
-  const singleVertexLength = vertices[0].length;
+  const singleVertexLength = vertices[0].length || prefferedSingleVertexLength;
 
   // validators
   if (!singleVertexLength)
@@ -38,25 +38,30 @@ const createVertexBuffer = (
 
   // create buffer
   const data = new Float32Array(R.unnest(vertices));
-  return {
-    vertexAttribDivisor,
-
-    // used to bind buffer
-    // todo: add more basic buffer creator?
-    components: {
-      type: gl.FLOAT,
-      singleLength: singleVertexLength,
-      count: vertices.length,
+  const bufferWrapper = createBuffer(
+    gl,
+    {
+      data,
+      usage,
     },
+  );
 
-    ...createBuffer(
-      gl,
-      {
-        data,
-        usage,
+  Object.assign(
+    bufferWrapper,
+    {
+      vertexAttribDivisor,
+
+      // used to bind buffer
+      // todo: add more basic buffer creator?
+      components: {
+        type: gl.FLOAT,
+        singleLength: singleVertexLength,
+        count: vertices.length,
       },
-    ),
-  };
+    },
+  );
+
+  return bufferWrapper;
 };
 
 export default R.curryN(2, createVertexBuffer);

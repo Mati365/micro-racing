@@ -1,10 +1,11 @@
 import React, {useRef, useEffect} from 'react';
 
 import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
-import {useGameBoard} from './GameBoard';
+
+import {useGameBoard} from '../../game/GameBoard';
+import TrackPath from '../../game/types/TrackPath';
 
 import EditorCanvas from '../EditorCanvas';
-import TrackPath from '../types/TrackPath';
 // import PhysicsCanvas from '../PhysicsCanvas/PhysicsCanvas';
 
 const track = TrackPath.fromRandomPath(

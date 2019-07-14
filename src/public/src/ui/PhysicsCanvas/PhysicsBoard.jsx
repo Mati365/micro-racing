@@ -3,7 +3,7 @@ import {useMemo} from 'react';
 import {vec2, toRadians} from '@pkg/gl-math';
 import {createAnimationFrameRenderer} from '@pkg/isometric-renderer/FGL/core/viewport/createDtRenderLoop';
 
-import Car from './Objects/Car';
+import Car from './objects/Car';
 
 export default class PhysicsBoard {
   setCanvas({canvas, dimensions}) {

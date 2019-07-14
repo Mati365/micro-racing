@@ -14,7 +14,7 @@ import createTexturedTree from './utils/createTexturedTree';
 import {
   CarNode,
   RoadNode,
-} from './Objects';
+} from './objects';
 
 const ROTATE_CAR_SPEED = toRadians(1);
 

@@ -19,8 +19,13 @@ const createIsometricScene = (
   const canvasDimensions = getDOMElementSize(canvas);
 
   const matrices = {
-    sceneScaling: mat4.from.scaling([sceneScale, sceneScale, sceneScale]),
-    camera: mat4.from.translation([0.0, 0.0, 0.2 / sceneScale * 5]),
+    sceneScaling: mat4.from.scaling([
+      sceneScale, sceneScale, sceneScale,
+    ]),
+
+    camera: mat4.from.translation([
+      0.0, 0.0, 0.2 / sceneScale * 5,
+    ]),
 
     projection: createIsometricProjection(
       {

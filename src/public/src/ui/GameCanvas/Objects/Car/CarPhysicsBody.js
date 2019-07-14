@@ -71,7 +71,7 @@ export default class CarPhysicsBody {
     this.pos = pos;
 
     this.throttle = 0;
-    this.maxThrottle = 90;
+    this.maxThrottle = 130;
 
     this.brake = 0;
 

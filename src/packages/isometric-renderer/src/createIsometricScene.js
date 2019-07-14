@@ -12,14 +12,15 @@ const createIsometricScene = (
   {
     canvas,
     aspectRatio,
+    sceneScale = 0.125,
   },
 ) => {
   const f = fgl(canvas);
   const canvasDimensions = getDOMElementSize(canvas);
 
   const matrices = {
-    sceneScaling: mat4.from.scaling([0.2, 0.2, 0.2]),
-    camera: mat4.from.translation([0.0, 0.0, 5.0]),
+    sceneScaling: mat4.from.scaling([sceneScale, sceneScale, sceneScale]),
+    camera: mat4.from.translation([0.0, 0.0, 0.2 / sceneScale * 5]),
 
     projection: createIsometricProjection(
       {

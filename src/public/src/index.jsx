@@ -6,8 +6,8 @@ import GameCanvas from './ui/GameCanvas';
 ReactDOM.render(
   <GameCanvas
     dimensions={{
-      w: 640,
-      h: 480,
+      w: 800,
+      h: 600,
     }}
   />,
   document.getElementById('app-root'),

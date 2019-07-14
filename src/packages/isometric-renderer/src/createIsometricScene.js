@@ -1,5 +1,4 @@
 import {mat4} from '@pkg/gl-math/matrix';
-import getDOMElementSize from '@pkg/basic-helpers/base/getDOMElementSize';
 
 import fgl from './FGL';
 import createIsometricProjection from './FGL/core/viewport/projections/createIsometricProjection';
@@ -16,7 +15,7 @@ const createIsometricScene = (
   },
 ) => {
   const f = fgl(canvas);
-  const canvasDimensions = getDOMElementSize(canvas);
+  const {canvasDimensions} = f.state;
 
   const matrices = {
     sceneScaling: mat4.from.scaling([

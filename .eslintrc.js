@@ -48,6 +48,14 @@ module.exports = {
     'no-bitwise': 0,
     'no-loop-func': 0,
     'guard-for-in': 0,
+    'indent': [
+      'error',
+      2,
+      {
+        ignoredNodes: ['TemplateLiteral > *'],
+        SwitchCase: 1
+      },
+    ],
   },
   settings: {
     'import/resolver': {

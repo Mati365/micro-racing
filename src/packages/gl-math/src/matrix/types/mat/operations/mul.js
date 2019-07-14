@@ -8,8 +8,8 @@ import createMatrix from '../createMatrix';
  *
  * @returns {Matrix}
  */
-export const mul = (m1, m2) => {
-  const result = createMatrix(m2.w, m1.h);
+export const mul = (m1, m2, result = createMatrix(m2.w, m1.h)) => {
+  const {array} = result;
 
   for (let i = result.h - 1; i >= 0; --i) {
     for (let j = result.w - 1; j >= 0; --j) {
@@ -19,7 +19,7 @@ export const mul = (m1, m2) => {
         buffer += m1.array[i * m1.w + k] * m2.array[k * m2.w + j];
       }
 
-      result.array[i * result.w + j] = buffer;
+      array[i * result.w + j] = buffer;
     }
   }
 

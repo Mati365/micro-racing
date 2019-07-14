@@ -29,7 +29,7 @@ const vec2rot = (angle, vec) => {
 export default class CarPhysicsBody {
   constructor(
     {
-      mass = 250,
+      mass = 120,
 
       velocity = vec2(0, 0),
 
@@ -97,12 +97,12 @@ export default class CarPhysicsBody {
     };
 
     this.corneringStiffness = {
-      front: -10.0,
-      rear: -10.2,
+      front: -20.0,
+      rear: -20.2,
     };
 
-    this.maxGrip = 5.0;
-    this.resistance = 10.0;
+    this.maxGrip = 15.0;
+    this.resistance = 5.0;
     this.drag = 2.2;
   }
 
@@ -213,6 +213,6 @@ export default class CarPhysicsBody {
     this.steerAngle = lerp(this.steerAngle, 0, 0.05 * dt);
     this.throttle *= 0.9 * dt;
 
-    this.corneringIntensity = vec2.len(fCornering) / 10000;
+    this.corneringIntensity = vec2.len(fCornering) / 8000;
   }
 }

@@ -1,12 +1,13 @@
 import * as R from 'ramda';
 
 // CORE
-import * as COLORS from './core/constants/colors';
+import COLORS from './core/constants/colors';
 
 import {createShaderMaterial} from './core/material/types';
 import texture2D from './core/texture/texture2D';
 import tileTexture2D from './core/texture/tileTexture2D';
 
+import appendCanvasHTMLNode from './core/appendCanvasHTMLNode';
 import createMesh from './core/mesh/createMesh';
 import createMeshBatch from './core/mesh/createMeshBatch';
 import createFGLState from './core/createFGLState';
@@ -66,6 +67,9 @@ const createRenderContext = (canvasElement, glContextFlags) => {
           from: getMaterialMeshFrom(fgl, gl),
         },
       },
+
+      // HTML helpers
+      appendCanvasHTMLNode: appendCanvasHTMLNode(canvasElement),
 
       // non related creators
       createSceneBuffer: R.partial(createSceneBuffer, [fgl]),

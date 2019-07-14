@@ -1,5 +1,7 @@
+import getDOMElementSize from '@pkg/basic-helpers/base/getDOMElementSize';
 import createContextFlags from './constants/createContextFlags';
-import * as COLORS from './constants/colors';
+
+import COLORS from './constants/colors';
 
 /**
  * Creates blank shared between engine functions context.
@@ -17,8 +19,13 @@ const createFGLState = gl => ({
   flags: createContextFlags(gl),
   colors: COLORS,
 
-  materialUUID: null,
+  canvas: gl.canvas,
+  canvasDimensions: getDOMElementSize(gl.canvas),
+
   gl,
+
+  // cache utils
+  materialUUID: null,
 });
 
 export default createFGLState;

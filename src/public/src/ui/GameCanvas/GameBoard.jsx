@@ -165,6 +165,7 @@ export default class GameBoard {
       async sceneParams => new CarNode(
         {
           ...sceneParams,
+          nick: '#1 Mati',
           renderer: await createTexturedCar(f)(CAR_COLORS.BLUE),
           transform: {
             rotate: [0, 0, segments[0].angle],

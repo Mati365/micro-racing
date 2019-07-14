@@ -117,11 +117,11 @@ class SceneBuffer {
   }
 
   render(delta, mpMatrix) {
-    const {list, camera} = this;
+    const {f, list, camera} = this;
 
     camera.render(delta, mpMatrix);
     for (let i = 0, len = list.length; i < len; ++i)
-      list[i].render(delta, camera.mpMatrix);
+      list[i].render(delta, camera.mpMatrix, f);
   }
 }
 

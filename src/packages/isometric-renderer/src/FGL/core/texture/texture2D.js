@@ -1,4 +1,4 @@
-import * as COLORS from '../constants/colors';
+import COLORS from '../constants/colors';
 
 /**
  * Creates webgl 2D texture

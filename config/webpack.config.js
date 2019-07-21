@@ -1,132 +1,71 @@
-const {resolve} = require('path');
 const R = require('ramda');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const NodemonPlugin = require('nodemon-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const {resolve} = require('path');
 
 const OUTPUT_FOLDER = resolve(__dirname, '../dist');
+const MANIFEST_NAME = 'public-manifest.json';
+const SERVER_FILENAME = 'server.js';
 
-const resolveSource = folder => resolve(__dirname, `../src/${folder}`);
+const createWebpackConfig = require('./utils/createWebpackConfig');
 
-module.exports = {
-  devtool: 'eval-source-map',
-  entry: {
-    main: resolveSource('public/src/index.jsx'),
+const resolveSource = path => resolve(__dirname, `../src/${path}`);
+
+const SHARED_ALIASES = R.mapObjIndexed(
+  resolveSource,
+  {
+    '@pkg/schemas': 'packages/basic-type-schemas/src/',
+    '@pkg/resource-pack': 'packages/resource-pack/src/',
+    '@pkg/gl-math': 'packages/gl-math/src/',
+    '@pkg/basic-helpers': 'packages/basic-helpers/src/',
+    '@pkg/isometric-renderer': 'packages/isometric-renderer/src/',
+    '@pkg/ctx': 'packages/ctx-utils/src',
+    '@pkg/struct-pack': 'packages/struct-pack/src/',
+    '@game/res': 'public/res/',
+    '@game/public': 'public/',
+    '@game/server': 'server/',
+    '@game/shared': 'shared/',
   },
-  output: {
-    path: OUTPUT_FOLDER,
-    filename: '[name]-[hash].js',
-  },
-  resolve: {
-    extensions: ['.js', '.jsx', '.json'],
-    modules: [
-      resolve(__dirname, '../node_modules'),
-      resolve(__dirname, '../src'),
-    ],
-    alias: R.mapObjIndexed(
-      resolveSource,
-      {
-        '@pkg/schemas': 'packages/basic-type-schemas/src/',
-        '@pkg/resource-pack': 'packages/resource-pack/src/',
-        '@pkg/gl-math': 'packages/gl-math/src/',
-        '@pkg/basic-helpers': 'packages/basic-helpers/src/',
-        '@pkg/isometric-renderer': 'packages/isometric-renderer/src/',
-        '@pkg/ctx': 'packages/ctx-utils/src',
-        '@pkg/struct-pack': 'packages/struct-pack/src/',
-        '@game/res': 'public/res/',
-        '@game/public': 'public/',
-        '@game/server': 'server/',
-        '@game/shared': 'shared/',
-      },
-    ),
-  },
-  plugins: [
-    new HtmlWebpackPlugin(
-      {
-        template: resolveSource('public/res/index.pug'),
-        filename: 'index.html',
-      },
-    ),
-    new webpack.HotModuleReplacementPlugin,
-  ],
-  devServer: {
-    port: 3000,
-    hot: true,
-    inline: true,
-    watchContentBase: true,
-    compress: true,
-    historyApiFallback: true,
-    contentBase: OUTPUT_FOLDER,
-    publicPath: '/',
-  },
-  module: {
-    rules: [
-      {
-        test: /\.pug$/,
-        use: ['raw-loader', 'pug-html-loader'],
-      },
-      {
-        enforce: 'pre',
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        loader: 'eslint-loader',
-        options: {
-          emitError: false,
-        },
-      },
-      {
-        test: /\.(png|jpg|gif|obj|mtl)$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {},
-          },
-        ],
-      },
-      {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              // polyfill for new browser
-              '@babel/preset-env',
-              '@babel/preset-react', // react jsx compiler
-            ],
-            plugins: [
-              ['@babel/plugin-transform-runtime',
+);
+
+module.exports = [
+  createWebpackConfig(
+    {
+      publicPath: 'static/',
+      target: 'web',
+      alias: SHARED_ALIASES,
+      manifestName: MANIFEST_NAME,
+      entry: resolveSource('public/src/index.jsx'),
+      outputFolder: resolve(OUTPUT_FOLDER, 'public'),
+      plugins: [
+        new CleanWebpackPlugin,
+      ],
+    },
+  ),
+
+  createWebpackConfig(
+    {
+      target: 'node',
+      alias: SHARED_ALIASES,
+      entry: resolveSource('server/index.jsx'),
+      outputFolder: resolve(OUTPUT_FOLDER, 'api'),
+      outputName: SERVER_FILENAME,
+      plugins: [
+        new CleanWebpackPlugin,
+        ...(
+          process.env.NODE_ENV === 'development'
+            ? [
+              new NodemonPlugin(
                 {
-                  regenerator: true,
+                  watch: [
+                    resolve(OUTPUT_FOLDER),
+                  ],
                 },
-              ],
-              '@babel/plugin-transform-named-capturing-groups-regex',
-              '@babel/plugin-proposal-nullish-coalescing-operator',
-              '@babel/plugin-proposal-optional-chaining',
-              '@babel/plugin-proposal-logical-assignment-operators',
-              '@babel/plugin-proposal-do-expressions',
-              '@babel/plugin-proposal-function-bind',
-              [
-                '@babel/plugin-proposal-pipeline-operator',
-                {
-                  proposal: 'minimal',
-                },
-              ],
-              [
-                '@babel/plugin-proposal-decorators',
-                {
-                  legacy: true,
-                },
-              ],
-              [
-                '@babel/plugin-proposal-class-properties',
-                {
-                  loose: true,
-                },
-              ],
-            ],
-          },
-        },
-      },
-    ],
-  },
-};
+              ),
+            ]
+            : []
+        ),
+      ],
+    },
+  ),
+];

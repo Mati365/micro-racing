@@ -15,7 +15,9 @@
     "ramda-fantasy": "^0.8.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "rxjs": "^6.4.0"
+    "rxjs": "^6.4.0",
+    "express": "^4.17.1",
+    "consola": "^2.9.0"
   },
   "devDependencies": {
     "@babel/core": "^7.4.0",
@@ -40,15 +42,17 @@
     "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-react": "^7.12.4",
     "file-loader": "^3.0.1",
-    "html-webpack-plugin": "^3.2.0",
-    "pug-html-loader": "^1.1.5",
     "raw-loader": "^2.0.0",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
-    "webpack-dev-server": "^3.2.1"
+    "webpack-dev-server": "^3.2.1",
+    "nodemon-webpack-plugin": "^4.0.8",
+    "clean-webpack-plugin": "^3.0.0",
+    "webpack-manifest-plugin": "^2.0.4",
+    "webpack-node-externals": "^1.7.2"
   },
   "scripts": {
-    "develop": "env NODE_ENV=development npx webpack-dev-server --config=config/webpack.config.js --mode=development",
+    "develop": "env NODE_ENV=development npx webpack --config=config/webpack.config.js --mode=development --watch",
     "build:production": "(rm -rf ./dist/*; env NODE_ENV=production npx webpack --config=config/webpack.config.js --mode=production)"
   }
 }

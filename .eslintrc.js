@@ -41,6 +41,7 @@ module.exports = {
     'object-curly-newline': 0,
     'no-unused-expressions': 0,
     'react/forbid-prop-types': 0,
+    'react/no-danger': 0,
     curly: 0,
     'new-parens': 0,
     'no-continue': 0,

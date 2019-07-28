@@ -11,9 +11,9 @@ import TrackPath, {
   TRACK_POINTS,
   CHUNK_SIZE,
   getHandlerSiblingParentPoint,
-} from '../../game/types/TrackPath';
+} from '@game/shared/track/TrackPath';
 
-import segmentizePath from '../../game/types/TrackSegments/utils/segmentizePath';
+import segmentizePath from '@game/shared/track/TrackSegments/utils/segmentizePath';
 
 const drawPoints = (color, r, points, ctx) => {
   for (let i = points.length - 1; i >= 0; --i) {

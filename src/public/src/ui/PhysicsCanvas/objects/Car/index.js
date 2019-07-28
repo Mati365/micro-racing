@@ -3,7 +3,7 @@ import {
   drawRect,
 } from '@pkg/ctx';
 
-import CarPhysicsBody from './CarPhysicsBody';
+import CarPhysicsBody from '@game/shared/physics/CarPhysicsBody';
 
 const drawWheel = (size, wheel, body, ctx) => {
   const {

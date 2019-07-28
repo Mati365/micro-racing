@@ -4,8 +4,8 @@ import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
 import {SceneNode} from '@pkg/isometric-renderer/FGL/engine/scene';
 import raceTrackTextureUrl from '@game/res/img/race-track.png';
 
+import {TrackSegments} from '@game/shared/track';
 import RoadWireframe from './RoadWireframe';
-import {TrackSegments} from '../../types';
 
 const createRoadRenderer = f => async ({path: {segments}}) => {
   const vertices = [];

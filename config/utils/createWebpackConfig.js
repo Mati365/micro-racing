@@ -15,7 +15,13 @@ const createWebpackConfig = ({
   target,
   externals: (
     target === 'node'
-      ? [nodeExternals()]
+      ? [nodeExternals(
+        {
+          whitelist: [
+            /^@pkg*/,
+          ],
+        },
+      )]
       : []
   ),
   node: {

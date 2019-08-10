@@ -5,11 +5,14 @@ import {resolve} from 'path';
 import express from 'express';
 import consola from 'consola';
 
+import GameServer from '@game/network/server/Server';
 import staticManifest from './constants/staticManifest';
 
 const APP_PORT = 3000;
 
 const app = express();
+
+new GameServer().start();
 
 app
   .use(

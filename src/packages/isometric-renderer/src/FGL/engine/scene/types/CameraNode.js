@@ -7,7 +7,7 @@ export default class Camera extends SceneNode {
     pos,
     target,
     lerpSpeed = 0.45,
-    viewportOffset = [0, 0.75, 0],
+    viewportOffset = [0, 0.9, 0],
   }) {
     super(
       {

@@ -49,7 +49,10 @@
     "nodemon-webpack-plugin": "^4.0.8",
     "clean-webpack-plugin": "^3.0.0",
     "webpack-manifest-plugin": "^2.0.4",
-    "webpack-node-externals": "^1.7.2"
+    "webpack-node-externals": "^1.7.2",
+    "ws": "^7.1.1",
+    "uniqid": "^5.0.3",
+    "chalk": "^2.4.2"
   },
   "scripts": {
     "develop": "env NODE_ENV=development npx webpack --config=config/webpack.config.js --mode=development --watch",

@@ -12,7 +12,7 @@ export default class HTMLTextNode {
   constructor({
     f,
     text,
-    margin = vec2(0, -60), // in pixels
+    margin = vec2(0, -50), // in pixels
     translate = vec4(0, 0, 0, 1),
     outlineColor = f.colors.hex.BLACK,
     color = f.colors.hex.WHITE,

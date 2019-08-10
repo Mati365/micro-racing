@@ -25,7 +25,7 @@ const GameCanvas = ({dimensions}) => {
         .setCanvas(
           {
             canvas: canvasRef.current,
-            aspectRatio: 1.16,
+            aspectRatio: 1.05,
             dimensions,
             track,
           },

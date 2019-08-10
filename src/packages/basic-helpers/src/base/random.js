@@ -8,7 +8,21 @@ import {vec2} from '@pkg/gl-math/matrix';
  *
  * @returns {Number}
  */
-export const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+export const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+
+/**
+ * Returns random element from array
+ *
+ * @param {Array} array
+ *
+ * @returns {Any}
+ */
+export const getRandomArrayItem = (array) => {
+  if (array.length > 0)
+    return array[getRandomNumber(0, array.length - 1)];
+
+  return null;
+};
 
 /**
  * Gets array of points on certain area

@@ -136,7 +136,6 @@ export default class WheelTrack {
     );
 
     // update buffer alpha
-    // console.log(offset);
     for (let i = offset + 1, no = 0; i !== offset; ++no) {
       i = (i + 1) % maxSegments;
 

@@ -29,6 +29,7 @@ module.exports = {
       'LabeledStatement',
       'WithStatement',
     ],
+    'no-new': 0,
     'jsx-a11y/click-events-have-key-events': 0,
     'jsx-a11y/mouse-events-have-key-events': 0,
     'import/no-extraneous-dependencies': 0,

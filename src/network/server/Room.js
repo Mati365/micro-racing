@@ -1,7 +1,9 @@
 import * as R from 'ramda';
 
+import {ERROR_CODES} from '@game/network/constants/serverCodes';
+
 import {getByID} from '@pkg/basic-helpers';
-import ServerError, {ERROR_CODES} from '../../shared/errors/ServerError';
+import ServerError from '../shared/ServerError';
 
 export default class Room {
   constructor(

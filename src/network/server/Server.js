@@ -36,7 +36,8 @@ export default class GameServer {
       'connection',
       ws => new PlayerSocket(
         {
-          socket: ws,
+          gameServer: this,
+          ws,
         },
       ),
     );

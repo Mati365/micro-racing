@@ -11,7 +11,6 @@ import Lang from './res';
  * @param {Object} config
  */
 const generateName = ({lang} = {lang: 'eng'}) => {
-  console.log(Lang);
   const {
     adjectives,
     animals,

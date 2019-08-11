@@ -9,22 +9,30 @@ export default class Room {
   constructor(
     {
       owner,
+      name,
       kickedPlayers = [],
       players = [],
       playersLimit = 8,
     },
   ) {
+    this.name = name;
     this.owner = owner;
-    this.kickedPlayers = kickedPlayers;
     this.playersLimit = playersLimit;
-    this.players = [
-      ...players,
-      owner,
-    ];
+
+    this.kickedPlayers = kickedPlayers;
+    this.players = (
+      owner
+        ? [...players, owner]
+        : players
+    );
+  }
+
+  get playersCount() {
+    return this.players.length;
   }
 
   get isFull() {
-    return this.playersLimit === this.players.length - 1;
+    return this.playersLimit === this.playersCount - 1;
   }
 
   /**
@@ -43,10 +51,10 @@ export default class Room {
       throw new ServerError(ERROR_CODES.ROOM_FULL);
 
     const {id} = player;
-    if (getByID(id, players)?.id === player.id)
+    if (getByID(id, players))
       throw new ServerError(ERROR_CODES.ALREADY_JOINED);
 
-    if (getByID(id, kickedPlayers)?.id === player.id)
+    if (getByID(id, kickedPlayers))
       throw new ServerError(ERROR_CODES.ALREADY_KICKED);
 
     if (R.isNil(this.owner))
@@ -61,8 +69,8 @@ export default class Room {
    * @param {Player} player
    */
   leave(player) {
-    this.players = R.without(
-      [player],
+    this.players = R.reject(
+      R.propEq('id', player.id),
       this.players,
     );
   }

@@ -24,24 +24,15 @@ export default class PlayerSocket {
     ws,
     gameServer,
     info = new PlayerInfo,
+    onDisconnect,
   }) {
     this.gameServer = gameServer;
     this.ws = ws;
     this.info = info;
+    this.onDisconnect = onDisconnect;
 
     this.mountMessagesHandler();
   }
-
-  /**
-   * Mount action decoders
-   */
-  listeners = provideListenersDecoder(
-    {
-      [PLAYER_ACTIONS.JOIN_ROOM]: (roomName) => {
-        consola.info(`Wanna join to ${roomName}?`);
-      },
-    },
-  );
 
   mountMessagesHandler() {
     const {
@@ -50,18 +41,34 @@ export default class PlayerSocket {
       listeners,
     } = this;
 
-    consola.info(`Welcome player ${chalk.white.bold(info.nick)}!`);
-    ws.on(
-      'message',
-      (message) => {
-        const listener = listeners[message[0]];
-        if (!listener)
-          return;
+    const boldNick = chalk.white.bold(info.nick);
+    consola.info(`Welcome player ${boldNick}!`);
 
-        listener(
-          message.slice(1, message.length), // drop action byte
-        );
-      },
-    );
+    ws.on('message', (message) => {
+      const listener = listeners[message[0]];
+      if (!listener)
+        return;
+
+      listener(
+        message.slice(1, message.length), // drop action byte
+      );
+    });
+
+    ws.on('close', () => {
+      this.onDisconnect?.();
+      consola.info(`Bye bye player ${boldNick}!`);
+    });
   }
+
+  /**
+   * Mount action listeners with provided decoders
+   */
+  listeners = provideListenersDecoder(
+    {
+      /** ROOM JOIN */
+      [PLAYER_ACTIONS.JOIN_ROOM]: (roomName) => {
+        consola.info(`Wanna join to ${roomName}?`);
+      },
+    },
+  );
 }

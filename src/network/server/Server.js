@@ -1,8 +1,10 @@
 import WebSocket from 'ws';
 import consola from 'consola';
+import * as R from 'ramda';
 
 import {logMethod} from '@pkg/basic-helpers';
 import PlayerSocket from './PlayerSocket';
+import Room from './Room';
 
 /**
  * Main networking class
@@ -15,7 +17,17 @@ export default class GameServer {
     },
   } = {}) {
     this.socketOptions = socketOptions;
+
+    /**
+     * rootRoom is a room with all players
+     * each player is assigned to id
+     */
     this.rooms = [];
+    this.rootRoom = new Room(
+      {
+        owner: null,
+      },
+    );
   }
 
   /**
@@ -27,20 +39,25 @@ export default class GameServer {
     },
   )
   start() {
-    const {socketOptions} = this;
+    const {
+      rootRoom,
+      socketOptions,
+    } = this;
 
     this.wss = new WebSocket.Server(socketOptions);
     this.wss.binaryType = 'arraybuffer';
 
-    this.wss.on(
-      'connection',
-      ws => new PlayerSocket(
+    this.wss.on('connection', (ws) => {
+      const playerSocket = new PlayerSocket(
         {
           gameServer: this,
           ws,
         },
-      ),
-    );
+      );
+
+      rootRoom.join(playerSocket.info);
+      playerSocket.onDisconnect = () => rootRoom.leave(playerSocket.info);
+    });
   }
 
   /**
@@ -48,5 +65,15 @@ export default class GameServer {
    */
   stop() {
     this.wss.close();
+  }
+
+  /**
+   * User API
+   */
+  findRoom(name) {
+    return R.find(
+      R.propEq('name', name),
+      this.rooms,
+    );
   }
 }

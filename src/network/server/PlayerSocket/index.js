@@ -1,20 +1,17 @@
 import consola from 'consola';
 import chalk from 'chalk';
-import * as R from 'ramda';
 
-import API_BINARY_ENCODERS, {PLAYER_ACTIONS} from '../../constants/apiBinaryEncoders';
+import {
+  PLAYER_ACTIONS,
+  ACTION_FLAGS,
+} from '../../constants/serverCodes';
 
 import PlayerInfo from './PlayerInfo';
 
-const provideListenersDecoder = R.mapObjIndexed(
-  (listener, actionName) => {
-    const decoder = API_BINARY_ENCODERS[actionName].decode;
-
-    return data => listener(
-      decoder(data),
-    );
-  },
-);
+import createActionMessage, {
+  getMessageMeta,
+  getMessageContent,
+} from '../../shared/utils/createActionMessage';
 
 /**
  * Socket API provider for player
@@ -22,11 +19,11 @@ const provideListenersDecoder = R.mapObjIndexed(
 export default class PlayerSocket {
   constructor({
     ws,
-    gameServer,
+    server,
     info = new PlayerInfo,
     onDisconnect,
   }) {
-    this.gameServer = gameServer;
+    this.server = server;
     this.ws = ws;
     this.info = info;
     this.onDisconnect = onDisconnect;
@@ -45,12 +42,14 @@ export default class PlayerSocket {
     consola.info(`Welcome player ${boldNick}!`);
 
     ws.on('message', (message) => {
-      const listener = listeners[message[0]];
+      const {cmdID, action} = getMessageMeta(message);
+      const listener = listeners[action];
       if (!listener)
         return;
 
       listener(
-        message.slice(1, message.length), // drop action byte
+        cmdID,
+        getMessageContent(message),
       );
     });
 
@@ -61,14 +60,37 @@ export default class PlayerSocket {
   }
 
   /**
+   * Sends response callback to client
+   *
+   * @param {Int} cmdID Action identifier on client
+   * @param {Object|Array} data
+   */
+  sendActionResponse(cmdID, data) {
+    const {ws} = this;
+
+    ws.send(
+      createActionMessage(
+        cmdID,
+        null,
+        ACTION_FLAGS.RESPONSE,
+        data,
+      ),
+    );
+  }
+
+  /**
    * Mount action listeners with provided decoders
    */
-  listeners = provideListenersDecoder(
-    {
-      /** ROOM JOIN */
-      [PLAYER_ACTIONS.JOIN_ROOM]: (roomName) => {
-        consola.info(`Wanna join to ${roomName}?`);
-      },
+  listeners = {
+    /** ROOM JOIN */
+    [PLAYER_ACTIONS.JOIN_ROOM]: (cmdID, {name}) => {
+      consola.info(`Wanna join to ${name}?`);
+      this.sendActionResponse(
+        cmdID,
+        {
+          a: 2,
+        },
+      );
     },
-  );
+  }
 }

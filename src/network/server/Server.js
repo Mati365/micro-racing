@@ -50,7 +50,7 @@ export default class GameServer {
     this.wss.on('connection', (ws) => {
       const playerSocket = new PlayerSocket(
         {
-          gameServer: this,
+          server: this,
           ws,
         },
       );

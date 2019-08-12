@@ -1,12 +1,14 @@
 import * as R from 'ramda';
 
-import API_BINARY_ENCODERS, {PLAYER_ACTIONS} from '../constants/apiBinaryEncoders';
-
-import createActionMessage from '../shared/utils/createActionMessage';
+import {PLAYER_ACTIONS} from '../constants/serverCodes';
+import BinarySocketRPCWrapper from './BinarySocketRPCWrapper';
 
 export default class PlayerClientSocket {
   static defaultApiMethods = {
-    joinRoom: PLAYER_ACTIONS.JOIN_ROOM,
+    joinRoom: {
+      action: PLAYER_ACTIONS.JOIN_ROOM,
+      serialize: R.objOf('name'),
+    },
   };
 
   /**
@@ -16,6 +18,7 @@ export default class PlayerClientSocket {
    */
   static connect = (uri, clientParams) => new Promise((resolve, reject) => {
     const ws = new WebSocket(uri);
+    ws.binaryType = 'arraybuffer';
     ws.onopen = () => {
       resolve(
         new PlayerClientSocket(
@@ -33,27 +36,17 @@ export default class PlayerClientSocket {
   });
 
   constructor({ws} = {}) {
-    this.ws = ws;
+    this.rpc = new BinarySocketRPCWrapper(ws);
+    this.state = [];
 
     R.forEachObjIndexed(
-      (actionName, methodName) => {
-        const encoder = API_BINARY_ENCODERS[actionName].encode;
-
-        this[methodName] = (...args) => this.sendAPIMessage(
-          actionName,
-          encoder(...args),
+      ({action, serialize}, methodName) => {
+        this[methodName] = (...args) => this.rpc.sendBinaryRequest(
+          action,
+          serialize(...args),
         );
       },
       PlayerClientSocket.defaultApiMethods,
     );
   }
-
-  /** @todo: Return response */
-  sendAPIMessage = (action, data) => {
-    const {ws} = this;
-
-    ws.send(
-      createActionMessage(action, data),
-    );
-  };
 }

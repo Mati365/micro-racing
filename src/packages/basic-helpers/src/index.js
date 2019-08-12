@@ -9,4 +9,6 @@ export {default as getIndexByName} from './list/getIndexByName';
 export {default as wrapMethod} from './decorators/wrapMethod';
 export {default as logMethod} from './decorators/logMethod';
 
+export {default as Deferred} from './types/Deferred';
+
 export * from './base/random';

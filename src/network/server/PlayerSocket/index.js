@@ -1,6 +1,8 @@
 import consola from 'consola';
 import chalk from 'chalk';
 
+import logMethod, {logFunction} from '@pkg/basic-helpers/decorators/logMethod';
+
 import {
   PLAYER_ACTIONS,
   ACTION_FLAGS,
@@ -31,16 +33,26 @@ export default class PlayerSocket {
     this.mountMessagesHandler();
   }
 
+  get id() {
+    return this.info.id;
+  }
+
+  @logMethod(
+    ({info}) => {
+      consola.info(`Welcome player ${chalk.white.bold(info.nick)}!`);
+    },
+    {
+      afterExec: true,
+    },
+  )
   mountMessagesHandler() {
     const {
       ws,
       server,
-      info,
       listeners,
     } = this;
 
-    server.rootRoom.join(info);
-    consola.info(`Welcome player ${chalk.white.bold(info.nick)}!`);
+    server.rootRoom.join(this);
 
     ws.on('message', (message) => {
       const {cmdID, action} = getMessageMeta(message);
@@ -56,7 +68,7 @@ export default class PlayerSocket {
 
     ws.on('close', () => {
       this.leave();
-      this.onDisconnect?.(this.info);
+      this.onDisconnect?.(this);
     });
   }
 
@@ -87,11 +99,11 @@ export default class PlayerSocket {
 
     let room = server.findRoom(name);
     if (room)
-      room.join(info);
+      room.join(this);
     else {
       room = server.createRoom(
         {
-          owner: info,
+          owner: this,
           name,
         },
       );
@@ -104,25 +116,35 @@ export default class PlayerSocket {
   /**
    * Remove user from root players list and room
    */
+  @logMethod(
+    ({info}) => {
+      consola.info(`Bye bye player ${chalk.white.bold(info.nick)}!`);
+    },
+    {
+      afterExec: true,
+    },
+  )
   leave() {
     const {server, info} = this;
+    const {room} = info;
 
-    if (info.room)
-      info.room.leave(info);
-
-    server.rootRoom.leave(info);
-    consola.info(`Bye bye player ${chalk.white.bold(info.nick)}!`);
+    room?.leave(this);
+    server.rootRoom.leave(this);
   }
 
   /**
    * Mount action listeners
    */
   listeners = {
-    [PLAYER_ACTIONS.JOIN_ROOM]: (cmdID, {name}) => {
-      const {info} = this;
-      const room = this.joinRoom(name);
-
-      consola.info(`Player ${chalk.white.bold(info.nick)} joined to ${chalk.white.bold(room.name)}!`);
-    },
+    [PLAYER_ACTIONS.JOIN_ROOM]: logFunction(
+      (_, room) => {
+        consola.info(`Player ${chalk.white.bold(this.info.nick)} joined to ${chalk.white.bold(room.name)}!`);
+      },
+      {
+        afterExec: true,
+      },
+    )(
+      (cmdID, {name}) => this.joinRoom(name),
+    ),
   }
 }

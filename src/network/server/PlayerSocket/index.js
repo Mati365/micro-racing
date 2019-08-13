@@ -34,12 +34,13 @@ export default class PlayerSocket {
   mountMessagesHandler() {
     const {
       ws,
+      server,
       info,
       listeners,
     } = this;
 
-    const boldNick = chalk.white.bold(info.nick);
-    consola.info(`Welcome player ${boldNick}!`);
+    server.rootRoom.join(info);
+    consola.info(`Welcome player ${chalk.white.bold(info.nick)}!`);
 
     ws.on('message', (message) => {
       const {cmdID, action} = getMessageMeta(message);
@@ -54,8 +55,8 @@ export default class PlayerSocket {
     });
 
     ws.on('close', () => {
-      this.onDisconnect?.();
-      consola.info(`Bye bye player ${boldNick}!`);
+      this.leave();
+      this.onDisconnect?.(this.info);
     });
   }
 
@@ -79,18 +80,49 @@ export default class PlayerSocket {
   }
 
   /**
-   * Mount action listeners with provided decoders
+   * Append player to both rooms
    */
-  listeners = {
-    /** ROOM JOIN */
-    [PLAYER_ACTIONS.JOIN_ROOM]: (cmdID, {name}) => {
-      consola.info(`Wanna join to ${name}?`);
-      this.sendActionResponse(
-        cmdID,
+  joinRoom(name) {
+    const {server, info} = this;
+
+    let room = server.findRoom(name);
+    if (room)
+      room.join(info);
+    else {
+      room = server.createRoom(
         {
-          a: 2,
+          owner: info,
+          name,
         },
       );
+    }
+
+    info.room = room;
+    return room;
+  }
+
+  /**
+   * Remove user from root players list and room
+   */
+  leave() {
+    const {server, info} = this;
+
+    if (info.room)
+      info.room.leave(info);
+
+    server.rootRoom.leave(info);
+    consola.info(`Bye bye player ${chalk.white.bold(info.nick)}!`);
+  }
+
+  /**
+   * Mount action listeners
+   */
+  listeners = {
+    [PLAYER_ACTIONS.JOIN_ROOM]: (cmdID, {name}) => {
+      const {info} = this;
+      const room = this.joinRoom(name);
+
+      consola.info(`Player ${chalk.white.bold(info.nick)} joined to ${chalk.white.bold(room.name)}!`);
     },
   }
 }

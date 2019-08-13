@@ -1,10 +1,15 @@
 import WebSocket from 'ws';
 import consola from 'consola';
-import * as R from 'ramda';
 
+import {removeByProp} from '@pkg/basic-helpers/list/removeByID';
+import {findByProp} from '@pkg/basic-helpers/list/findByID';
 import {logMethod} from '@pkg/basic-helpers';
+
 import PlayerSocket from './PlayerSocket';
 import Room from './Room';
+import ServerError from '../shared/ServerError';
+
+import {ERROR_CODES} from '../constants/serverCodes';
 
 /**
  * Main networking class
@@ -39,24 +44,18 @@ export default class GameServer {
     },
   )
   start() {
-    const {
-      rootRoom,
-      socketOptions,
-    } = this;
+    const {socketOptions} = this;
 
     this.wss = new WebSocket.Server(socketOptions);
     this.wss.binaryType = 'arraybuffer';
 
     this.wss.on('connection', (ws) => {
-      const playerSocket = new PlayerSocket(
+      new PlayerSocket(
         {
           server: this,
           ws,
         },
       );
-
-      rootRoom.join(playerSocket.info);
-      playerSocket.onDisconnect = () => rootRoom.leave(playerSocket.info);
     });
   }
 
@@ -68,12 +67,29 @@ export default class GameServer {
   }
 
   /**
-   * User API
+   * ROOM API
    */
   findRoom(name) {
-    return R.find(
-      R.propEq('name', name),
-      this.rooms,
+    return findByProp('name')(name, this.rooms);
+  }
+
+  removeRoom(name) {
+    this.rooms = removeByProp('name')(name, this.rooms);
+  }
+
+  createRoom({name, owner}) {
+    if (this.findRoom(name))
+      throw new ServerError(ERROR_CODES.ROOM_ALREADY_EXISTS);
+
+    const room = new Room(
+      {
+        owner,
+        name,
+        onDestroy: () => this.removeRoom(name),
+      },
     );
+
+    this.rooms.push(room);
+    return room;
   }
 }

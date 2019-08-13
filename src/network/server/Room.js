@@ -2,7 +2,11 @@ import * as R from 'ramda';
 
 import {ERROR_CODES} from '@game/network/constants/serverCodes';
 
-import {getByID} from '@pkg/basic-helpers';
+import {
+  findByID,
+  removeByID,
+} from '@pkg/basic-helpers';
+
 import ServerError from '../shared/ServerError';
 
 export default class Room {
@@ -13,11 +17,13 @@ export default class Room {
       kickedPlayers = [],
       players = [],
       playersLimit = 8,
+      onDestroy,
     },
   ) {
     this.name = name;
     this.owner = owner;
     this.playersLimit = playersLimit;
+    this.onDestroy = onDestroy;
 
     this.kickedPlayers = kickedPlayers;
     this.players = (
@@ -51,10 +57,10 @@ export default class Room {
       throw new ServerError(ERROR_CODES.ROOM_FULL);
 
     const {id} = player;
-    if (getByID(id, players))
+    if (findByID(id, players))
       throw new ServerError(ERROR_CODES.ALREADY_JOINED);
 
-    if (getByID(id, kickedPlayers))
+    if (findByID(id, kickedPlayers))
       throw new ServerError(ERROR_CODES.ALREADY_KICKED);
 
     if (R.isNil(this.owner))
@@ -69,9 +75,8 @@ export default class Room {
    * @param {Player} player
    */
   leave(player) {
-    this.players = R.reject(
-      R.propEq('id', player.id),
-      this.players,
-    );
+    this.players = removeByID(player.id, this.players);
+    if (!this.playersCount)
+      this.onDestroy?.(this);
   }
 }

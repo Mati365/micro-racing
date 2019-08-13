@@ -6,9 +6,11 @@ export default class PlayerInfo {
     {
       nick = generateName(),
       id = uniqid(),
+      room = null,
     } = {},
   ) {
     this.nick = nick;
     this.id = id;
+    this.room = room;
   }
 }

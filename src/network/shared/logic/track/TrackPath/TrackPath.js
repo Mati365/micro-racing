@@ -94,7 +94,7 @@ export default class TrackPath {
     R.forEach(::this.appendPoint, points);
   }
 
-  static fromRandomPath(config) {
+  static fromRandomPath(config = {w: 640, h: 480}) {
     return new TrackPath(
       generateRandomPath(config),
     );

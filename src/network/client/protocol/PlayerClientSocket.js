@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import {PLAYER_ACTIONS} from '../constants/serverCodes';
+import {PLAYER_ACTIONS} from '../../constants/serverCodes';
 import BinarySocketRPCWrapper from './BinarySocketRPCWrapper';
 
 export default class PlayerClientSocket {
@@ -8,6 +8,9 @@ export default class PlayerClientSocket {
     joinRoom: {
       action: PLAYER_ACTIONS.JOIN_ROOM,
       serialize: R.objOf('name'),
+      flags: {
+        waitForResponse: true,
+      },
     },
   };
 
@@ -40,10 +43,11 @@ export default class PlayerClientSocket {
     this.state = [];
 
     R.forEachObjIndexed(
-      ({action, serialize}, methodName) => {
+      ({action, serialize, flags}, methodName) => {
         this[methodName] = (...args) => this.rpc.sendBinaryRequest(
           action,
           serialize(...args),
+          flags,
         );
       },
       PlayerClientSocket.defaultApiMethods,

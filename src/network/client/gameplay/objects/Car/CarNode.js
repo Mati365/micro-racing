@@ -3,7 +3,7 @@ import {
   MeshNode,
 } from '@pkg/isometric-renderer/FGL/engine/scene';
 
-import CarPhysicsBody from '@game/shared/physics/CarPhysicsBody';
+import CarPhysicsBody from '@game/logic/physics/CarPhysicsBody';
 import CarNodeEffects from './CarNodeEffects';
 
 export default class CarNode extends MeshNode {

@@ -7,14 +7,11 @@ import carTextureUrl from '@game/res/model/cars/tex.png';
 import blueCarUrl from '@game/res/model/cars/blue.obj';
 import redCarUrl from '@game/res/model/cars/red.obj';
 
-export const CAR_COLORS = {
-  RED: 'RED',
-  BLUE: 'BLUE',
-};
+import {CAR_TYPES} from '../../../constants/serverCodes';
 
 const CARS_URLS = {
-  [CAR_COLORS.BLUE]: blueCarUrl,
-  [CAR_COLORS.RED]: redCarUrl,
+  [CAR_TYPES.BLUE]: blueCarUrl,
+  [CAR_TYPES.RED]: redCarUrl,
 };
 
 const createTexturedCar = f => async color => f.loaders.mesh.from(

@@ -18,3 +18,14 @@ export const PLAYER_ACTIONS = {
   PLAYER_INFO: 0,
   JOIN_ROOM: 1,
 };
+
+export const CAR_TYPES = {
+  RED: 0,
+  BLUE: 1,
+};
+
+export const OBJECT_TYPES = {
+  PRIMITIVE: 0,
+  ROAD: 1,
+  PLAYER: 2,
+};

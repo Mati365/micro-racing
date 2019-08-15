@@ -13,4 +13,11 @@ export default class PlayerInfo {
     this.id = id;
     this.room = room;
   }
+
+  getBroadcastSocketJSON() {
+    return {
+      id: this.id,
+      nick: this.nick,
+    };
+  }
 }

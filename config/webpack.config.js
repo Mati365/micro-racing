@@ -21,11 +21,14 @@ const SHARED_ALIASES = R.mapObjIndexed(
     '@pkg/isometric-renderer': 'packages/isometric-renderer/src/',
     '@pkg/ctx': 'packages/ctx-utils/src',
     '@pkg/struct-pack': 'packages/struct-pack/src/',
+    '@pkg/basic-hooks': 'packages/basic-hooks/src/',
+
     '@game/res': 'public/res/',
     '@game/public': 'public/',
     '@game/server': 'server/',
     '@game/shared': 'shared/',
     '@game/network': 'network/',
+    '@game/logic': 'network/shared/logic/',
   },
 );
 
@@ -48,7 +51,10 @@ module.exports = [
     {
       target: 'node',
       alias: SHARED_ALIASES,
-      entry: resolveSource('server/index.jsx'),
+      entry: [
+        'source-map-support/register',
+        resolveSource('server/index.jsx'),
+      ],
       outputFolder: resolve(OUTPUT_FOLDER, 'api'),
       outputName: SERVER_FILENAME,
       plugins: [

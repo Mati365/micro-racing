@@ -1,13 +1,7 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 
-import PlayerClientSocket from '@game/network/client/PlayerClientSocket';
-import GameCanvas from './ui/GameCanvas';
-
-(async () => {
-  const client = await PlayerClientSocket.connect('ws://lvh.me:8080');
-  client.joinRoom('general');
-})();
+import GameCanvas from '@game/network/client/gameplay/GameCanvas';
 
 ReactDOM.render(
   <GameCanvas

@@ -31,6 +31,7 @@ export default class GameServer {
     this.rootRoom = new Room(
       {
         owner: null,
+        abstract: true,
       },
     );
   }

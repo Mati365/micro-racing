@@ -6,6 +6,7 @@ export {default as getDOMElementSize} from './base/getDOMElementSize';
 export {default as findByID} from './list/findByID';
 export {default as removeByID} from './list/removeByID';
 export {default as getIndexByName} from './list/getIndexByName';
+export {default as safeArray} from './list/safeArray';
 
 export {default as wrapMethod} from './decorators/wrapMethod';
 export {default as logMethod} from './decorators/logMethod';

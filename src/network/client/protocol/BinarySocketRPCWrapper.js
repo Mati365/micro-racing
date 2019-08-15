@@ -1,6 +1,6 @@
 import {Deferred} from '@pkg/basic-helpers';
 
-import {ACTION_FLAGS} from '../constants/serverCodes';
+import {ACTION_FLAGS} from '../../constants/serverCodes';
 
 import createActionMessage, {
   MAX_CMD_ID,
@@ -9,7 +9,7 @@ import createActionMessage, {
   getMessageMeta,
   isMessageFlagActive,
   getMessageContent,
-} from '../shared/utils/createActionMessage';
+} from '../../shared/utils/createActionMessage';
 
 /**
  * Provides "http style" binary socket wrapper
@@ -80,7 +80,7 @@ export default class BinarySocketRPCWrapper {
       ),
     );
 
-    return deferred;
+    return deferred && deferred.promise;
   };
 
   /**

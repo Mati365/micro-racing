@@ -4,7 +4,7 @@ import {ACTION_FLAGS} from '../../constants/serverCodes';
 
 export const MAX_CMD_ID = 0xFFFF;
 
-export const MAGIC_NULL_CMD_ID = 0xFF; // ID ignored in client callback search
+export const MAGIC_NULL_CMD_ID = 0xFFFF; // ID ignored in client callback search
 
 export const META_MESSAGE_LENGTH = 4;
 
@@ -37,8 +37,8 @@ export const getMessageMeta = msg => ({
  * allows client to wait for response, 0xFF is when ID is not provided
  *
  * Flags:
- * [0000000X] - X is Request / Response flags
- *
+ * [00000YYX] - X is Request / Response flags
+ *              Y payload type array / bson
  * Message:
  * [CMD ID][ACTION][FLAGS][   CONTENT   ]
  */

@@ -14,6 +14,10 @@ export default class Vector extends Float32Array {
   set z(v) { this[2] = v; }
 
   set w(v) { this[3] = v; }
+
+  toBSON() {
+    return Array.from(this);
+  }
 }
 
 // unroll operation global scope fix

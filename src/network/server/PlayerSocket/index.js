@@ -144,7 +144,14 @@ export default class PlayerSocket {
         afterExec: true,
       },
     )(
-      (cmdID, {name}) => this.joinRoom(name),
+      (cmdID, {name}) => {
+        const room = this.joinRoom(name);
+        this.sendActionResponse(
+          cmdID,
+          room.getBroadcastSocketJSON(),
+        );
+        return room;
+      },
     ),
   }
 }

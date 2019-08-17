@@ -148,14 +148,19 @@ export default class GameBoard {
     canvas.addEventListener('keyup', (e) => { this.keyMap[e.which] = false; }, true);
 
     const {f} = this.scene;
+    const {
+      client,
+      room,
+    } = this;
+
     this.roomMapNode = new RoomMapNode(
       {
+        currentPlayer: client.info,
         f,
       },
     );
 
-    await this.roomMapNode.setRoom(this.room);
-    console.log(this.roomMapNode);
+    await this.roomMapNode.setRoom(room);
 
     // this.road = await this.scene.createNode(
     //   () => new RoadNode(
@@ -237,8 +242,13 @@ export default class GameBoard {
   }
 
   start() {
-    // this.scene.camera.target = this.car;
-    this.scene.frame(
+    const {
+      roomMapNode,
+      scene,
+    } = this;
+
+    roomMapNode.sceneBuffer.camera.target = this.roomMapNode.currentPlayerCar;
+    scene.frame(
       (delta, mpMatrix) => {
         this.update(delta);
         this.render(delta, mpMatrix);
@@ -248,10 +258,11 @@ export default class GameBoard {
 
   update(delta) {
     const {
-      roomMapNode: {sceneBuffer},
-      car, keyMap,
+      roomMapNode,
+      keyMap,
     } = this;
 
+    const {currentPlayerCar: car} = roomMapNode;
     if (car) {
       // left
       if (keyMap[37])
@@ -270,14 +281,12 @@ export default class GameBoard {
         car.body.speedUp(-4 * delta);
     }
 
-    if (sceneBuffer)
-      sceneBuffer.update(delta);
+    roomMapNode.update(delta);
   }
 
   render(delta, mpMatrix) {
-    const {roomMapNode: {sceneBuffer}} = this;
+    const {roomMapNode} = this;
 
-    if (sceneBuffer)
-      sceneBuffer.render(delta, mpMatrix);
+    roomMapNode.render(delta, mpMatrix);
   }
 }

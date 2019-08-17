@@ -17,6 +17,8 @@ import ServerError from '../shared/ServerError';
 import TrackSegments from '../shared/logic/track/TrackSegments/TrackSegments';
 import MapElement from '../shared/MapElement';
 
+import genCarSegmentTransform from '../shared/logic/genCarSegmentTransform';
+
 const generateBlankMap = (players) => {
   const segmentsInfo = new TrackSegments(
     {
@@ -39,9 +41,8 @@ const generateBlankMap = (players) => {
           playerID: players[0].info.id,
           carType: CAR_TYPES.BLUE,
           transform: {
-            rotate: [0, 0, segments[0].angle],
+            ...genCarSegmentTransform(segments)(),
             scale: [1.25, 1.25, 1.25],
-            translate: segments[0].point,
           },
         },
       ),

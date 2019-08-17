@@ -136,6 +136,13 @@ export default class PlayerSocket {
    * Mount action listeners
    */
   listeners = {
+    [PLAYER_ACTIONS.PLAYER_INFO]: (cmdID) => {
+      this.sendActionResponse(
+        cmdID,
+        this.info.getBroadcastSocketJSON(),
+      );
+    },
+
     [PLAYER_ACTIONS.JOIN_ROOM]: logFunction(
       (_, room) => {
         consola.info(`Player ${chalk.white.bold(this.info.nick)} joined to ${chalk.white.bold(room.name)}!`);

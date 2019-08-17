@@ -12,6 +12,13 @@ export default class PlayerClientSocket {
         waitForResponse: true,
       },
     },
+
+    fetchPlayerInfo: {
+      action: PLAYER_ACTIONS.PLAYER_INFO,
+      flags: {
+        waitForResponse: true,
+      },
+    },
   };
 
   /**
@@ -22,15 +29,16 @@ export default class PlayerClientSocket {
   static connect = (uri, clientParams) => new Promise((resolve, reject) => {
     const ws = new WebSocket(uri);
     ws.binaryType = 'arraybuffer';
-    ws.onopen = () => {
-      resolve(
-        new PlayerClientSocket(
-          {
-            ws,
-            ...clientParams,
-          },
-        ),
+    ws.onopen = async () => {
+      const clientSocket = new PlayerClientSocket;
+      await clientSocket.init(
+        {
+          ws,
+          ...clientParams,
+        },
       );
+
+      resolve(clientSocket);
     };
 
     ws.onerror = (err) => {
@@ -38,12 +46,14 @@ export default class PlayerClientSocket {
     };
   });
 
-  constructor({ws} = {}) {
-    this.rpc = new BinarySocketRPCWrapper(ws);
-    this.state = [];
-
+  /**
+   * Load RPC wrappers, fetch initial player info
+   *
+   * @param {Object} config
+   */
+  async init({ws} = {}) {
     R.forEachObjIndexed(
-      ({action, serialize, flags}, methodName) => {
+      ({action, serialize = R.identity, flags}, methodName) => {
         this[methodName] = (...args) => this.rpc.sendBinaryRequest(
           action,
           serialize(...args),
@@ -52,5 +62,8 @@ export default class PlayerClientSocket {
       },
       PlayerClientSocket.defaultApiMethods,
     );
+
+    this.rpc = new BinarySocketRPCWrapper(ws);
+    this.info = await this.fetchPlayerInfo();
   }
 }

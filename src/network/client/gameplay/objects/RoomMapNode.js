@@ -78,15 +78,17 @@ export default class RoomMapNode {
   constructor({
     f,
     room,
+    currentPlayer,
   }) {
     this.f = f;
+    this.currentPlayer = currentPlayer;
 
     if (room)
       this.setRoom(room);
   }
 
   async setRoom(room) {
-    const {f} = this;
+    const {f, currentPlayer} = this;
     const {
       buffer,
       playersCars,
@@ -94,6 +96,11 @@ export default class RoomMapNode {
 
     this.room = room;
     this.sceneBuffer = buffer;
+
     this.playersCars = playersCars;
+    this.currentPlayerCar = playersCars[currentPlayer.id];
+
+    this.update = ::this.sceneBuffer.update;
+    this.render = ::this.sceneBuffer.render;
   }
 }

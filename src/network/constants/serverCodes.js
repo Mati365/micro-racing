@@ -17,6 +17,10 @@ export const ACTION_FLAGS = {
 export const PLAYER_ACTIONS = {
   PLAYER_INFO: 0,
   JOIN_ROOM: 1,
+
+  // BROADCAST
+  PLAYER_JOINED_TO_ROOM: 2,
+  PLAYER_LEFT_FROM_ROOM: 3,
 };
 
 export const CAR_TYPES = {

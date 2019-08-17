@@ -37,6 +37,10 @@ export default class PlayerSocket {
     return this.info.id;
   }
 
+  getBroadcastSocketJSON() {
+    return this.info.getBroadcastSocketJSON();
+  }
+
   @logMethod(
     ({info}) => {
       consola.info(`Welcome player ${chalk.white.bold(info.nick)}!`);
@@ -139,7 +143,7 @@ export default class PlayerSocket {
     [PLAYER_ACTIONS.PLAYER_INFO]: (cmdID) => {
       this.sendActionResponse(
         cmdID,
-        this.info.getBroadcastSocketJSON(),
+        this.getBroadcastSocketJSON(),
       );
     },
 

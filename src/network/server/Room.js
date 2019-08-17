@@ -1,11 +1,16 @@
 import * as R from 'ramda';
 
-import {ERROR_CODES} from '@game/network/constants/serverCodes';
+import {
+  ERROR_CODES,
+  PLAYER_ACTIONS,
+} from '@game/network/constants/serverCodes';
 
 import {
   findByID,
   removeByID,
 } from '@pkg/basic-helpers';
+
+import createActionMessage from '../shared/utils/createActionMessage';
 
 import ServerError from '../shared/ServerError';
 import RoadMap from './RoadMap';
@@ -41,6 +46,29 @@ export default class Room {
   }
 
   /**
+   * It is faster than sendBroadcastAction in real time events
+   *
+   * @param {Buffer} message
+   */
+  sendBinaryBroadcastMessage(message) {
+    const {players} = this;
+
+    for (let i = players.length - 1; i >= 0; --i)
+      players[i].ws.send(message);
+  }
+
+  /**
+   * Creates action message and broadcasts it to all players in room
+   *
+   * @param  {...any} params
+   */
+  sendBroadcastAction(...params) {
+    this.sendBinaryBroadcastMessage(
+      createActionMessage(...params),
+    );
+  }
+
+  /**
    * Returns info about map
    */
   getBroadcastSocketJSON() {
@@ -72,6 +100,7 @@ export default class Room {
    */
   join(player) {
     const {
+      abstract,
       kickedPlayers,
       players,
     } = this;
@@ -89,8 +118,23 @@ export default class Room {
     if (R.isNil(this.owner))
       this.owner = player;
 
+    // broadcast it to all players, exclude added
+    if (!abstract) {
+      const playerCar = this.map.appendPlayerCar(player);
+
+      this.sendBroadcastAction(
+        null,
+        PLAYER_ACTIONS.PLAYER_JOINED_TO_ROOM,
+        null,
+        {
+          player: player.getBroadcastSocketJSON(),
+          car: playerCar,
+        },
+      );
+    }
+
+    // append player to list and create car object
     this.players.push(player);
-    this.map?.appendPlayerCar(player);
   }
 
   /**
@@ -99,8 +143,21 @@ export default class Room {
    * @param {Player} player
    */
   leave(player) {
+    const {abstract} = this;
+
     this.players = removeByID(player.id, this.players);
-    this.map?.removePlayerCar(player);
+
+    if (!abstract) {
+      this.map.removePlayerCar(player);
+      this.sendBroadcastAction(
+        null,
+        PLAYER_ACTIONS.PLAYER_LEFT_FROM_ROOM,
+        null,
+        {
+          player: player.getBroadcastSocketJSON(),
+        },
+      );
+    }
 
     if (!this.playersCount)
       this.onDestroy?.(this);

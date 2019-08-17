@@ -1,109 +1,14 @@
 import * as R from 'ramda';
 
-import PALETTE from '@pkg/isometric-renderer/FGL/core/constants/colors';
-import {
-  OBJECT_TYPES,
-  ERROR_CODES,
-  CAR_TYPES,
-} from '@game/network/constants/serverCodes';
+import {ERROR_CODES} from '@game/network/constants/serverCodes';
 
 import {
   findByID,
   removeByID,
 } from '@pkg/basic-helpers';
 
-import TrackPath from '@game/logic/track/TrackPath/TrackPath';
 import ServerError from '../shared/ServerError';
-import TrackSegments from '../shared/logic/track/TrackSegments/TrackSegments';
-import MapElement from '../shared/MapElement';
-
-import genCarSegmentTransform from '../shared/logic/genCarSegmentTransform';
-
-const generateBlankMap = (players) => {
-  const segmentsInfo = new TrackSegments(
-    {
-      segmentWidth: 2.5,
-      transform: {
-        scale: [0.1, 0.1, 1.0],
-        translate: [0.0, 0.0, -0.01],
-      },
-      interpolatedPath: TrackPath.fromRandomPath().getInterpolatedPathPoints(),
-    },
-  );
-
-  const {segments} = segmentsInfo;
-
-  return {
-    objects: [
-      new MapElement(
-        OBJECT_TYPES.PLAYER,
-        {
-          playerID: players[0].info.id,
-          carType: CAR_TYPES.BLUE,
-          transform: {
-            ...genCarSegmentTransform(segments)(),
-            scale: [1.25, 1.25, 1.25],
-          },
-        },
-      ),
-
-      new MapElement(
-        OBJECT_TYPES.ROAD,
-        {
-          uniforms: {
-            color: PALETTE.WHITE,
-          },
-          segmentsInfo,
-        },
-      ),
-
-      new MapElement(
-        OBJECT_TYPES.PRIMITIVE,
-        {
-          name: 'pyramid',
-          uniforms: {
-            color: PALETTE.YELLOW,
-          },
-          transform: {
-            scale: [1.0, 1.0, 1.5],
-            translate: [0, 0, -0.01],
-          },
-        },
-      ),
-
-      new MapElement(
-        OBJECT_TYPES.PRIMITIVE,
-        {
-          name: 'box',
-          uniforms: {
-            color: PALETTE.GREEN,
-          },
-          transform: {
-            scale: [1.0, 1.0, 1.5],
-            translate: [6, 6, -0.01],
-          },
-        },
-      ),
-
-      new MapElement(
-        OBJECT_TYPES.PRIMITIVE,
-        {
-          name: 'plainTerrainWireframe',
-          constructor: {
-            w: 64,
-            h: 64,
-          },
-          uniforms: {
-            color: PALETTE.DARK_GRAY,
-          },
-          transform: {
-            scale: [64.0, 64.0, 1.0],
-          },
-        },
-      ),
-    ],
-  };
-};
+import RoadMap from './RoadMap';
 
 export default class Room {
   constructor(
@@ -130,7 +35,7 @@ export default class Room {
     );
 
     if (!abstract)
-      this.map = generateBlankMap(this.players);
+      this.map = new RoadMap(this.players);
 
     this.onDestroy = onDestroy;
   }
@@ -143,7 +48,7 @@ export default class Room {
 
     return {
       owner: owner.info.id,
-      map,
+      map: map.getBroadcastSocketJSON(),
       players: R.map(
         ({info}) => info.getBroadcastSocketJSON(),
         players,
@@ -185,6 +90,7 @@ export default class Room {
       this.owner = player;
 
     this.players.push(player);
+    this.map?.appendPlayerCar(player);
   }
 
   /**
@@ -194,6 +100,8 @@ export default class Room {
    */
   leave(player) {
     this.players = removeByID(player.id, this.players);
+    this.map?.removePlayerCar(player);
+
     if (!this.playersCount)
       this.onDestroy?.(this);
   }

@@ -27,5 +27,6 @@ export const CAR_TYPES = {
 export const OBJECT_TYPES = {
   PRIMITIVE: 0,
   ROAD: 1,
-  PLAYER: 2,
+  TERRAIN: 2,
+  PLAYER: 3,
 };

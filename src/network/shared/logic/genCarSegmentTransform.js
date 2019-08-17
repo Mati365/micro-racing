@@ -15,11 +15,10 @@ export const CAR_ALIGN = {
   RIGHT_CORNER: -1,
 };
 
-const genCarSegmentTransform = segments => ({
-  segmentIndex = 0,
+const genCarSegmentTransform = ({
+  segment,
   align = CAR_ALIGN.LEFT_CORNER,
 } = {}) => {
-  const segment = segments[segmentIndex];
   const point = vec3.add(
     segment.point,
     vec2.toVec3(

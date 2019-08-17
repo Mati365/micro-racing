@@ -1,10 +1,15 @@
-import * as R from 'ramda';
+import atlasDefaultUrl from '@game/res/img/atlas.png';
+
 import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
 
-const generateTerrain = f => async ({
-  atlasImageUrl,
-  atlasSize,
+const createTerrain = f => async ({
+  atlasImageUrl = atlasDefaultUrl,
+  atlasSize = {
+    w: 5,
+    h: 5,
+  },
   size,
+  items,
 }) => {
   const atlasImage = await createSingleResourceLoader()(atlasImageUrl);
   const texTile = f.tileTexture2D(
@@ -18,14 +23,9 @@ const generateTerrain = f => async ({
     {
       texTile,
       size,
-      items: R.times(
-        () => ({
-          uv: [1, 0],
-        }),
-        size.w * size.h,
-      ),
+      items,
     },
   );
 };
 
-export default generateTerrain;
+export default createTerrain;

@@ -12,6 +12,7 @@ export default class HTMLTextNode {
   constructor({
     f,
     text,
+    opacity = 0.7,
     margin = vec2(0, -50), // in pixels
     translate = vec4(0, 0, 0, 1),
     outlineColor = f.colors.hex.BLACK,
@@ -40,6 +41,11 @@ export default class HTMLTextNode {
           user-select: none;
           font-weight: 700;
           font-smooth: never;
+          ${
+            opacity
+              ? `opacity: ${opacity};`
+              : ''
+          }
           ${
             outlineColor
               ? `text-shadow: -1px 0 ${outlineColor}, 0 1px ${outlineColor}, 1px 0 ${outlineColor}, 0 -1px ${outlineColor}`

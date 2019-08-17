@@ -23,6 +23,25 @@ export const createMapSceneBuffer = f => async ({players, map: {objects}}) => {
 
       switch (type) {
         /**
+         * **size**, **items**
+         */
+        case OBJECT_TYPES.TERRAIN: {
+          const {size, items, ...renderParams} = params;
+
+          buffer.createNode(
+            async () => ({
+              ...renderParams,
+              renderer: await Factory.createTerrain(f)(
+                {
+                  size,
+                  items,
+                },
+              ),
+            }),
+          );
+        } break;
+
+        /**
          * **segments**
          */
         case OBJECT_TYPES.ROAD: {

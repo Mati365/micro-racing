@@ -4,7 +4,6 @@ import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
 import {SceneNode} from '@pkg/isometric-renderer/FGL/engine/scene';
 import raceTrackTextureUrl from '@game/res/img/race-track.png';
 
-import {TrackSegments} from '@game/logic/track';
 import RoadWireframe from './RoadWireframe';
 
 const createRoadRenderer = f => async ({path: {segments}}) => {
@@ -55,7 +54,7 @@ const createRoadRenderer = f => async ({path: {segments}}) => {
 };
 
 export default class RoadNode extends SceneNode {
-  constructor({track, transform, ...config}) {
+  constructor({segmentsInfo, ...config}) {
     super(
       {
         ...config,
@@ -63,18 +62,12 @@ export default class RoadNode extends SceneNode {
       },
     );
 
-    this.pathInfo = new TrackSegments(
-      {
-        segmentWidth: 2.5,
-        interpolatedPath: track.getInterpolatedPathPoints(),
-        transform,
-      },
-    );
+    this.segmentsInfo = segmentsInfo;
 
-    this.createRenderer(config.f, this.pathInfo);
+    this.createRenderer(config.f, this.segmentsInfo);
     this.updateTransformCache();
 
-    this.wireframe = new RoadWireframe(config.f, this.pathInfo);
+    this.wireframe = new RoadWireframe(config.f, this.segmentsInfo);
   }
 
   async createRenderer(f, path) {

@@ -6,6 +6,7 @@ import {OBJECT_TYPES} from '../../../constants/serverCodes';
 
 import * as Factory from '../factory';
 import CarNode from './Car';
+import RoadNode from './RoadNode/RoadNode';
 
 /**
  * @see MapElement
@@ -21,6 +22,21 @@ export const createMapSceneBuffer = f => async ({players, map: {objects}}) => {
       const {type, params} = R.clone(item); // some engine methods can modify item
 
       switch (type) {
+        /**
+         * **segments**
+         */
+        case OBJECT_TYPES.ROAD: {
+          const {segmentsInfo, ...renderParams} = params;
+
+          buffer.createNode(sceneParams => new RoadNode(
+            {
+              ...sceneParams,
+              ...renderParams,
+              segmentsInfo,
+            },
+          ));
+        } break;
+
         /**
          * Each primitive should contain **name** field and
          * optionally **constructor**

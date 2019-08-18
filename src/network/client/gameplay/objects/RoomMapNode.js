@@ -21,7 +21,7 @@ export const appendToSceneBuffer = f => ({
 
   R.forEach(
     (item) => {
-      const {type, params, id} = R.clone(item); // some engine methods can modify item
+      const {type, params, id} = item; // some engine methods can modify item
 
       switch (type) {
         /**

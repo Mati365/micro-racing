@@ -54,7 +54,7 @@ const createRoadRenderer = f => async ({path: {segments}}) => {
 };
 
 export default class RoadNode extends SceneNode {
-  constructor({segmentsInfo, ...config}) {
+  constructor({segmentsInfo, transform, ...config}) {
     super(
       {
         ...config,
@@ -67,7 +67,7 @@ export default class RoadNode extends SceneNode {
     this.createRenderer(config.f, this.segmentsInfo);
     this.updateTransformCache();
 
-    this.wireframe = new RoadWireframe(config.f, this.segmentsInfo);
+    this.wireframe = new RoadWireframe(config.f, this);
   }
 
   async createRenderer(f, path) {

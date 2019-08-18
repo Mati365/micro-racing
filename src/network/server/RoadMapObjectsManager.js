@@ -47,16 +47,6 @@ const generateBlankObjects = () => {
       ),
 
       new MapElement(
-        OBJECT_TYPES.ROAD,
-        {
-          uniforms: {
-            color: PALETTE.WHITE,
-          },
-          segmentsInfo,
-        },
-      ),
-
-      new MapElement(
         OBJECT_TYPES.PRIMITIVE,
         {
           name: 'pyramid',
@@ -98,6 +88,16 @@ const generateBlankObjects = () => {
           transform: {
             scale: [64.0, 64.0, 1.0],
           },
+        },
+      ),
+
+      new MapElement(
+        OBJECT_TYPES.ROAD,
+        {
+          uniforms: {
+            color: PALETTE.WHITE,
+          },
+          segmentsInfo,
         },
       ),
     ],

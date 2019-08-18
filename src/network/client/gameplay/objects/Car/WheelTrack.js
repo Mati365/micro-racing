@@ -88,22 +88,29 @@ export default class WheelTrack {
       1,
     );
 
-    this.mesh = f
-      .mesh(
-        {
-          renderMode: f.flags.LINES, // f.flags.TRIANGLE_STRIP,
-          material: createWheelTrackMaterial(f)(),
-          vbo: this.vbo,
-          uniforms: {
-            color: f.colors.BLACK,
-          },
-          buffers: {
-            inAlpha: this.alphaVBO,
-          },
-          elementsCount: 0,
+    this.mesh = f.mesh(
+      {
+        renderMode: f.flags.LINES, // f.flags.TRIANGLE_STRIP,
+        material: createWheelTrackMaterial(f)(),
+        vbo: this.vbo,
+        uniforms: {
+          color: f.colors.BLACK,
         },
-      )
+        buffers: {
+          inAlpha: this.alphaVBO,
+        },
+        elementsCount: 0,
+      },
+    )
       .instance;
+  }
+
+  release() {
+    const {vbo, mesh, alphaVBO} = this;
+
+    alphaVBO.release();
+    mesh.release();
+    vbo.release();
   }
 
   /**

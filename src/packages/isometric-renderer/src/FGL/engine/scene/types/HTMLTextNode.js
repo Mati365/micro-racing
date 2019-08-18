@@ -57,6 +57,11 @@ export default class HTMLTextNode {
     );
   }
 
+  release() {
+    this.htmlNode.remove();
+    this.htmlNode = null;
+  }
+
   render(delta, mpMatrix, f) {
     const {canvasDimensions} = f.state;
     const {

@@ -13,7 +13,7 @@ import {
 import createActionMessage from '../shared/utils/createActionMessage';
 
 import ServerError from '../shared/ServerError';
-import RoadMap from './RoadMap';
+import RoadMapObjectsManager from './RoadMapObjectsManager';
 
 export default class Room {
   constructor(
@@ -40,7 +40,7 @@ export default class Room {
     );
 
     if (!abstract)
-      this.map = new RoadMap(this.players);
+      this.map = new RoadMapObjectsManager(this.players);
 
     this.onDestroy = onDestroy;
   }
@@ -72,15 +72,21 @@ export default class Room {
    * Returns info about map
    */
   getBroadcastSocketJSON() {
-    const {owner, map, players} = this;
+    const {
+      name, owner,
+      map, players,
+    } = this;
 
     return {
-      owner: owner.info.id,
-      map: map.getBroadcastSocketJSON(),
+      name,
+      ownerID: owner.info.id,
       players: R.map(
         ({info}) => info.getBroadcastSocketJSON(),
         players,
       ),
+
+      // objects
+      ...map.getBroadcastSocketJSON(),
     };
   }
 
@@ -151,7 +157,7 @@ export default class Room {
       this.map.removePlayerCar(player);
       this.sendBroadcastAction(
         null,
-        PLAYER_ACTIONS.PLAYER_LEFT_FROM_ROOM,
+        PLAYER_ACTIONS.PLAYER_LEFT_ROOM,
         null,
         {
           player: player.getBroadcastSocketJSON(),

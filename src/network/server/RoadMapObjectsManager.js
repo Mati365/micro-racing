@@ -106,11 +106,8 @@ const generateBlankObjects = () => {
 
 /**
  * Manage map, align players on road etc
- *
- * @todo
- *  Add
  */
-export default class RoadMap {
+export default class RoadMapObjectsManager {
   objects = [];
 
   totalPlayers = 0;

@@ -6,7 +6,9 @@ import createActionMessage, {
   MAX_CMD_ID,
   MAGIC_NULL_CMD_ID,
 
+  getMessageAction,
   getMessageMeta,
+
   isMessageFlagActive,
   getMessageContent,
 } from '../../shared/utils/createActionMessage';
@@ -18,8 +20,10 @@ import createActionMessage, {
  *  Max CMD ID count invoked simultaneously is 0xFFFF!
  */
 export default class BinarySocketRPCWrapper {
-  constructor(ws) {
+  constructor(ws, listeners) {
     this.ws = ws;
+    this.listeners = listeners;
+
     this.cmdResponseQueue = {
       __id: 0,
     };
@@ -28,8 +32,10 @@ export default class BinarySocketRPCWrapper {
   }
 
   onMessage = ({data}) => {
+    const {listeners} = this;
     const msg = new Uint8Array(data);
 
+    // calls from RPC methods
     if (isMessageFlagActive(ACTION_FLAGS.RESPONSE, msg)) {
       const {cmdID} = getMessageMeta(msg);
       if (cmdID === MAGIC_NULL_CMD_ID)
@@ -41,6 +47,17 @@ export default class BinarySocketRPCWrapper {
           getMessageContent(msg),
         );
         delete this.cmdResponseQueue[cmdID];
+      }
+    } else if (listeners) {
+      // do not use there getMessageMeta
+      // it is much slower and mem intense than getMessageAction
+      const action = getMessageAction(msg);
+      const handler = listeners[action];
+
+      if (handler) {
+        handler(
+          getMessageContent(msg),
+        );
       }
     }
   };

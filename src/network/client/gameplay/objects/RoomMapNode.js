@@ -11,15 +11,17 @@ import RoadNode from './RoadNode/RoadNode';
 /**
  * @see MapElement
  */
-export const createMapSceneBuffer = f => async ({players, map: {objects}}) => {
-  const buffer = f.createSceneBuffer();
+export const appendToSceneBuffer = f => ({
+  players = [],
+  objects,
+}) => async (buffer) => {
   const playersCars = {};
 
   const asyncObjectsQueue = [];
 
   R.forEach(
     (item) => {
-      const {type, params} = R.clone(item); // some engine methods can modify item
+      const {type, params, id} = R.clone(item); // some engine methods can modify item
 
       switch (type) {
         /**
@@ -31,6 +33,7 @@ export const createMapSceneBuffer = f => async ({players, map: {objects}}) => {
           buffer.createNode(
             async () => ({
               ...renderParams,
+              id,
               renderer: await Factory.createTerrain(f)(
                 {
                   size,
@@ -51,6 +54,7 @@ export const createMapSceneBuffer = f => async ({players, map: {objects}}) => {
             {
               ...sceneParams,
               ...renderParams,
+              id,
               segmentsInfo,
             },
           ));
@@ -66,6 +70,7 @@ export const createMapSceneBuffer = f => async ({players, map: {objects}}) => {
           buffer.createNode(
             {
               renderer: f.mesh[name](constructor),
+              id,
               ...renderParams,
             },
           );
@@ -81,6 +86,7 @@ export const createMapSceneBuffer = f => async ({players, map: {objects}}) => {
               {
                 ...sceneParams,
                 ...renderParams,
+                id,
                 nick: findByID(playerID, players).nick,
                 renderer: await Factory.createTexturedCar(f)(carType),
               },
@@ -112,24 +118,28 @@ export const createMapSceneBuffer = f => async ({players, map: {objects}}) => {
 export default class RoomMapNode {
   constructor({
     f,
-    room,
+    initialRoomState,
     currentPlayer,
   }) {
     this.f = f;
     this.currentPlayer = currentPlayer;
 
-    if (room)
-      this.setRoom(room);
+    if (initialRoomState)
+      this.loadInitialRoomState(initialRoomState);
   }
 
-  async setRoom(room) {
+  async loadInitialRoomState({players, objects}) {
     const {f, currentPlayer} = this;
     const {
       buffer,
       playersCars,
-    } = await createMapSceneBuffer(f)(room);
+    } = await appendToSceneBuffer(f)(
+      {
+        players,
+        objects,
+      },
+    )(f.createSceneBuffer());
 
-    this.room = room;
     this.sceneBuffer = buffer;
 
     this.playersCars = playersCars;
@@ -137,5 +147,24 @@ export default class RoomMapNode {
 
     this.update = ::this.sceneBuffer.update;
     this.render = ::this.sceneBuffer.render;
+  }
+
+  removePlayerCar(player) {
+    const {sceneBuffer, playersCars} = this;
+    const carNode = playersCars[player.id];
+
+    sceneBuffer.removeNode(carNode);
+    delete playersCars[player.id];
+  }
+
+  async appendObjects({players = [], objects}) {
+    const {playersCars} = await appendToSceneBuffer(this.f)(
+      {
+        players,
+        objects,
+      },
+    )(this.sceneBuffer);
+
+    Object.assign(this.playersCars, playersCars);
   }
 }

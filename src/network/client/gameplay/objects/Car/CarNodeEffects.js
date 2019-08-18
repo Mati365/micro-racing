@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 
 import {
   vec2, vec3,
@@ -63,6 +64,22 @@ export default class CarNodeEffects extends MeshWireframe {
         },
       ),
     ];
+  }
+
+  release() {
+    const {meshWheels, wheelTracks} = this;
+
+    super.release();
+
+    R.forEach(
+      meshWheel => meshWheel.release(),
+      meshWheels,
+    );
+
+    R.forEach(
+      wheelTrack => wheelTrack?.release(),
+      wheelTracks,
+    );
   }
 
   update() {

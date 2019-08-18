@@ -32,6 +32,13 @@ export default class CarNode extends MeshNode {
     );
   }
 
+  release() {
+    const {nickNode} = this;
+
+    super.release();
+    nickNode.release();
+  }
+
   update(delta) {
     const {
       nickNode, body,

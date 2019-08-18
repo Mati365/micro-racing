@@ -41,9 +41,7 @@ export default class PlayerClientSocket {
       resolve(clientSocket);
     };
 
-    ws.onerror = (err) => {
-      reject(err);
-    };
+    ws.onerror = reject;
   });
 
   /**
@@ -63,7 +61,8 @@ export default class PlayerClientSocket {
       PlayerClientSocket.defaultApiMethods,
     );
 
-    this.rpc = new BinarySocketRPCWrapper(ws);
+    this.listeners = {};
+    this.rpc = new BinarySocketRPCWrapper(ws, this.listeners);
     this.info = await this.fetchPlayerInfo();
   }
 }

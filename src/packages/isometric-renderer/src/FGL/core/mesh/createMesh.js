@@ -18,6 +18,12 @@ export class MeshRenderer {
     this.meshDescriptor = meshDescriptor;
   }
 
+  release() {
+    const {meshDescriptor} = this;
+
+    meshDescriptor.release();
+  }
+
   /**
    * @export
    */
@@ -150,7 +156,10 @@ export class MeshRenderer {
 const createMesh = gl => (description) => {
   const mesh = new MeshRenderer(gl, createMeshDescriptor(gl)(description));
   const renderer = mesh.render.bind(mesh);
+
   renderer.instance = mesh;
+  renderer.release = ::mesh.release;
+
   return renderer;
 };
 

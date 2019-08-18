@@ -20,7 +20,7 @@ export const PLAYER_ACTIONS = {
 
   // BROADCAST
   PLAYER_JOINED_TO_ROOM: 2,
-  PLAYER_LEFT_FROM_ROOM: 3,
+  PLAYER_LEFT_ROOM: 3,
 };
 
 export const CAR_TYPES = {

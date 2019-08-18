@@ -11,28 +11,16 @@ import GameBoard from './states/GameBoard';
 const useClientSocket = (
   {
     uri = 'ws://lvh.me:8080',
-    initialRoom = 'general',
   } = {},
 ) => {
   const {loading, result} = usePromise(
-    async () => {
-      const client = await PlayerClientSocket.connect(uri);
-
-      return {
-        client,
-        room: (
-          initialRoom
-            ? await client.joinRoom(initialRoom)
-            : null
-        ),
-      };
-    },
+    () => PlayerClientSocket.connect(uri),
     [uri],
   );
 
   return {
     connecting: loading,
-    socketInfo: result,
+    client: result,
   };
 };
 
@@ -40,7 +28,7 @@ const GameCanvas = ({dimensions}) => {
   const canvasRef = useRef();
   const {
     connecting,
-    socketInfo,
+    client,
   } = useClientSocket();
 
   useEffect(
@@ -49,12 +37,21 @@ const GameCanvas = ({dimensions}) => {
         return;
 
       (async () => {
-        const board = new GameBoard(socketInfo);
+        const board = new GameBoard(
+          {
+            client,
+          },
+        );
+
         await board.setCanvas(
           {
             canvas: canvasRef.current,
             aspectRatio: 1.05,
           },
+        );
+
+        await board.loadInitialRoomState(
+          await client.joinRoom('general'),
         );
 
         board.start();

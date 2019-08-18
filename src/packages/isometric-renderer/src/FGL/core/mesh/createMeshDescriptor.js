@@ -28,16 +28,32 @@ const createMeshDescriptor = gl => ({
 
   // other flags such as {attributes, uniforms}
   ...options
-}) => ({
-  material,
-  renderMode,
+}) => {
+  const descriptor = {
+    material,
+    renderMode,
 
-  uv: uv && createVertexBuffer(gl, uv, usage, 2),
-  vbo: vertices && createVertexBuffer(gl, vertices, usage),
-  ibo: indices && createIndexBuffer(gl, indices, usage),
+    uv: uv && createVertexBuffer(gl, uv, usage, 2),
+    vbo: vertices && createVertexBuffer(gl, vertices, usage),
+    ibo: indices && createIndexBuffer(gl, indices, usage),
 
-  buffers: removeNullValues(buffers),
-  ...options,
-});
+    buffers: removeNullValues(buffers),
+    ...options,
+
+    // cleanup allocated stuff
+    release() {
+      if (uv)
+        descriptor.uv.release();
+
+      if (vertices)
+        descriptor.vbo.release();
+
+      if (indices)
+        descriptor.ibo.release();
+    },
+  };
+
+  return descriptor;
+};
 
 export default createMeshDescriptor;

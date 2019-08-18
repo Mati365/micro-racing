@@ -16,6 +16,12 @@ class BufferWrapper {
     gl.bufferSubData(type, destOffset, src, srcOffset, length);
     gl.bindBuffer(type, null);
   }
+
+  release() {
+    const {gl, handle} = this;
+
+    gl.deleteBuffer(handle);
+  }
 }
 
 /**

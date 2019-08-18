@@ -116,13 +116,22 @@ const createTileTerrain = (fgl) => {
     ];
 
     // used in instancing
-    const uvOffsets = R.pluck('uv')(items);
-    const tileOffsets = R.times(
-      index => ([
-        index % size.w,
-        Number.parseInt(index / size.w, 10),
-      ]),
-    )(instances);
+    // run inside self invoked function
+    // tell GC that uvOffsets, tileOffsets can be destroyed
+    const buffers = (() => {
+      const uvOffsets = R.pluck('uv')(items);
+      const tileOffsets = R.times(
+        index => ([
+          index % size.w,
+          Number.parseInt(index / size.w, 10),
+        ]),
+      )(instances);
+
+      return {
+        inPosTileOffset: createVertexBuffer(gl, tileOffsets, gl.STATIC_DRAW, 2, 1),
+        inUvTileOffset: createVertexBuffer(gl, uvOffsets, gl.STATIC_DRAW, 2, 1),
+      };
+    })();
 
     const mesh = fgl.mesh(
       {
@@ -137,10 +146,7 @@ const createTileTerrain = (fgl) => {
         vertices,
 
         // external attributes / unfiroms
-        buffers: {
-          inPosTileOffset: createVertexBuffer(gl, tileOffsets, gl.STATIC_DRAW, 2, 1),
-          inUvTileOffset: createVertexBuffer(gl, uvOffsets, gl.STATIC_DRAW, 2, 1),
-        },
+        buffers,
         uniforms: {
           tileSize,
           uvTileSize: uvSize,
@@ -148,10 +154,21 @@ const createTileTerrain = (fgl) => {
       },
     );
 
-    return (descriptor) => {
+    const renderer = (descriptor) => {
       descriptor.instances = instances;
       mesh(descriptor);
     };
+
+    renderer.release = () => {
+      mesh.release();
+
+      R.forEachObjIndexed(
+        buffer => buffer.release(),
+        buffers,
+      );
+    };
+
+    return renderer;
   };
 };
 

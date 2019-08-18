@@ -26,6 +26,8 @@ export const getMessageContent = (msg) => {
   );
 };
 
+export const getMessageAction = msg => msg[2];
+
 export const getMessageMeta = msg => ({
   cmdID: msg[0] | (msg[1] << 0x8),
   action: msg[2],
@@ -51,6 +53,9 @@ const createActionMessage = (cmdID, actionCode, flags, data) => {
 
   const {byteLength: len} = data;
   const tmp = new Uint8Array(META_MESSAGE_LENGTH + len);
+
+  if (cmdID === null)
+    cmdID = MAGIC_NULL_CMD_ID;
 
   tmp[0] = cmdID & 0xFF;
   tmp[1] = (cmdID << 0x8) & 0xFF;

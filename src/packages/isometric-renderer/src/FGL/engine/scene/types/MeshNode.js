@@ -12,6 +12,13 @@ export default class MeshNode extends SceneNode {
       this.wireframe = new MeshWireframe(config.f, this);
   }
 
+  release() {
+    const {meshDescriptor} = this;
+
+    super.release();
+    meshDescriptor.release();
+  }
+
   updateTransformCache() {
     super.updateTransformCache();
 

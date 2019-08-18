@@ -76,6 +76,16 @@ class SceneBuffer {
     return this;
   }
 
+  removeNode(node) {
+    if (!node)
+      return this;
+
+    this.list = R.without([node], this.list);
+    node.release?.();
+
+    return this;
+  }
+
   async createNode(nodeConfig) {
     const {f, list} = this;
     const sceneParams = {
@@ -120,8 +130,11 @@ class SceneBuffer {
     const {f, list, camera} = this;
 
     camera.render(delta, mpMatrix);
-    for (let i = 0, len = list.length; i < len; ++i)
-      list[i].render(delta, camera.mpMatrix, f);
+    for (let i = 0, len = list.length; i < len; ++i) {
+      const node = list[i];
+
+      node.render(delta, camera.mpMatrix, f);
+    }
   }
 }
 

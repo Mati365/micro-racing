@@ -10,7 +10,7 @@ Preview of Functional WebGL 2.0 Isometric Engine(FGL) with depth test and mesh i
 [![Video](https://i.imgur.com/JckXVQs.png)](https://www.youtube.com/watch?v=EDJOmJYySsc "Engine video")
 Engine prototype (click to play)
 
-### Goals
+## Goals
 - Use monorepo, separated logic
 - Create tiny matrix math library
 - Create 3D isometric WebGL 2.0 functional wrapper(it should handle depth sorting and other stuff)
@@ -19,11 +19,12 @@ Engine prototype (click to play)
 - Bots using Neural Network for AI(see neural-cars)
 - Multiplayer
 
-### Packages
+## Packages
 **@pkg/fast-stylesheet:**
-> Fast and small CSS in JS implementation with syntax similar to JSS
+> Fast and small CSS in JS implementation with syntax similar to JSS<br />
+[Link](https://github.com/Mati365/kart-racing/tree/master/src/packages/fast-stylesheet)
 
-### See also
+## See also
 http://buildnewgames.com/real-time-multiplayer/<br/>
 https://codea.io/talk/discussion/6648/port-of-marco-monsters-2d-car-physics-now-with-video <br/>
 https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking <br/>

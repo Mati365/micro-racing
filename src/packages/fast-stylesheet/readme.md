@@ -8,7 +8,7 @@
 ```js
 import fastCSS fom '@pkg/fast-stylesheet';
 
-const {classes, sheet} = css(
+const {classes, node} = css(
   {
     exampleClass: {
       composes: ['d-block'],
@@ -39,14 +39,14 @@ const {classes, sheet} = css(
 );
 
 classes.exampleClass // => c1
-sheet.unmount(); // removes style tag from DOM
+node.remove(); // removes style tag from DOM
 ```
 
 *Single class:*
 ```js
 import {singleClassCSS} fom '@pkg/fast-stylesheet';
 
-const {className, sheet} = singleClassCSS(
+const {className, node} = singleClassCSS(
   {
     composes: ['d-block'],
     color: 'red',
@@ -69,5 +69,5 @@ const {className, sheet} = singleClassCSS(
 );
 
 className; // => c1
-sheet.unmount();
+node.remove();
 ```

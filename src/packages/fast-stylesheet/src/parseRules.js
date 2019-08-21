@@ -97,7 +97,7 @@ const parseRules = (classes, classNameGenerator) => {
        * Handle optional compression of class names
        */
       const generatedClassName = (
-        classNameGenerator
+        classNameGenerator !== undefined
           ? classNameGenerator(className)
           : className
       );

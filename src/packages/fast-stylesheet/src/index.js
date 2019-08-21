@@ -1,36 +1,25 @@
-import DOMCssSheet from './DOMCssSheet';
+/* eslint-disable prefer-template */
+import DOMCssSheetStore from './stores/DOMCssSheetStore';
+
+const defaultSheetStore = new DOMCssSheetStore('c0');
 
 const css = (
   classes,
   {
-    SheetStore,
-  } = {
-    SheetStore: DOMCssSheet,
-  },
-) => {
-  const sheet = new SheetStore(classes);
-
-  return {
-    classes: sheet.injectedClasses,
-    sheet,
-  };
-};
+    sheetStore = defaultSheetStore,
+  } = {},
+) => sheetStore.injectRules(classes);
 
 export const singleClassCSS = (classRules, ...args) => {
-  const {
-    sheet,
-    classes: {base: baseClassName},
-  } = css(
+  const output = css(
     {
       base: classRules,
     },
     ...args,
   );
 
-  return {
-    sheet,
-    className: baseClassName,
-  };
+  output.className = output.classes.base;
+  return output;
 };
 
 export default css;

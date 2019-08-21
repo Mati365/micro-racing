@@ -3,10 +3,7 @@
 # kart-racing
 online 2D multiplayer go-carts racing game
 
-## Screens
-![Isometric engine](/doc/screens/isometric-engine.png?raw=true "Isometric engine")<br />
-Preview of Functional WebGL 2.0 Isometric Engine(FGL) with depth test and mesh instancing support
-
+## Gameplay
 [![Video](https://i.imgur.com/JckXVQs.png)](https://www.youtube.com/watch?v=EDJOmJYySsc "Engine video")
 Engine prototype (click to play)
 

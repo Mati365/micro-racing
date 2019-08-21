@@ -1,7 +1,7 @@
 /* eslint-disable prefer-template */
-import DOMCssSheetStore from './stores/DOMCssSheetStore';
+import {IsomorphicSheetStore} from './stores/types';
 
-const defaultSheetStore = new DOMCssSheetStore('c0');
+const defaultSheetStore = new IsomorphicSheetStore('c0');
 
 const css = (
   classes,

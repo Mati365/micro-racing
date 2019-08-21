@@ -19,6 +19,10 @@ Engine prototype (click to play)
 - Bots using Neural Network for AI(see neural-cars)
 - Multiplayer
 
+### Packages
+**@pkg/fast-stylesheet:**
+> Fast and small CSS in JS implementation with syntax similar to JSS
+
 ### See also
 http://buildnewgames.com/real-time-multiplayer/<br/>
 https://codea.io/talk/discussion/6648/port-of-marco-monsters-2d-car-physics-now-with-video <br/>

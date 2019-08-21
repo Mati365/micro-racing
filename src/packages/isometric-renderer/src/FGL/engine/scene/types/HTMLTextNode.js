@@ -1,4 +1,18 @@
+import {singleClassCSS} from '@pkg/fast-stylesheet';
 import {vec2, vec4, mat} from '@pkg/gl-math';
+
+const FLOATING_HTML_TEXT_CLASS = singleClassCSS(
+  {
+    display: 'none',
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    userSelect: 'none',
+    fontSize: 12,
+    fontWeight: 700,
+    fontSmooth: 'never',
+  },
+).className;
 
 /**
  * @see
@@ -12,12 +26,12 @@ export default class HTMLTextNode {
   constructor({
     f,
     text,
-    opacity = 0.7,
-    margin = vec2(0, -50), // in pixels
+    opacity = 1.0,
+    margin = vec2(0, -55), // in pixels
     translate = vec4(0, 0, 0, 1),
     outlineColor = f.colors.hex.BLACK,
     color = f.colors.hex.WHITE,
-    cssText = '',
+    css,
   }) {
     this.text = text;
     this.translate = translate;
@@ -32,27 +46,21 @@ export default class HTMLTextNode {
       {
         tag: 'span',
         children: text,
-        cssText: `
-          display: none;
-          position: absolute;
-          left: 0;
-          top: 0;
-          color: ${color};
-          user-select: none;
-          font-weight: 700;
-          font-smooth: never;
-          ${
-            opacity
-              ? `opacity: ${opacity};`
-              : ''
-          }
-          ${
+        css: {
+          composes: [FLOATING_HTML_TEXT_CLASS],
+          color,
+          opacity: (
+            opacity && opacity !== 1.0
+              ? opacity
+              : null
+          ),
+          textShadow: (
             outlineColor
-              ? `text-shadow: -1px 0 ${outlineColor}, 0 1px ${outlineColor}, 1px 0 ${outlineColor}, 0 -1px ${outlineColor}`
+              ? `-1px 0 ${outlineColor}, 0 1px ${outlineColor}, 1px 0 ${outlineColor}, 0 -1px ${outlineColor}`
               : ''
-          }
-          ${cssText}
-        `,
+          ),
+          ...css,
+        },
       },
     );
   }

@@ -1,10 +1,14 @@
+import * as R from 'ramda';
+import {singleClassCSS} from '@pkg/fast-stylesheet';
+
 export const MAGIC_LAYER_TAG = 'canvas-html-wrapper';
 
 const appendCanvasHTMLNode = canvas => (
   {
     tag,
     children,
-    cssText,
+    css,
+    className,
   },
 ) => {
   let {parentNode} = canvas;
@@ -26,8 +30,22 @@ const appendCanvasHTMLNode = canvas => (
 
   // append elements
   const node = document.createElement(tag);
-  node.style.cssText = cssText;
   node.innerHTML = children;
+
+  if (className)
+    node.classList.add(className);
+
+  if (css) {
+    const {
+      sheet,
+      className: injectedClassName,
+    } = singleClassCSS(css);
+
+    node.classList.add(...R.split(' ', injectedClassName));
+    node.addEventListener('DOMNodeRemoved', () => {
+      sheet.unmount();
+    });
+  }
 
   parentNode.appendChild(node);
   return node;

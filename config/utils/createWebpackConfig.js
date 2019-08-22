@@ -78,7 +78,9 @@ const createWebpackConfig = ({
         use: [
           {
             loader: 'file-loader',
-            options: {},
+            options: {
+              emitFile: target === 'web',
+            },
           },
         ],
       },

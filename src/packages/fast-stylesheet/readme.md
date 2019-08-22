@@ -4,11 +4,12 @@
 
 ### Example:
 
+#### Dynamic Rules
 *Multiple classes:*
 ```js
-import fastCSS fom '@pkg/fast-stylesheet';
+import css fom '@pkg/fast-stylesheet';
 
-const {classes, node} = css(
+const sheet = css(
   {
     exampleClass: {
       composes: ['d-block'],
@@ -38,15 +39,16 @@ const {classes, node} = css(
   },
 );
 
+const {classes} = sheet;
 classes.exampleClass // => c1
-node.remove(); // removes style tag from DOM
+sheet.remove?.(); // removes style tag from DOM, warn: only if dynamic rule
 ```
 
 *Single class:*
 ```js
 import {singleClassCSS} fom '@pkg/fast-stylesheet';
 
-const {className, node} = singleClassCSS(
+const sheet = singleClassCSS(
   {
     composes: ['d-block'],
     color: 'red',
@@ -68,6 +70,43 @@ const {className, node} = singleClassCSS(
   },
 );
 
-className; // => c1
-node.remove();
+sheet.className; // => c1
+sheet.remove?.();
+```
+
+#### SSR
+```jsx
+import css, {sheetStore} fom '@pkg/fast-stylesheet';
+// or if you want separate styles..
+// cache it somewhere in global scope
+// it will create <style /> tag in header and watch for hydration
+import {createSheetAccessors} fom '@pkg/fast-stylesheet';
+const {css, sheetStore} = createSheetAccessors(
+  {
+    id: 'x',
+  }
+);
+
+// client or server
+const sheet = css(
+  {
+    exampleClass: {
+      color: 'red',
+    },
+  },
+);
+
+// somewhere in express
+const content = (
+  ReactDOMServer.renderToString(
+    <html lang='en'>
+      <head>
+        <CacheStoreReactProvider store={sheetStore} />
+      </head>
+
+      <body>
+        ...
+      </body>
+  )
+);
 ```

@@ -1,3 +1,5 @@
+import ssr from '../../utils/ssr';
+
 import DOMSheetStore from './DOMSheetStore';
 import SSRSheetStore from './SSRSheetStore';
 
@@ -7,7 +9,7 @@ export {
 };
 
 export const IsomorphicSheetStore = (
-  typeof document !== 'undefined'
-    ? DOMSheetStore
-    : SSRSheetStore
+  ssr
+    ? SSRSheetStore
+    : DOMSheetStore
 );

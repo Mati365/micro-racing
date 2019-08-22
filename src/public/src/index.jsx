@@ -1,14 +1,9 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 
-import GameCanvas from '@game/network/client/gameplay/GameCanvas';
+import RootContainer from './RootContainer';
 
 ReactDOM.render(
-  <GameCanvas
-    dimensions={{
-      w: 800,
-      h: 600,
-    }}
-  />,
+  <RootContainer />,
   document.getElementById('app-root'),
 );

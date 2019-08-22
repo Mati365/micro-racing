@@ -1,20 +1,43 @@
 import SheetStore from '../SheetStore';
 
+export class ServerSheet {
+  constructor(id, index, text, classes) {
+    this.id = id;
+    this.index = index;
+    this.text = text;
+    this.classes = classes;
+  }
+}
+
 export default class SSRSheetStore extends SheetStore {
-  #allRules = '';
+  createSheet(sheetID, parseResult, index = null) {
+    const {text, injectedClasses} = parseResult;
 
-  injectRules(classes) {
-    const [text, injectedClasses] = this.parseRules(classes);
-
-    this.#allRules += text;
-    return injectedClasses;
+    return this.addToRegistry(
+      new ServerSheet(
+        sheetID, index,
+        text, injectedClasses,
+      ),
+    );
   }
 
-  flushRules() {
-    this.#allRules = '';
-  }
+  dump() {
+    const {registry, classNameGenerator} = this;
 
-  get allRules() {
-    return this.#allRules;
+    return {
+      id: this.id,
+      classGeneratorValue: classNameGenerator.getValue(),
+      sheetsClasses: registry.reduce(
+        (acc, sheet) => {
+          acc[sheet.id] = sheet.classes;
+          return acc;
+        },
+        {},
+      ),
+      css: registry.reduce(
+        (acc, {text}) => acc + text, // eslint-disable-line prefer-template
+        '',
+      ),
+    };
   }
 }

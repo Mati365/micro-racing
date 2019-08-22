@@ -1,5 +1,5 @@
 {
   "name": "@pkg/fast-stylesheet",
   "version": "1.0.0",
-  "main": "src/index.js"
+  "main": "src/css.js"
 }

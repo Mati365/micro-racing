@@ -7,7 +7,7 @@
   "workspaces": [
     "src/packages/*"
   ],
-  "dependencies": {
+  "devDependencies": {
     "eslint-import-resolver-webpack": "^0.11.0",
     "prop-types": "^15.7.2",
     "push-dir": "^0.4.1",
@@ -17,9 +17,7 @@
     "react-dom": "^16.8.6",
     "rxjs": "^6.4.0",
     "express": "^4.17.1",
-    "consola": "^2.9.0"
-  },
-  "devDependencies": {
+    "consola": "^2.9.0",
     "@babel/core": "^7.4.0",
     "@babel/plugin-proposal-class-properties": "^7.4.0",
     "@babel/plugin-proposal-decorators": "^7.4.0",
@@ -43,6 +41,7 @@
     "eslint-plugin-react": "^7.12.4",
     "file-loader": "^3.0.1",
     "raw-loader": "^2.0.0",
+    "url-loader": "^2.1.0",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.2.1",

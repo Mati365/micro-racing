@@ -5,6 +5,7 @@ import {
 
 /* eslint-disable prefer-template */
 const GLOBAL_CLASS_NAME = '@global';
+const KEYFRAMES_CLASS_NAME = '@keyframes';
 
 const wrapWithSelector = (selector, content) => {
   if (!content)
@@ -35,9 +36,8 @@ const toRuleValue = (ruleName, value) => {
   return value;
 };
 
-const generateRule = (selectorName, rules) => {
+const generateRule = (selectorName, rules, output = []) => {
   let content = '';
-  let nestedRulesContent = '';
 
   for (const ruleName in rules) {
     const ruleValue = rules[ruleName];
@@ -49,16 +49,19 @@ const generateRule = (selectorName, rules) => {
       /** & > *, & *, & tags */
       case '&': {
         const nestedRuleSelector = ruleName.replace(/&/g, selectorName);
-        nestedRulesContent += '\n' + generateRule(nestedRuleSelector, ruleValue);
+        generateRule(nestedRuleSelector, ruleValue, output);
       } break;
 
       /** @media @global tags */
       case '@':
-        if (ruleName === GLOBAL_CLASS_NAME)
-          nestedRulesContent += '\n' + generateRule('', ruleValue);
-        else {
+        if (ruleName === GLOBAL_CLASS_NAME) {
+          generateRule('', ruleValue, output);
+        } else {
           const wrappedRuleContent = generateRule(selectorName, ruleValue);
-          nestedRulesContent += '\n' + wrapWithSelector(ruleName, wrappedRuleContent);
+
+          output.push(
+            wrapWithSelector(ruleName, wrappedRuleContent),
+          );
         }
         break;
 
@@ -69,7 +72,32 @@ const generateRule = (selectorName, rules) => {
     }
   }
 
-  return wrapWithSelector(selectorName, content) + nestedRulesContent;
+  content && output.unshift(
+    wrapWithSelector(selectorName, content),
+  );
+
+  return output;
+};
+
+/**
+ * Converts object with keyframes to CSS rule
+ *
+ * @param {String} selector
+ * @param {Object} rules
+ *
+ * @returns {Array}
+ */
+const parseKeyframesRule = (selector, rules) => {
+  const name = selector.substring(selector.indexOf(' ') + 1);
+  const parsedRules = [];
+
+  for (const percentage in rules)
+    parsedRules.push(generateRule(percentage, rules[percentage]));
+
+  return [
+    name,
+    wrapWithSelector(selector, parsedRules.join(' ')),
+  ];
 };
 
 /**
@@ -77,22 +105,38 @@ const generateRule = (selectorName, rules) => {
  *
  * @param {Object} classes
  * @param {Object} classNameGenerator
+ *
+ * @returns {Array}
  */
 const parseRules = (classes, classNameGenerator) => {
   const stylesheet = {};
   let globals = 0;
 
   for (const className in classes) {
-    if (className === GLOBAL_CLASS_NAME) {
-      const globalMappedName = 'global-' + (++globals);
+    let rules = classes[className];
 
-      stylesheet[globalMappedName] = {
-        className: globalMappedName,
-        text: generateRule('', classes[className]),
-      };
+    /** handle @* tags */
+    if (className[0] === '@') {
+      /** handle @global */
+      if (className === GLOBAL_CLASS_NAME) {
+        const globalMappedName = 'global-' + (++globals);
+
+        stylesheet[globalMappedName] = {
+          className: globalMappedName,
+          parsedRules: [generateRule('', rules)],
+        };
+
+      /** handle @keyframes */
+      } else if (className.indexOf(KEYFRAMES_CLASS_NAME) === 0) {
+        const [name, text] = parseKeyframesRule(className, rules);
+        stylesheet[name] = {
+          className: name,
+          parsedRules: [text],
+        };
+      }
+
+    /** handle class name */
     } else {
-      let rules = classes[className];
-
       /**
        * Handle optional compression of class names
        */
@@ -109,16 +153,44 @@ const parseRules = (classes, classNameGenerator) => {
        *  {class: {composes: ['a']}} => 'a class' in element tag
        */
       let tagClassName = generatedClassName;
-      if (rules.composes) {
-        const {composes, ...nonComposeRules} = rules;
 
-        rules = nonComposeRules;
-        tagClassName = composes.join(' ') + ' ' + generatedClassName;
+      let {extend, composes} = rules;
+      if (extend || composes) {
+        rules = {...rules};
+        delete rules.extend;
+        delete rules.composes;
+      }
+
+      /** handle extend */
+      if (rules.extend) {
+        if (typeof extend === 'string')
+          extend = [extend];
+
+        Object.assign(rules, ...extend);
+      }
+
+      /** handle composes */
+      if (composes) {
+        // transform strings to array
+        if (typeof composes === 'string')
+          composes = composes.split(' ');
+
+        // handle arrays
+        for (let i = composes.length - 1; i >= 0; --i) {
+          let composedClass = composes[i];
+
+          /** handle $classA, $classB */
+          if (composedClass[0] === '$')
+            composedClass = stylesheet[composedClass.substring(1)]?.className;
+
+          if (composedClass)
+            tagClassName = composedClass + ' ' + tagClassName;
+        }
       }
 
       stylesheet[className] = {
         className: tagClassName,
-        text: generateRule('.' + generatedClassName, rules),
+        parsedRules: generateRule('.' + generatedClassName, rules),
       };
     }
   }

@@ -47,7 +47,7 @@ const styled = (Tag, classes, params) => {
     params || {},
   );
 
-  const Wrapped = ({className, ...props}) => {
+  const Wrapped = React.forwardRef(({className, ...props}, ref) => {
     const injectedClasses = useCSS().classes;
 
     let generatedClassName = injectedClasses.base;
@@ -57,10 +57,11 @@ const styled = (Tag, classes, params) => {
     return (
       <Tag
         {...props}
+        ref={ref}
         className={generatedClassName}
       />
     );
-  };
+  });
 
   Wrapped.displayName = 'Styled';
 

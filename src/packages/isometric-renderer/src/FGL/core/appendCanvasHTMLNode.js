@@ -14,7 +14,7 @@ const appendCanvasHTMLNode = canvas => (
   let {parentNode} = canvas;
 
   // create relative container if not present
-  if (parentNode.tagName !== MAGIC_LAYER_TAG) {
+  if (R.toLower(parentNode.tagName) !== MAGIC_LAYER_TAG) {
     const canvasHTMLWrapper = document.createElement(MAGIC_LAYER_TAG);
 
     canvasHTMLWrapper.className = singleClassCSS(

@@ -70,7 +70,7 @@ export default class SheetStore {
     let text = '';
     rules.forEach((rulesArray) => {
       rulesArray.forEach((rule) => {
-        text += rule + '\n';
+        text += rule + ' ';
       });
     });
 

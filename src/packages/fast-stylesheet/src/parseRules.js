@@ -3,9 +3,10 @@ import {
   camelCaseToDash,
 } from './utils';
 
-/* eslint-disable prefer-template */
+/* eslint-disable prefer-template, no-restricted-syntax, guard-for-in, no-continue */
 const GLOBAL_CLASS_NAME = '@global';
 const KEYFRAMES_CLASS_NAME = '@keyframes';
+const MEDIA_CLASS_NAME = '@media';
 
 const wrapWithSelector = (selector, content) => {
   if (!content)
@@ -128,7 +129,7 @@ const parseRules = (classes, classNameGenerator) => {
 
     /** handle @* tags */
     if (className[0] === '@') {
-      /** handle @global */
+      /** handle @global - do not define any class */
       if (className === GLOBAL_CLASS_NAME) {
         const globalMappedName = 'global-' + (++globals);
 
@@ -136,6 +137,13 @@ const parseRules = (classes, classNameGenerator) => {
           className: globalMappedName,
           parsedRules: [generateRule('', rules)],
         };
+
+      /** handle @media - it can contain nested classes */
+      } else if (className.indexOf(MEDIA_CLASS_NAME) === 0) {
+        Object.assign(
+          stylesheet,
+          parseRules(rules, classNameGenerator),
+        );
 
       /** handle @keyframes */
       } else if (className.indexOf(KEYFRAMES_CLASS_NAME) === 0) {

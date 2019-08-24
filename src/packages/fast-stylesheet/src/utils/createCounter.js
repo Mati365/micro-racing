@@ -1,7 +1,7 @@
 const createCounter = (prefix = 0, initialValue = 0) => {
   let id = initialValue;
 
-  const counterFn = () => prefix + ++id;
+  const counterFn = () => prefix + (++id).toString(16);
 
   counterFn.prefix = prefix;
 

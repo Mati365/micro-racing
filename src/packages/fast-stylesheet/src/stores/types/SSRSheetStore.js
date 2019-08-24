@@ -10,14 +10,13 @@ export class ServerSheet {
 }
 
 export default class SSRSheetStore extends SheetStore {
+  // eslint-disable-next-line class-methods-use-this
   createSheet(sheetID, parseResult, index = null) {
     const {text, injectedClasses} = parseResult;
 
-    return this.addToRegistry(
-      new ServerSheet(
-        sheetID, index,
-        text, injectedClasses,
-      ),
+    return new ServerSheet(
+      sheetID, index,
+      text, injectedClasses,
     );
   }
 
@@ -34,10 +33,14 @@ export default class SSRSheetStore extends SheetStore {
         },
         {},
       ),
-      css: registry.reduce(
-        (acc, {text}) => acc + text, // eslint-disable-line prefer-template
-        '',
-      ),
+      css: registry
+        .sort(
+          (a, b) => a.index - b.index,
+        )
+        .reduce(
+          (acc, {text}) => acc + text, // eslint-disable-line prefer-template
+          '',
+        ),
     };
   }
 }

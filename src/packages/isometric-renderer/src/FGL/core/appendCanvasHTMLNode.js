@@ -16,11 +16,14 @@ const appendCanvasHTMLNode = canvas => (
   // create relative container if not present
   if (parentNode.tagName !== MAGIC_LAYER_TAG) {
     const canvasHTMLWrapper = document.createElement(MAGIC_LAYER_TAG);
-    canvasHTMLWrapper.style.cssText = `
-      display: inline-block;
-      position: relative;
-      overflow: hidden;
-    `;
+
+    canvasHTMLWrapper.className = singleClassCSS(
+      {
+        display: 'inline-block',
+        position: 'relative',
+        overflow: 'hidden',
+      },
+    ).className;
 
     parentNode.insertBefore(canvasHTMLWrapper, canvas);
     canvasHTMLWrapper.appendChild(canvas);
@@ -36,14 +39,11 @@ const appendCanvasHTMLNode = canvas => (
     node.classList.add(className);
 
   if (css) {
-    const {
-      sheet,
-      className: injectedClassName,
-    } = singleClassCSS(css);
+    const sheet = singleClassCSS(css);
 
-    node.classList.add(...R.split(' ', injectedClassName));
+    node.classList.add(...R.split(' ', sheet.className));
     node.addEventListener('DOMNodeRemoved', () => {
-      sheet.unmount();
+      sheet.remove();
     });
   }
 

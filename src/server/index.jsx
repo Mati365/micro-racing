@@ -5,8 +5,12 @@ import {resolve} from 'path';
 import express from 'express';
 import consola from 'consola';
 
-import CacheStoreReactProvider from '@pkg/fast-stylesheet/src/react/CacheStoreReactProvider';
-import {sheetStore} from '@pkg/fast-stylesheet';
+import CacheStoreReactMetatags from '@pkg/fast-stylesheet/src/react/server/CacheStoreReactMetatags';
+import {
+  criticalSheetStore,
+  createHydratedSheetStore,
+  SheetStoreContextProvider,
+} from '@pkg/fast-stylesheet/src/react';
 
 import GameServer from '@game/network/server/Server';
 import RootContainer from '../public/src/RootContainer';
@@ -14,6 +18,8 @@ import RootContainer from '../public/src/RootContainer';
 import staticManifest from './constants/staticManifest';
 
 const APP_PORT = 3000;
+
+const CRITICAL_SHEET_STORE_DUMP = criticalSheetStore.dump();
 
 const app = express();
 
@@ -25,33 +31,30 @@ app
     express.static(resolve(__dirname, '../public')),
   )
   .get('/', (req, res) => {
-    res.send(
-      ReactDOMServer.renderToString(
-        <html lang='en'>
-          <head>
-            <style
-              dangerouslySetInnerHTML={{
-                __html: 'html, body { margin: 0; padding: 0; }',
-              }}
-            />
-            <CacheStoreReactProvider store={sheetStore} />
-          </head>
+    const dynamicSheetStore = createHydratedSheetStore({id: 'd'});
 
-          <body>
-            <div
-              id='app-root'
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '100vh',
-              }}
-            >
-              <RootContainer />
-            </div>
-            <script src={staticManifest['main.js']} />
-          </body>
-        </html>,
+    res.send(
+      CacheStoreReactMetatags.insertToHTML(
+        [
+          CRITICAL_SHEET_STORE_DUMP,
+          dynamicSheetStore,
+        ],
+        ReactDOMServer.renderToString(
+          <html lang='en'>
+            <head>
+              <CacheStoreReactMetatags />
+            </head>
+
+            <body>
+              <div id='hydration-container'>
+                <SheetStoreContextProvider value={dynamicSheetStore}>
+                  <RootContainer />
+                </SheetStoreContextProvider>
+              </div>
+              <script src={staticManifest['main.js']} />
+            </body>
+          </html>,
+        ),
       ),
     );
   });

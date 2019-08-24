@@ -1,22 +1,21 @@
-import DEFAULT_STORE from './defaultSheetStore';
 import createHydratedSheetStore from './createHydratedSheetStore';
+import criticalSheetStore from './criticalSheetStore';
+
+export {
+  createHydratedSheetStore,
+};
 
 export const createSheetAccessors = (storeConstructParams) => {
   const sheetStore = (
     storeConstructParams
       ? createHydratedSheetStore(storeConstructParams)
-      : DEFAULT_STORE
+      : criticalSheetStore
   );
 
-  const css = (
-    classes,
-    {
-      index = null,
-    } = {},
-  ) => sheetStore.injectRules(classes, index);
+  const css = ::sheetStore.injectRules;
 
   const singleClassCSS = (classRules, ...args) => {
-    const output = css(
+    const output = sheetStore.injectRules(
       {
         base: classRules,
       },
@@ -35,13 +34,12 @@ export const createSheetAccessors = (storeConstructParams) => {
 };
 
 const {
-  sheetStore,
   css,
   singleClassCSS,
 } = createSheetAccessors();
 
 export {
-  sheetStore,
+  criticalSheetStore,
   singleClassCSS,
 };
 

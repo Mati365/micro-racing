@@ -3,7 +3,9 @@ import parseRules from '../parseRules';
 
 /* eslint-disable prefer-template */
 export default class SheetStore {
-  registry = [];
+  registry = []; // list of NON CACHED list of rules
+
+  sheetIdGenerator = createCounter('s');
 
   constructor({
     id,
@@ -21,9 +23,11 @@ export default class SheetStore {
     );
   }
 
-  injectRules(classes, index = null) {
-    const {cacheStore, registry} = this;
-    const sheetID = 's' + registry.length;
+  injectRules(classes, index = null, sheetID = null) {
+    const {cacheStore} = this;
+
+    if (sheetID === null)
+      sheetID = this.sheetIdGenerator();
 
     if (cacheStore) {
       let cachedSheet = this.cacheStore[sheetID];
@@ -35,13 +39,14 @@ export default class SheetStore {
           };
         }
 
-        registry.push(cachedSheet);
         return cachedSheet;
       }
     }
 
     const parseResult = this.parseRules(classes);
-    const sheet = this.createSheet(sheetID, parseResult, index);
+    const sheet = this.addToRegistry(
+      this.createSheet(sheetID, parseResult, index),
+    );
 
     if (cacheStore)
       cacheStore[sheetID] = sheet;

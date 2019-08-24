@@ -1,15 +1,55 @@
-import React from 'react';
-import css from '../css';
+import React, {useRef} from 'react';
 
-const styled = (Tag, classes) => {
+import criticalSheetStore from '../criticalSheetStore';
+import {useSheetStoreContext} from './SheetStoreContextProvider';
+
+import {createCounter} from '../utils';
+
+const dynamicHooksCounter = createCounter('d');
+const createUseCSSHook = (
+  classes,
+  {
+    sheetStore = criticalSheetStore,
+    critical = true,
+    index = null,
+  } = {},
+) => {
   if (!classes.base) {
     classes = {
       base: classes,
     };
   }
 
-  const {classes: injectedClasses} = css(classes);
+  // all styles with critical tags are loaded during app startup
+  if (critical) {
+    const sheet = sheetStore.injectRules(classes, index);
+    return () => sheet;
+  }
+
+  // all styles are created on demand
+  // context based stylesheet, uses context api
+  const dynamicSheetID = dynamicHooksCounter();
+
+  return () => {
+    const sheetRef = useRef(null);
+    const contextSheetStore = useSheetStoreContext();
+
+    if (sheetRef.current === null)
+      sheetRef.current = contextSheetStore.injectRules(classes, index, dynamicSheetID);
+
+    return sheetRef.current;
+  };
+};
+
+const styled = (Tag, classes, params) => {
+  const useCSS = createUseCSSHook(
+    classes,
+    params || {},
+  );
+
   const Wrapped = ({className, ...props}) => {
+    const injectedClasses = useCSS().classes;
+
     let generatedClassName = injectedClasses.base;
     if (className)
       generatedClassName += ' ' + className; // eslint-disable-line prefer-template
@@ -37,7 +77,7 @@ const styled = (Tag, classes) => {
   'img',
 ].forEach(
   (tag) => {
-    styled[tag] = classes => styled(tag, classes);
+    styled[tag] = (classes, params) => styled(tag, classes, params);
   },
 );
 

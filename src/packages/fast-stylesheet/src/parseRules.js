@@ -27,8 +27,11 @@ const toRuleValue = (ruleName, value) => {
 
   if (Array.isArray(value)) {
     let acc = '';
-    for (let i = 0, l = value.length - 1; i < l; ++i)
-      acc += toRuleValue(null, value[i]) + ' ';
+    for (let i = 0, l = value.length; i < l; ++i) {
+      acc += toRuleValue(null, value[i]);
+      if (i + 1 < l)
+        acc += ' ';
+    }
 
     return acc;
   }
@@ -39,6 +42,10 @@ const toRuleValue = (ruleName, value) => {
 const generateRule = (selectorName, rules, output = []) => {
   let content = '';
 
+  // empty selectors can cause weird glitches in & > * ruless
+  // example: "& > a" becamse " > a", fix it removing spaces after character
+  const nextedRulesReplaceRegex = selectorName ? /&/g : /&\s*/g;
+
   for (const ruleName in rules) {
     const ruleValue = rules[ruleName];
 
@@ -48,7 +55,11 @@ const generateRule = (selectorName, rules, output = []) => {
     switch (ruleName[0]) {
       /** & > *, & *, & tags */
       case '&': {
-        const nestedRuleSelector = ruleName.replace(/&/g, selectorName);
+        const nestedRuleSelector = ruleName.replace(
+          nextedRulesReplaceRegex,
+          selectorName,
+        );
+
         generateRule(nestedRuleSelector, ruleValue, output);
       } break;
 

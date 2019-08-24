@@ -1,15 +1,14 @@
 /* eslint-disable prefer-template */
-import {MAGIC_STORE_ID_ATTRIB} from '../../constants/magicFlags';
+import {MAGIC_HYDRATED_STORE_ID_ATTRIB} from '../../constants/magicFlags';
 import SheetStore from '../SheetStore';
 
 const insertAfter = (prevRule, rule) => {
   prevRule.parentNode.insertBefore(rule, prevRule.nextSibling);
 };
 
-const createStyleTag = (sheetStoreID) => {
-  const node = document.head.appendChild(document.createElement('style'));
+const createStyleTag = () => {
+  const node = document.createElement('style');
   node.setAttribute('type', 'text/css');
-  node.setAttribute(MAGIC_STORE_ID_ATTRIB, sheetStoreID);
   return node;
 };
 
@@ -27,6 +26,9 @@ export class DOMSheet {
     const {index, node} = this;
     const {indexedNodeStore, registry} = this.store;
 
+    if (!node)
+      return;
+
     if (indexedNodeStore[index]?.node === node)
       indexedNodeStore.delete(index);
 
@@ -34,13 +36,18 @@ export class DOMSheet {
       registry.findIndex(({node: registryNode}) => registryNode === node),
       1,
     );
+
+    node.remove();
   }
 }
 
 export default class DOMSheetStore extends SheetStore {
-  constructor(...args) {
-    super(...args);
-    this.node = createStyleTag(this.id);
+  constructor(config) {
+    super(config);
+
+    this.node = config.node || createStyleTag();
+    this.node.setAttribute(MAGIC_HYDRATED_STORE_ID_ATTRIB, '');
+
     this.indexedNodeStore = new Map;
   }
 
@@ -50,6 +57,10 @@ export default class DOMSheetStore extends SheetStore {
     const {registry, indexedNodeStore} = this;
 
     const rulesNode = document.createTextNode(text);
+
+    // node is lazy added to DOM
+    if (sheetNode.parentNode === null)
+      document.head.appendChild(sheetNode);
 
     // add rules in proper order
     if (index === null || registry.length === 0)
@@ -83,11 +94,9 @@ export default class DOMSheetStore extends SheetStore {
 
     indexedNodeStore.set(index, rulesNode);
 
-    return this.addToRegistry(
-      new DOMSheet(
-        this, sheetID, rulesNode,
-        index, rules, injectedClasses,
-      ),
+    return new DOMSheet(
+      this, sheetID, rulesNode,
+      index, rules, injectedClasses,
     );
   }
 }

@@ -3,26 +3,35 @@ import ssr from './utils/ssr';
 
 import {
   HYDRATION_CACHE_VARIABLE,
-  MAGIC_HYDRATED_STORE_ID_ATTRIB,
+  MAGIC_SSR_STORE_ID_ATTRIB,
 } from './constants/magicFlags';
 
+import {isEmptyObject} from './utils';
 import {IsomorphicSheetStore} from './stores/types';
 
 const createHydratedSheetStore = (constructParams) => {
   if (!ssr) {
-    const hydrationStore = window[HYDRATION_CACHE_VARIABLE]?.[constructParams.id];
+    const globalStore = window[HYDRATION_CACHE_VARIABLE];
+    const hydrationStore = globalStore?.[constructParams.id];
 
     if (hydrationStore) {
+      constructParams.node = document.querySelector(`style[${MAGIC_SSR_STORE_ID_ATTRIB}]`);
       constructParams.initialClassNameGeneratorValue = hydrationStore.classGeneratorValue;
       constructParams.cacheStore = {
         ...hydrationStore.sheetsClasses,
       };
 
-      // cleanup stuff
-      delete window[HYDRATION_CACHE_VARIABLE];
-      document
-        .querySelector(`script[${MAGIC_HYDRATED_STORE_ID_ATTRIB}='${constructParams.id}']`)
-        .remove();
+      // cleanup store key
+      delete globalStore[constructParams.id];
+
+      // if list is empty - remove script holder
+      if (isEmptyObject(globalStore)) {
+        document
+          .querySelector(`script[${MAGIC_SSR_STORE_ID_ATTRIB}]`)
+          .remove();
+
+        delete window[HYDRATION_CACHE_VARIABLE];
+      }
     }
   }
 

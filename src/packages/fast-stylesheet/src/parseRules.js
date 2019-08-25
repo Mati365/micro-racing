@@ -29,7 +29,7 @@ const toRuleValue = (ruleName, value) => {
   if (Array.isArray(value)) {
     let acc = '';
     for (let i = 0, l = value.length; i < l; ++i) {
-      acc += toRuleValue(null, value[i]);
+      acc += toRuleValue(ruleName, value[i]);
       if (i + 1 < l)
         acc += ' ';
     }
@@ -67,7 +67,8 @@ const generateRule = (selectorName, rules, output = []) => {
       /** @media @global tags */
       case '@':
         if (ruleName === GLOBAL_CLASS_NAME) {
-          generateRule('', ruleValue, output);
+          // eslint-disable-next-line no-use-before-define
+          output = output.concat(parseGlobalRule(ruleValue));
         } else {
           const wrappedRuleContent = generateRule(selectorName, ruleValue);
 
@@ -84,11 +85,33 @@ const generateRule = (selectorName, rules, output = []) => {
     }
   }
 
-  content && output.unshift(
-    wrapWithSelector(selectorName, content),
-  );
+  if (selectorName && content) {
+    output.unshift(
+      wrapWithSelector(selectorName, content),
+    );
+  }
 
   return output;
+};
+
+/**
+ * Handles @global rules and generated parsed rules array
+ *
+ * @param {Object} rules
+ *
+ * @returns {Array} rules
+ */
+const parseGlobalRule = (rules) => {
+  const parsedClasses = parseRules(rules, null, false); // eslint-disable-line no-use-before-define
+  const parsedRules = [];
+
+  for (const parsedClassName in parsedClasses) {
+    parsedRules.push(
+      ...parsedClasses[parsedClassName].parsedRules,
+    );
+  }
+
+  return parsedRules;
 };
 
 /**
@@ -117,10 +140,11 @@ const parseKeyframesRule = (selector, rules) => {
  *
  * @param {Object} classes
  * @param {Object} classNameGenerator
+ * @param {String} generateClassSelector
  *
  * @returns {Array}
  */
-const parseRules = (classes, classNameGenerator) => {
+const parseRules = (classes, classNameGenerator, generateClassSelector = true) => {
   const stylesheet = {};
   let globals = 0;
 
@@ -129,13 +153,13 @@ const parseRules = (classes, classNameGenerator) => {
 
     /** handle @* tags */
     if (className[0] === '@') {
-      /** handle @global - do not define any class */
+      /** handle @global */
       if (className === GLOBAL_CLASS_NAME) {
         const globalMappedName = 'global-' + (++globals);
 
         stylesheet[globalMappedName] = {
           className: globalMappedName,
-          parsedRules: [generateRule('', rules)],
+          parsedRules: parseGlobalRule(rules),
         };
 
       /** handle @media - it can contain nested classes */
@@ -160,10 +184,16 @@ const parseRules = (classes, classNameGenerator) => {
        * Handle optional compression of class names
        */
       const generatedClassName = (
-        classNameGenerator !== undefined
+        classNameGenerator
           ? classNameGenerator(className)
           : className
       );
+
+      let tagClassName = generatedClassName;
+      let selectorName = tagClassName;
+
+      if (generateClassSelector)
+        selectorName = '.' + tagClassName;
 
       /**
        * handle composition of CSS classes
@@ -171,7 +201,6 @@ const parseRules = (classes, classNameGenerator) => {
        * @example
        *  {class: {composes: ['a']}} => 'a class' in element tag
        */
-      let tagClassName = generatedClassName;
 
       let {extend, composes} = rules;
       if (extend || composes) {
@@ -181,8 +210,8 @@ const parseRules = (classes, classNameGenerator) => {
       }
 
       /** handle extend */
-      if (rules.extend) {
-        if (typeof extend === 'string')
+      if (extend) {
+        if (!Array.isArray(extend))
           extend = [extend];
 
         Object.assign(rules, ...extend);
@@ -209,7 +238,7 @@ const parseRules = (classes, classNameGenerator) => {
 
       stylesheet[className] = {
         className: tagClassName,
-        parsedRules: generateRule('.' + generatedClassName, rules),
+        parsedRules: generateRule(selectorName, rules),
       };
     }
   }

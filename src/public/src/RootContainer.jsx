@@ -11,7 +11,7 @@ const Container = styled.div(
     height: '100vh',
 
     '@global': {
-      '& body, & html': {
+      'body, html': {
         margin: 0,
         padding: 0,
       },

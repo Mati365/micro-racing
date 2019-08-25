@@ -56,10 +56,9 @@ const generateRule = (selectorName, rules, output = []) => {
     switch (ruleName[0]) {
       /** & > *, & *, & tags */
       case '&': {
-        const nestedRuleSelector = ruleName.replace(
-          nextedRulesReplaceRegex,
-          selectorName,
-        );
+        const nestedRuleSelector = ruleName
+          .replace(nextedRulesReplaceRegex, selectorName)
+          .replace(/,\s+/, ', ' + selectorName + ' ');
 
         generateRule(nestedRuleSelector, ruleValue, output);
       } break;

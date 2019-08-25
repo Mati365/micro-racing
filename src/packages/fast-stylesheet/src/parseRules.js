@@ -67,9 +67,9 @@ const generateRule = (selectorName, rules, output = []) => {
       case '@':
         if (ruleName === GLOBAL_CLASS_NAME) {
           // eslint-disable-next-line no-use-before-define
-          output = output.concat(parseGlobalRule(ruleValue));
+          output = [...output, parseGlobalRule(ruleValue)];
         } else {
-          const wrappedRuleContent = generateRule(selectorName, ruleValue);
+          const wrappedRuleContent = generateRule(selectorName, ruleValue).join(' ');
 
           output.push(
             wrapWithSelector(ruleName, wrappedRuleContent),

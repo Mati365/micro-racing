@@ -1,5 +1,7 @@
 import {useRef} from 'react';
 
+import {ssr} from '../../utils';
+
 import criticalSheetStore from '../../criticalSheetStore';
 import {useSheetStoreContext} from '../SheetStoreContextProvider';
 
@@ -9,13 +11,14 @@ const createUseCSSHook = (
     sheetStore = criticalSheetStore,
     critical = true,
     index = null,
+    allowBaseWrap = true,
   } = {},
 ) => {
   const options = {
     index,
   };
 
-  if (!classes.base) {
+  if (allowBaseWrap && !classes.base) {
     classes = {
       base: classes,
     };
@@ -23,8 +26,18 @@ const createUseCSSHook = (
 
   // all styles with critical tags are loaded during app startup
   if (critical) {
-    const sheet = sheetStore.injectRules(classes, options);
-    return () => sheet;
+    let sheet = (
+      ssr
+        ? sheetStore.injectRules(classes, options)
+        : null
+    );
+
+    return () => {
+      if (sheet === null)
+        sheet = sheetStore.injectRules(classes, options);
+
+      return sheet;
+    };
   }
 
   return () => {

@@ -1,6 +1,7 @@
 import {
   isUnitLessProp,
   camelCaseToDash,
+  nestedShallowExtend,
 } from './utils';
 
 /* eslint-disable prefer-template, no-restricted-syntax, guard-for-in, no-continue */
@@ -13,6 +14,53 @@ const wrapWithSelector = (selector, content) => {
     return '';
 
   return selector + ' {' + content + '}';
+};
+
+/**
+ * Assigns extended css to rules
+ *
+ * @param {Object} extend
+ * @param {Object} rules
+ *
+ * @example
+ * {
+ *    extend: {background: 'red'},
+ *    opacity: 0.5,
+ * } => {opcity: 0.25, background: 'red'}
+ *
+ */
+const assignExtendRule = (extend, rules) => {
+  if (!Array.isArray(extend))
+    extend = [extend];
+
+  return nestedShallowExtend(...extend, rules);
+};
+
+/**
+ * Merges composes class names to tagClassName
+ *
+ * @param {Object} stylesheet
+ * @param {Any} composes
+ * @param {String} tagClassName
+ */
+const appendComposedClassNames = (stylesheet, composes, tagClassName) => {
+  // transform strings to array
+  if (typeof composes === 'string')
+    composes = composes.split(' ');
+
+  // handle arrays
+  for (let i = composes.length - 1; i >= 0; --i) {
+    let composedClass = composes[i];
+
+    /** handle $classA, $classB */
+    if (composedClass[0] === '$')
+      composedClass = stylesheet[composedClass.substring(1)]?.className;
+
+    if (composedClass)
+      tagClassName = composedClass + ' ' + tagClassName;
+  }
+
+  return tagClassName;
 };
 
 /**
@@ -201,39 +249,19 @@ const parseRules = (classes, classNameGenerator, generateClassSelector = true) =
        *  {class: {composes: ['a']}} => 'a class' in element tag
        */
 
-      let {extend, composes} = rules;
+      const {composes, extend} = rules;
       if (extend || composes) {
-        rules = {...rules};
         delete rules.extend;
         delete rules.composes;
       }
 
       /** handle extend */
-      if (extend) {
-        if (!Array.isArray(extend))
-          extend = [extend];
-
-        Object.assign(rules, ...extend);
-      }
+      if (extend)
+        rules = assignExtendRule(extend, rules);
 
       /** handle composes */
-      if (composes) {
-        // transform strings to array
-        if (typeof composes === 'string')
-          composes = composes.split(' ');
-
-        // handle arrays
-        for (let i = composes.length - 1; i >= 0; --i) {
-          let composedClass = composes[i];
-
-          /** handle $classA, $classB */
-          if (composedClass[0] === '$')
-            composedClass = stylesheet[composedClass.substring(1)]?.className;
-
-          if (composedClass)
-            tagClassName = composedClass + ' ' + tagClassName;
-        }
-      }
+      if (composes)
+        tagClassName = appendComposedClassNames(stylesheet, composes, tagClassName);
 
       stylesheet[className] = {
         className: tagClassName,

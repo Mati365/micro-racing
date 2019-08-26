@@ -16,7 +16,6 @@ const createHydratedSheetStore = (constructParams) => {
 
     if (hydrationStore) {
       constructParams.node = document.querySelector(`style[${MAGIC_SSR_STORE_ID_ATTRIB}]`);
-      constructParams.initialClassNameGeneratorValue = hydrationStore.classGeneratorValue;
       constructParams.cacheStore = {
         ...hydrationStore.sheetsClasses,
       };

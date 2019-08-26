@@ -1,31 +1,17 @@
 import SheetStore from '../SheetStore';
-
-export class ServerSheet {
-  constructor(id, index, text, classes) {
-    this.id = id;
-    this.index = index;
-    this.text = text;
-    this.classes = classes;
-  }
-}
+import Sheet from '../Sheet';
 
 export default class SSRSheetStore extends SheetStore {
   // eslint-disable-next-line class-methods-use-this
-  createSheet(sheetID, parseResult, index = null) {
-    const {text, injectedClasses} = parseResult;
-
-    return new ServerSheet(
-      sheetID, index,
-      text, injectedClasses,
-    );
+  createSheet(sheetID, styles, options) {
+    return new Sheet(sheetID, styles, options);
   }
 
   dump() {
-    const {registry, classNameGenerator} = this;
+    const {registry} = this;
 
     return {
       id: this.id,
-      classGeneratorValue: classNameGenerator.getValue(),
       sheetsClasses: registry.reduce(
         (acc, sheet) => {
           acc[sheet.id] = sheet.classes;

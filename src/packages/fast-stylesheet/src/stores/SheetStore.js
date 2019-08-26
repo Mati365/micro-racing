@@ -1,33 +1,44 @@
-import {createCounter} from '../utils';
-import parseRules from '../parseRules';
-
 /* eslint-disable prefer-template */
+import {hashObject} from '../utils';
+
+export const defaultClassNameGenerator = (sheetID, ruleIndex) => {
+  const prefix = '_' + sheetID;
+  if (ruleIndex)
+    return prefix + '-' + ruleIndex.toString(36);
+
+  return prefix;
+};
+
 export default class SheetStore {
   registry = []; // list of NON CACHED list of rules
 
-  sheetIdGenerator = createCounter('s');
-
   constructor({
     id,
-    classNameGenerator,
-    initialClassNameGeneratorValue = 0,
+    classNameGenerator = defaultClassNameGenerator,
     cacheStore = {},
   }) {
     this.id = id;
 
     this.cacheStore = cacheStore;
-    this.classNameGenerator = (
-      classNameGenerator
-        ? classNameGenerator(initialClassNameGeneratorValue)
-        : createCounter(this.id, initialClassNameGeneratorValue)
-    );
+    this.classNameGenerator = classNameGenerator;
   }
 
-  injectRules(classes, index = null, sheetID = null) {
-    const {cacheStore} = this;
+  injectRules(styles, options) {
+    // fill missing options params
+    options = options || {};
 
-    if (sheetID === null)
-      sheetID = this.sheetIdGenerator();
+    if (options.index === undefined)
+      options.index = null;
+
+    if (options.sheetID === undefined)
+      options.sheetID = hashObject(styles);
+
+    if (options.classNameGenerator === undefined)
+      options.classNameGenerator = this.classNameGenerator;
+
+    // lookup for cache
+    const {sheetID} = options;
+    const {cacheStore} = this;
 
     if (cacheStore) {
       let cachedSheet = this.cacheStore[sheetID];
@@ -43,42 +54,15 @@ export default class SheetStore {
       }
     }
 
-    const parseResult = this.parseRules(classes);
+    // generate styles if cache not found
     const sheet = this.addToRegistry(
-      this.createSheet(sheetID, parseResult, index),
+      this.createSheet(sheetID, styles, options),
     );
 
     if (cacheStore)
       cacheStore[sheetID] = sheet;
 
     return sheet;
-  }
-
-  parseRules(classes) {
-    const parsedRules = parseRules(classes, this.classNameGenerator);
-
-    const injectedClasses = {};
-    const rules = [];
-
-    for (const className in parsedRules) {
-      const rule = parsedRules[className];
-
-      rules.push(rule.parsedRules);
-      injectedClasses[className] = rule.className;
-    }
-
-    let text = '';
-    rules.forEach((rulesArray) => {
-      rulesArray.forEach((rule) => {
-        text += rule + ' ';
-      });
-    });
-
-    return {
-      text,
-      rules,
-      injectedClasses,
-    };
   }
 
   addToRegistry(item) {

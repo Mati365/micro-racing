@@ -1,6 +1,8 @@
 /* eslint-disable prefer-template */
 import {MAGIC_HYDRATED_STORE_ID_ATTRIB} from '../../constants/magicFlags';
+
 import SheetStore from '../SheetStore';
+import Sheet from '../Sheet';
 
 const insertAfter = (prevRule, rule) => {
   prevRule.parentNode.insertBefore(rule, prevRule.nextSibling);
@@ -12,18 +14,12 @@ const createStyleTag = () => {
   return node;
 };
 
-export class DOMSheet {
-  constructor(store, id, node, index, rules, classes) {
-    this.id = id;
-    this.store = store;
-    this.index = index;
-    this.node = node;
-    this.rules = rules;
-    this.classes = classes;
-  }
+export class DOMSheet extends Sheet {
+  node = null;
 
   remove() {
-    const {index, node} = this;
+    const {node} = this;
+    const {index} = this.options;
     const {indexedNodeStore, registry} = this.store;
 
     if (!node)
@@ -51,26 +47,28 @@ export default class DOMSheetStore extends SheetStore {
     this.indexedNodeStore = new Map;
   }
 
-  createSheet(sheetID, parseResult, index = null) {
-    const {text, rules, injectedClasses} = parseResult;
-    const {node: sheetNode} = this;
+  createSheet(sheetID, styles, options) {
+    const sheet = new DOMSheet(sheetID, styles, options);
+    const {text, index} = sheet;
+
+    const {node: storeNode} = this;
     const {registry, indexedNodeStore} = this;
 
-    const rulesNode = document.createTextNode(text);
+    const sheetNode = document.createTextNode(text);
 
     // node is lazy added to DOM
-    if (sheetNode.parentNode === null)
-      document.head.appendChild(sheetNode);
+    if (storeNode.parentNode === null)
+      document.head.appendChild(storeNode);
 
     // add rules in proper order
     if (index === null || registry.length === 0)
-      sheetNode.appendChild(rulesNode);
+      storeNode.appendChild(sheetNode);
     else {
       // find nearest node with lowest index
       const equalLevelNode = indexedNodeStore.get(index);
 
       if (equalLevelNode)
-        insertAfter(equalLevelNode, rulesNode);
+        insertAfter(equalLevelNode, sheetNode);
       else {
         const nearest = {
           index: null,
@@ -86,17 +84,15 @@ export default class DOMSheetStore extends SheetStore {
         }
 
         if (nearest.node !== null)
-          insertAfter(nearest.node, rulesNode);
+          insertAfter(nearest.node, sheetNode);
         else
-          sheetNode.appendChild(rulesNode);
+          storeNode.appendChild(sheetNode);
       }
     }
 
-    indexedNodeStore.set(index, rulesNode);
+    indexedNodeStore.set(index, sheetNode);
+    sheet.node = sheetNode;
 
-    return new DOMSheet(
-      this, sheetID, rulesNode,
-      index, rules, injectedClasses,
-    );
+    return sheet;
   }
 }

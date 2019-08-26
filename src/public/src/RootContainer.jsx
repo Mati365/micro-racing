@@ -5,10 +5,12 @@ import {styled} from '@pkg/fast-stylesheet/src/react';
 
 const Container = styled.div(
   {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100vh',
+    base: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100vh',
+    },
 
     '@global': {
       'body, html': {

@@ -145,11 +145,13 @@ const generateRule = (selectorName, rules, output = []) => {
  * Handles @global rules and generated parsed rules array
  *
  * @param {Object} rules
+ * @param {Boolean} generateClassSelector
  *
  * @returns {Array} rules
  */
-const parseGlobalRule = (rules) => {
-  const parsedClasses = parseRules(rules, null, false); // eslint-disable-line no-use-before-define
+const parseGlobalRule = (rules, generateClassSelector = false) => {
+  // eslint-disable-next-line no-use-before-define
+  const parsedClasses = parseRules(rules, null, generateClassSelector);
   const parsedRules = [];
 
   for (const parsedClassName in parsedClasses) {
@@ -211,10 +213,15 @@ const parseRules = (classes, classNameGenerator, generateClassSelector = true) =
 
       /** handle @media - it can contain nested classes */
       } else if (className.indexOf(MEDIA_CLASS_NAME) === 0) {
-        Object.assign(
-          stylesheet,
-          parseRules(rules, classNameGenerator),
-        );
+        const mediaRules = parseRules(rules, classNameGenerator);
+        for (const key in mediaRules) {
+          const mediaRule = mediaRules[key];
+          mediaRule.parsedRules = mediaRule.parsedRules.map(
+            ruleContent => wrapWithSelector(className, ruleContent),
+          );
+        }
+
+        Object.assign(stylesheet, mediaRules);
 
       /** handle @keyframes */
       } else if (className.indexOf(KEYFRAMES_CLASS_NAME) === 0) {

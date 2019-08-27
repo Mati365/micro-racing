@@ -88,12 +88,26 @@ const toRuleValue = (ruleName, value) => {
   return value;
 };
 
-const generateRule = (selectorName, rules, output = []) => {
-  let content = '';
-
+/**
+ * Replaces & > * with .test > *
+ *
+ * @param {String} ruleName
+ * @param {String} selectorName
+ */
+const insertSelectorToRuleName = (ruleName, selectorName) => {
   // empty selectors can cause weird glitches in & > * ruless
   // example: "& > a" becamse " > a", fix it removing spaces after character
   const nextedRulesReplaceRegex = selectorName ? /&/g : /&\s*/g;
+
+  return (
+    ruleName
+      .replace(/(,)(\s+)([^&])/g, '$1 ' + selectorName + ' $3')
+      .replace(nextedRulesReplaceRegex, selectorName)
+  );
+};
+
+const generateRule = (selectorName, rules, output = []) => {
+  let content = '';
 
   for (const ruleName in rules) {
     const ruleValue = rules[ruleName];
@@ -104,9 +118,7 @@ const generateRule = (selectorName, rules, output = []) => {
     switch (ruleName[0]) {
       /** & > *, & *, & tags */
       case '&': {
-        const nestedRuleSelector = ruleName
-          .replace(nextedRulesReplaceRegex, selectorName)
-          .replace(/,\s+/, ', ' + selectorName + ' ');
+        const nestedRuleSelector = insertSelectorToRuleName(ruleName, selectorName);
 
         generateRule(nestedRuleSelector, ruleValue, output);
       } break;

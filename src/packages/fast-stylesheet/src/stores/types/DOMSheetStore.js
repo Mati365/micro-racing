@@ -1,4 +1,4 @@
-/* eslint-disable prefer-template */
+/* eslint-disable prefer-template, no-restricted-syntax */
 import {MAGIC_HYDRATED_STORE_ID_ATTRIB} from '../../constants/magicFlags';
 
 import SheetStore from '../SheetStore';
@@ -61,7 +61,7 @@ export default class DOMSheetStore extends SheetStore {
       document.head.appendChild(storeNode);
 
     // add rules in proper order
-    if (index === null || registry.length === 0)
+    if (index === null && registry.length === 0)
       storeNode.appendChild(sheetNode);
     else {
       // find nearest node with lowest index
@@ -77,7 +77,7 @@ export default class DOMSheetStore extends SheetStore {
 
         for (const [_index, _node] of indexedNodeStore.entries()) {
           // watch SSR code!
-          if (index <= _index && _index >= nearest.index) {
+          if (index >= _index && _index >= nearest.index) {
             nearest.index = _index;
             nearest.node = _node;
           }
@@ -85,6 +85,8 @@ export default class DOMSheetStore extends SheetStore {
 
         if (nearest.node !== null)
           insertAfter(nearest.node, sheetNode);
+        else if (storeNode.firstChild)
+          storeNode.insertBefore(sheetNode, storeNode.firstChild);
         else
           storeNode.appendChild(sheetNode);
       }

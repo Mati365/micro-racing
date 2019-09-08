@@ -9,6 +9,9 @@ const GLOBAL_CLASS_NAME = '@global';
 const KEYFRAMES_CLASS_NAME = '@keyframes';
 const MEDIA_CLASS_NAME = '@media';
 
+const EXTEND_KEYWORD = 'extend';
+const COMPOSE_KEYWORD = 'composes';
+
 const wrapWithSelector = (selector, content) => {
   if (!content)
     return '';
@@ -30,6 +33,9 @@ const wrapWithSelector = (selector, content) => {
  *
  */
 const assignExtendRule = (extend, rules) => {
+  if (!extend)
+    return rules;
+
   if (!Array.isArray(extend))
     extend = [extend];
 
@@ -108,6 +114,12 @@ const insertSelectorToRuleName = (ruleName, selectorName) => {
 
 const generateRule = (selectorName, rules, output = []) => {
   let content = '';
+
+  /** handle extend */
+  if (EXTEND_KEYWORD in rules) {
+    rules = assignExtendRule(rules[EXTEND_KEYWORD], rules);
+    delete rules[EXTEND_KEYWORD];
+  }
 
   for (const ruleName in rules) {
     const ruleValue = rules[ruleName];
@@ -210,7 +222,7 @@ const parseRules = (classes, classNameGenerator, generateClassSelector = true) =
   let globals = 0;
 
   for (const className in classes) {
-    let rules = classes[className];
+    const rules = classes[className];
 
     /** handle @* tags */
     if (className[0] === '@') {
@@ -268,19 +280,11 @@ const parseRules = (classes, classNameGenerator, generateClassSelector = true) =
        *  {class: {composes: ['a']}} => 'a class' in element tag
        */
 
-      const {composes, extend} = rules;
-      if (extend || composes) {
-        delete rules.extend;
-        delete rules.composes;
-      }
-
-      /** handle extend */
-      if (extend)
-        rules = assignExtendRule(extend, rules);
-
       /** handle composes */
-      if (composes)
-        tagClassName = appendComposedClassNames(stylesheet, composes, tagClassName);
+      if (COMPOSE_KEYWORD in rules) {
+        tagClassName = appendComposedClassNames(stylesheet, rules[COMPOSE_KEYWORD], tagClassName);
+        delete rules[COMPOSE_KEYWORD];
+      }
 
       stylesheet[className] = {
         className: tagClassName,

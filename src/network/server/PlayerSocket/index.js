@@ -28,6 +28,7 @@ export default class PlayerSocket {
     this.server = server;
     this.ws = ws;
     this.info = info;
+    this.keyMap = {};
     this.onDisconnect = onDisconnect;
 
     this.mountMessagesHandler();
@@ -140,6 +141,17 @@ export default class PlayerSocket {
    * Mount action listeners
    */
   listeners = {
+    [PLAYER_ACTIONS.PRESS_KEY]: (cmdID, {keyCode, press}) => {
+      // prevent h4ckers from overflow keyMap object
+      // by uploading multibyte keycodes
+      keyCode = (+keyCode) % 0xFF;
+
+      if (press)
+        this.keyMap[keyCode] = true;
+      else
+        delete this.keyMap[keyCode];
+    },
+
     [PLAYER_ACTIONS.PLAYER_INFO]: (cmdID) => {
       this.sendActionResponse(
         cmdID,

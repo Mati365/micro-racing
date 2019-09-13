@@ -17,10 +17,11 @@ export const ACTION_FLAGS = {
 export const PLAYER_ACTIONS = {
   PLAYER_INFO: 0,
   JOIN_ROOM: 1,
+  PRESS_KEY: 2,
 
   // BROADCAST
-  PLAYER_JOINED_TO_ROOM: 2,
-  PLAYER_LEFT_ROOM: 3,
+  PLAYER_JOINED_TO_ROOM: 3,
+  PLAYER_LEFT_ROOM: 4,
 };
 
 export const CAR_TYPES = {

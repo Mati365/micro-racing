@@ -25,8 +25,28 @@ export default class GameBoard {
       },
     );
 
-    canvas.addEventListener('keydown', (e) => { this.keyMap[e.which] = true; }, true);
-    canvas.addEventListener('keyup', (e) => { this.keyMap[e.which] = false; }, true);
+    canvas.addEventListener(
+      'keydown',
+      (e) => {
+        if (!this.keyMap[e.which])
+          this.client.sendKeyState(e.which, true);
+
+        this.keyMap[e.which] = true;
+      },
+      true,
+    );
+
+    canvas.addEventListener(
+      'keyup',
+      (e) => {
+        if (this.keyMap[e.which])
+          this.client.sendKeyState(e.which, false);
+
+        this.keyMap[e.which] = false;
+      },
+      true,
+    );
+
     return this;
   }
 

@@ -5,6 +5,17 @@ import BinarySocketRPCWrapper from './BinarySocketRPCWrapper';
 
 export default class PlayerClientSocket {
   static defaultApiMethods = {
+    sendKeyState: {
+      action: PLAYER_ACTIONS.PRESS_KEY,
+      serialize: (keyCode, press) => ({
+        keyCode,
+        press,
+      }),
+      flags: {
+        waitForResponse: false,
+      },
+    },
+
     joinRoom: {
       action: PLAYER_ACTIONS.JOIN_ROOM,
       serialize: R.objOf('name'),

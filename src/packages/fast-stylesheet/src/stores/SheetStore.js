@@ -26,6 +26,7 @@ export default class SheetStore {
   injectRules(styles, options) {
     // fill missing options params
     options = options || {};
+    options.store = this;
 
     if (options.index === undefined)
       options.index = null;
@@ -46,9 +47,11 @@ export default class SheetStore {
         if (!('id' in cachedSheet)) {
           cachedSheet = {
             id: sheetID,
+            usages: 1,
             classes: cachedSheet,
           };
-        }
+        } else
+          cachedSheet.usages++;
 
         return cachedSheet;
       }

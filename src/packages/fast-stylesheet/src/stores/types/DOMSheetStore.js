@@ -19,8 +19,8 @@ export class DOMSheet extends Sheet {
 
   remove() {
     const {node} = this;
-    const {index} = this.options;
-    const {indexedNodeStore, registry} = this.store;
+    const {index, store} = this.options;
+    const {indexedNodeStore, registry} = store;
 
     if (!node)
       return;
@@ -29,11 +29,13 @@ export class DOMSheet extends Sheet {
       indexedNodeStore.delete(index);
 
     registry.splice(
-      registry.findIndex(({node: registryNode}) => registryNode === node),
+      registry.indexOf(this),
       1,
     );
 
-    node.remove();
+    // ID is equal for cached stylesheets
+    if (!this.usages)
+      node.remove();
   }
 }
 

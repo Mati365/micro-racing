@@ -6,6 +6,7 @@ export default class Sheet {
     this.id = id;
     this.options = options;
     this.injectedRulesCount = 0;
+    this.usages = 0; // used in cache stylesheet removal
 
     // parse
     const {text, rules, classes} = this.parseStyles(styles);

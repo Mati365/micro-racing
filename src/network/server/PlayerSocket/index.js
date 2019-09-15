@@ -73,8 +73,6 @@ export default class PlayerSocket {
           getMessageContent(message),
         );
       } catch (e) {
-        consola.error(e);
-
         const serializedError = (
           e?.toJSON
             ? e
@@ -87,6 +85,8 @@ export default class PlayerSocket {
             error: serializedError.toJSON(),
           },
         );
+
+        consola.error(e);
       }
     });
 

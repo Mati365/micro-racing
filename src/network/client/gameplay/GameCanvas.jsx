@@ -55,6 +55,10 @@ const GameCanvas = ({dimensions}) => {
         );
 
         board.start();
+
+        setTimeout(() => {
+          client.startRace();
+        }, 1000);
       })();
     },
     [connecting],

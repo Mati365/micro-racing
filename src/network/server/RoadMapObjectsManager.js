@@ -113,7 +113,6 @@ export default class RoadMapObjectsManager {
   totalPlayers = 0;
 
   constructor(
-    players,
     {
       objects,
       segmentsInfo,
@@ -121,8 +120,6 @@ export default class RoadMapObjectsManager {
   ) {
     this.objects = objects;
     this.segmentsInfo = segmentsInfo;
-
-    R.forEach(::this.appendPlayerCar, players || []);
   }
 
   appendPlayerCar(
@@ -137,6 +134,7 @@ export default class RoadMapObjectsManager {
     const playerElement = new MapElement(
       OBJECT_TYPES.PLAYER,
       {
+        // todo: User car physics
         playerID: player.id,
         carType,
         transform: {

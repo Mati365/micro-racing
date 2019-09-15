@@ -13,6 +13,8 @@ import createActionMessage, {
   getMessageContent,
 } from '../../shared/utils/createActionMessage';
 
+import ServerError from '../../shared/ServerError';
+
 /**
  * Provides "http style" binary socket wrapper
  *
@@ -84,7 +86,15 @@ export default class BinarySocketRPCWrapper {
       if (cmdResponseQueue[cmdID])
         throw new Error('BinarySocketWrapper buffer overflow!');
 
-      cmdResponseQueue[cmdID] = deferred.resolve;
+      cmdResponseQueue[cmdID] = (response) => {
+        if (response.error) {
+          deferred.reject(
+            ServerError.fromJSON(response.error),
+          );
+        } else
+          deferred.resolve(response);
+      };
+
       cmdResponseQueue.__id = (cmdResponseQueue.__id + 1) % MAX_CMD_ID;
     }
 

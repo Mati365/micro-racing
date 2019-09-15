@@ -32,18 +32,24 @@ export default class Room {
     this.abstract = abstract;
     this.kickedPlayers = kickedPlayers;
 
+    if (!abstract)
+      this.map = new RoadMapObjectsManager;
+
     this.playersLimit = playersLimit;
-    this.players = (
+    this.players = [];
+
+    R.map(
+      player => this.join(player, false),
       owner
         ? [...players, owner]
-        : players
+        : players,
     );
-
-    if (!abstract)
-      this.map = new RoadMapObjectsManager(this.players);
 
     this.onDestroy = onDestroy;
   }
+
+  // eslint-disable-next-line
+  startRace() {}
 
   /**
    * It is faster than sendBroadcastAction in real time events
@@ -103,8 +109,9 @@ export default class Room {
    * if owner is null(which should never happen) set it as owner
    *
    * @param {Player} player
+   * @param {Boolean} broadcast
    */
-  join(player) {
+  join(player, broadcast = true) {
     const {
       abstract,
       kickedPlayers,
@@ -128,7 +135,15 @@ export default class Room {
     if (!abstract) {
       const playerCar = this.map.appendPlayerCar(player);
 
-      this.sendBroadcastAction(
+      Object.assign(
+        player.info,
+        {
+          room: this,
+          car: playerCar,
+        },
+      );
+
+      broadcast && this.sendBroadcastAction(
         null,
         PLAYER_ACTIONS.PLAYER_JOINED_TO_ROOM,
         null,
@@ -147,15 +162,24 @@ export default class Room {
    * Remove player from list
    *
    * @param {Player} player
+   * @param {Boolean} broadcast
    */
-  leave(player) {
+  leave(player, broadcast = true) {
     const {abstract} = this;
 
     this.players = removeByID(player.id, this.players);
 
     if (!abstract) {
       this.map.removePlayerCar(player);
-      this.sendBroadcastAction(
+      Object.assign(
+        player.info,
+        {
+          room: null,
+          car: null,
+        },
+      );
+
+      broadcast && this.sendBroadcastAction(
         null,
         PLAYER_ACTIONS.PLAYER_LEFT_ROOM,
         null,

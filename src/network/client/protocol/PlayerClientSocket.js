@@ -30,6 +30,13 @@ export default class PlayerClientSocket {
         waitForResponse: true,
       },
     },
+
+    startRace: {
+      action: PLAYER_ACTIONS.START_ROOM_RACE,
+      flags: {
+        waitForResponse: true,
+      },
+    },
   };
 
   /**

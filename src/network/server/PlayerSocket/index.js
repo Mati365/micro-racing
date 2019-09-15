@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import logMethod, {logFunction} from '@pkg/basic-helpers/decorators/logMethod';
 
 import {
+  ERROR_CODES,
   PLAYER_ACTIONS,
   ACTION_FLAGS,
 } from '../../constants/serverCodes';
@@ -14,6 +15,7 @@ import createActionMessage, {
   getMessageMeta,
   getMessageContent,
 } from '../../shared/utils/createActionMessage';
+import ServerError from '../../shared/ServerError';
 
 /**
  * Socket API provider for player
@@ -65,10 +67,27 @@ export default class PlayerSocket {
       if (!listener)
         return;
 
-      listener(
-        cmdID,
-        getMessageContent(message),
-      );
+      try {
+        listener(
+          cmdID,
+          getMessageContent(message),
+        );
+      } catch (e) {
+        consola.error(e);
+
+        const serializedError = (
+          e?.toJSON
+            ? e
+            : new ServerError(ERROR_CODES.UNEXPECTED_ERROR)
+        );
+
+        this.sendActionResponse(
+          cmdID,
+          {
+            error: serializedError.toJSON(),
+          },
+        );
+      }
     });
 
     ws.on('close', () => {
@@ -100,7 +119,7 @@ export default class PlayerSocket {
    * Append player to both rooms
    */
   joinRoom(name) {
-    const {server, info} = this;
+    const {server} = this;
 
     let room = server.findRoom(name);
     if (room)
@@ -114,7 +133,6 @@ export default class PlayerSocket {
       );
     }
 
-    info.room = room;
     return room;
   }
 
@@ -174,6 +192,24 @@ export default class PlayerSocket {
           room.getBroadcastSocketJSON(),
         );
         return room;
+      },
+    ),
+
+    [PLAYER_ACTIONS.START_ROOM_RACE]: logFunction(
+      () => {
+        consola.info(`Player ${chalk.white.bold(this.info.nick)} started racing in ${chalk.white.bold(this.info.room.name)}!`);
+      },
+      {
+        afterExec: true,
+      },
+    )(
+      () => {
+        const {room} = this.info;
+
+        if (room?.owner !== this)
+          throw new ServerError(ERROR_CODES.ACCESS_DENIED);
+
+        room.startRace();
       },
     ),
   }

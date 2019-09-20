@@ -77,24 +77,19 @@ export const appendToSceneBuffer = f => ({
         } break;
 
         /**
-         * Each player should contain **playerID**, **type**
+         * Each player should contain **id**, **type**
          */
         case OBJECT_TYPES.PLAYER: {
-          const {carType, playerID, ...renderParams} = params;
-          const carCreator = async (sceneParams) => {
-            const car = new CarNode(
-              {
-                ...sceneParams,
-                ...renderParams,
-                id,
-                nick: findByID(playerID, players).nick,
-                renderer: await Factory.createTexturedCar(f)(carType),
-              },
-            );
-
-            playersCars[playerID] = car;
-            return car;
-          };
+          const {carType, ...renderParams} = params;
+          const carCreator = async sceneParams => (playersCars[id] = new CarNode(
+            {
+              ...sceneParams,
+              ...renderParams,
+              id,
+              nick: findByID(id, players).nick,
+              renderer: await Factory.createTexturedCar(f)(carType),
+            },
+          ));
 
           asyncObjectsQueue.push(
             buffer.createNode(carCreator),

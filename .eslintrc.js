@@ -50,6 +50,7 @@ module.exports = {
     'no-bitwise': 0,
     'no-loop-func': 0,
     'guard-for-in': 0,
+    'no-return-assign': ['error', 'except-parens'],
     'indent': [
       'error',
       2,

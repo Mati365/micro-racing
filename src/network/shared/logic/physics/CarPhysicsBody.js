@@ -1,4 +1,8 @@
-import {clamp, lerp, toRadians, vec2} from '@pkg/gl-math';
+import * as R from 'ramda';
+
+import {
+  clamp, lerp, toRadians, vec2,
+} from '@pkg/gl-math';
 
 const GRAVITY = 9.81;
 
@@ -31,14 +35,13 @@ export default class CarPhysicsBody {
     {
       mass = 120,
 
-      velocity = vec2(0, 0),
-
       // rotations
       angle = toRadians(45),
       steerAngle = toRadians(0), // relative to root angle
       maxSteerAngle = toRadians(45),
 
       // left top corner
+      velocity = vec2(0, 0),
       pos = vec2(0, 0),
       size = vec2(0, 0),
       massCenter = vec2(0.5, 0.5),
@@ -66,7 +69,7 @@ export default class CarPhysicsBody {
     this.steerAngle = steerAngle;
     this.maxSteerAngle = maxSteerAngle;
 
-    this.massCenter = vec2(0.5, 0.5 + lerp());
+    this.massCenter = massCenter;
     this.size = size;
     this.pos = pos;
 
@@ -215,4 +218,37 @@ export default class CarPhysicsBody {
 
     this.corneringIntensity = vec2.len(fCornering) / 8000;
   }
+
+  toJSON = (() => {
+    const serializer = R.pick(
+      [
+        'mass', 'velocity', 'angle', 'steerAngle', 'maxSteerAngle',
+        'pos', 'size', 'massCenter', 'wheelSize', 'axles',
+      ],
+    );
+
+    return () => serializer(this);
+  })();
+
+  toBSON = ::this.toJSON;
+
+  static fromJSON = (() => {
+    const deserializer = R.converge(
+      R.merge,
+      [
+        R.pick(['mass', 'angle', 'steerAngle', 'maxSteerAngle', 'axles']),
+        R.compose(
+          R.mapObjIndexed(obj => vec2(...obj)),
+          R.pick(['velocity', 'pos', 'size', 'massCenter', 'wheelSize']),
+        ),
+      ],
+    );
+
+    return (json, additionalParams) => new CarPhysicsBody(
+      {
+        ...deserializer(json),
+        ...additionalParams,
+      },
+    );
+  })();
 }

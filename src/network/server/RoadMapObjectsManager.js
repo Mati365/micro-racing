@@ -8,9 +8,9 @@ import {
 
 import TrackPath from '@game/logic/track/TrackPath/TrackPath';
 import TrackSegments from '../shared/logic/track/TrackSegments/TrackSegments';
-import MapElement from '../shared/MapElement';
 
-import genCarSegmentTransform, {CAR_ALIGN} from '../shared/logic/genCarSegmentTransform';
+import {MapElement} from '../shared/map';
+import PlayerMapElement, {genCarSegmentTransform, CAR_ALIGN} from '../shared/map/PlayerMapElement';
 
 const generateBlankObjects = () => {
   const segmentsInfo = new TrackSegments(
@@ -130,22 +130,16 @@ export default class RoadMapObjectsManager {
     } = {},
   ) {
     const {segments} = this.segmentsInfo;
-
-    const playerElement = new MapElement(
-      OBJECT_TYPES.PLAYER,
+    const playerElement = new PlayerMapElement(
       {
-        // todo: User car physics
         playerID: player.id,
         carType,
-        transform: {
-          ...alignFn(
-            {
-              segment: segments[this.totalPlayers],
-              align: CAR_ALIGN[this.totalPlayers % 2 ? 'LEFT_CORNER' : 'RIGHT_CORNER'],
-            },
-          ),
-          scale: [1.25, 1.25, 1.25],
-        },
+        body: alignFn(
+          {
+            segment: segments[this.totalPlayers],
+            align: CAR_ALIGN[this.totalPlayers % 2 ? 'LEFT_CORNER' : 'RIGHT_CORNER'],
+          },
+        ),
       },
     );
 
@@ -158,7 +152,7 @@ export default class RoadMapObjectsManager {
   removePlayerCar(player) {
     this.totalPlayers--;
     this.objects = R.reject(
-      ({params: {playerID}}) => playerID === player.id,
+      R.propEq('id', player.id),
       this.objects,
     );
   }

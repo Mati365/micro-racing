@@ -25,9 +25,9 @@ const SHARED_ALIASES = R.mapObjIndexed(
 
     '@game/res': 'public/res/',
     '@game/public': 'public/',
-    '@game/server': 'server/',
-    '@game/shared': 'shared/',
     '@game/network': 'network/',
+    '@game/server': 'network/server/',
+    '@game/shared': 'network/shared/',
     '@game/logic': 'network/shared/logic/',
   },
 );

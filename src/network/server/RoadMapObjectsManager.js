@@ -126,7 +126,7 @@ export default class RoadMapObjectsManager {
     player,
     {
       alignFn = genCarSegmentTransform,
-      carType = CAR_TYPES.BLUE,
+      carType = CAR_TYPES.RED,
     } = {},
   ) {
     const {segments} = this.segmentsInfo;

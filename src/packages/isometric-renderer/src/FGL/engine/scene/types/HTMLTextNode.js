@@ -70,7 +70,7 @@ export default class HTMLTextNode {
     this.htmlNode = null;
   }
 
-  render(delta, mpMatrix, f) {
+  render(interpolate, mpMatrix, f) {
     const {canvasDimensions} = f.state;
     const {
       text,

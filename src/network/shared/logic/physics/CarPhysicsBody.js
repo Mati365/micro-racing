@@ -33,7 +33,7 @@ const vec2rot = (angle, vec) => {
 export default class CarPhysicsBody {
   constructor(
     {
-      mass = 120,
+      mass = 100,
 
       // rotations
       angle = toRadians(45),
@@ -74,7 +74,7 @@ export default class CarPhysicsBody {
     this.pos = pos;
 
     this.throttle = 0;
-    this.maxThrottle = 130;
+    this.maxThrottle = 300;
 
     this.brake = 0;
 
@@ -100,13 +100,13 @@ export default class CarPhysicsBody {
     };
 
     this.corneringStiffness = {
-      front: -20.0,
-      rear: -20.2,
+      front: -80.0,
+      rear: -80.2,
     };
 
-    this.maxGrip = 15.0;
+    this.maxGrip = 40.0;
     this.resistance = 5.0;
-    this.drag = 2.2;
+    this.drag = 3.5;
   }
 
   turn(delta) {
@@ -120,11 +120,15 @@ export default class CarPhysicsBody {
   speedUp(delta) {
     const {maxThrottle} = this;
 
-    this.throttle = clamp(-maxThrottle, maxThrottle, this.throttle + delta);
+    this.throttle = clamp(
+      -maxThrottle,
+      maxThrottle,
+      this.throttle + delta,
+    );
   }
 
-  update(dt) {
-    const delta = dt / 100;
+  update() {
+    const PHYSICS_SPEED = 1.0 / 100;
 
     const {
       angle,
@@ -198,26 +202,68 @@ export default class CarPhysicsBody {
     const acceleration = vec2rot(angle, localAcceleration);
 
     this.velocity = vec2.add(
-      vec2.mul(delta, acceleration),
+      vec2.mul(PHYSICS_SPEED, acceleration),
       this.velocity,
     );
 
     this.pos = vec2.add(
-      vec2.mul(delta / 2, vec2(this.velocity.x, -this.velocity.y)),
+      vec2.mul(PHYSICS_SPEED / 1.5, vec2(this.velocity.x, -this.velocity.y)),
       this.pos,
     );
 
     const torque = -fLateral.rear.y * axles.rear + fLateral.front.y * -axles.front;
     const angularAcceleration = torque / inertia;
 
-    this.angularVelocity += delta * angularAcceleration;
-    this.angle += delta * this.angularVelocity;
+    // smooth wheel returning to 0 position interpolation
+    this.angularVelocity += PHYSICS_SPEED * angularAcceleration;
 
-    this.steerAngle = lerp(this.steerAngle, 0, 0.05 * dt);
-    this.throttle *= 0.9 * dt;
+    const angleDelta = PHYSICS_SPEED * this.angularVelocity;
+    this.angle += angleDelta;
+    this.steerAngle *= 0.9;
 
+    this.throttle *= 0.95;
     this.corneringIntensity = vec2.len(fCornering) / 8000;
   }
+
+  interpolatedUpdate = (() => {
+    const interpolationCache = {};
+    const interpolateState = {
+      prevState: null,
+      state: null,
+    };
+
+    return (interpolate) => {
+      const {alpha} = interpolate;
+
+      if (interpolate.fixedStepUpdate) {
+        this.update();
+
+        interpolateState.prevState = interpolateState.state;
+        interpolateState.state = {
+          pos: vec2.clone(this.pos),
+          angle: this.angle,
+        };
+      }
+
+      if (!interpolateState.prevState)
+        return this;
+
+      // update attributes
+      interpolationCache.angle = lerp(
+        interpolateState.prevState.angle,
+        interpolateState.state.angle,
+        alpha,
+      );
+
+      interpolationCache.pos = vec2.lerp(
+        alpha,
+        interpolateState.prevState.pos,
+        interpolateState.state.pos,
+      );
+
+      return interpolationCache;
+    };
+  })();
 
   toJSON = (() => {
     const serializer = R.pick(

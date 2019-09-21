@@ -117,23 +117,23 @@ class SceneBuffer {
   /**
    * SceneNode methods
    */
-  update(delta) {
+  update(interpolate) {
     const {list} = this;
 
     for (let i = 0, len = list.length; i < len; ++i) {
       const item = list[i];
-      item.update && item.update(delta);
+      item.update && item.update(interpolate);
     }
   }
 
-  render(delta, mpMatrix) {
+  render(interpolate, mpMatrix) {
     const {f, list, camera} = this;
 
-    camera.render(delta, mpMatrix);
+    camera.render(interpolate, mpMatrix);
     for (let i = 0, len = list.length; i < len; ++i) {
       const node = list[i];
 
-      node.render(delta, camera.mpMatrix, f);
+      node.render(interpolate, camera.mpMatrix, f);
     }
   }
 }

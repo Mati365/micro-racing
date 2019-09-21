@@ -13,6 +13,8 @@ import {
 } from './vec/operations/add';
 import composeOperations from './composeOperations';
 
+import Vector from '../../classes/Vector';
+
 /**
  * Creates object of unrolled square vector operations
  *
@@ -35,6 +37,7 @@ const createVectorOptimizedOperations = (w, additionalOperations) => {
       negate: unrollMul(w, -1),
       dist: unrollDistance(w),
 
+      clone: array => new Vector(array),
       len: unrollLength(w),
       lerp: unrollLerp(w),
       normalize: unrollNormalize(w),

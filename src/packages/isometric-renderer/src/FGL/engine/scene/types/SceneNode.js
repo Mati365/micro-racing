@@ -179,14 +179,14 @@ export default class SceneNode {
     this.updateTransformCache();
   }
 
-  update(delta) {
+  update(interpolation) {
     const {wireframe} = this;
 
     if (wireframe && wireframe.update)
-      wireframe.update(delta);
+      wireframe.update(interpolation);
   }
 
-  render(delta, mpMatrix) {
+  render(interpolate, mpMatrix) {
     const {
       wireframe, cache, scene,
       renderer, renderConfig,
@@ -218,9 +218,9 @@ export default class SceneNode {
     if (scene)
       scene.assignSceneRenderConfig(renderConfig);
 
-    renderConfig.delta = delta;
+    renderConfig.interpolate = interpolate;
 
-    wireframe && wireframe.render(delta, mpMatrix);
+    wireframe && wireframe.render(interpolate, mpMatrix);
     renderer(renderConfig);
   }
 }

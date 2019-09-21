@@ -5,11 +5,14 @@ import {
   PLAYER_ACTIONS,
 } from '@game/network/constants/serverCodes';
 
+import {createAnimationFrameRenderer} from '@pkg/isometric-renderer/FGL/core/viewport/createDtRenderLoop';
+
 import {
   findByID,
   removeByID,
 } from '@pkg/basic-helpers';
 
+// import carKeyboardDriver from '@game/logic/physics/drivers/carKeyboardDriver';
 import createActionMessage from '../shared/utils/createActionMessage';
 
 import ServerError from '../shared/ServerError';
@@ -48,8 +51,24 @@ export default class Room {
     this.onDestroy = onDestroy;
   }
 
-  // eslint-disable-next-line
-  startRace() {}
+  startRace() {
+    createAnimationFrameRenderer(
+      {
+        render: ::this.updateMapState,
+        raf: fn => setTimeout(fn, 500),
+      },
+    );
+  }
+
+  updateMapState() {
+    const {players} = this;
+
+    for (let i = players.length - 1; i >= 0; --i) {
+      const player = players[i];
+
+      player.info.inputs = [];
+    }
+  }
 
   /**
    * It is faster than sendBroadcastAction in real time events

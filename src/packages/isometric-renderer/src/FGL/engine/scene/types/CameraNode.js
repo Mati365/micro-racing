@@ -26,7 +26,7 @@ export default class Camera extends SceneNode {
     return this.cache.mpTransform;
   }
 
-  render(delta, mpMatrix) {
+  render(interpolate, mpMatrix) {
     const {
       viewportOffset, cache,
       target, translate, lerpSpeed,

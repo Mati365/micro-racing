@@ -180,7 +180,7 @@ export default class WheelTrack {
     );
   }
 
-  render(delta, mpMatrix) {
+  render(interpolate, mpMatrix) {
     const {gl, mesh, renderConfig} = this;
 
     gl.lineWidth(2.0);

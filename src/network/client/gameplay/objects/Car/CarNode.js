@@ -47,29 +47,28 @@ export default class CarNode extends MeshNode {
     nickNode.release();
   }
 
-  update(delta) {
+  update(interpolate) {
     const {
       nickNode, body,
       translate, rotate,
     } = this;
 
-    // update attributes
-    body.update(delta);
-    rotate.z = body.angle;
-
-    [translate.x, translate.y] = body.pos;
-    [nickNode.translate.x, nickNode.translate.y] = body.pos;
+    // physics is slower than renderer
+    const interpolatedBody = body.interpolatedUpdate(interpolate);
+    rotate.z = interpolatedBody.angle;
+    [translate.x, translate.y] = interpolatedBody.pos;
+    [nickNode.translate.x, nickNode.translate.y] = interpolatedBody.pos;
 
     this.updateTransformCache();
 
     // updated linked meshes
-    super.update(delta);
+    super.update(interpolate);
   }
 
-  render(delta, mpMatrix, f) {
+  render(interpolate, mpMatrix, f) {
     const {nickNode} = this;
 
-    nickNode.render(delta, mpMatrix, f);
-    super.render(delta, mpMatrix);
+    nickNode.render(interpolate, mpMatrix, f);
+    super.render(interpolate, mpMatrix);
   }
 }

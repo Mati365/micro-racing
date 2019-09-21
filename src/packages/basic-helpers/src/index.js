@@ -10,6 +10,7 @@ export {default as safeArray} from './list/safeArray';
 
 export {default as wrapMethod} from './decorators/wrapMethod';
 export {default as logMethod} from './decorators/logMethod';
+export {default as ssr} from './base/ssr';
 
 export {default as Deferred} from './types/Deferred';
 

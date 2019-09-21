@@ -19,7 +19,7 @@ export const ACTION_FLAGS = {
 export const PLAYER_ACTIONS = {
   PLAYER_INFO: 0,
   JOIN_ROOM: 1,
-  PRESS_KEY: 2,
+  SEND_KEYMAP: 2,
 
   // GLOBAL ROOM METHODS
   START_ROOM_RACE: 3,

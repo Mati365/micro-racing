@@ -55,9 +55,12 @@ const createIsometricScene = (
   /**
    * Render loop
    */
-  const frame = (fn) => {
+  const frame = ({render, update}) => {
     f.frame(
-      delta => fn(delta, matrices.mpMatrix, context),
+      {
+        update,
+        render: interpolate => render(interpolate, matrices.mpMatrix, context),
+      },
     );
   };
 

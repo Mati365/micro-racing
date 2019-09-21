@@ -1,10 +1,8 @@
-import {toRadians} from '@pkg/gl-math';
 import {createIsometricScene} from '@pkg/isometric-renderer';
+import carKeyboardDriver from '@game/logic/physics/drivers/carKeyboardDriver';
 
 import RoomMapNode from '../objects/RoomMapNode';
 import RemoteRoomState from '../RemoteRoomState';
-
-const ROTATE_CAR_SPEED = toRadians(1);
 
 export default class GameBoard {
   keyMap = {};
@@ -28,10 +26,8 @@ export default class GameBoard {
     canvas.addEventListener(
       'keydown',
       (e) => {
-        if (!this.keyMap[e.which])
-          this.client.sendKeyState(e.which, true);
-
         this.keyMap[e.which] = true;
+        this.client.sendKeyMapState(this.keyMap);
       },
       true,
     );
@@ -39,10 +35,8 @@ export default class GameBoard {
     canvas.addEventListener(
       'keyup',
       (e) => {
-        if (this.keyMap[e.which])
-          this.client.sendKeyState(e.which, false);
-
-        this.keyMap[e.which] = false;
+        delete this.keyMap[e.which];
+        this.client.sendKeyMapState(this.keyMap);
       },
       true,
     );
@@ -95,9 +89,9 @@ export default class GameBoard {
     // focus camera on player car
     roomMapNode.sceneBuffer.camera.target = this.roomMapNode.currentPlayerCar;
     scene.frame(
-      (delta, mpMatrix) => {
-        this.update(delta);
-        this.render(delta, mpMatrix);
+      {
+        update: ::this.update,
+        render: ::this.render,
       },
     );
   }
@@ -106,37 +100,20 @@ export default class GameBoard {
     this.roomState?.releaseListeners();
   }
 
-  update(delta) {
+  update(interpolate) {
     const {
       roomMapNode,
       keyMap,
     } = this;
 
     const {currentPlayerCar: car} = roomMapNode;
-    if (car) {
-      // left
-      if (keyMap[37])
-        car.body.turn(-ROTATE_CAR_SPEED * delta);
-
-      // right
-      else if (keyMap[39])
-        car.body.turn(ROTATE_CAR_SPEED * delta);
-
-      // w
-      if (keyMap[87])
-        car.body.speedUp(4 * delta);
-
-      // s
-      if (keyMap[83])
-        car.body.speedUp(-4 * delta);
-    }
-
-    roomMapNode.update(delta);
+    carKeyboardDriver(keyMap, car.body);
+    roomMapNode.update(interpolate);
   }
 
-  render(delta, mpMatrix) {
+  render(interpolate, mpMatrix) {
     const {roomMapNode} = this;
 
-    roomMapNode.render(delta, mpMatrix);
+    roomMapNode.render(interpolate, mpMatrix);
   }
 }

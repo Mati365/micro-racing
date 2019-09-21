@@ -5,11 +5,11 @@ import BinarySocketRPCWrapper from './BinarySocketRPCWrapper';
 
 export default class PlayerClientSocket {
   static defaultApiMethods = {
-    sendKeyState: {
-      action: PLAYER_ACTIONS.PRESS_KEY,
-      serialize: (keyCode, press) => ({
-        keyCode,
-        press,
+    sendKeyMapState: {
+      action: PLAYER_ACTIONS.SEND_KEYMAP,
+      serialize: keyMap => ({
+        keyMap,
+        timestamp: Date.now(),
       }),
       flags: {
         waitForResponse: false,

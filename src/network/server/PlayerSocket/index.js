@@ -17,6 +17,11 @@ import createActionMessage, {
 } from '../../shared/utils/createActionMessage';
 import ServerError from '../../shared/ServerError';
 
+export const LIMITS = {
+  KEYMAP_SIZE: 5,
+  INPUTS_COUNT: 100,
+};
+
 /**
  * Socket API provider for player
  */
@@ -30,7 +35,6 @@ export default class PlayerSocket {
     this.server = server;
     this.ws = ws;
     this.info = info;
-    this.keyMap = {};
     this.onDisconnect = onDisconnect;
 
     this.mountMessagesHandler();
@@ -159,15 +163,19 @@ export default class PlayerSocket {
    * Mount action listeners
    */
   listeners = {
-    [PLAYER_ACTIONS.PRESS_KEY]: (cmdID, {keyCode, press}) => {
-      // prevent h4ckers from overflow keyMap object
-      // by uploading multibyte keycodes
-      keyCode = (+keyCode) % 0xFF;
+    [PLAYER_ACTIONS.SEND_KEYMAP]: (cmdID, {timestamp, keyMap}) => {
+      const {inputs} = this.info;
 
-      if (press)
-        this.keyMap[keyCode] = true;
-      else
-        delete this.keyMap[keyCode];
+      // prevent h4ckers from overflow inputs array
+      if (inputs.length > LIMITS.INPUTS_COUNT || Object.keys(keyMap).length > LIMITS.KEYMAP_SIZE)
+        throw new ServerError(ERROR_CODES.ACCESS_DENIED);
+
+      inputs.push(
+        {
+          keyMap,
+          timestamp,
+        },
+      );
     },
 
     [PLAYER_ACTIONS.PLAYER_INFO]: (cmdID) => {
@@ -209,6 +217,7 @@ export default class PlayerSocket {
         if (room?.owner !== this)
           throw new ServerError(ERROR_CODES.ACCESS_DENIED);
 
+        this.info.keyMap = {};
         room.startRace();
       },
     ),

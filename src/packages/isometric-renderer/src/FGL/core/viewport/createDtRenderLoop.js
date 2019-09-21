@@ -57,7 +57,7 @@ export const createAnimationFrameRenderer = ({
     update && update(interpolate);
 
     // exec frame
-    render(interpolate);
+    render && render(interpolate);
 
     // request new frame
     raf(renderFrame);

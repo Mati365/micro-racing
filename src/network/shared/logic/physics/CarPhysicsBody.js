@@ -245,21 +245,22 @@ export default class CarPhysicsBody {
         };
       }
 
-      if (!interpolateState.prevState)
+      if (!interpolateState.prevState || (!interpolate.lerpUpdate && !interpolationCache.pos))
         return this;
 
-      // update attributes
-      interpolationCache.angle = lerp(
-        interpolateState.prevState.angle,
-        interpolateState.state.angle,
-        alpha,
-      );
+      if (interpolate.lerpUpdate) {
+        interpolationCache.angle = lerp(
+          interpolateState.prevState.angle,
+          interpolateState.state.angle,
+          alpha,
+        );
 
-      interpolationCache.pos = vec2.lerp(
-        alpha,
-        interpolateState.prevState.pos,
-        interpolateState.state.pos,
-      );
+        interpolationCache.pos = vec2.lerp(
+          alpha,
+          interpolateState.prevState.pos,
+          interpolateState.state.pos,
+        );
+      }
 
       return interpolationCache;
     };

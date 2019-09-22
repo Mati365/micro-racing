@@ -6,6 +6,7 @@
 export const createAnimationFrameRenderer = ({
   render,
   update,
+  allowLerpUpdate = true,
   updateDelay = 1000 / 30, // 30 fps
   limitFrameTime = 1000 / 60, // 60fps
   raf = window?.requestAnimationFrame,
@@ -36,25 +37,27 @@ export const createAnimationFrameRenderer = ({
     lastFrame = timestamp;
     updateAcc += deltaTime;
 
-    // update every frame but e.g physics
-    // only 30fps per second
-    if (updateAcc >= updateDelay) {
+    // reset updater flags
+    interpolate.timestamp = timestamp;
+    interpolate.fixedStepUpdate = false;
+    interpolate.lerpUpdate = false;
+
+    // update positions without lerp
+    while (updateAcc >= updateDelay) {
       updateAcc -= updateDelay;
       interpolate.fixedStepUpdate = true;
-    } else
+
+      update && update(interpolate);
+    }
+
+    // lerp between frames
+    if (allowLerpUpdate) {
+      interpolate.delta = deltaTime / limitFrameTime;
+      interpolate.alpha = updateAcc / updateDelay;
       interpolate.fixedStepUpdate = false;
-
-    // save timestamp
-    interpolate.timestamp = timestamp;
-
-    // used for inputs etc.
-    interpolate.delta = deltaTime / limitFrameTime;
-
-    // used for interpolation between renderer states
-    interpolate.alpha = updateAcc / updateDelay;
-
-    // exec frame update
-    update && update(interpolate);
+      interpolate.lerpUpdate = true;
+      update && update(interpolate);
+    }
 
     // exec frame
     render && render(interpolate);

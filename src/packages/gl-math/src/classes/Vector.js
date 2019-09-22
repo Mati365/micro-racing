@@ -15,6 +15,19 @@ export default class Vector extends Float32Array {
 
   set w(v) { this[3] = v; }
 
+  /* eslint-disable prefer-destructuring */
+  set xy(vec) {
+    this[0] = vec[0];
+    this[1] = vec[1];
+  }
+
+  set xyz(vec) {
+    this[0] = vec[0];
+    this[1] = vec[1];
+    this[2] = vec[2];
+  }
+  /* eslint-enable prefer-destructuring */
+
   toBSON() {
     return Array.from(this);
   }

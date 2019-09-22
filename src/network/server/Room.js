@@ -54,8 +54,10 @@ export default class Room {
   startRace() {
     createAnimationFrameRenderer(
       {
+        allowLerpUpdate: false,
+
         update: ::this.updateMapState,
-        raf: fn => setTimeout(fn, 10),
+        raf: setImmediate,
       },
     );
   }

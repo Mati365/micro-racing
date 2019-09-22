@@ -54,10 +54,12 @@ export default class CarNode extends MeshNode {
     } = this;
 
     // physics is slower than renderer
+    // interpolate between frames
     const interpolatedBody = body.interpolatedUpdate(interpolate);
+
     rotate.z = interpolatedBody.angle;
-    [translate.x, translate.y] = interpolatedBody.pos;
-    [nickNode.translate.x, nickNode.translate.y] = interpolatedBody.pos;
+    translate.xy = interpolatedBody.pos;
+    nickNode.translate.xy = interpolatedBody.pos;
 
     this.updateTransformCache();
 

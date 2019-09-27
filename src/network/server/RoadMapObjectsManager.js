@@ -118,8 +118,29 @@ export default class RoadMapObjectsManager {
       segmentsInfo,
     } = generateBlankObjects(),
   ) {
-    this.objects = objects;
     this.segmentsInfo = segmentsInfo;
+    this.appendObjects(objects);
+  }
+
+  generateID = (() => {
+    let counter = 0;
+
+    return () => (
+      counter = (++counter) % 0xFFFF
+    );
+  })();
+
+  appendObjects(objects) {
+    if (!this.objects)
+      this.objects = [];
+
+    R.forEach(
+      (object) => {
+        object.id = this.generateID();
+        this.objects.push(object);
+      },
+      objects,
+    );
   }
 
   appendPlayerCar(
@@ -132,7 +153,7 @@ export default class RoadMapObjectsManager {
     const {segments} = this.segmentsInfo;
     const playerElement = new PlayerMapElement(
       {
-        playerID: player.id,
+        player,
         carType,
         body: alignFn(
           {
@@ -144,7 +165,11 @@ export default class RoadMapObjectsManager {
     );
 
     this.totalPlayers++;
-    this.objects.push(playerElement);
+    this.appendObjects(
+      [
+        playerElement,
+      ],
+    );
 
     return playerElement;
   }
@@ -152,7 +177,7 @@ export default class RoadMapObjectsManager {
   removePlayerCar(player) {
     this.totalPlayers--;
     this.objects = R.reject(
-      R.propEq('id', player.id),
+      obj => obj.player?.id === player.id,
       this.objects,
     );
   }

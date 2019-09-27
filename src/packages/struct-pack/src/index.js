@@ -24,6 +24,7 @@ export const toGLSLTypeDef = R.compose(
  */
 const packStruct = ({
   align = 'std140',
+  wrapToType = true,
   fields,
   defs,
 }) => (ParentStruct) => {
@@ -35,6 +36,9 @@ const packStruct = ({
       defs,
     },
   );
+  if (!wrapToType)
+    return descriptor;
+
   const mergeWithDefaults = R.mergeRight(
     R.mapObjIndexed(R.prop('default'), fields),
   );

@@ -1,3 +1,5 @@
+import * as R from 'ramda';
+
 import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
 
 // global tex
@@ -14,17 +16,20 @@ const CARS_URLS = {
   [CAR_TYPES.RED]: redCarUrl,
 };
 
-const createTexturedCar = f => async color => f.loaders.mesh.from(
-  {
-    loader: 'obj',
-    loaderData: {
-      source: await createSingleResourceLoader()(CARS_URLS[color]),
-      normalize: 'h',
+const createTexturedCar = f => R.memoizeWith(
+  R.identity,
+  async color => f.loaders.mesh.from(
+    {
+      loader: 'obj',
+      loaderData: {
+        source: await createSingleResourceLoader()(CARS_URLS[color]),
+        normalize: 'h',
+      },
+      textures: [
+        await createSingleResourceLoader()(carTextureUrl),
+      ],
     },
-    textures: [
-      await createSingleResourceLoader()(carTextureUrl),
-    ],
-  },
+  ),
 );
 
 export default createTexturedCar;

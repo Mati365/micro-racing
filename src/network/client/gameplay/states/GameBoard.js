@@ -2,7 +2,7 @@ import {createIsometricScene} from '@pkg/isometric-renderer';
 import carKeyboardDriver from '@game/logic/physics/drivers/carKeyboardDriver';
 
 import RoomMapNode from '../objects/RoomMapNode';
-import RemoteRoomState from '../RemoteRoomState';
+import RemoteRoomStateListener from '../RemoteRoomStateListener';
 
 export default class GameBoard {
   keyMap = {};
@@ -56,10 +56,35 @@ export default class GameBoard {
     );
 
     await this.roomMapNode.loadInitialRoomState(initialRoomState);
-    this.roomState = new RemoteRoomState(
+    this.roomState = new RemoteRoomStateListener(
       {
         client,
-        initialRoomState,
+
+        onSyncObject: (playerSyncInfo) => {
+          const node = this.roomMapNode.refs.objects[playerSyncInfo.id];
+
+          if (this.roomMapNode.currentPlayerCar.id === playerSyncInfo.id)
+            return;
+
+          if (!node) {
+            console.warn(`Unknown sync object(id: ${playerSyncInfo.id})!`);
+            return;
+          }
+
+          /** @see PlayerMapElement.binarySnapshotSerializer */
+          const {body} = node;
+
+          // floats
+          body.angle = playerSyncInfo.angle;
+          body.corneringIntensity = playerSyncInfo.corneringIntensity;
+          body.angularVelocity = playerSyncInfo.angularVelocity;
+          body.steerAngle = playerSyncInfo.steerAngle;
+          body.throttle = playerSyncInfo.throttle;
+
+          // vectors
+          body.pos.set(playerSyncInfo.pos);
+          body.velocity.set(playerSyncInfo.velocity);
+        },
 
         onLeavePlayer: (player) => {
           this.roomMapNode.removePlayerCar(player);

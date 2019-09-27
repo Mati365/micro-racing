@@ -5,6 +5,8 @@ import {
   OBJECT_TYPES,
 } from '@game/network/constants/serverCodes';
 
+import {createPackedStruct} from '@pkg/struct-pack';
+
 import CarPhysicsBody from '../logic/physics/CarPhysicsBody';
 import MapElement from './MapElement';
 
@@ -44,7 +46,8 @@ export const genCarSegmentTransform = ({
 export default class PlayerMapElement extends MapElement {
   constructor(
     {
-      playerID,
+      id,
+      player,
       carType = CAR_TYPES.BLUE,
       body = {},
       transform = {
@@ -52,28 +55,78 @@ export default class PlayerMapElement extends MapElement {
       },
     },
   ) {
-    super(OBJECT_TYPES.PLAYER, null, playerID);
+    super(OBJECT_TYPES.PLAYER, null, id);
 
+    this.player = player;
     this.carType = carType;
     this.transform = transform;
     this.body = new CarPhysicsBody(body);
   }
 
   toBSON() {
-    const {id, type, carType, body, transform} = this;
+    const {
+      id, player, type,
+      carType, body, transform,
+    } = this;
 
     return {
       id,
       type,
       params: {
         carType,
+        playerID: player.id,
         body: body.toBSON(),
         transform: {
           ...transform,
           rotate: [0, 0, body.angle],
-          translate: body.pos,
+          translate: vec2.toVec3(body.pos),
         },
       },
     };
   }
+
+  static binarySnapshotSerializer = createPackedStruct(
+    {
+      align: 'plain',
+      wrapToType: false,
+      fields: {
+        type: {
+          type: 'int8',
+        },
+        id: {
+          type: 'int16',
+        },
+        pos: {
+          type: 'float32',
+          count: 2,
+          srcPath: 'body.pos',
+        },
+        velocity: {
+          type: 'float32',
+          count: 2,
+          srcPath: 'body.velocity',
+        },
+        throttle: {
+          type: 'float32',
+          srcPath: 'body.throttle',
+        },
+        corneringIntensity: {
+          type: 'float32',
+          srcPath: 'body.corneringIntensity',
+        },
+        angularVelocity: {
+          type: 'float32',
+          srcPath: 'body.angularVelocity',
+        },
+        angle: {
+          type: 'float32',
+          srcPath: 'body.angle',
+        },
+        steerAngle: {
+          type: 'float32',
+          srcPath: 'body.steerAngle',
+        },
+      },
+    },
+  );
 }

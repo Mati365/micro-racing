@@ -5,18 +5,15 @@ import {
   PLAYER_ACTIONS,
 } from '@game/network/constants/serverCodes';
 
-import {createAnimationFrameRenderer} from '@pkg/isometric-renderer/FGL/core/viewport/createDtRenderLoop';
-
 import {
   findByID,
   removeByID,
 } from '@pkg/basic-helpers';
 
-// import carKeyboardDriver from '@game/logic/physics/drivers/carKeyboardDriver';
 import createActionMessage from '../shared/utils/createActionMessage';
 
 import ServerError from '../shared/ServerError';
-import RoadMapObjectsManager from './RoadMapObjectsManager';
+import RoomRacing from './RoomRacing';
 
 export default class Room {
   constructor(
@@ -35,8 +32,13 @@ export default class Room {
     this.abstract = abstract;
     this.kickedPlayers = kickedPlayers;
 
-    if (!abstract)
-      this.map = new RoadMapObjectsManager;
+    if (!abstract) {
+      this.racing = new RoomRacing(
+        {
+          room: this,
+        },
+      );
+    }
 
     this.playersLimit = playersLimit;
     this.players = [];
@@ -52,24 +54,7 @@ export default class Room {
   }
 
   startRace() {
-    createAnimationFrameRenderer(
-      {
-        allowLerpUpdate: false,
-
-        update: ::this.updateMapState,
-        raf: setImmediate,
-      },
-    );
-  }
-
-  updateMapState() {
-    const {players} = this;
-
-    for (let i = players.length - 1; i >= 0; --i) {
-      const player = players[i];
-
-      player.info.inputs = [];
-    }
+    this.racing.start();
   }
 
   /**
@@ -101,7 +86,7 @@ export default class Room {
   getBroadcastSocketJSON() {
     const {
       name, owner,
-      map, players,
+      racing, players,
     } = this;
 
     return {
@@ -113,7 +98,7 @@ export default class Room {
       ),
 
       // objects
-      ...map.getBroadcastSocketJSON(),
+      ...racing.map.getBroadcastSocketJSON(),
     };
   }
 
@@ -152,9 +137,12 @@ export default class Room {
     if (R.isNil(this.owner))
       this.owner = player;
 
+    // append player to list and create car object
+    this.players.push(player);
+
     // broadcast it to all players, exclude added
     if (!abstract) {
-      const playerCar = this.map.appendPlayerCar(player);
+      const playerCar = this.racing.map.appendPlayerCar(player);
 
       Object.assign(
         player.info,
@@ -174,9 +162,6 @@ export default class Room {
         },
       );
     }
-
-    // append player to list and create car object
-    this.players.push(player);
   }
 
   /**
@@ -191,7 +176,7 @@ export default class Room {
     this.players = removeByID(player.id, this.players);
 
     if (!abstract) {
-      this.map.removePlayerCar(player);
+      this.racing.map.removePlayerCar(player);
       Object.assign(
         player.info,
         {

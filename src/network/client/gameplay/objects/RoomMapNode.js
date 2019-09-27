@@ -1,6 +1,9 @@
 import * as R from 'ramda';
 
-import {findByID} from '@pkg/basic-helpers';
+import {
+  findByID,
+  mapObjValuesToPromise,
+} from '@pkg/basic-helpers';
 
 import {OBJECT_TYPES} from '../../../constants/serverCodes';
 
@@ -15,10 +18,7 @@ export const appendToSceneBuffer = f => ({
   players = [],
   objects,
 }) => async (buffer) => {
-  const playersCars = {};
-
-  const asyncObjectsQueue = [];
-
+  let mapNodes = {};
   R.forEach(
     (item) => {
       const {type, params, id} = item; // some engine methods can modify item
@@ -30,7 +30,7 @@ export const appendToSceneBuffer = f => ({
         case OBJECT_TYPES.TERRAIN: {
           const {size, items, ...renderParams} = params;
 
-          buffer.createNode(
+          mapNodes[id] = buffer.createNode(
             async () => ({
               ...renderParams,
               id,
@@ -50,7 +50,7 @@ export const appendToSceneBuffer = f => ({
         case OBJECT_TYPES.ROAD: {
           const {segmentsInfo, ...renderParams} = params;
 
-          buffer.createNode(sceneParams => new RoadNode(
+          mapNodes[id] = buffer.createNode(sceneParams => new RoadNode(
             {
               ...sceneParams,
               ...renderParams,
@@ -67,7 +67,7 @@ export const appendToSceneBuffer = f => ({
         case OBJECT_TYPES.PRIMITIVE: {
           const {name, constructor, ...renderParams} = params;
 
-          buffer.createNode(
+          mapNodes[id] = buffer.createNode(
             {
               renderer: f.mesh[name](constructor),
               id,
@@ -80,20 +80,17 @@ export const appendToSceneBuffer = f => ({
          * Each player should contain **id**, **type**
          */
         case OBJECT_TYPES.PLAYER: {
-          const {carType, ...renderParams} = params;
-          const carCreator = async sceneParams => (playersCars[id] = new CarNode(
+          const {carType, playerID, ...renderParams} = params;
+
+          mapNodes[id] = buffer.createNode(async sceneParams => new CarNode(
             {
               ...sceneParams,
               ...renderParams,
               id,
-              nick: findByID(id, players).nick,
+              player: findByID(playerID, players),
               renderer: await Factory.createTexturedCar(f)(carType),
             },
           ));
-
-          asyncObjectsQueue.push(
-            buffer.createNode(carCreator),
-          );
         } break;
 
         default:
@@ -102,11 +99,22 @@ export const appendToSceneBuffer = f => ({
     objects,
   );
 
-  await Promise.all(asyncObjectsQueue);
-
+  mapNodes = await mapObjValuesToPromise(R.identity, mapNodes);
   return {
     buffer,
-    playersCars,
+    refs: {
+      objects: mapNodes,
+      players: R.reduce(
+        (acc, [, object]) => {
+          if (object.player)
+            acc[object.player.id] = object;
+
+          return acc;
+        },
+        {},
+        R.toPairs(mapNodes),
+      ),
+    },
   };
 };
 
@@ -123,11 +131,11 @@ export default class RoomMapNode {
       this.loadInitialRoomState(initialRoomState);
   }
 
-  async loadInitialRoomState({players, objects}) {
+  async loadInitialRoomState({players, objects, ...roomInfo}) {
     const {f, currentPlayer} = this;
     const {
       buffer,
-      playersCars,
+      refs,
     } = await appendToSceneBuffer(f)(
       {
         players,
@@ -135,31 +143,44 @@ export default class RoomMapNode {
       },
     )(f.createSceneBuffer());
 
+    this.roomInfo = roomInfo;
     this.sceneBuffer = buffer;
 
-    this.playersCars = playersCars;
-    this.currentPlayerCar = playersCars[currentPlayer.id];
+    this.refs = refs;
+    this.currentPlayerCar = refs.players[currentPlayer.id];
 
     this.update = ::this.sceneBuffer.update;
     this.render = ::this.sceneBuffer.render;
   }
 
   removePlayerCar(player) {
-    const {sceneBuffer, playersCars} = this;
-    const carNode = playersCars[player.id];
+    const {sceneBuffer, refs} = this;
+    const carNode = refs.players[player.id];
 
     sceneBuffer.removeNode(carNode);
-    delete playersCars[player.id];
+
+    delete refs.players[player.id];
+    delete refs.objects[carNode.id];
   }
 
   async appendObjects({players = [], objects}) {
-    const {playersCars} = await appendToSceneBuffer(this.f)(
+    const {refs} = await appendToSceneBuffer(this.f)(
       {
         players,
         objects,
       },
     )(this.sceneBuffer);
 
-    Object.assign(this.playersCars, playersCars);
+    this.refs = {
+      players: {
+        ...this.refs.players,
+        ...refs.players,
+      },
+
+      objects: {
+        ...this.refs.objects,
+        ...refs.objects,
+      },
+    };
   }
 }

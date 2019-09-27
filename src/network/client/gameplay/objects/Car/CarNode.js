@@ -9,7 +9,7 @@ import CarNodeEffects from './CarNodeEffects';
 export default class CarNode extends MeshNode {
   constructor({
     f,
-    nick,
+    player,
     body,
     ...meshConfig
   }) {
@@ -30,12 +30,12 @@ export default class CarNode extends MeshNode {
       );
     }
 
-    this.nick = nick;
+    this.player = player;
     this.wireframe = new CarNodeEffects(f, this);
     this.nickNode = new HTMLTextNode(
       {
         f,
-        text: this.nick,
+        text: player.nick,
       },
     );
   }

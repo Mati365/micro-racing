@@ -1,0 +1,17 @@
+import KEYCODES from './keycodes';
+
+const INPUT_FLAGS = {
+  TURN_LEFT: 1 << 0,
+  TURN_RIGHT: 1 << 1,
+  THROTTLE: 1 << 2,
+  BRAKE: 1 << 3,
+};
+
+export const ACTION_KEYCODES_MAP = {
+  [KEYCODES.W]: INPUT_FLAGS.THROTTLE,
+  [KEYCODES.S]: INPUT_FLAGS.BRAKE,
+  [KEYCODES.LEFT]: INPUT_FLAGS.TURN_LEFT,
+  [KEYCODES.RIGHT]: INPUT_FLAGS.TURN_RIGHT,
+};
+
+export default INPUT_FLAGS;

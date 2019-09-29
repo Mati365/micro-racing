@@ -1,16 +1,13 @@
 import * as R from 'ramda';
 
-import {PLAYER_ACTIONS} from '../../constants/serverCodes';
+import {PLAYER_ACTIONS} from '@game/network/constants/serverCodes';
 import BinarySocketRPCWrapper from './BinarySocketRPCWrapper';
 
 export default class PlayerClientSocket {
   static defaultApiMethods = {
     sendKeyMapState: {
       action: PLAYER_ACTIONS.SEND_KEYMAP,
-      serialize: keyMap => ({
-        keyMap,
-        timestamp: Date.now(),
-      }),
+      serialize: R.objOf('list'),
       flags: {
         waitForResponse: false,
       },

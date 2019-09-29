@@ -13,6 +13,7 @@ export default class PlayerInfo {
     this.id = id;
     this.room = room;
     this.inputs = [];
+    this.lastProcessedInput = null;
   }
 
   getBroadcastSocketJSON() {

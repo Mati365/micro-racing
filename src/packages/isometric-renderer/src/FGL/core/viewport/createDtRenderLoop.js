@@ -38,6 +38,7 @@ export const createAnimationFrameRenderer = ({
     updateAcc += deltaTime;
 
     // reset updater flags
+    interpolate.deltaTime = deltaTime;
     interpolate.timestamp = timestamp;
     interpolate.fixedStepUpdate = false;
     interpolate.lerpUpdate = false;

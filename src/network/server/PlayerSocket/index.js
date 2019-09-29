@@ -3,24 +3,20 @@ import chalk from 'chalk';
 
 import logMethod, {logFunction} from '@pkg/basic-helpers/decorators/logMethod';
 
+import {SERVER_STACK_INPUTS} from '@game/network/constants/limits';
 import {
   ERROR_CODES,
   PLAYER_ACTIONS,
   ACTION_FLAGS,
-} from '../../constants/serverCodes';
-
-import PlayerInfo from './PlayerInfo';
+} from '@game/network/constants/serverCodes';
 
 import createActionMessage, {
   getMessageMeta,
   getMessageContent,
 } from '../../shared/utils/createActionMessage';
-import ServerError from '../../shared/ServerError';
 
-export const LIMITS = {
-  KEYMAP_SIZE: 5,
-  INPUTS_COUNT: 100,
-};
+import ServerError from '../../shared/ServerError';
+import PlayerInfo from './PlayerInfo';
 
 /**
  * Socket API provider for player
@@ -163,19 +159,14 @@ export default class PlayerSocket {
    * Mount action listeners
    */
   listeners = {
-    [PLAYER_ACTIONS.SEND_KEYMAP]: (cmdID, {timestamp, keyMap}) => {
+    [PLAYER_ACTIONS.SEND_KEYMAP]: (cmdID, {list}) => {
       const {inputs} = this.info;
 
       // prevent h4ckers from overflow inputs array
-      if (inputs.length > LIMITS.INPUTS_COUNT || Object.keys(keyMap).length > LIMITS.KEYMAP_SIZE)
+      if (inputs.length > SERVER_STACK_INPUTS)
         throw new ServerError(ERROR_CODES.ACCESS_DENIED);
 
-      inputs.push(
-        {
-          keyMap,
-          timestamp,
-        },
-      );
+      this.info.inputs = inputs.concat(list);
     },
 
     [PLAYER_ACTIONS.PLAYER_INFO]: (cmdID) => {

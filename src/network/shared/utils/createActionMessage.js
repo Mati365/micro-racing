@@ -46,7 +46,7 @@ export const getMessageMeta = msg => ({
  */
 const createActionMessage = (cmdID, actionCode, flags, data) => {
   let payloadTypeFlag = ACTION_FLAGS.ARRAYBUF_PAYLOAD;
-  if (!ArrayBuffer.isView(data)) {
+  if (!data || data.byteLength === undefined) {
     payloadTypeFlag = ACTION_FLAGS.BSON_PAYLOAD;
     data = BSON.serialize(data);
   }

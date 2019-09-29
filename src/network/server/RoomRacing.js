@@ -1,5 +1,5 @@
 import {createAnimationFrameRenderer} from '@pkg/isometric-renderer/FGL/core/viewport/createDtRenderLoop';
-import carKeyboardDriver from '../shared/logic/physics/drivers/carKeyboardDriver';
+import carKeyboardDriver from '../shared/logic/drivers/carKeyboardDriver';
 
 import RoadMapObjectsManager from './RoadMapObjectsManager';
 import {PlayerMapElement} from '../shared/map';
@@ -18,7 +18,7 @@ export default class RoomRacing {
         allowLerpUpdate: false,
 
         update: ::this.updateMapState,
-        raf: fn => setTimeout(fn, 15),
+        raf: fn => setTimeout(fn, 0),
       },
     );
   }
@@ -34,12 +34,18 @@ export default class RoomRacing {
       const {info} = player;
       const {body: carBody} = info.car;
 
-      // todo: add delta times check
-      for (let j = 0; j < info.inputs.length; ++j)
-        carKeyboardDriver(info.inputs[j].keyMap, carBody);
+      // process inputs from oldest to newest
+      const {inputs} = info;
+      if (inputs.length) {
+        for (let j = 0; j < inputs.length; ++j)
+          carKeyboardDriver(inputs[j].bitset, carBody);
+
+        // used for client side prediction checks
+        info.lastProcessedInput = inputs[inputs.length - 1];
+        info.inputs = [];
+      }
 
       carBody.update();
-      player.info.inputs = [];
     }
 
     this.broadcastRaceState();

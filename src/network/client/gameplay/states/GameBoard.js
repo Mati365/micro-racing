@@ -1,12 +1,11 @@
 import {createIsometricScene} from '@pkg/isometric-renderer';
-import carKeyboardDriver from '@game/logic/physics/drivers/carKeyboardDriver';
+
+import carKeyboardDriver, {GameKeyboardController} from '@game/logic/drivers/carKeyboardDriver';
 
 import RoomMapNode from '../objects/RoomMapNode';
 import RemoteRoomStateListener from '../RemoteRoomStateListener';
 
 export default class GameBoard {
-  keyMap = {};
-
   constructor({client}) {
     this.client = client;
   }
@@ -16,29 +15,12 @@ export default class GameBoard {
     aspectRatio,
   }) {
     this.canvas = canvas;
+    this.keyboardController = new GameKeyboardController(canvas);
     this.scene = createIsometricScene(
       {
         canvas,
         aspectRatio,
       },
-    );
-
-    canvas.addEventListener(
-      'keydown',
-      (e) => {
-        this.keyMap[e.which] = true;
-        this.client.sendKeyMapState(this.keyMap);
-      },
-      true,
-    );
-
-    canvas.addEventListener(
-      'keyup',
-      (e) => {
-        delete this.keyMap[e.which];
-        this.client.sendKeyMapState(this.keyMap);
-      },
-      true,
     );
 
     return this;
@@ -59,6 +41,10 @@ export default class GameBoard {
     this.roomState = new RemoteRoomStateListener(
       {
         client,
+
+        onSynchronized: () => {
+          this.keyboardController.flushPrediction();
+        },
 
         onSyncObject: (playerSyncInfo) => {
           const node = this.roomMapNode.refs.objects[playerSyncInfo.id];
@@ -128,11 +114,21 @@ export default class GameBoard {
   update(interpolate) {
     const {
       roomMapNode,
-      keyMap,
+      client,
+      keyboardController,
     } = this;
 
     const {currentPlayerCar: car} = roomMapNode;
-    carKeyboardDriver(keyMap, car.body);
+
+    carKeyboardDriver(keyboardController.inputs, car.body);
+    keyboardController.updateInputsQueue();
+
+    if (interpolate.fixedStepUpdate) {
+      const batchedInputs = keyboardController.flushBatch();
+      if (batchedInputs.length)
+        client.sendKeyMapState(batchedInputs);
+    }
+
     roomMapNode.update(interpolate);
   }
 

@@ -27,16 +27,20 @@ export default class RemoteRoomStateListener {
 
         offset += serializer.size;
       }
+
+      this.onSynchronized();
     },
   };
 
   constructor({
     client,
+    onSynchronized,
     onSyncObject,
     onLeavePlayer,
     onJoinPlayer,
   } = {}) {
     this.onSyncObject = onSyncObject;
+    this.onSynchronized = onSynchronized;
     this.onLeavePlayer = onLeavePlayer;
     this.onJoinPlayer = onJoinPlayer;
 

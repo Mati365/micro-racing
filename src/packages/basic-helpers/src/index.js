@@ -15,4 +15,5 @@ export {default as ssr} from './base/ssr';
 export {default as mapObjValuesToPromise} from './base/mapObjValuesToPromise';
 export {default as Deferred} from './types/Deferred';
 
+export * from './base/bits';
 export * from './base/random';

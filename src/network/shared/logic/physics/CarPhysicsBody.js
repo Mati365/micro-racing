@@ -206,6 +206,21 @@ export default class CarPhysicsBody {
       this.velocity,
     );
 
+    // fix physics bugs on low speed
+    if (Math.abs(this.velocity.x) < 1.0 && Math.abs(this.velocity.y) < 1.0) {
+      this.velocity.x = 0;
+      this.velocity.y = 0;
+
+      fTotal.x = 0;
+      fTotal.y = 0;
+
+      fLateral.rear.y = 0;
+      fLateral.front.y = 0;
+
+      this.corneringIntensity = 0;
+      this.angularVelocity = 0;
+    }
+
     this.pos = vec2.add(
       vec2.mul(PHYSICS_SPEED / 1.5, vec2(this.velocity.x, -this.velocity.y)),
       this.pos,

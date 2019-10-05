@@ -205,9 +205,11 @@ export default class CarPhysicsBody {
       vec2.mul(PHYSICS_SPEED, acceleration),
       this.velocity,
     );
+    this.speed = vec2.len(velocity);
 
-    // fix physics bugs on low speed
-    if (Math.abs(this.velocity.x) < 1.0 && Math.abs(this.velocity.y) < 1.0) {
+    if (Math.abs(this.throttle) < 5 && this.speed < 5.0) {
+      this.speed = 0;
+
       this.velocity.x = 0;
       this.velocity.y = 0;
 
@@ -221,23 +223,29 @@ export default class CarPhysicsBody {
       this.angularVelocity = 0;
     }
 
-    this.pos = vec2.add(
-      vec2.mul(PHYSICS_SPEED / 1.5, vec2(this.velocity.x, -this.velocity.y)),
-      this.pos,
-    );
+    if (this.speed || this.throttle) {
+      this.pos = vec2.add(
+        vec2.mul(PHYSICS_SPEED / 1.5, vec2(this.velocity.x, -this.velocity.y)),
+        this.pos,
+      );
 
-    const torque = -fLateral.rear.y * axles.rear + fLateral.front.y * -axles.front;
-    const angularAcceleration = torque / inertia;
+      const torque = -fLateral.rear.y * axles.rear + fLateral.front.y * -axles.front;
+      const angularAcceleration = torque / inertia;
 
-    // smooth wheel returning to 0 position interpolation
-    this.angularVelocity += PHYSICS_SPEED * angularAcceleration;
+      // smooth wheel returning to 0 position interpolation
+      this.angularVelocity += PHYSICS_SPEED * angularAcceleration;
 
-    const angleDelta = PHYSICS_SPEED * this.angularVelocity;
-    this.angle += angleDelta;
-    this.steerAngle *= 0.9;
+      const angleDelta = PHYSICS_SPEED * this.angularVelocity;
+      this.angle += angleDelta;
+      this.steerAngle *= 0.9;
 
-    this.throttle *= 0.95;
-    this.corneringIntensity = vec2.len(fCornering) / 8000;
+      if (Math.abs(this.throttle) < 1)
+        this.throttle = 0.0;
+      else
+        this.throttle *= 0.95;
+
+      this.corneringIntensity = vec2.len(fCornering) / 8000;
+    }
   }
 
   interpolatedUpdate = (() => {
@@ -284,8 +292,8 @@ export default class CarPhysicsBody {
   toJSON = (() => {
     const serializer = R.pick(
       [
-        'mass', 'velocity', 'angle', 'steerAngle', 'maxSteerAngle',
-        'pos', 'size', 'massCenter', 'wheelSize', 'axles',
+        'mass', 'velocity', 'angle', 'steerAngle', 'maxSteerAngle', 'throttle',
+        'pos', 'size', 'massCenter', 'wheelSize', 'axles', 'angularVelocity',
       ],
     );
 
@@ -298,7 +306,7 @@ export default class CarPhysicsBody {
     const deserializer = R.converge(
       R.merge,
       [
-        R.pick(['mass', 'angle', 'steerAngle', 'maxSteerAngle', 'axles']),
+        R.pick(['mass', 'angle', 'steerAngle', 'maxSteerAngle', 'axles', 'angularVelocity']),
         R.compose(
           R.mapObjIndexed(obj => vec2(...obj)),
           R.pick(['velocity', 'pos', 'size', 'massCenter', 'wheelSize']),

@@ -28,7 +28,7 @@ export default class RemoteRoomStateListener {
         offset += serializer.size;
       }
 
-      this.onSynchronized();
+      this.onSynchronized?.();
     },
   };
 

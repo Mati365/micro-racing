@@ -18,7 +18,7 @@ export default class RoomRacing {
         allowLerpUpdate: false,
 
         update: ::this.updateMapState,
-        raf: fn => setTimeout(fn, 0),
+        raf: setImmediate,
       },
     );
   }
@@ -37,12 +37,25 @@ export default class RoomRacing {
       // process inputs from oldest to newest
       const {inputs} = info;
       if (inputs.length) {
-        for (let j = 0; j < inputs.length; ++j)
-          carKeyboardDriver(inputs[j].bitset, carBody);
+        let processedInputs = 0;
+        let prevFrameId = inputs[0].frameId;
+
+        for (; processedInputs < inputs.length; ++processedInputs) {
+          const input = inputs[processedInputs];
+          if (prevFrameId !== input.frameId)
+            break;
+
+          prevFrameId = input.frameId;
+          info.lastProcessedInput = input.id;
+
+          carKeyboardDriver(input.bitset, carBody);
+        }
 
         // used for client side prediction checks
-        info.lastProcessedInput = inputs[inputs.length - 1];
-        info.inputs = [];
+        if (processedInputs < inputs.length)
+          info.inputs.splice(0, processedInputs);
+        else
+          info.inputs = [];
       }
 
       carBody.update();
@@ -57,8 +70,9 @@ export default class RoomRacing {
 
     let offset = 0;
     const buffer = new ArrayBuffer(1 + serializer.size * players.length);
-    new DataView(buffer).setInt8(offset++, players.length);
+    const view = new DataView(buffer);
 
+    view.setInt8(offset++, players.length);
     for (let i = players.length - 1; i >= 0; --i) {
       serializer.pack(players[i].info.car, buffer, offset);
       offset += serializer.size;

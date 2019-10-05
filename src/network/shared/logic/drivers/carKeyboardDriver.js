@@ -1,5 +1,4 @@
 import INPUT_FLAGS, {ACTION_KEYCODES_MAP} from '@game/network/constants/inputFlags';
-import {MAX_INPUTS_QUEUE_LENGTH} from '@game/network/constants/limits';
 
 import {toRadians} from '@pkg/gl-math';
 import {
@@ -43,9 +42,12 @@ export class GameKeyboardController {
 
   inputsCounter = 0;
 
+  frameId = 0
+
   predictedInputs = [];
 
   batch = [];
+
 
   constructor(canvas) {
     this.canvas = this.attachCanvasListeners(canvas);
@@ -79,26 +81,34 @@ export class GameKeyboardController {
     return canvas;
   }
 
-  updateInputsQueue() {
+  storeInputs() {
     const {predictedInputs, batch} = this;
 
-    if (this.inputs && predictedInputs.length < MAX_INPUTS_QUEUE_LENGTH) {
+    if (this.inputs) {
       const input = new PlayerInput(
         (this.inputsCounter++) % 0xFFFF, // due to binary serializer
+        this.frameId,
         this.inputs,
       );
 
-      predictedInputs.push(input);
       batch.push(input);
+      predictedInputs.push(input);
+
       return input;
     }
 
     return null;
   }
 
+  /**
+   * @see
+   *  Send current batch to server!
+   */
   flushBatch() {
     const list = this.batch;
+
     this.batch = [];
+    this.frameId = (this.frameId || 0) + 1;
 
     return list;
   }

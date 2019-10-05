@@ -1,4 +1,6 @@
+import {getIndexByID} from '@pkg/basic-helpers';
 import {createIsometricScene} from '@pkg/isometric-renderer';
+import {vec2} from '@pkg/gl-math';
 
 import carKeyboardDriver, {GameKeyboardController} from '@game/logic/drivers/carKeyboardDriver';
 
@@ -42,35 +44,7 @@ export default class GameBoard {
       {
         client,
 
-        onSynchronized: () => {
-          this.keyboardController.flushPrediction();
-        },
-
-        onSyncObject: (playerSyncInfo) => {
-          const node = this.roomMapNode.refs.objects[playerSyncInfo.id];
-
-          if (this.roomMapNode.currentPlayerCar.id === playerSyncInfo.id)
-            return;
-
-          if (!node) {
-            console.warn(`Unknown sync object(id: ${playerSyncInfo.id})!`);
-            return;
-          }
-
-          /** @see PlayerMapElement.binarySnapshotSerializer */
-          const {body} = node;
-
-          // floats
-          body.angle = playerSyncInfo.angle;
-          body.corneringIntensity = playerSyncInfo.corneringIntensity;
-          body.angularVelocity = playerSyncInfo.angularVelocity;
-          body.steerAngle = playerSyncInfo.steerAngle;
-          body.throttle = playerSyncInfo.throttle;
-
-          // vectors
-          body.pos.set(playerSyncInfo.pos);
-          body.velocity.set(playerSyncInfo.velocity);
-        },
+        onSyncObject: this.onSyncObject,
 
         onLeavePlayer: (player) => {
           this.roomMapNode.removePlayerCar(player);
@@ -89,6 +63,64 @@ export default class GameBoard {
 
     return this;
   }
+
+  onSyncObject = (playerSyncInfo) => {
+    const node = this.roomMapNode.refs.objects[playerSyncInfo.id];
+    const {lastProcessedInput} = playerSyncInfo;
+
+    const {currentPlayerCar} = this.roomMapNode;
+    const currentPlayerSync = (
+      currentPlayerCar.id === playerSyncInfo.id
+    );
+
+    if (!node) {
+      console.warn(`Unknown sync object(id: ${playerSyncInfo.id})!`);
+      return;
+    }
+
+    /** @see PlayerMapElement.binarySnapshotSerializer */
+    const {body} = node;
+
+    // floats
+    Object.assign(
+      body,
+      {
+        angle: playerSyncInfo.angle,
+        corneringIntensity: playerSyncInfo.corneringIntensity,
+        angularVelocity: playerSyncInfo.angularVelocity,
+        steerAngle: playerSyncInfo.steerAngle,
+        throttle: playerSyncInfo.throttle,
+        pos: vec2(playerSyncInfo.pos[0], playerSyncInfo.pos[1]),
+        velocity: vec2(playerSyncInfo.velocity[0], playerSyncInfo.velocity[1]),
+      },
+    );
+
+    // try to reply all inputs after response
+    if (lastProcessedInput !== -1 && currentPlayerSync) {
+      const {predictedInputs} = this.keyboardController;
+      const serverInputIndex = getIndexByID(lastProcessedInput, predictedInputs);
+
+      if (serverInputIndex === -1)
+        this.keyboardController.predictedInputs = [];
+      else {
+        if (serverInputIndex < predictedInputs.length) {
+          let prevFrameId = predictedInputs[0].id;
+          for (let i = serverInputIndex; i < predictedInputs.length; ++i) {
+            const {bitset, frameId} = predictedInputs[i];
+            if (prevFrameId !== frameId)
+              body.update();
+
+            carKeyboardDriver(bitset, body);
+            prevFrameId = frameId;
+          }
+
+          body.update();
+        }
+
+        predictedInputs.splice(0, serverInputIndex);
+      }
+    }
+  };
 
   start() {
     const {
@@ -119,9 +151,9 @@ export default class GameBoard {
     } = this;
 
     const {currentPlayerCar: car} = roomMapNode;
-
-    carKeyboardDriver(keyboardController.inputs, car.body);
-    keyboardController.updateInputsQueue();
+    const input = keyboardController.storeInputs();
+    if (input)
+      carKeyboardDriver(input.bitset, car.body);
 
     if (interpolate.fixedStepUpdate) {
       const batchedInputs = keyboardController.flushBatch();

@@ -1,3 +1,3 @@
 import getIndexBy from './getIndexBy';
 
-export default getIndexBy('name');
+export default getIndexBy('id');

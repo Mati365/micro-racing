@@ -126,6 +126,10 @@ export default class PlayerMapElement extends MapElement {
           type: 'float32',
           srcPath: 'body.steerAngle',
         },
+        lastProcessedInput: {
+          type: 'int16',
+          srcPath: 'player.info.lastProcessedInput',
+        },
       },
     },
   );

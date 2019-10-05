@@ -3,7 +3,6 @@ import chalk from 'chalk';
 
 import logMethod, {logFunction} from '@pkg/basic-helpers/decorators/logMethod';
 
-import {SERVER_STACK_INPUTS} from '@game/network/constants/limits';
 import {
   ERROR_CODES,
   PLAYER_ACTIONS,
@@ -161,11 +160,6 @@ export default class PlayerSocket {
   listeners = {
     [PLAYER_ACTIONS.SEND_KEYMAP]: (cmdID, {list}) => {
       const {inputs} = this.info;
-
-      // prevent h4ckers from overflow inputs array
-      if (inputs.length > SERVER_STACK_INPUTS)
-        throw new ServerError(ERROR_CODES.ACCESS_DENIED);
-
       this.info.inputs = inputs.concat(list);
     },
 

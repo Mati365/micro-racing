@@ -15,7 +15,7 @@ export default class RoadWireframe {
           material: f.material.solidColor,
           vertices,
           transform: {
-            translate: [0.0, 0.0, -0.01],
+            translate: [0.0, 0.0, -0.1],
           },
         },
       ),

@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import {vec2} from '@pkg/gl-math/matrix';
 
 /**
@@ -19,7 +20,7 @@ export const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - m
  */
 export const getRandomArrayItem = (array) => {
   if (array.length > 0)
-    return array[getRandomNumber(0, array.length - 1)];
+    return array[getRandomNumber(0, array.length)];
 
   return null;
 };
@@ -40,4 +41,18 @@ export const getRandomPoint = (border, areaSize) => {
     cx + getRandomNumber(-cx + border.x, cx - border.x),
     cy + getRandomNumber(-cy + border.y, cy - border.y),
   );
+};
+
+/**
+ * Returns random value from object
+ *
+ * @param {Object} obj
+ * @returns {Any}
+ */
+export const getRandomObjValue = (obj) => {
+  const objKey = getRandomArrayItem(
+    R.keys(obj),
+  );
+
+  return obj[objKey];
 };

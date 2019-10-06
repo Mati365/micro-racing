@@ -147,14 +147,22 @@ export default class RoadMapObjectsManager {
     player,
     {
       alignFn = genCarSegmentTransform,
-      carType = CAR_TYPES.RED,
+      carType,
     } = {},
   ) {
     const {segments} = this.segmentsInfo;
     const playerElement = new PlayerMapElement(
       {
         player,
-        carType,
+        carType: R.when(
+          R.isNil,
+          () => {
+            const carTypesList = R.keys(CAR_TYPES);
+
+            return CAR_TYPES[carTypesList[this.totalPlayers % carTypesList.length]];
+          },
+          carType,
+        ),
         body: alignFn(
           {
             segment: segments[this.totalPlayers],

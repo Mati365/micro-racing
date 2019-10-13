@@ -1,5 +1,6 @@
 import WebSocket from 'ws';
 import consola from 'consola';
+import chalk from 'chalk';
 
 import {removeByProp} from '@pkg/basic-helpers/list/removeByID';
 import {findByProp} from '@pkg/basic-helpers/list/findByID';
@@ -74,10 +75,30 @@ export default class GameServer {
     return findByProp('name')(name, this.rooms);
   }
 
+  /**
+   * Remove room from rooms list by name
+   *
+   * @param {String} name
+   */
+  @logMethod(
+    (_, name) => {
+      consola.info(`Remove room ${chalk.green.bold(name)}!`);
+    },
+  )
   removeRoom(name) {
     this.rooms = removeByProp('name')(name, this.rooms);
   }
 
+  /**
+   * Create room on server with owner flag and onDestroy handler
+   *
+   * @param {Object} config
+   */
+  @logMethod(
+    (_, {name, owner}) => {
+      consola.info(`Create room ${chalk.green.bold(name)} by ${chalk.white.bold(owner.info.nick)}!`);
+    },
+  )
   createRoom({name, owner}) {
     if (this.findRoom(name))
       throw new ServerError(ERROR_CODES.ROOM_ALREADY_EXISTS);

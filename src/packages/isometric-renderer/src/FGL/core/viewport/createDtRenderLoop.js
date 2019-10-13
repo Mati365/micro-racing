@@ -11,6 +11,7 @@ export const createAnimationFrameRenderer = ({
   limitFrameTime = 1000 / 60, // 60fps
   raf = window?.requestAnimationFrame,
 }) => {
+  let stop = false;
   let lastFrame = Date.now();
   let updateAcc = 0;
 
@@ -24,6 +25,9 @@ export const createAnimationFrameRenderer = ({
   };
 
   const renderFrame = () => {
+    if (stop)
+      return;
+
     // do not use timestamp from requestAnimationFrame
     // that function is executed also in server side
     const timestamp = Date.now();
@@ -68,6 +72,10 @@ export const createAnimationFrameRenderer = ({
   };
 
   raf(renderFrame);
+
+  return () => {
+    stop = true;
+  };
 };
 
 /**

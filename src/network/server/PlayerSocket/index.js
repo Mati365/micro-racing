@@ -172,7 +172,7 @@ export default class PlayerSocket {
 
     [PLAYER_ACTIONS.JOIN_ROOM]: logFunction(
       (_, room) => {
-        consola.info(`Player ${chalk.white.bold(this.info.nick)} joined to ${chalk.white.bold(room.name)}!`);
+        consola.info(`Player ${chalk.white.bold(this.info.nick)} joined to ${chalk.green.bold(room.name)}!`);
       },
       {
         afterExec: true,
@@ -190,7 +190,7 @@ export default class PlayerSocket {
 
     [PLAYER_ACTIONS.START_ROOM_RACE]: logFunction(
       () => {
-        consola.info(`Player ${chalk.white.bold(this.info.nick)} started racing in ${chalk.white.bold(this.info.room.name)}!`);
+        consola.info(`Player ${chalk.white.bold(this.info.nick)} started racing in ${chalk.green.bold(this.info.room.name)}!`);
       },
       {
         afterExec: true,

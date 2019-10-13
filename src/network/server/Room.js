@@ -54,7 +54,18 @@ export default class Room {
   }
 
   startRace() {
+    if (this.abstract)
+      return;
+
     this.racing.start();
+  }
+
+  destroy() {
+    if (this.abstract)
+      return;
+
+    this.onDestroy?.(this);
+    this.racing?.stop();
   }
 
   /**
@@ -108,6 +119,10 @@ export default class Room {
 
   get isFull() {
     return this.playersLimit === this.playersCount - 1;
+  }
+
+  get isEmpty() {
+    return !this.playersCount;
   }
 
   /**
@@ -195,7 +210,7 @@ export default class Room {
       );
     }
 
-    if (!this.playersCount)
-      this.onDestroy?.(this);
+    if (this.isEmpty)
+      this.destroy();
   }
 }

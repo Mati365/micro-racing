@@ -13,7 +13,7 @@ export default class RoomRacing {
   }
 
   start() {
-    createAnimationFrameRenderer(
+    this.renderLoop = createAnimationFrameRenderer(
       {
         allowLerpUpdate: false,
 
@@ -21,6 +21,11 @@ export default class RoomRacing {
         raf: setImmediate,
       },
     );
+  }
+
+  stop() {
+    this.renderLoop?.();
+    delete this.renderLoop;
   }
 
   /**

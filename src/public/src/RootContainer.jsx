@@ -1,7 +1,10 @@
 import React from 'react';
 
-import GameCanvas from '@game/network/client/gameplay/GameCanvas';
+// import GameCanvas from '@game/network/client/gameplay/GameCanvas';
 import {styled} from '@pkg/fast-stylesheet/src/react';
+
+import {SSRRenderSwitch} from '@ui/basic-components';
+import EditorCanvas from './ui/EditorCanvas';
 
 const Container = styled.div(
   {
@@ -26,12 +29,23 @@ const Container = styled.div(
 
 const RootContainer = () => (
   <Container>
-    <GameCanvas
+    {/* <GameCanvas
       dimensions={{
         w: 800,
         h: 600,
       }}
-    />
+    /> */}
+
+    <SSRRenderSwitch>
+      {() => (
+        <EditorCanvas
+          dimensions={{
+            w: window.innerWidth,
+            h: window.innerHeight,
+          }}
+        />
+      )}
+    </SSRRenderSwitch>
   </Container>
 );
 

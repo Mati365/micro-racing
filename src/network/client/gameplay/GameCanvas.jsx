@@ -1,9 +1,8 @@
 import React, {useRef, useEffect} from 'react';
 
-import {DIMENSIONS_SCHEMA} from '@pkg/basic-type-schemas';
+import {DIMENSIONS_SCHEMA} from '@ui/schemas';
 
-import usePromise from '@pkg/basic-hooks/async/usePromise';
-// import {useGameBoard} from './states/GameBoard';
+import usePromise from '@ui/basic-hooks/async/usePromise';
 
 import PlayerClientSocket from '../protocol/PlayerClientSocket';
 import GameBoard from './states/GameBoard';

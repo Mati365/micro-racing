@@ -14,14 +14,16 @@ const resolveSource = path => resolve(__dirname, `../src/${path}`);
 const SHARED_ALIASES = R.mapObjIndexed(
   resolveSource,
   {
-    '@pkg/schemas': 'packages/basic-type-schemas/src/',
     '@pkg/resource-pack': 'packages/resource-pack/src/',
     '@pkg/gl-math': 'packages/gl-math/src/',
     '@pkg/basic-helpers': 'packages/basic-helpers/src/',
     '@pkg/isometric-renderer': 'packages/isometric-renderer/src/',
     '@pkg/ctx': 'packages/ctx-utils/src',
     '@pkg/struct-pack': 'packages/struct-pack/src/',
-    '@pkg/basic-hooks': 'packages/basic-hooks/src/',
+
+    '@ui/basic-hooks': 'packages/ui/basic-hooks/src/',
+    '@ui/basic-components': 'packages/ui/basic-components/src/',
+    '@ui/schemas': 'packages/ui/basic-type-schemas/src/schemas',
 
     '@game/res': 'public/res/',
     '@game/public': 'public/',

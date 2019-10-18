@@ -3,6 +3,7 @@ export default class PlayerInput {
     this.id = id;
     this.frameId = frameId;
     this.bitset = bitset;
+    this.tempOnly = true;
   }
 
   toBSON() {

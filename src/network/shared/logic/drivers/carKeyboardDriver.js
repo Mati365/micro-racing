@@ -38,11 +38,9 @@ const carKeyboardDriver = (input, carBody) => {
  * server or client updater code
  */
 export class GameKeyboardController {
-  inputs = 0b0;
+  inputs = 0;
 
   inputsCounter = 0;
-
-  frameId = 0
 
   predictedInputs = [];
 
@@ -81,13 +79,13 @@ export class GameKeyboardController {
     return canvas;
   }
 
-  storeInputs() {
+  storeInputs(frameId) {
     const {predictedInputs, batch} = this;
 
     if (this.inputs) {
       const input = new PlayerInput(
         (this.inputsCounter++) % 0xFFFF, // due to binary serializer
-        this.frameId,
+        frameId,
         this.inputs,
       );
 
@@ -106,10 +104,11 @@ export class GameKeyboardController {
    */
   flushBatch() {
     const list = this.batch;
+    list.forEach((item) => {
+      item.tempOnly = false;
+    });
 
     this.batch = [];
-    this.frameId = (this.frameId || 0) + 1;
-
     return list;
   }
 

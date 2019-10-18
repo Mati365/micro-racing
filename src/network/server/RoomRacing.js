@@ -41,13 +41,16 @@ export default class RoomRacing {
 
       // process inputs from oldest to newest
       const {inputs} = info;
-      if (inputs.length) {
-        let processedInputs = 0;
-        let prevFrameId = inputs[0].frameId;
+      let prevFrameId = null;
+      let processedInputs = 0;
 
-        for (; processedInputs < inputs.length; ++processedInputs) {
+      info.lastProcessedInput = -1;
+      if (inputs.length) {
+        prevFrameId = inputs[processedInputs].frameId;
+
+        for (;;++processedInputs) {
           const input = inputs[processedInputs];
-          if (prevFrameId !== input.frameId)
+          if (!input || prevFrameId !== input.frameId)
             break;
 
           prevFrameId = input.frameId;
@@ -57,16 +60,16 @@ export default class RoomRacing {
         }
 
         // used for client side prediction checks
-        if (processedInputs < inputs.length)
-          info.inputs.splice(0, processedInputs);
-        else
-          info.inputs = [];
+        info.inputs.splice(0, processedInputs);
       }
 
+      carBody.idleInputs = prevFrameId === null;
       carBody.update();
     }
 
-    this.broadcastRaceState();
+    setTimeout(() => {
+      this.broadcastRaceState();
+    }, 260);
   }
 
   broadcastRaceState() {

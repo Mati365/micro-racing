@@ -54,13 +54,10 @@ const GameCanvas = ({dimensions}) => {
           await client.joinRoom('general'),
         );
 
-        board.start();
+        if (board.roomMapNode.roomInfo.ownerID === client.info.id)
+          client.startRace();
 
-        if (board.roomMapNode.roomInfo.ownerID === client.info.id) {
-          setTimeout(() => {
-            client.startRace();
-          }, 1000);
-        }
+        board.start();
       })();
     },
     [connecting],

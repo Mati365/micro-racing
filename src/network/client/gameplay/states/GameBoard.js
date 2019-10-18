@@ -10,6 +10,7 @@ import RemoteRoomStateListener from '../RemoteRoomStateListener';
 export default class GameBoard {
   constructor({client}) {
     this.client = client;
+    this.frameId = 1;
   }
 
   async setCanvas({
@@ -82,6 +83,9 @@ export default class GameBoard {
     const {body} = node;
 
     // floats
+    const prevPos = body.pos;
+    const prevVelocity = body.velocity;
+
     Object.assign(
       body,
       {
@@ -96,30 +100,43 @@ export default class GameBoard {
     );
 
     // try to reply all inputs after response
-    if (lastProcessedInput !== -1 && currentPlayerSync) {
-      const {predictedInputs} = this.keyboardController;
-      const serverInputIndex = getIndexByID(lastProcessedInput, predictedInputs);
+    const {predictedInputs} = this.keyboardController;
+    if (lastProcessedInput !== -1 && predictedInputs.length && currentPlayerSync) {
+      let serverInputIndex = getIndexByID(lastProcessedInput, predictedInputs);
 
-      if (serverInputIndex === -1)
-        this.keyboardController.predictedInputs = [];
-      else {
-        if (serverInputIndex < predictedInputs.length) {
-          let prevFrameId = predictedInputs[0].id;
-          for (let i = serverInputIndex; i < predictedInputs.length; ++i) {
-            const {bitset, frameId} = predictedInputs[i];
-            if (prevFrameId !== frameId)
-              body.update();
+      if (serverInputIndex !== -1 && serverInputIndex + 1 < predictedInputs.length) {
+        serverInputIndex++;
 
-            carKeyboardDriver(bitset, body);
-            prevFrameId = frameId;
+        let prevFrameId = predictedInputs[serverInputIndex].frameId;
+        let skipLastUpdate = null;
+
+        for (let i = serverInputIndex; i < predictedInputs.length; ++i) {
+          const {bitset, frameId, tempOnly} = predictedInputs[i];
+
+          if (skipLastUpdate === null)
+            skipLastUpdate = false;
+
+          carKeyboardDriver(bitset, body);
+          prevFrameId = frameId;
+
+          if (!tempOnly && prevFrameId !== frameId) {
+            body.update();
+            if (!skipLastUpdate && i + 1 >= predictedInputs.length)
+              skipLastUpdate = true;
           }
-
-          body.update();
         }
 
-        predictedInputs.splice(0, serverInputIndex);
+        if (skipLastUpdate === false)
+          body.update();
       }
+
+      predictedInputs.splice(0, serverInputIndex);
     }
+
+    body.pos = vec2.lerp(0.05, prevPos, body.pos);
+    body.velocity = vec2.lerp(0.05, prevVelocity, body.velocity);
+
+    this.waitForSync = false;
   };
 
   start() {
@@ -137,31 +154,41 @@ export default class GameBoard {
         render: ::this.render,
       },
     );
+
+    this.waitForSync = true;
   }
 
   stop() {
     this.roomState?.releaseListeners();
   }
 
+  SERVER_FRAME_CACHE = {};
+
   update(interpolate) {
     const {
+      waitForSync,
       roomMapNode,
       client,
       keyboardController,
     } = this;
 
+    if (waitForSync)
+      return;
+
     const {currentPlayerCar: car} = roomMapNode;
-    const input = keyboardController.storeInputs();
+    const input = keyboardController.storeInputs(this.frameId);
     if (input)
       carKeyboardDriver(input.bitset, car.body);
+
+    roomMapNode.update(interpolate);
 
     if (interpolate.fixedStepUpdate) {
       const batchedInputs = keyboardController.flushBatch();
       if (batchedInputs.length)
         client.sendKeyMapState(batchedInputs);
-    }
 
-    roomMapNode.update(interpolate);
+      this.frameId++;
+    }
   }
 
   render(interpolate, mpMatrix) {

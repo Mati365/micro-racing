@@ -1,4 +1,11 @@
 const BINARY_TYPES = {
+  float64: {
+    size: 8,
+    setter: 'setFloat64',
+    getter: 'getFloat64',
+    array: 'Float64Array',
+  },
+
   float32: {
     size: 4,
     setter: 'setFloat32',

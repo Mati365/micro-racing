@@ -97,33 +97,33 @@ export default class PlayerMapElement extends MapElement {
           type: 'int16',
         },
         pos: {
-          type: 'float32',
+          type: 'float64',
           count: 2,
           srcPath: 'body.pos',
         },
         velocity: {
-          type: 'float32',
+          type: 'float64',
           count: 2,
           srcPath: 'body.velocity',
         },
         throttle: {
-          type: 'float32',
+          type: 'float64',
           srcPath: 'body.throttle',
         },
         corneringIntensity: {
-          type: 'float32',
+          type: 'float64',
           srcPath: 'body.corneringIntensity',
         },
         angularVelocity: {
-          type: 'float32',
+          type: 'float64',
           srcPath: 'body.angularVelocity',
         },
         angle: {
-          type: 'float32',
+          type: 'float64',
           srcPath: 'body.angle',
         },
         steerAngle: {
-          type: 'float32',
+          type: 'float64',
           srcPath: 'body.steerAngle',
         },
         lastProcessedInput: {

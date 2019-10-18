@@ -7,7 +7,7 @@ export const createAnimationFrameRenderer = ({
   render,
   update,
   allowLerpUpdate = true,
-  updateDelay = 1000 / 30, // 30 fps
+  updateDelay = 1000 / 30,
   limitFrameTime = 1000 / 60, // 60fps
   raf = window?.requestAnimationFrame,
 }) => {

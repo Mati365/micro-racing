@@ -67,9 +67,7 @@ export default class RoomRacing {
       carBody.update();
     }
 
-    setTimeout(() => {
-      this.broadcastRaceState();
-    }, 260);
+    this.broadcastRaceState();
   }
 
   broadcastRaceState() {

@@ -1,6 +1,6 @@
 import {getIndexByID} from '@pkg/basic-helpers';
 import {createIsometricScene} from '@pkg/isometric-renderer';
-import {vec2} from '@pkg/gl-math';
+import {vec2, lerp} from '@pkg/gl-math';
 
 import carKeyboardDriver, {GameKeyboardController} from '@game/logic/drivers/carKeyboardDriver';
 
@@ -84,6 +84,7 @@ export default class GameBoard {
 
     // floats
     const prevPos = body.pos;
+    const prevAngle = body.angle;
     const prevVelocity = body.velocity;
 
     Object.assign(
@@ -133,6 +134,7 @@ export default class GameBoard {
       predictedInputs.splice(0, serverInputIndex);
     }
 
+    body.angle = lerp(prevAngle, body.angle, 0.05);
     body.pos = vec2.lerp(0.05, prevPos, body.pos);
     body.velocity = vec2.lerp(0.05, prevVelocity, body.velocity);
 

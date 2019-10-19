@@ -52,7 +52,7 @@ const EditorCanvas = ({track, dimensions}) => {
         }}
       />
 
-      <Toolbar />
+      <Toolbar editor={editor} />
     </Wrapper>
   );
 };

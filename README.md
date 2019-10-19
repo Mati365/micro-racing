@@ -39,3 +39,7 @@ https://www.gdcvault.com/play/1022055/How-to-Implement-AAA-Game
 ## Resources
 Cars:
 https://opengameart.org/content/low-poly-cars
+https://free3d.com/3d-model/cartoon-low-poly-city-cars-pack-32084.html
+
+Elements:
+https://free3d.com/3d-model/road-elements-40062.html

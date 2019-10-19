@@ -24,6 +24,8 @@ const SHARED_ALIASES = R.mapObjIndexed(
     '@ui/basic-hooks': 'packages/ui/basic-hooks/src/',
     '@ui/basic-components': 'packages/ui/basic-components/src/',
     '@ui/schemas': 'packages/ui/basic-type-schemas/src/schemas',
+    '@ui/colors': 'packages/ui/basic-type-schemas/src/colors',
+    '@ui/i18n': 'packages/ui/i18n/src/',
 
     '@game/res': 'public/res/',
     '@game/public': 'public/',
@@ -31,6 +33,7 @@ const SHARED_ALIASES = R.mapObjIndexed(
     '@game/server': 'network/server/',
     '@game/shared': 'network/shared/',
     '@game/logic': 'network/shared/logic/',
+    '@game/i18n': 'lang/',
   },
 );
 

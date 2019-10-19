@@ -5,7 +5,10 @@ import React, {
 } from 'react';
 
 import {DIMENSIONS_SCHEMA} from '@ui/schemas';
+
+import {Wrapper} from '@ui/basic-components/styled';
 import TrackEditor from './TrackEditor';
+import Toolbar from './Toolbar/Toolbar';
 
 const useTrackEditor = initialConfig => useMemo(
   () => new TrackEditor(initialConfig),
@@ -38,15 +41,19 @@ const EditorCanvas = ({track, dimensions}) => {
   );
 
   return (
-    <canvas
-      ref={roadRef}
-      tabIndex={-1}
-      width={dimensions.w}
-      height={dimensions.h}
-      style={{
-        outline: 0,
-      }}
-    />
+    <Wrapper position='relative'>
+      <canvas
+        ref={roadRef}
+        tabIndex={-1}
+        width={dimensions.w}
+        height={dimensions.h}
+        style={{
+          outline: 0,
+        }}
+      />
+
+      <Toolbar />
+    </Wrapper>
   );
 };
 

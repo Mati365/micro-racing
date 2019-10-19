@@ -6,3 +6,4 @@ export {default as ssr} from './ssr';
 export {default as hashObject} from './hashObject';
 export {default as isVoidTag} from './isVoidTag';
 export {default as nestedShallowExtend} from './nestedShallowExtend';
+export {default as omitProps} from './omitProps';

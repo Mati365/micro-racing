@@ -2,6 +2,7 @@ export {default as alwaysThrow} from './base/alwaysThrow';
 export {default as removeNullValues} from './base/removeNullValues';
 export {default as relativeEventPos} from './base/relativeEventPos';
 export {default as getDOMElementSize} from './base/getDOMElementSize';
+export {default as format} from './base/format';
 
 export {default as findByID} from './list/findByID';
 export {default as removeByID} from './list/removeByID';

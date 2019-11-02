@@ -20,20 +20,15 @@ const useTrackEditor = initialConfig => useMemo(
  *
  * @export
  */
-const EditorCanvas = ({track, dimensions}) => {
+const EditorCanvas = ({dimensions}) => {
   const roadRef = useRef();
-  const editor = useTrackEditor(
-    {
-      track,
-    },
-  );
+  const editor = useTrackEditor();
 
   useEffect(
     () => {
       editor.setCanvas(
         {
           canvas: roadRef.current,
-          dimensions,
         },
       );
     },

@@ -72,3 +72,30 @@ export const drawPolygon = (points, color, width, loop, ctx) => {
 
   ctx.stroke();
 };
+
+export const drawPoints = (color, r, points, ctx) => {
+  for (let i = points.length - 1; i >= 0; --i) {
+    const [x, y] = points[i];
+
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+};
+
+export const drawTriangles = (color, lineWidth, triangles, ctx) => {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+
+  for (let i = triangles.length - 1; i >= 0; --i) {
+    const {a, b, c} = triangles[i];
+
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(c.x, c.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.lineTo(a.x, a.y);
+    ctx.stroke();
+  }
+};

@@ -1,2 +1,2 @@
-// eslint-disable-next-line import/prefer-default-export
 export {default as SSRRenderSwitch} from './SSRRenderSwitch';
+export {default as IsomorphicRouter} from './IsomorphicRouter';

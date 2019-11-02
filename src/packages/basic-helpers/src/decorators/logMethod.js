@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import wrapMethod from './wrapMethod';
 
 export const logFunction = (logger, {afterExec, target} = {}) => fn => (...args) => {
@@ -5,8 +6,17 @@ export const logFunction = (logger, {afterExec, target} = {}) => fn => (...args)
     logger(target, ...args);
 
   const result = fn(...args);
-  if (afterExec)
-    logger(target, result, ...args);
+  if (afterExec) {
+    const postLoad = (_result = result) => logger(target, _result, ...args);
+
+    if (R.is(Promise, result)) {
+      result.then((data) => {
+        postLoad(data);
+        return data;
+      });
+    } else
+      postLoad();
+  }
 
   return result;
 };

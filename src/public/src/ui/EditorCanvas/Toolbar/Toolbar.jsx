@@ -1,10 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import pako from 'pako';
 
 import {WHITE} from '@ui/colors';
 
-import {useI18n} from '@ui/i18n';
 import {styled} from '@pkg/fast-stylesheet/src/react';
+
+import {useI18n} from '@ui/i18n';
+import {useInputs} from '@ui/basic-hooks';
+
+import {
+  exportBlobToFile,
+  importBlobFromFile,
+  parameterize,
+} from '@pkg/basic-helpers';
+
 import {
   TextButton,
   UnorderedList,
@@ -41,11 +51,40 @@ const ToolbarHolder = styled(
 
 const Toolbar = ({editor}) => {
   const t = useI18n();
+  const {l, value, setValue} = useInputs(
+    {
+      initialData: {
+        meta: {
+          title: 'Game map',
+        },
+      },
+    },
+  );
 
   const onSave = () => {
-    console.log(editor);
+    exportBlobToFile(
+      `${parameterize(value.meta.title || 'blank')}.gzip`,
+      new Blob([
+        pako.deflate(
+          editor.toBSON(value.meta),
+        ),
+      ]),
+    );
   };
-  const onLoad = () => {};
+
+  const onLoad = async () => {
+    const result = pako.inflate(
+      await importBlobFromFile(),
+    );
+
+    const {meta} = editor.fromBSON(result);
+    setValue(
+      {
+        ...value,
+        meta: meta || {},
+      },
+    );
+  };
 
   return (
     <ToolbarHolder>
@@ -59,6 +98,13 @@ const Toolbar = ({editor}) => {
         <TextButton onClick={onLoad}>
           {t('editor.titles.load')}
         </TextButton>
+      </li>
+
+      <li>
+        <input
+          type='text'
+          {...l.input('meta.title', {defaultInputValue: ''})}
+        />
       </li>
     </ToolbarHolder>
   );

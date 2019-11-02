@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 import {vec2} from '@pkg/gl-math/matrix';
 
+import {filterMap} from '@pkg/basic-helpers';
 import {
   interpolateEditorPath,
   generateRandomPath,
@@ -75,7 +76,7 @@ export const getHandlerSiblingParentPoint = (index, path) => {
  * @param {Vec2} item
  * @param {Number} index
  */
-export const createPathPoint = (item, index) => ({
+export const createPointResultDescriptor = (item, index) => ({
   item,
   index,
 });
@@ -143,7 +144,7 @@ export default class TrackPath {
     if (autoposCurveHandlers)
       this.updateHandlersPos();
 
-    return createPathPoint(point, insertIndex);
+    return createPointResultDescriptor(point, insertIndex);
   }
 
   /**
@@ -274,7 +275,7 @@ export default class TrackPath {
     return (
       index === -1
         ? null
-        : createPathPoint(path[index], index)
+        : createPointResultDescriptor(path[index], index)
     );
   }
 
@@ -298,6 +299,22 @@ export default class TrackPath {
         ...config,
       },
       path,
+    );
+  }
+
+  /**
+   * Return track points without curve handlers
+   *
+   * @returns {Vector3[]}
+   */
+  getRealPathPoints() {
+    return filterMap(
+      R.ifElse(
+        R.propEq('type', TRACK_POINTS.PATH_POINT),
+        R.prop('point'),
+        R.always(null),
+      ),
+      this.path,
     );
   }
 }

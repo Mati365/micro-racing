@@ -19,6 +19,8 @@ import GameServer from '@game/network/server/Server';
 import RootContainer from '../public/src/RootContainer';
 
 import staticManifest from './constants/staticManifest';
+import loadMapsDirectory from './utils/loadMapsDirectory';
+
 import ProvideGlobalJSON from './components/ProvideGlobalJSON';
 
 const APP_PORT = 3000;
@@ -27,47 +29,73 @@ const CRITICAL_SHEET_STORE_DUMP = criticalSheetStore.dump();
 
 const app = express();
 
-new GameServer().start();
+(async () => {
+  const maps = await loadMapsDirectory(
+    {
+      dir: resolve(__dirname, 'res/maps/'),
+    },
+  );
+
+  new GameServer(
+    {
+      maps,
+    },
+  ).start();
+})();
 
 app
   .use(
     '/static',
     express.static(resolve(__dirname, '../public')),
   )
-  .get('/', assignI18nPackMiddleware(GAME_LANG_PACK), (req, res) => {
+
+  .get('*', assignI18nPackMiddleware(GAME_LANG_PACK), (req, res) => {
     const {i18n} = res.locals;
     const dynamicSheetStore = createHydratedSheetStore({id: 'd'});
 
-    res.send(
-      CacheStoreReactMetatags.insertToHTML(
-        [
-          CRITICAL_SHEET_STORE_DUMP,
-          dynamicSheetStore,
-        ],
-        ReactDOMServer.renderToString(
-          <html lang='en'>
-            <head>
-              <CacheStoreReactMetatags />
-            </head>
+    const context = {};
+    const html = (
+      <html lang='en'>
+        <head>
+          <CacheStoreReactMetatags />
+        </head>
 
-            <body>
-              <div id='hydration-container'>
-                <SheetStoreContextProvider value={dynamicSheetStore}>
-                  <RootContainer i18n={i18n} />
-                </SheetStoreContextProvider>
-              </div>
-
-              <ProvideGlobalJSON
-                value={{
-                  i18n,
+        <body>
+          <div id='hydration-container'>
+            <SheetStoreContextProvider value={dynamicSheetStore}>
+              <RootContainer
+                i18n={i18n}
+                routerProps={{
+                  location: req.url,
+                  context,
                 }}
               />
-              <script src={staticManifest['main.js']} />
-            </body>
-          </html>,
-        ),
-      ),
+            </SheetStoreContextProvider>
+          </div>
+
+          <ProvideGlobalJSON
+            value={{
+              i18n,
+            }}
+          />
+          <script src={staticManifest['main.js']} />
+        </body>
+      </html>
     );
+
+    if (context.url)
+      res.redirect(302, context.url);
+    else {
+      res.send(
+        CacheStoreReactMetatags.insertToHTML(
+          [
+            CRITICAL_SHEET_STORE_DUMP,
+            dynamicSheetStore,
+          ],
+          `<!doctype html>${ReactDOMServer.renderToString(html)}`,
+        ),
+      );
+    }
   });
 
 app.listen(

@@ -1,11 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-// import GameCanvas from '@game/network/client/gameplay/GameCanvas';
 import {styled} from '@pkg/fast-stylesheet/src/react';
+import {
+  Switch,
+  Route,
+} from 'react-router-dom';
 
-import {SSRRenderSwitch} from '@ui/basic-components';
 import ProvideI18n from '@ui/i18n/components/ProvideI18n';
+import {
+  IsomorphicRouter,
+  SSRRenderSwitch,
+} from '@ui/basic-components';
+
+import GameCanvas from '@game/network/client/gameplay/GameCanvas';
 import EditorCanvas from './ui/EditorCanvas';
 
 const Container = styled.div(
@@ -29,26 +37,37 @@ const Container = styled.div(
   },
 );
 
-const RootContainer = ({i18n}) => (
+const EditorRoute = () => (
+  <SSRRenderSwitch>
+    {() => (
+      <EditorCanvas
+        dimensions={{
+          w: window.innerWidth,
+          h: window.innerHeight,
+        }}
+      />
+    )}
+  </SSRRenderSwitch>
+);
+
+const GameRoute = () => (
+  <GameCanvas
+    dimensions={{
+      w: 800,
+      h: 600,
+    }}
+  />
+);
+
+const RootContainer = ({i18n, routerProps}) => (
   <ProvideI18n {...i18n}>
     <Container>
-      {/* <GameCanvas
-        dimensions={{
-          w: 800,
-          h: 600,
-        }}
-      /> */}
-
-      <SSRRenderSwitch>
-        {() => (
-          <EditorCanvas
-            dimensions={{
-              w: window.innerWidth,
-              h: window.innerHeight,
-            }}
-          />
-        )}
-      </SSRRenderSwitch>
+      <IsomorphicRouter {...routerProps}>
+        <Switch>
+          <Route path='/editor' component={EditorRoute} />
+          <Route path='/' component={GameRoute} />
+        </Switch>
+      </IsomorphicRouter>
     </Container>
   </ProvideI18n>
 );
@@ -56,12 +75,17 @@ const RootContainer = ({i18n}) => (
 RootContainer.displayName = 'RootContainer';
 
 RootContainer.propTypes = {
+  routerProps: PropTypes.object,
   i18n: PropTypes.shape(
     {
       lang: PropTypes.string,
       pack: PropTypes.any,
     },
   ).isRequired,
+};
+
+RootContainer.defaultProps = {
+  routerProps: {},
 };
 
 export default RootContainer;

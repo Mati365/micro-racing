@@ -17,11 +17,13 @@ import {ERROR_CODES} from '../constants/serverCodes';
  */
 export default class GameServer {
   constructor({
+    maps,
     socketOptions = {
       port: 8080,
       perMessageDeflate: false,
     },
   } = {}) {
+    this.maps = maps || {};
     this.socketOptions = socketOptions;
 
     /**

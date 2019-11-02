@@ -50,14 +50,18 @@
     "clean-webpack-plugin": "^3.0.0",
     "webpack-manifest-plugin": "^2.0.4",
     "webpack-node-externals": "^1.7.2",
+    "copy-webpack-plugin": "^5.0.4",
     "bson": "^4.0.2",
+    "fast-glob": "^3.1.0",
     "ws": "^7.1.1",
     "uniqid": "^5.0.3",
     "chalk": "^2.4.2",
-    "source-map-support": "^0.5.13"
+    "source-map-support": "^0.5.13",
+    "pako": "^1.0.10",
+    "react-router-dom": "^5.1.2"
   },
   "scripts": {
-    "develop": "env NODE_ENV=development npx webpack --config=config/webpack.config.js --mode=development --watch",
+    "develop": "(rm -rf ./dist/*; env NODE_ENV=development npx webpack --config=config/webpack.config.js --mode=development --watch)",
     "build:production": "(rm -rf ./dist/*; env NODE_ENV=production npx webpack --config=config/webpack.config.js --mode=production)"
   }
 }

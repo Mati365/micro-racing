@@ -1,6 +1,6 @@
 const R = require('ramda');
 const NodemonPlugin = require('nodemon-webpack-plugin');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const {resolve} = require('path');
 
 const OUTPUT_FOLDER = resolve(__dirname, '../dist');
@@ -46,9 +46,6 @@ module.exports = [
       manifestName: MANIFEST_NAME,
       entry: resolveSource('public/src/index.jsx'),
       outputFolder: resolve(OUTPUT_FOLDER, 'public'),
-      plugins: [
-        new CleanWebpackPlugin,
-      ],
     },
   ),
 
@@ -63,7 +60,12 @@ module.exports = [
       outputFolder: resolve(OUTPUT_FOLDER, 'api'),
       outputName: SERVER_FILENAME,
       plugins: [
-        new CleanWebpackPlugin,
+        new CopyPlugin([
+          {
+            from: resolve(__dirname, '../src/server/res/'),
+            to: resolve(__dirname, '../dist/api/res/'),
+          },
+        ]),
         ...(
           process.env.NODE_ENV === 'development'
             ? [

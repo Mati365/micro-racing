@@ -31,6 +31,10 @@ export default class Vector extends Float32Array {
   toBSON() {
     return Array.from(this);
   }
+
+  static fromArray(arr) {
+    return new Vector(arr);
+  }
 }
 
 // unroll operation global scope fix

@@ -4,6 +4,30 @@ import {vec2} from '@pkg/gl-math/matrix';
 import convexHull from '@pkg/convex-hull';
 import {getRandomPoint} from '@pkg/basic-helpers/base/random';
 
+export const getPathDimensions = (points) => {
+  const topLeft = vec2(Infinity, Infinity);
+  const bottomRight = vec2(-Infinity, -Infinity);
+
+  R.forEach(
+    (point) => {
+      topLeft.x = Math.min(point[0], topLeft.x);
+      topLeft.y = Math.min(point[1], topLeft.y);
+
+      bottomRight.x = Math.max(point[0], bottomRight.x);
+      bottomRight.y = Math.max(point[1], bottomRight.y);
+    },
+    points,
+  );
+
+  return {
+    topLeft,
+    bottomRight,
+
+    width: bottomRight.x - topLeft.x,
+    height: bottomRight.y - topLeft.y,
+  };
+};
+
 /**
  * Creates array of points on racing map
  *
@@ -71,19 +95,12 @@ const generateRandomPath = (area, moveToOrigin = vec2(area.w * 0.4, area.h * 0.4
   )(area);
 
   if (moveToOrigin) {
-    const minCoordinate = vec2(Infinity, Infinity);
-    R.forEach(
-      (point) => {
-        minCoordinate.x = Math.min(point[0], minCoordinate.x);
-        minCoordinate.y = Math.min(point[1], minCoordinate.y);
-      },
-      points,
-    );
+    const {topLeft} = getPathDimensions(points);
 
     R.forEach(
       (point) => {
-        point[0] -= minCoordinate.x - moveToOrigin.x;
-        point[1] -= minCoordinate.y - moveToOrigin.y;
+        point[0] -= topLeft.x - moveToOrigin.x;
+        point[1] -= topLeft.y - moveToOrigin.y;
       },
       points,
     );

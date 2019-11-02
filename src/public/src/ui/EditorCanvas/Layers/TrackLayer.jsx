@@ -4,6 +4,8 @@ import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
 import PALETTE from '@pkg/isometric-renderer/FGL/core/constants/colors';
 
 import segmentizePath from '@game/logic/track/TrackSegments/utils/segmentizePath';
+import {getPathDimensions} from '@game/logic/track/TrackPath/utils/generateRandomPath';
+
 import {Vector} from '@pkg/gl-math';
 
 import {
@@ -35,7 +37,6 @@ import AbstractDraggableEditorLayer from './AbstractDraggableEditorLayer';
  */
 const renderTrack = ({
   segmentize = true,
-  spacing = 40,
   colors = {
     points: '#0000ff',
     segments: '#666',
@@ -46,11 +47,7 @@ const renderTrack = ({
 
   // Render curve lines
   if (realPointsLength >= 2) {
-    const interpolated = track.getInterpolatedPathPoints(
-      {
-        spacing,
-      },
-    );
+    const interpolated = track.getInterpolatedPathPoints();
 
     drawPoints(colors.points, 3, interpolated, ctx);
 
@@ -176,17 +173,32 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
   }
 
   toBSON() {
+    const points = this.track.getRealPathPoints();
+    const {transform} = this.sceneMeta;
+    const {topLeft, width, height} = getPathDimensions(
+      this.track.getInterpolatedPathPoints(),
+    );
+
+    const terrainMargin = 80;
+    const terrainTransform = {
+      translate: [
+        (topLeft.x - terrainMargin) * transform.scale[0],
+        (topLeft.y - terrainMargin) * transform.scale[1],
+        0.0,
+      ],
+      scale: [
+        (width + terrainMargin * 2) * transform.scale[0],
+        (height + terrainMargin * 2) * transform.scale[1],
+        1.0,
+      ],
+    };
+
     return [
-      new RoadMapElement(
-        this.track.getRealPathPoints(),
-        this.sceneMeta,
-      ),
+      new RoadMapElement(points, this.sceneMeta),
       new MapElement(
         OBJECT_TYPES.TERRAIN,
         {
-          transform: {
-            scale: [64.0, 64.0, 1.0],
-          },
+          transform: terrainTransform,
           size: {
             w: 64,
             h: 64,
@@ -205,15 +217,13 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
         {
           name: 'plainTerrainWireframe',
           constructor: {
-            w: 64,
-            h: 64,
+            w: 80,
+            h: Math.floor(80 * height / width),
           },
           uniforms: {
             color: PALETTE.DARK_GRAY,
           },
-          transform: {
-            scale: [64.0, 64.0, 1.0],
-          },
+          transform: terrainTransform,
         },
       ),
     ];

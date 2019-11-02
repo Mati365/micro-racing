@@ -4,6 +4,7 @@ import chalk from 'chalk';
 
 import {removeByProp} from '@pkg/basic-helpers/list/removeByID';
 import {findByProp} from '@pkg/basic-helpers/list/findByID';
+import {getRandomObjValue} from '@pkg/basic-helpers/base/random';
 import {logMethod} from '@pkg/basic-helpers';
 
 import PlayerSocket from './PlayerSocket';
@@ -109,6 +110,7 @@ export default class GameServer {
       {
         owner,
         name,
+        map: getRandomObjValue(this.maps),
         onDestroy: () => this.removeRoom(name),
       },
     );

@@ -49,9 +49,11 @@ export const dropNearPoints = ({minDistance}) => (points) => {
 /**
  * Generate array of points from provided area size
  *
+ * @param {Vec2} moveToOrigin If true moves whole track to origin
+ *
  * @param {Rect} area
  */
-const generateRandomPath = (area) => {
+const generateRandomPath = (area, moveToOrigin = vec2(area.w * 0.4, area.h * 0.4)) => {
   const points = R.compose(
     dropNearPoints(
       {
@@ -67,6 +69,25 @@ const generateRandomPath = (area) => {
       32,
     ),
   )(area);
+
+  if (moveToOrigin) {
+    const minCoordinate = vec2(Infinity, Infinity);
+    R.forEach(
+      (point) => {
+        minCoordinate.x = Math.min(point[0], minCoordinate.x);
+        minCoordinate.y = Math.min(point[1], minCoordinate.y);
+      },
+      points,
+    );
+
+    R.forEach(
+      (point) => {
+        point[0] -= minCoordinate.x - moveToOrigin.x;
+        point[1] -= minCoordinate.y - moveToOrigin.y;
+      },
+      points,
+    );
+  }
 
   return points;
 };

@@ -9,7 +9,7 @@ import {PLAYER_ACTIONS} from '../constants/serverCodes';
 export default class RoomRacing {
   constructor({room}) {
     this.room = room;
-    this.map = new RoadMapObjectsManager;
+    this.map = new RoadMapObjectsManager(room.map);
   }
 
   start() {

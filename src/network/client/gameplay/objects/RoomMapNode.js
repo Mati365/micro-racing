@@ -1,11 +1,14 @@
 import * as R from 'ramda';
 
+import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
+import PALETTE from '@pkg/isometric-renderer/FGL/core/constants/colors';
+
 import {
   findByID,
   mapObjValuesToPromise,
 } from '@pkg/basic-helpers';
 
-import {OBJECT_TYPES} from '../../../constants/serverCodes';
+import {RoadMapElement} from '@game/network/shared/map';
 
 import * as Factory from '../factory';
 import CarNode from './Car';
@@ -48,12 +51,14 @@ export const appendToSceneBuffer = f => ({
          * **segments**
          */
         case OBJECT_TYPES.ROAD: {
-          const {segmentsInfo, ...renderParams} = params;
+          const segmentsInfo = RoadMapElement.fromBSON(item).getSegmentsInfo();
 
           mapNodes[id] = buffer.createNode(sceneParams => new RoadNode(
             {
               ...sceneParams,
-              ...renderParams,
+              uniforms: {
+                color: PALETTE.WHITE,
+              },
               id,
               segmentsInfo,
             },

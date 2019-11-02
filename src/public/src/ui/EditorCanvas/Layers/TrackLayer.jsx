@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 
 import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
+import PALETTE from '@pkg/isometric-renderer/FGL/core/constants/colors';
 
 import segmentizePath from '@game/logic/track/TrackSegments/utils/segmentizePath';
 import {Vector} from '@pkg/gl-math';
@@ -10,7 +11,11 @@ import {
   drawTriangles,
 } from '@pkg/ctx';
 
-import {MapElement} from '@game/shared/map';
+import {
+  MapElement,
+  RoadMapElement,
+} from '@game/shared/map';
+
 import TrackPath, {
   TRACK_POINTS,
   CHUNK_SIZE,
@@ -145,12 +150,18 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
     super.setCanvas(canvasConfig);
 
     if (!this.track) {
-      this.track = TrackPath.fromRandomPath(this.dimensions);
+      this.track = TrackPath.fromRandomPath(
+        R.mapObjIndexed(
+          R.multiply(0.5),
+          this.dimensions,
+        ),
+        false,
+      );
       this.render();
     }
   }
 
-  fromBSON([, roadMapElement]) {
+  fromBSON([roadMapElement]) {
     const {points, sceneMeta} = roadMapElement.params;
 
     this.sceneMeta = sceneMeta;
@@ -166,6 +177,10 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
 
   toBSON() {
     return [
+      new RoadMapElement(
+        this.track.getRealPathPoints(),
+        this.sceneMeta,
+      ),
       new MapElement(
         OBJECT_TYPES.TERRAIN,
         {
@@ -186,10 +201,19 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
       ),
 
       new MapElement(
-        OBJECT_TYPES.ROAD,
+        OBJECT_TYPES.PRIMITIVE,
         {
-          points: this.track.getRealPathPoints(),
-          sceneMeta: this.sceneMeta,
+          name: 'plainTerrainWireframe',
+          constructor: {
+            w: 64,
+            h: 64,
+          },
+          uniforms: {
+            color: PALETTE.DARK_GRAY,
+          },
+          transform: {
+            scale: [64.0, 64.0, 1.0],
+          },
         },
       ),
     ];

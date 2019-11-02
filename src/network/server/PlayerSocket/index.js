@@ -117,6 +117,14 @@ export default class PlayerSocket {
   /**
    * Append player to both rooms
    */
+  @logFunction(
+    (_, room) => {
+      consola.info(`Player ${chalk.white.bold(this.info.nick)} joined to ${chalk.green.bold(room.name)}!`);
+    },
+    {
+      afterExec: true,
+    },
+  )
   joinRoom(name) {
     const {server} = this;
 
@@ -159,8 +167,7 @@ export default class PlayerSocket {
    */
   listeners = {
     [PLAYER_ACTIONS.SEND_KEYMAP]: (cmdID, {list}) => {
-      const {inputs} = this.info;
-      this.info.inputs = inputs.concat(list);
+      this.info.inputs.push(...list);
     },
 
     [PLAYER_ACTIONS.PLAYER_INFO]: (cmdID) => {

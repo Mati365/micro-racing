@@ -1,6 +1,7 @@
 import BSON from 'bson';
 import * as R from 'ramda';
 
+import {LayerMap} from '@game/network/shared/map';
 import * as Layers from './Layers';
 
 /**
@@ -23,12 +24,10 @@ export default class TrackEditor {
   }
 
   toBSON(meta) {
-    return BSON.serialize(
-      {
-        meta,
-        layers: this.mapLayers(layer => layer.toBSON()),
-      },
-    );
+    return new LayerMap(
+      meta,
+      this.mapLayers(layer => layer.toBSON()),
+    ).toBSON();
   }
 
   fromBSON(bson) {

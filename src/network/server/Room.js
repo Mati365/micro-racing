@@ -20,6 +20,7 @@ export default class Room {
     {
       owner,
       name,
+      map,
       abstract, // its only virtual represenation of list of players
       kickedPlayers = [],
       players = [],
@@ -27,6 +28,7 @@ export default class Room {
       onDestroy,
     },
   ) {
+    this.map = map;
     this.name = name;
     this.owner = owner;
     this.abstract = abstract;

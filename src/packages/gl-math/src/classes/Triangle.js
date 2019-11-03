@@ -4,4 +4,14 @@ export default class Triangle {
     this.b = b;
     this.c = c;
   }
+
+  toVertexList() {
+    const {a, b, c} = this;
+
+    return [
+      a,
+      b,
+      c,
+    ];
+  }
 }

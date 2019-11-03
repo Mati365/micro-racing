@@ -21,7 +21,7 @@ export default class RoadMapElement extends MapElement {
 
     return new TrackSegments(
       {
-        ...sceneMeta,
+        ...sceneMeta, // sceneWidth
         interpolatedPath: new TrackPath(points).getInterpolatedPathPoints(),
       },
     );

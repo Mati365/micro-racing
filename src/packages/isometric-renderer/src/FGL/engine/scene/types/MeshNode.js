@@ -5,6 +5,11 @@ import MeshWireframe from './MeshWireframe';
 export default class MeshNode extends SceneNode {
   wireframe = null;
 
+  /**
+   * + size record is required for MeshNode
+   *
+   * @param {Object} config
+   */
   constructor(config) {
     super(config);
 

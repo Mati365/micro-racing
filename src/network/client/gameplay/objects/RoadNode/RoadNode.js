@@ -1,38 +1,22 @@
-import {vec2} from '@pkg/gl-math';
 import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
 
-import {SceneNode} from '@pkg/isometric-renderer/FGL/engine/scene';
 import raceTrackTextureUrl from '@game/res/img/race-track.png';
 
+import {SceneNode} from '@pkg/isometric-renderer/FGL/engine/scene';
 import RoadWireframe from './RoadWireframe';
+import MetaNode from './MetaNode';
 
 const createRoadRenderer = f => async ({path: {segments}}) => {
   const vertices = [];
   const uv = [];
 
   segments.forEach((segment) => {
-    const {triangles} = segment;
-
     vertices.push(
-      triangles[0].a,
-      triangles[0].b,
-      triangles[0].c,
-
-      triangles[1].a,
-      triangles[1].b,
-      triangles[1].c,
+      ...segment.toTrianglesVertexList(),
     );
 
     uv.push(
-      // down
-      vec2(0.0, 0.0),
-      vec2(1.0, 1.0),
-      vec2(0.0, 1.0),
-
-      // uper
-      vec2(1.0, 0.0),
-      vec2(1.0, 1.0),
-      vec2(0.0, 1.0),
+      ...segment.toTrianglesUVList(),
     );
   });
 
@@ -68,6 +52,7 @@ export default class RoadNode extends SceneNode {
     this.updateTransformCache();
 
     this.wireframe = new RoadWireframe(config.f, this);
+    this.metaNode = new MetaNode(config, this);
   }
 
   async createRenderer(f, path) {
@@ -76,5 +61,15 @@ export default class RoadNode extends SceneNode {
         path,
       },
     );
+  }
+
+  release() {
+    super.release();
+    this.metaNode.release();
+  }
+
+  render(interpolate, mpMatrix, f) {
+    super.render(interpolate, mpMatrix, f);
+    this.metaNode.render(interpolate, mpMatrix, f);
   }
 }

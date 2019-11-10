@@ -36,6 +36,7 @@ const createVectorOptimizedOperations = (w, additionalOperations) => {
       div: unrollDiv(w),
       negate: unrollMul(w, -1),
       dist: unrollDistance(w),
+      equals: (a, b) => a.equals(b),
 
       clone: array => new Vector(array),
       len: unrollLength(w),

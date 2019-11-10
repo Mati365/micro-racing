@@ -15,6 +15,7 @@ import {
 
 import GameCanvas from '@game/network/client/gameplay/GameCanvas';
 import EditorCanvas from './ui/EditorCanvas';
+import PhysicsCanvas from './ui/PhysicsCanvas/PhysicsCanvas';
 
 const Container = styled.div(
   {
@@ -37,10 +38,10 @@ const Container = styled.div(
   },
 );
 
-const EditorRoute = () => (
+const editorRoute = Component => () => (
   <SSRRenderSwitch>
     {() => (
-      <EditorCanvas
+      <Component
         dimensions={{
           w: window.innerWidth,
           h: window.innerHeight,
@@ -64,7 +65,8 @@ const RootContainer = ({i18n, routerProps}) => (
     <Container>
       <IsomorphicRouter {...routerProps}>
         <Switch>
-          <Route path='/editor' component={EditorRoute} />
+          <Route path='/physics' component={editorRoute(PhysicsCanvas)} />
+          <Route path='/editor' component={editorRoute(EditorCanvas)} />
           <Route path='/' component={GameRoute} />
         </Switch>
       </IsomorphicRouter>

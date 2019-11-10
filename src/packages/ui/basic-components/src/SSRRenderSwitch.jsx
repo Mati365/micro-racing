@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 
 const SSRRenderSwitch = ({children, allowSSR}) => {
@@ -23,5 +23,14 @@ SSRRenderSwitch.displayName = 'SSRRenderSwitch';
 SSRRenderSwitch.propTypes = {
   allowSSR: PropTypes.bool,
 };
+
+export const withSSRSwitch = switchProps => ({children, ...props}) => (
+  <SSRRenderSwitch
+    {...switchProps}
+    {...props}
+  >
+    {() => children}
+  </SSRRenderSwitch>
+);
 
 export default SSRRenderSwitch;

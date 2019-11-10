@@ -20,6 +20,7 @@ const SHARED_ALIASES = R.mapObjIndexed(
     '@pkg/isometric-renderer': 'packages/isometric-renderer/src/',
     '@pkg/ctx': 'packages/ctx-utils/src',
     '@pkg/struct-pack': 'packages/struct-pack/src/',
+    '@pkg/physics': 'packages/physics-scene/src/',
 
     '@ui/basic-hooks': 'packages/ui/basic-hooks/src/',
     '@ui/basic-components': 'packages/ui/basic-components/src/',

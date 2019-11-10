@@ -28,6 +28,15 @@ export default class Vector extends Float32Array {
   }
   /* eslint-enable prefer-destructuring */
 
+  equals(a) {
+    return (
+      this[0] === a[0]
+        && this[1] === a[1]
+        && this[2] === a[2]
+        && this[3] === a[3]
+    );
+  }
+
   toBSON() {
     return Array.from(this);
   }

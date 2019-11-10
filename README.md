@@ -29,7 +29,8 @@ https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking <br/>
 http://www.asawicki.info/Mirror/Car%20Physics%20for%20Games/Car%20Physics%20for%20Games.html <br/>
 https://github.com/nadako/cars/blob/gh-pages/Car.hx <br/>
 https://github.com/spacejack/carphysics2d/blob/master/marco/Cardemo.c<br/>
-
+https://www.sevenson.com.au/actionscript/sat<br/>
+http://www.dyn4j.org/2010/01/sat<br/>
 HTML UI in AAA games:<br/>
 https://www.gdcvault.com/play/1022055/How-to-Implement-AAA-Game
 

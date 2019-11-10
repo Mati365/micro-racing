@@ -4,6 +4,7 @@ import createVectorOptimizedOperations from '../createVectorOptimizedOperations'
 import vec3 from '../vec3';
 import vec4 from '../vec4';
 
+import dot from './operations/dot';
 import rotate from './operations/rotate';
 import orthogonal from './operations/orthogonal';
 import fromScalar from './operations/fromScalar';
@@ -13,6 +14,7 @@ import vectorAngle from './operations/vectorAngle';
 export default createVectorOptimizedOperations(
   2,
   {
+    dot,
     rotate,
     orthogonal,
     fromScalar,

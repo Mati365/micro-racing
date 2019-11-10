@@ -1,5 +1,5 @@
 {
   "name": "@pkg/physics-scene",
   "version": "1.0.0",
-  "main": "src/index.jsx"
+  "main": "src/index.js"
 }

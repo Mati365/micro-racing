@@ -43,6 +43,9 @@ export const drawLine = (v1, v2, color, width, ctx) => {
 };
 
 export const drawPolygon = (points, color, width, loop, ctx) => {
+  if (!points.length)
+    return;
+
   const blurOffset = width <= 1 ? 0.5 : 0;
   const firstPoint = points[0];
 

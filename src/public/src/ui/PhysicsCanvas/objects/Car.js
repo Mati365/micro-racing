@@ -4,11 +4,9 @@ import {
   drawPolygon,
 } from '@pkg/ctx';
 
-class SimpleBody {
-  angle = 0;
+import PhysicsBody from '@pkg/physics/types/PhysicsBody';
 
-  velocity = 0;
-
+class SimpleBody extends PhysicsBody {
   constructor({
     // left top corner
     pos = vec2(0, 0),
@@ -24,43 +22,21 @@ class SimpleBody {
       rear: 0.5,
     },
   }) {
-    this.pos = pos;
+    super(
+      {
+        pos,
+        points: [
+          vec2(-size.y / 2, size.x / 2),
+          vec2(size.y / 2, size.x / 2),
+          vec2(size.y / 2, -size.x / 2),
+          vec2(-size.y / 2, -size.x / 2),
+        ],
+      },
+    );
+
     this.size = size;
     this.wheelSize = wheelSize;
     this.wheelBase = axles.rear - axles.front;
-  }
-
-  relativeBodyRelativeVector(v) {
-    const {angle, pos} = this;
-
-    return vec2.add(
-      vec2.rotate(angle, v),
-      pos,
-    );
-  }
-
-  get vertices() {
-    const {size} = this;
-
-    return [
-      this.relativeBodyRelativeVector(vec2(-size.y / 2, size.x / 2)),
-      this.relativeBodyRelativeVector(vec2(size.y / 2, size.x / 2)),
-      this.relativeBodyRelativeVector(vec2(size.y / 2, -size.x / 2)),
-      this.relativeBodyRelativeVector(vec2(-size.y / 2, -size.x / 2)),
-    ];
-  }
-
-  get center() {
-    return this.pos;
-  }
-
-  get velocityVector() {
-    const {angle, velocity} = this;
-
-    return vec2(
-      Math.cos(angle) * velocity,
-      Math.sin(angle) * velocity,
-    );
   }
 
   speedUp(delta) {

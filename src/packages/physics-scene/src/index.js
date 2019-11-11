@@ -7,8 +7,11 @@ export default class PhysicsScene {
     this.items = items || [];
   }
 
-  update() {
+  update(delta) {
     const {items} = this;
+
+    for (let i = 0; i < items.length; ++i)
+      items[i].update(delta);
 
     for (let i = 0; i < items.length; ++i) {
       const a = items[i];

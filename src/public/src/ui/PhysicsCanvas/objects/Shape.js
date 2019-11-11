@@ -1,50 +1,25 @@
-import * as R from 'ramda';
-
-import {vec2} from '@pkg/gl-math';
 import {
   fillCircle,
   drawPolygon,
 } from '@pkg/ctx';
 
-export default class Shape {
+import PhysicsBody from '@pkg/physics/types/PhysicsBody';
+
+export default class Shape extends PhysicsBody {
   constructor({
     points,
     pos,
+    angle = Math.PI / 4,
     moveable = false,
-    renderNormals = true,
   }) {
-    this.points = points;
-    this.pos = pos;
-    this.moveable = moveable;
-    this.renderNormals = renderNormals;
-
-    const cacheByPos = (fn) => {
-      const prevPos = vec2(null, null);
-      let cachedList = null;
-
-      return () => {
-        if (cachedList && this.pos.equals(prevPos))
-          return cachedList;
-
-        prevPos.xy = this.pos;
-        cachedList = fn();
-
-        return cachedList;
-      };
-    };
-
-    Object.defineProperty(this, 'vertices', {
-      get: cacheByPos(
-        () => R.map(
-          p => vec2.add(this.pos, p),
-          this.points,
-        ),
-      ),
-    });
-  }
-
-  get center() {
-    return this.pos;
+    super(
+      {
+        pos,
+        points,
+        moveable,
+        angle,
+      },
+    );
   }
 
   render(ctx) {

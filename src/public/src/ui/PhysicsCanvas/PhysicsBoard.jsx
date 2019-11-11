@@ -84,8 +84,7 @@ export default class PhysicsBoard {
     else if (keycodes[83])
       body.speedUp(-0.1);
 
-    car.update(delta);
-    physics.update();
+    physics.update(delta);
   }
 
   render(delta) {

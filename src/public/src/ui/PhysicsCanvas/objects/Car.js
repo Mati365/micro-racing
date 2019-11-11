@@ -1,5 +1,6 @@
 import {vec2} from '@pkg/gl-math';
 import {
+  drawLine,
   fillCircle,
   drawPolygon,
 } from '@pkg/ctx';
@@ -38,21 +39,6 @@ class SimpleBody extends PhysicsBody {
     this.wheelSize = wheelSize;
     this.wheelBase = axles.rear - axles.front;
   }
-
-  speedUp(delta) {
-    this.velocity += delta;
-  }
-
-  turn(delta) {
-    this.angle += delta;
-  }
-
-  update() {
-    const {pos, velocityVector} = this;
-
-    this.pos = vec2.add(pos, velocityVector);
-    this.velocity *= 0.99;
-  }
 }
 
 export default class Car {
@@ -79,6 +65,14 @@ export default class Car {
       '#fff',
       2,
       true,
+      ctx,
+    );
+
+    drawLine(
+      vertices[1],
+      vertices[2],
+      '#ff0000',
+      2,
       ctx,
     );
   }

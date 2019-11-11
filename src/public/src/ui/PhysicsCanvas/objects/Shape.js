@@ -9,7 +9,7 @@ export default class Shape extends PhysicsBody {
   constructor({
     points,
     pos,
-    angle = Math.PI / 4,
+    angle = 20,
     moveable = false,
   }) {
     super(

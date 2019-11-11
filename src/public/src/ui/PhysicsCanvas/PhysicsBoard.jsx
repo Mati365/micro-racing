@@ -21,7 +21,7 @@ export default class PhysicsBoard {
 
     this.car = new Car(
       {
-        pos: vec2(dimensions.w / 2, dimensions.h / 2),
+        pos: vec2(dimensions.w / 2 - 650, dimensions.h / 2 + 150),
         size: vec2(32, 64),
       },
     );
@@ -49,6 +49,34 @@ export default class PhysicsBoard {
                 vec2(-100, -100),
               ],
               moveable: false,
+            },
+          ),
+
+          new Shape(
+            {
+              pos: vec2(dimensions.w / 2 + 100, dimensions.h / 2 - 60),
+              points: [
+                vec2(-100, 100),
+                vec2(100, 100),
+                vec2(100, -100),
+                vec2(-100, -100),
+              ],
+              angle: Math.PI / 3,
+              moveable: false,
+            },
+          ),
+
+          new Shape(
+            {
+              pos: vec2(dimensions.w / 2 - 500, dimensions.h / 2 + 150),
+              points: [
+                vec2(-50, 50),
+                vec2(50, 50),
+                vec2(50, -50),
+                vec2(-50, -50),
+              ],
+              angle: -Math.PI / 3,
+              moveable: true,
             },
           ),
         ],

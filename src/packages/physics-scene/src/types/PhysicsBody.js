@@ -1,4 +1,8 @@
-import {vec2} from '@pkg/gl-math';
+import * as R from 'ramda';
+import {
+  wrapAngleTo2PI,
+  vec2,
+} from '@pkg/gl-math';
 
 export default class PhysicsBody {
   constructor({
@@ -10,8 +14,9 @@ export default class PhysicsBody {
   }) {
     this.pos = pos;
     this.points = points;
-    this.moveable = moveable;
+    this.moveable = R.defaultTo(true, moveable);
     this.angle = angle;
+    this.angularVelocity = 0;
     this.velocity = velocity;
 
     const cacheByPos = (fn) => {
@@ -45,6 +50,15 @@ export default class PhysicsBody {
     });
   }
 
+  speedUp(delta) {
+    this.velocity += delta;
+  }
+
+  turn(delta) {
+    this.angularVelocity *= 0.3;
+    this.angle += delta;
+  }
+
   relativeBodyVector(v) {
     const {angle, pos} = this;
 
@@ -70,7 +84,12 @@ export default class PhysicsBody {
     );
   }
 
-  /* eslint-disable class-methods-use-this */
-  update() {}
-  /* eslint-enable class-methods-use-this */
+  update() {
+    const {pos, angle, velocityVector, angularVelocity} = this;
+
+    this.pos = vec2.add(pos, velocityVector);
+    this.angle = wrapAngleTo2PI(angle + angularVelocity);
+    this.angularVelocity *= 0.9;
+    this.velocity *= 0.99;
+  }
 }

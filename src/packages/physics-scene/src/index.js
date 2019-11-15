@@ -1,12 +1,14 @@
 import {
-  reflectByNormal,
   smallestAngleDistance,
   wrapAngleTo2PI,
   vec2,
   toRadians,
 } from '@pkg/gl-math';
 
-import collisionsCheck from './engines/diagonal';
+import {
+  aabb,
+  diagonal,
+} from './engines';
 
 export default class PhysicsScene {
   constructor({
@@ -36,7 +38,7 @@ export default class PhysicsScene {
           const intersection = intersections[k];
           const edgeNormal = intersection.edgeB.normal(true);
 
-          const newVelocity = reflectByNormal(edgeNormal, a.velocityVector, true);
+          const newVelocity = vec2.reflectByNormal(edgeNormal, a.velocityVector, true);
           const newAngle = wrapAngleTo2PI(
             Math.atan2(newVelocity.y, newVelocity.x),
           );
@@ -46,9 +48,7 @@ export default class PhysicsScene {
 
           // performs bounce if < maxReflectionAngle
           if (a.velocity > 0.1) {
-            const cornerCollision = intersection.uB < 0.1 || intersection.uB > 0.9;
-
-            if (!cornerCollision && Math.abs(angleDelta) < config.maxReflectionAngle + Math.PI / 2)
+            if (Math.abs(angleDelta) < config.maxReflectionAngle + Math.PI / 2)
               a.angularVelocity = angleDelta / (1 / a.velocity * 50);
             else
               a.velocity = -a.velocity * 0.25;
@@ -61,23 +61,35 @@ export default class PhysicsScene {
       b.pos = vec2.sub(b.pos, mtv.translate);
   }
 
+  updateObjectPhysics(a) {
+    const {items} = this;
+    const {box: boxA} = a;
+
+    for (let j = 0; j < items.length; ++j) {
+      const b = items[j];
+      if (a === b || (!a.moveable && !b.moveable))
+        continue;
+
+      // ignore if not AABB, it is much faster than diagonal checks
+      const {box: boxB} = b;
+      if (!aabb(boxA, boxB))
+        continue;
+
+      // DIAGONAL
+      const mtv = diagonal(a, b);
+      if (mtv)
+        this.performBodyReaction(a, b, mtv);
+    }
+  }
+
   update(delta) {
     const {items} = this;
 
     for (let i = 0; i < items.length; ++i) {
-      const a = items[i];
+      const body = items[i];
 
-      items[i].update(delta);
-
-      for (let j = 0; j < items.length; ++j) {
-        const b = items[j];
-        if (i === j || (!a.moveable && !b.moveable))
-          continue;
-
-        const mtv = collisionsCheck(a, b);
-        if (mtv)
-          this.performBodyReaction(a, b, mtv);
-      }
+      body.update(delta);
+      this.updateObjectPhysics(body);
     }
 
     return false;

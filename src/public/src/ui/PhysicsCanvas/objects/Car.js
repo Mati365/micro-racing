@@ -1,6 +1,7 @@
 import {vec2} from '@pkg/gl-math';
 import {
   drawLine,
+  drawRect,
   fillCircle,
   drawPolygon,
 } from '@pkg/ctx';
@@ -51,7 +52,7 @@ export default class Car {
   }
 
   render(ctx) {
-    const {pos, vertices} = this.body;
+    const {pos, vertices, box} = this.body;
 
     fillCircle(
       pos,
@@ -73,6 +74,13 @@ export default class Car {
       vertices[2],
       '#ff0000',
       2,
+      ctx,
+    );
+
+    drawRect(
+      box,
+      1,
+      '#0000ff',
       ctx,
     );
   }

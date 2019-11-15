@@ -2,6 +2,7 @@ import * as R from 'ramda';
 import {
   wrapAngleTo2PI,
   vec2,
+  getPathCornersBox,
 } from '@pkg/gl-math';
 
 export default class PhysicsBody {
@@ -19,35 +20,41 @@ export default class PhysicsBody {
     this.angularVelocity = 0;
     this.velocity = velocity;
 
-    const cacheByPos = (fn) => {
-      const prevState = {
-        pos: vec2(null, null),
-        prevAngle: null,
-      };
-
-      let cachedList = null;
-
-      return () => {
-        if (cachedList
-            && this.pos.equals(prevState.pos)
-            && this.angle === prevState.angle)
-          return cachedList;
-
-        prevState.pos.xy = this.pos;
-        prevState.angle = this.angle;
-
-        cachedList = fn();
-        return cachedList;
-      };
-    };
-
     Object.defineProperty(this, 'vertices', {
-      get: cacheByPos(
+      get: this.cacheByPos(
         () => this.points.map(
           p => this.relativeBodyVector(p),
         ),
       ),
     });
+
+    Object.defineProperty(this, 'box', {
+      get: this.cacheByPos(
+        () => getPathCornersBox(this.vertices),
+      ),
+    });
+  }
+
+  cacheByPos(fn) {
+    const prevState = {
+      pos: vec2(null, null),
+      prevAngle: null,
+    };
+
+    let cachedValue = null;
+
+    return () => {
+      if (cachedValue
+          && this.pos.equals(prevState.pos)
+          && this.angle === prevState.angle)
+        return cachedValue;
+
+      prevState.pos.xy = this.pos;
+      prevState.angle = this.angle;
+
+      cachedValue = fn();
+      return cachedValue;
+    };
   }
 
   speedUp(delta) {

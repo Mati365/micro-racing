@@ -4,9 +4,7 @@ import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
 import PALETTE from '@pkg/isometric-renderer/FGL/core/constants/colors';
 
 import segmentizePath from '@game/logic/track/TrackSegments/utils/segmentizePath';
-import {getPathDimensions} from '@game/logic/track/TrackPath/utils/generateRandomPath';
-
-import {Vector} from '@pkg/gl-math';
+import {getPathCornersBox, Vector} from '@pkg/gl-math';
 
 import {
   drawPoints,
@@ -175,7 +173,7 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
   toBSON() {
     const points = this.track.getRealPathPoints();
     const {transform} = this.sceneMeta;
-    const {topLeft, width, height} = getPathDimensions(
+    const {topLeft, width, height} = getPathCornersBox(
       this.track.getInterpolatedPathPoints(),
     );
 

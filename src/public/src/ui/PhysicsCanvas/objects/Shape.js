@@ -1,5 +1,6 @@
 import {
   fillCircle,
+  drawRect,
   drawPolygon,
 } from '@pkg/ctx';
 
@@ -23,13 +24,19 @@ export default class Shape extends PhysicsBody {
   }
 
   render(ctx) {
-    const {pos} = this;
+    const {pos, box} = this;
 
     drawPolygon(this.vertices, '#fff', 2, true, ctx);
     fillCircle(
       pos,
       2,
       '#ff0000',
+      ctx,
+    );
+    drawRect(
+      box,
+      1,
+      '#0000ff',
       ctx,
     );
   }

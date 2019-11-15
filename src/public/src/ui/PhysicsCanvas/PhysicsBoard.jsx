@@ -79,6 +79,20 @@ export default class PhysicsBoard {
               moveable: true,
             },
           ),
+
+          new Shape(
+            {
+              pos: vec2(dimensions.w / 2 - 500, 150),
+              points: [
+                vec2(-50, 50),
+                vec2(50, 50),
+                vec2(50, -50),
+                vec2(-50, -50),
+              ],
+              angle: Math.PI / 4.5,
+              moveable: false,
+            },
+          ),
         ],
       },
     );

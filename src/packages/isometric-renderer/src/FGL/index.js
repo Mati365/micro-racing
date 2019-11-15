@@ -63,7 +63,7 @@ const createRenderContext = (canvasElement, glContextFlags) => {
       state,
       loaders: {
         mesh: {
-          ...bindObjectSceneContext(meshLoaders),
+          ...meshLoaders,
           from: getMaterialMeshFrom(fgl, gl),
         },
       },

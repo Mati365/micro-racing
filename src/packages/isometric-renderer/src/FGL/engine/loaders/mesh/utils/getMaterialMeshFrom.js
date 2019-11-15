@@ -1,7 +1,8 @@
 import * as R from 'ramda';
 
-import {createUBO} from '../../../../core/buffer/types';
+import {createUBO, createMeshVertexBuffer} from '../../../../core/buffer/types';
 import {packMaterialsBuffer} from '../../../materials/createMaterialMeshMaterial';
+import MeshVertexResource from '../types/MeshVertexResource';
 
 const getMaterialMeshFrom = (f, gl) => async (
   {
@@ -13,12 +14,20 @@ const getMaterialMeshFrom = (f, gl) => async (
     ...params
   },
 ) => {
+  const meshVertexData = (
+    R.is(MeshVertexResource, loaderData)
+      ? loaderData
+      : f.loaders.mesh[loader](loaderData)
+  );
+
   const {
     size,
-    vao,
     materials,
+    normalized,
+    vertices,
     textures: loaderTextures,
-  } = f.loaders.mesh[loader](loaderData);
+    vao = createMeshVertexBuffer(gl, vertices, normalized),
+  } = meshVertexData;
 
   const shaderTextures = R.map(
     R.compose(

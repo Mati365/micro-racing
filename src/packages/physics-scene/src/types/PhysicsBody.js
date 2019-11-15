@@ -11,14 +11,14 @@ export default class PhysicsBody {
     points,
     moveable,
     angle = 0,
-    velocity = 0,
+    speed = 0,
   }) {
     this.pos = pos;
     this.points = points;
     this.moveable = R.defaultTo(true, moveable);
     this.angle = angle;
     this.angularVelocity = 0;
-    this.velocity = velocity;
+    this.speed = speed;
 
     Object.defineProperty(this, 'vertices', {
       get: this.cacheByPos(
@@ -58,7 +58,7 @@ export default class PhysicsBody {
   }
 
   speedUp(delta) {
-    this.velocity += delta;
+    this.speed += delta;
   }
 
   turn(delta) {
@@ -83,11 +83,11 @@ export default class PhysicsBody {
   }
 
   get velocityVector() {
-    const {angle, velocity} = this;
+    const {angle, speed} = this;
 
     return vec2(
-      Math.cos(angle) * velocity,
-      Math.sin(angle) * velocity,
+      Math.cos(angle) * speed,
+      Math.sin(angle) * speed,
     );
   }
 

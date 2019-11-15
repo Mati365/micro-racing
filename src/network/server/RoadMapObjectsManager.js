@@ -1,7 +1,11 @@
 import * as R from 'ramda';
 
-import {CAR_TYPES} from '@game/network/constants/serverCodes';
-import PlayerMapElement, {genCarSegmentTransform, CAR_ALIGN} from '../shared/map/PlayerMapElement';
+import {
+  CAR_TYPES,
+  CAR_ALIGN,
+} from '@game/network/constants/serverCodes';
+
+import PlayerMapElement, {genCarSegmentTransform} from '../shared/map/PlayerMapElement';
 
 /**
  * Manage map, align players on road etc

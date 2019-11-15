@@ -30,7 +30,7 @@ export default class PhysicsScene {
     if (a.moveable) {
       a.pos = vec2.add(a.pos, mtv.translate);
 
-      if (a.velocity) {
+      if (a.speed) {
         // apply impulses
         const {intersections} = mtv;
 
@@ -44,14 +44,14 @@ export default class PhysicsScene {
           );
 
           const angleDelta = -smallestAngleDistance(a.angle, newAngle);
-          a.velocity *= 0.95;
+          a.speed *= 0.95;
 
           // performs bounce if < maxReflectionAngle
-          if (a.velocity > 0.1) {
+          if (a.speed > 0.1) {
             if (Math.abs(angleDelta) < config.maxReflectionAngle + Math.PI / 2)
-              a.angularVelocity = angleDelta / (1 / a.velocity * 50);
+              a.angularVelocity = angleDelta / (1 / a.speed * 50);
             else
-              a.velocity = -a.velocity * 0.25;
+              a.speed = -a.speed * 0.25;
           }
         }
       }

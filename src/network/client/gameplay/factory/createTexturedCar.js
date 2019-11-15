@@ -1,35 +1,27 @@
 import * as R from 'ramda';
 
-import {createSingleResourceLoader} from '@pkg/resource-pack-loader';
-
-// global tex
-import carTextureUrl from '@game/res/model/cars/tex.png';
-
-// cars tex
-import blueCarUrl from '@game/res/model/cars/blue.obj';
-import redCarUrl from '@game/res/model/cars/red.obj';
-
-import {CAR_TYPES} from '../../../constants/serverCodes';
-
-const CARS_URLS = {
-  [CAR_TYPES.BLUE]: blueCarUrl,
-  [CAR_TYPES.RED]: redCarUrl,
-};
+import {fetchCachedCarResource} from '@game/shared/enumeratedResources/cars';
 
 const createTexturedCar = f => R.memoizeWith(
   R.identity,
-  async color => f.loaders.mesh.from(
-    {
-      loader: 'obj',
-      loaderData: {
-        source: await createSingleResourceLoader()(CARS_URLS[color]),
-        normalize: 'h',
+  async (color) => {
+    const {mesh, textures} = await fetchCachedCarResource(
+      {
+        color,
       },
-      textures: [
-        await createSingleResourceLoader()(carTextureUrl),
-      ],
-    },
-  ),
+    );
+
+    return f.loaders.mesh.from(
+      {
+        loader: 'obj',
+        loaderData: {
+          source: mesh,
+          normalize: 'h',
+        },
+        textures,
+      },
+    );
+  },
 );
 
 export default createTexturedCar;

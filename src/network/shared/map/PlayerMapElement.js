@@ -2,6 +2,7 @@ import {vec2, vec3} from '@pkg/gl-math';
 
 import {
   CAR_TYPES,
+  CAR_ALIGN,
   OBJECT_TYPES,
 } from '@game/network/constants/serverCodes';
 
@@ -19,12 +20,6 @@ import MapElement from './MapElement';
  *
  * @returns {Object}
  */
-export const CAR_ALIGN = {
-  CENTER: 0,
-  LEFT_CORNER: 1,
-  RIGHT_CORNER: -1,
-};
-
 export const genCarSegmentTransform = ({
   segment,
   align = CAR_ALIGN.LEFT_CORNER,
@@ -60,7 +55,15 @@ export default class PlayerMapElement extends MapElement {
     this.player = player;
     this.carType = carType;
     this.transform = transform;
-    this.body = new CarPhysicsBody(body);
+
+    const {scale} = transform;
+    console.log(scale);
+    this.body = new CarPhysicsBody(
+      {
+        ...body,
+        size: body.size || {},
+      },
+    );
   }
 
   toBSON() {

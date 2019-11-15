@@ -1,14 +1,15 @@
 import * as R from 'ramda';
 
 import getIndexByName from '@pkg/basic-helpers/list/getIndexByName';
-import createMeshVertexBuffer from '../../../../core/buffer/types/createMeshVertexBuffer';
-import {MeshMaterial} from '../../../materials/createMaterialMeshMaterial';
 
 import loadMTL from './loadMTL';
 import {
   generateLineTokens,
   mapToFloats,
 } from './utils';
+
+import {MeshMaterial} from '../../../materials/createMaterialMeshMaterial';
+import MeshVertexResource from '../types/MeshVertexResource';
 
 const MATCH_FACE_REGEX = /(?:(?<v>[^/]+)(?:\/|$))(?:(?<uv>[^/]*)(?:\/|$))?(?:(?<n>[^/]+)(?:\/|$))?/;
 
@@ -30,7 +31,7 @@ const flipUV = ([x, y]) => ([
  *
  * @returns {LoaderDescriptor}
  */
-const loadOBJ = gl => ({
+const loadOBJ = ({
   source,
   mtl,
   normalize, // w, h, z
@@ -149,12 +150,15 @@ const loadOBJ = gl => ({
     }
   }
 
-  return {
-    vao: createMeshVertexBuffer(gl, vertices, normalize),
-    materials: materials.map(material => new MeshMaterial(material)),
-    size,
-    textures: [],
-  };
+  return new MeshVertexResource(
+    {
+      materials: materials.map(material => new MeshMaterial(material)),
+      textures: [],
+      normalized: normalize,
+      vertices,
+      size,
+    },
+  );
 };
 
 export default loadOBJ;

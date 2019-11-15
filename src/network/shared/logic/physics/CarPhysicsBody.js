@@ -1,8 +1,11 @@
 import * as R from 'ramda';
 
 import {
-  clamp, lerp, toRadians, vec2,
+  clamp, lerp,
+  toRadians, vec2,
 } from '@pkg/gl-math';
+
+import PhysicsBody from '@pkg/physics/types/PhysicsBody';
 
 const GRAVITY = 9.81;
 
@@ -30,7 +33,7 @@ const vec2rot = (angle, vec) => {
  * - Sideslip angle (BETA) is angle between velocity and car angle
  *
  */
-export default class CarPhysicsBody {
+export default class CarPhysicsBody extends PhysicsBody {
   constructor(
     {
       mass = 100,
@@ -57,6 +60,15 @@ export default class CarPhysicsBody {
       },
     } = {},
   ) {
+    console.log(size);
+    super(
+      {
+        moveable: true,
+        points: [],
+        pos,
+      },
+    );
+
     this.braking = false;
     this.mass = mass;
     this.inertia = mass;
@@ -70,9 +82,6 @@ export default class CarPhysicsBody {
     this.maxSteerAngle = maxSteerAngle;
 
     this.massCenter = massCenter;
-    this.size = size;
-    this.pos = pos;
-
     this.throttle = 0;
     this.maxThrottle = 300;
 

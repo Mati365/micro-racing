@@ -37,6 +37,12 @@ export const CAR_TYPES = {
   BLUE: 1,
 };
 
+export const CAR_ALIGN = {
+  CENTER: 0,
+  LEFT_CORNER: 1,
+  RIGHT_CORNER: -1,
+};
+
 export const OBJECT_TYPES = {
   PRIMITIVE: 0,
   ROAD: 1,

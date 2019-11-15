@@ -1,4 +1,4 @@
-import {vec2, vec3} from '@pkg/gl-math';
+import {Size, vec2, vec3} from '@pkg/gl-math';
 
 import {
   CAR_TYPES,
@@ -10,6 +10,8 @@ import {createPackedStruct} from '@pkg/struct-pack';
 
 import CarPhysicsBody from '../logic/physics/CarPhysicsBody';
 import MapElement from './MapElement';
+
+import {CARS_RESOURCES} from '../sceneResources/cars';
 
 /**
  * Calculates angle and position car on map segment
@@ -57,11 +59,16 @@ export default class PlayerMapElement extends MapElement {
     this.transform = transform;
 
     const {scale} = transform;
-    console.log(scale);
+    const normalizedSize = body.size || CARS_RESOURCES[carType].normalizedSize;
+
     this.body = new CarPhysicsBody(
       {
         ...body,
-        size: body.size || {},
+        size: new Size(
+          normalizedSize.w * scale[0],
+          normalizedSize.h * scale[1],
+          normalizedSize.z * scale[2],
+        ),
       },
     );
   }

@@ -81,6 +81,8 @@ export default class GameBoard {
 
     /** @see PlayerMapElement.binarySnapshotSerializer */
     const {body} = node;
+    if (!body)
+      return;
 
     // floats
     const prevPos = body.pos;

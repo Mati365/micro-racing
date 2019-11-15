@@ -1,3 +1,7 @@
+/**
+ * Class that holds vertices / normals used to
+ * create VAO / internal FGL engine meshes
+ */
 export default class MeshVertexResource {
   constructor({materials, textures, normalized, vertices, size}) {
     this.materials = materials;

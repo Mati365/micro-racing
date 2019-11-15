@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import {fetchCachedCarResource} from '@game/shared/scene-resources/cars';
+import {fetchCachedCarResource} from '@game/shared/sceneResources/cars';
 
 import {
   HTMLTextNode,
@@ -28,6 +28,11 @@ const createTexturedCarRenderer = f => R.memoizeWith(
   },
 );
 
+/**
+ * @see
+ *  CarNode receives mesh size both from server and client
+ *  for CarPhysicsBody it will be better to use server size
+ */
 export default class CarNode extends MeshNode {
   constructor({
     f,

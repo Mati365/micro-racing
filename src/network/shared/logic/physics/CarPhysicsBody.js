@@ -2,7 +2,7 @@ import * as R from 'ramda';
 
 import {
   clamp, lerp,
-  toRadians, vec2,
+  toRadians, vec2, Size,
 } from '@pkg/gl-math';
 
 import PhysicsBody from '@pkg/physics/types/PhysicsBody';
@@ -19,7 +19,11 @@ const makeWheel = (x, y, steering = false) => ({
 const vec2rot = (angle, vec) => {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
-  return vec2(vec.x * sin + vec.y * cos, vec.x * cos - vec.y * sin);
+
+  return vec2(
+    vec.x * sin + vec.y * cos,
+    vec.x * cos - vec.y * sin,
+  );
 };
 
 /**
@@ -60,7 +64,6 @@ export default class CarPhysicsBody extends PhysicsBody {
       },
     } = {},
   ) {
-    console.log(size);
     super(
       {
         moveable: true,
@@ -86,6 +89,7 @@ export default class CarPhysicsBody extends PhysicsBody {
     this.maxThrottle = 300;
 
     this.brake = 0;
+    this.size = size;
 
     // wheelBase is distance betwen axles
     this.axles = axles;
@@ -312,15 +316,22 @@ export default class CarPhysicsBody extends PhysicsBody {
   toBSON = ::this.toJSON;
 
   static fromJSON = (() => {
-    const deserializer = R.converge(
-      R.merge,
-      [
-        R.pick(['mass', 'angle', 'steerAngle', 'maxSteerAngle', 'axles', 'angularVelocity']),
-        R.compose(
-          R.mapObjIndexed(obj => vec2(...obj)),
-          R.pick(['velocity', 'pos', 'size', 'massCenter', 'wheelSize']),
-        ),
-      ],
+    const deserializer = R.compose(
+      R.evolve(
+        {
+          size: size => new Size(size.w, size.h, size.z),
+        },
+      ),
+      R.converge(
+        R.merge,
+        [
+          R.pick(['mass', 'size', 'angle', 'steerAngle', 'maxSteerAngle', 'axles', 'angularVelocity']),
+          R.compose(
+            R.mapObjIndexed(obj => obj && vec2(...obj)),
+            R.pick(['velocity', 'pos', 'massCenter', 'wheelSize']),
+          ),
+        ],
+      ),
     );
 
     return (json, additionalParams) => new CarPhysicsBody(

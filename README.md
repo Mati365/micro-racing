@@ -5,7 +5,6 @@ online 2D multiplayer go-carts racing game
 
 ## Gameplay
 ![GIF](/doc/screens/gameplay.gif)
-GIF
 
 ## Goals
 - Use monorepo, separated logic

@@ -4,8 +4,8 @@
 online 2D multiplayer go-carts racing game
 
 ## Gameplay
-[![Video](https://i.imgur.com/JckXVQs.png)](https://www.youtube.com/watch?v=EDJOmJYySsc "Engine video")
-Engine prototype (click to play)
+![GIF](/doc/gameplay.gif)
+GIF
 
 ## Goals
 - Use monorepo, separated logic

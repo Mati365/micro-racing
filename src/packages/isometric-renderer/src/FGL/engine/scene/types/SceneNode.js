@@ -53,7 +53,6 @@ export default class SceneNode {
   } = {}) {
     this.id = id;
     this.scene = scene;
-    this.renderer = renderer;
     this.uniforms = uniforms;
     this.ubo = ubo;
     this.matrix = matrix;
@@ -88,6 +87,12 @@ export default class SceneNode {
 
     // third party flag fields
     Object.assign(this, attributes);
+
+    // lazy init renderer
+    if (R.is(Promise, renderer))
+      renderer.then(::this.setRenderer);
+    else
+      this.renderer = renderer;
   }
 
   release() {
@@ -103,6 +108,14 @@ export default class SceneNode {
    */
   setScene(scene) {
     this.scene = scene;
+    return this;
+  }
+
+  setRenderer(renderer) {
+    this.renderer = renderer;
+    this.updateTransformCache();
+
+    return this;
   }
 
   /**

@@ -1,3 +1,7 @@
+import * as R from 'ramda';
+
+import {fetchCachedCarResource} from '@game/shared/scene-resources/cars';
+
 import {
   HTMLTextNode,
   MeshNode,
@@ -6,20 +10,55 @@ import {
 import CarPhysicsBody from '@game/logic/physics/CarPhysicsBody';
 import CarNodeEffects from './CarNodeEffects';
 
+const createTexturedCarRenderer = f => R.memoizeWith(
+  R.identity,
+  async (type) => {
+    const {meshVertexResource, textures} = await fetchCachedCarResource(
+      {
+        type,
+      },
+    );
+
+    return f.loaders.mesh.from(
+      {
+        loaderData: meshVertexResource,
+        textures,
+      },
+    );
+  },
+);
+
 export default class CarNode extends MeshNode {
   constructor({
     f,
     player,
+    type,
     body,
     ...meshConfig
   }) {
-    super(meshConfig);
+    super(
+      {
+        ...meshConfig,
+        renderer: createTexturedCarRenderer(f)(type),
+      },
+    );
 
-    if (body) {
-      if (body instanceof CarPhysicsBody)
-        this.body = body;
+    this.f = f;
+    this.player = player;
+    this.type = type;
+    this.bodyConfig = body;
+  }
+
+  setRenderer(renderer) {
+    const {player, f, bodyConfig} = this;
+
+    super.setRenderer(renderer);
+
+    if (bodyConfig) {
+      if (bodyConfig instanceof CarPhysicsBody)
+        this.body = bodyConfig;
       else
-        this.body = CarPhysicsBody.fromJSON(body);
+        this.body = CarPhysicsBody.fromJSON(bodyConfig);
     } else {
       this.body = new CarPhysicsBody(
         {
@@ -30,7 +69,6 @@ export default class CarNode extends MeshNode {
       );
     }
 
-    this.player = player;
     this.wireframe = new CarNodeEffects(f, this);
     this.nickNode = new HTMLTextNode(
       {
@@ -44,7 +82,7 @@ export default class CarNode extends MeshNode {
     const {nickNode} = this;
 
     super.release();
-    nickNode.release();
+    nickNode && nickNode.release();
   }
 
   update(interpolate) {
@@ -52,6 +90,9 @@ export default class CarNode extends MeshNode {
       nickNode, body,
       translate, rotate,
     } = this;
+
+    if (!body)
+      return;
 
     // physics is slower than renderer
     // interpolate between frames
@@ -70,7 +111,7 @@ export default class CarNode extends MeshNode {
   render(interpolate, mpMatrix, f) {
     const {nickNode} = this;
 
-    nickNode.render(interpolate, mpMatrix, f);
+    nickNode && nickNode.render(interpolate, mpMatrix, f);
     super.render(interpolate, mpMatrix);
   }
 }

@@ -1,2 +1,3 @@
-export {default as createTexturedCar} from './createTexturedCar';
+/* eslint-disable */
 export {default as createTerrain} from './createTerrain';
+/* eslint-enable */

@@ -17,11 +17,16 @@ export default class MeshNode extends SceneNode {
       this.wireframe = new MeshWireframe(config.f, this);
   }
 
+  setRenderer(renderer) {
+    this.release();
+    super.setRenderer(renderer);
+  }
+
   release() {
     const {meshDescriptor} = this;
 
     super.release();
-    meshDescriptor.release();
+    meshDescriptor && meshDescriptor.release();
   }
 
   updateTransformCache() {
@@ -34,21 +39,28 @@ export default class MeshNode extends SceneNode {
     if (!this.boundingRect)
       this.boundingRect = new BoundingRect;
 
-    const {size: meshSize} = this.meshDescriptor;
-    const {
-      scale, translate,
-      size, boundingRect,
-    } = this;
+    const {meshDescriptor} = this;
+    if (meshDescriptor) {
+      const {size: meshSize} = meshDescriptor;
+      const {
+        scale, translate,
+        size, boundingRect,
+      } = this;
 
-    size.w = meshSize.w * scale[0];
-    size.h = meshSize.h * scale[1];
-    size.z = meshSize.z * scale[2];
+      size.w = meshSize.w * scale[0];
+      size.h = meshSize.h * scale[1];
+      size.z = meshSize.z * scale[2];
 
-    boundingRect.size = size;
-    boundingRect.translate = translate;
+      boundingRect.size = size;
+      boundingRect.translate = translate;
+    }
   }
 
   get meshDescriptor() {
-    return this.renderer.instance.meshDescriptor;
+    const {renderer} = this;
+    if (!renderer)
+      return null;
+
+    return renderer.instance.meshDescriptor;
   }
 }

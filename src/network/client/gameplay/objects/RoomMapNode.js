@@ -92,8 +92,8 @@ export const appendToSceneBuffer = f => ({
               ...sceneParams,
               ...renderParams,
               id,
+              type: carType,
               player: findByID(playerID, players),
-              renderer: await Factory.createTexturedCar(f)(carType),
             },
           ));
         } break;

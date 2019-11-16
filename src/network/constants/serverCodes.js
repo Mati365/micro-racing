@@ -16,6 +16,11 @@ export const ACTION_FLAGS = {
   BSON_PAYLOAD: 0b100,
 };
 
+export const PLAYER_TYPES = {
+  BOT: 1,
+  HUMAN: 2,
+};
+
 export const PLAYER_ACTIONS = {
   PLAYER_INFO: 0,
   JOIN_ROOM: 1,

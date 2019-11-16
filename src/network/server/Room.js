@@ -1,11 +1,13 @@
 import * as R from 'ramda';
 
 import {
+  PLAYER_TYPES,
   ERROR_CODES,
   PLAYER_ACTIONS,
 } from '@game/network/constants/serverCodes';
 
 import {
+  hasFlag,
   findByID,
   removeByID,
 } from '@pkg/basic-helpers';
@@ -14,20 +16,25 @@ import createActionMessage from '../shared/utils/createActionMessage';
 
 import ServerError from '../shared/ServerError';
 import RoomRacing from './RoomRacing';
+import {PlayerBot} from './Player/types';
 
 export default class Room {
   constructor(
     {
+      options = {
+        spawnBotsBeforeStart: true,
+      },
       owner,
       name,
       map,
       abstract, // its only virtual represenation of list of players
       kickedPlayers = [],
       players = [],
-      playersLimit = 8,
+      playersLimit = 5,
       onDestroy,
     },
   ) {
+    this.options = options;
     this.map = map;
     this.name = name;
     this.owner = owner;
@@ -56,8 +63,16 @@ export default class Room {
   }
 
   startRace() {
+    const {spawnBotsBeforeStart} = this.options;
+
     if (this.abstract)
       return;
+
+    if (spawnBotsBeforeStart) {
+      this.spawnBots(
+        Math.max(0, this.playersLimit - this.players.length - 1),
+      );
+    }
 
     this.racing.start();
   }
@@ -78,8 +93,11 @@ export default class Room {
   sendBinaryBroadcastMessage(message) {
     const {players} = this;
 
-    for (let i = players.length - 1; i >= 0; --i)
-      players[i].ws.send(message);
+    for (let i = players.length - 1; i >= 0; --i) {
+      const player = players[i];
+      if (player.ws)
+        player.ws.send(message);
+    }
   }
 
   /**
@@ -115,6 +133,13 @@ export default class Room {
     };
   }
 
+  get bots() {
+    return R.filter(
+      ({info}) => hasFlag(PLAYER_TYPES.BOT, info.kind),
+      this.players,
+    );
+  }
+
   get playersCount() {
     return this.players.length;
   }
@@ -125,6 +150,31 @@ export default class Room {
 
   get isEmpty() {
     return !this.playersCount;
+  }
+
+  /**
+   * Adds multiple bots to room and broadcast it
+   *
+   * @param {Number} count
+   */
+  spawnBots(count) {
+    if (!count || count < 0 || this.isFull)
+      return false;
+
+    R.times(
+      () => {
+        this.join(
+          new PlayerBot(
+            {
+              room: this,
+            },
+          ),
+        );
+      },
+      count,
+    );
+
+    return true;
   }
 
   /**
@@ -144,7 +194,7 @@ export default class Room {
     if (this.isFull)
       throw new ServerError(ERROR_CODES.ROOM_FULL);
 
-    const {id} = player;
+    const {id} = player.info;
     if (findByID(id, players))
       throw new ServerError(ERROR_CODES.ALREADY_JOINED);
 
@@ -212,7 +262,7 @@ export default class Room {
       );
     }
 
-    if (this.isEmpty)
+    if (this.isEmpty || this.bots.length === this.players.length)
       this.destroy();
   }
 }

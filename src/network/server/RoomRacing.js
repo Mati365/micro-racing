@@ -13,12 +13,16 @@ export default class RoomRacing {
   }
 
   start() {
+    /**
+     * setImmediate is more CPU intense and
+     * difference between both are small
+     */
     this.renderLoop = createAnimationFrameRenderer(
       {
         allowLerpUpdate: false,
 
         update: ::this.updateMapState,
-        raf: setImmediate,
+        raf: fn => setTimeout(fn, 0),
       },
     );
   }

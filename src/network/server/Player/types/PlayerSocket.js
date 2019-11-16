@@ -12,35 +12,33 @@ import {
 import createActionMessage, {
   getMessageMeta,
   getMessageContent,
-} from '../../shared/utils/createActionMessage';
+} from '../../../shared/utils/createActionMessage';
 
-import ServerError from '../../shared/ServerError';
-import PlayerInfo from './PlayerInfo';
+import ServerError from '../../../shared/ServerError';
+import PlayerInfo from '../PlayerInfo';
+import Player from '../Player';
 
 /**
  * Socket API provider for player
  */
-export default class PlayerSocket {
+export default class PlayerSocket extends Player {
   constructor({
     ws,
     server,
     info = new PlayerInfo,
     onDisconnect,
   }) {
+    super(
+      {
+        info,
+      },
+    );
+
     this.server = server;
     this.ws = ws;
-    this.info = info;
     this.onDisconnect = onDisconnect;
 
     this.mountMessagesHandler();
-  }
-
-  get id() {
-    return this.info.id;
-  }
-
-  getBroadcastSocketJSON() {
-    return this.info.getBroadcastSocketJSON();
   }
 
   @logMethod(

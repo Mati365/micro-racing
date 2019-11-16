@@ -7,7 +7,7 @@ import {findByProp} from '@pkg/basic-helpers/list/findByID';
 import {getRandomObjValue} from '@pkg/basic-helpers/base/random';
 import {logMethod} from '@pkg/basic-helpers';
 
-import PlayerSocket from './PlayerSocket';
+import PlayerSocket from './Player/types/PlayerSocket';
 import Room from './Room';
 import ServerError from '../shared/ServerError';
 

@@ -5,6 +5,7 @@ import {
   CAR_ALIGN,
 } from '@game/network/constants/serverCodes';
 
+import PhysicsScene from '@pkg/physics-scene';
 import PlayerMapElement, {genCarSegmentTransform} from '../shared/map/PlayerMapElement';
 
 /**
@@ -17,6 +18,8 @@ export default class RoadMapObjectsManager {
 
   constructor(map) {
     this.segmentsInfo = map.roadElement.getSegmentsInfo();
+    this.physics = new PhysicsScene;
+
     this.appendObjects(map.objects);
   }
 
@@ -29,13 +32,12 @@ export default class RoadMapObjectsManager {
   })();
 
   appendObjects(objects) {
-    if (!this.objects)
-      this.objects = [];
+    const {items} = this.physics;
 
     R.forEach(
       (object) => {
         object.id = this.generateID();
-        this.objects.push(object);
+        items.push(object);
       },
       objects,
     );
@@ -81,16 +83,18 @@ export default class RoadMapObjectsManager {
   }
 
   removePlayerCar(player) {
+    const {items} = this.physics;
+
     this.totalPlayers--;
-    this.objects = R.reject(
+    this.physics.items = R.reject(
       obj => obj.player?.id === player.id,
-      this.objects,
+      items,
     );
   }
 
   getBroadcastSocketJSON() {
     return {
-      objects: this.objects,
+      objects: this.physics.items,
     };
   }
 }

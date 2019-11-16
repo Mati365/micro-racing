@@ -35,7 +35,6 @@ const vec2rot = (angle, vec) => {
  *
  * @description
  * - Sideslip angle (BETA) is angle between velocity and car angle
- *
  */
 export default class CarPhysicsBody extends PhysicsBody {
   constructor(
@@ -64,10 +63,16 @@ export default class CarPhysicsBody extends PhysicsBody {
       },
     } = {},
   ) {
+    const [pW, pZ] = [size.w / 2, size.z / 2];
     super(
       {
         moveable: true,
-        points: [],
+        points: [
+          vec2(-pW, -pZ),
+          vec2(pW, -pZ),
+          vec2(pW, pZ),
+          vec2(-pW, pZ),
+        ],
         pos,
       },
     );

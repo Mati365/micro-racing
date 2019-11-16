@@ -16,11 +16,11 @@ const carKeyboardDriver = (input, carBody) => {
 
   // left
   if (getBit(INPUT_FLAGS.TURN_LEFT, input))
-    carBody.turn(-ROTATE_CAR_SPEED);
+    carBody.turnSteerWheels(-ROTATE_CAR_SPEED);
 
   // right
   else if (getBit(INPUT_FLAGS.TURN_RIGHT, input))
-    carBody.turn(ROTATE_CAR_SPEED);
+    carBody.turnSteerWheels(ROTATE_CAR_SPEED);
 
   // w
   if (getBit(INPUT_FLAGS.THROTTLE, input))

@@ -63,15 +63,15 @@ export default class CarPhysicsBody extends PhysicsBody {
       },
     } = {},
   ) {
-    const [pW, pZ] = [size.w / 2, size.z / 2];
+    const [pW, pH] = [size.w / 2, size.h / 2];
     super(
       {
         moveable: true,
         points: [
-          vec2(-pW, -pZ),
-          vec2(pW, -pZ),
-          vec2(pW, pZ),
-          vec2(-pW, pZ),
+          vec2(-pW, pH),
+          vec2(pW, pH),
+          vec2(pW, -pH),
+          vec2(-pW, -pH),
         ],
         pos,
       },
@@ -127,7 +127,7 @@ export default class CarPhysicsBody extends PhysicsBody {
     this.drag = 3.5;
   }
 
-  turn(delta) {
+  turnSteerWheels(delta) {
     this.steerAngle = clamp(
       -this.maxSteerAngle,
       this.maxSteerAngle,

@@ -30,7 +30,7 @@ export default class PhysicsScene {
     if (a.moveable) {
       a.pos = vec2.add(a.pos, mtv.translate);
 
-      if (a.speed) {
+      if (a.speed > 0.1) {
         // apply impulses
         const {intersections} = mtv;
 
@@ -44,21 +44,17 @@ export default class PhysicsScene {
           );
 
           const angleDelta = -smallestAngleDistance(a.angle, newAngle);
-          a.speed *= 0.95;
+          a.velocity = vec2.mul(0.9, a.velocity);
 
           // performs bounce if < maxReflectionAngle
-          if (a.speed > 0.1) {
-            if (Math.abs(angleDelta) < config.maxReflectionAngle + Math.PI / 2)
-              a.angularVelocity = angleDelta / (1 / a.speed * 50);
-            else
-              a.speed = -a.speed * 0.25;
-          }
+          if (Math.abs(angleDelta) < config.maxReflectionAngle + Math.PI / 2)
+            a.angularVelocity += -angleDelta / (1 / a.speed * 40);
         }
       }
     }
 
     if (b.moveable)
-      b.pos = vec2.sub(b.pos, mtv.translate);
+      b.pos = vec2.sub(b.pos, vec2.mul(0.1, mtv.translate));
   }
 
   updateObjectPhysics(a) {
@@ -66,19 +62,26 @@ export default class PhysicsScene {
     const {box: boxA} = a;
 
     for (let j = 0; j < items.length; ++j) {
-      const b = items[j];
+      const item = items[j];
+      const b = item.body || item;
+
       if (a === b || (!a.moveable && !b.moveable))
         continue;
 
       // ignore if not AABB, it is much faster than diagonal checks
       const {box: boxB} = b;
-      if (!aabb(boxA, boxB))
+      if (!boxB || !aabb(boxA, boxB))
         continue;
 
       // DIAGONAL
       const mtv = diagonal(a, b);
-      if (mtv)
-        this.performBodyReaction(a, b, mtv);
+      if (mtv) {
+        // prevent wrong edge collision behaviour
+        if (a.speed >= b.speed)
+          this.performBodyReaction(a, b, mtv);
+        else
+          this.performBodyReaction(b, a, {...mtv, translate: vec2.mul(-1, mtv.translate)});
+      }
     }
   }
 
@@ -86,7 +89,8 @@ export default class PhysicsScene {
     const {items} = this;
 
     for (let i = 0; i < items.length; ++i) {
-      const body = items[i];
+      const item = items[i];
+      const body = item.body || item;
 
       body.update(delta);
       this.updateObjectPhysics(body);

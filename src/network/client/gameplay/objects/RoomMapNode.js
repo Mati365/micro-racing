@@ -8,6 +8,7 @@ import {
   mapObjValuesToPromise,
 } from '@pkg/basic-helpers';
 
+import PhysicsScene from '@pkg/physics-scene';
 import {RoadMapElement} from '@game/network/shared/map';
 
 import * as Factory from '../factory';
@@ -131,6 +132,7 @@ export default class RoomMapNode {
   }) {
     this.f = f;
     this.currentPlayer = currentPlayer;
+    this.physics = new PhysicsScene;
 
     if (initialRoomState)
       this.loadInitialRoomState(initialRoomState);
@@ -154,8 +156,22 @@ export default class RoomMapNode {
     this.refs = refs;
     this.currentPlayerCar = refs.players[currentPlayer.id];
 
-    this.update = ::this.sceneBuffer.update;
     this.render = ::this.sceneBuffer.render;
+  }
+
+  update(interpolate) {
+    const {physics} = this;
+    const {list} = this.sceneBuffer;
+
+    // fixme: Maybe integrate sceneBuffer with phyics in different way?
+    physics.items = list;
+
+    for (let i = 0, len = list.length; i < len; ++i) {
+      const item = list[i];
+
+      item.update && item.update(interpolate);
+      item.body && physics.updateObjectPhysics(item.body);
+    }
   }
 
   removePlayerCar(player) {

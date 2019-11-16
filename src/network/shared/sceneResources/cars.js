@@ -21,7 +21,7 @@ export const CARS_RESOURCES = {
   [CAR_TYPES.BLUE]: new URLMeshResourceMeta(
     {
       url: blueCarResourceUrl,
-      normalizedSize: new Size(1.25, 0.5781292235980715, 0.5133089596548264),
+      normalizedSize: new Size(0.5781292235980715, 1.25, 0.5133089596548264),
     },
   ),
 

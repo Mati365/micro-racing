@@ -21,7 +21,7 @@ const chainMethods = (context) => {
   return boundContext.current;
 };
 
-class SceneBuffer {
+export class SceneBuffer {
   constructor(f) {
     this.f = f;
 

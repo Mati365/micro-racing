@@ -14,4 +14,8 @@ export default class Player {
   get id() {
     return this.info.id;
   }
+
+  get body() {
+    return this.info.body;
+  }
 }

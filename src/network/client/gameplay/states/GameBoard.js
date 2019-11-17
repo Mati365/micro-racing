@@ -120,13 +120,14 @@ export default class GameBoard {
             skipLastUpdate = false;
 
           carKeyboardDriver(bitset, body);
-          prevFrameId = frameId;
 
           if (!tempOnly && prevFrameId !== frameId) {
             body.update();
             if (!skipLastUpdate && i + 1 >= predictedInputs.length)
               skipLastUpdate = true;
           }
+
+          prevFrameId = frameId;
         }
 
         if (skipLastUpdate === false)

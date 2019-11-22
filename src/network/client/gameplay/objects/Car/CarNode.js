@@ -12,20 +12,15 @@ import CarNodeEffects from './CarNodeEffects';
 
 const createTexturedCarRenderer = f => R.memoizeWith(
   R.identity,
-  async (type) => {
-    const {meshVertexResource, textures} = await fetchCachedCarResource(
-      {
-        type,
-      },
-    );
-
-    return f.loaders.mesh.from(
-      {
-        loaderData: meshVertexResource,
-        textures,
-      },
-    );
-  },
+  async type => (
+    f.loaders.mesh.from(
+      await fetchCachedCarResource(
+        {
+          type,
+        },
+      ),
+    )
+  ),
 );
 
 /**

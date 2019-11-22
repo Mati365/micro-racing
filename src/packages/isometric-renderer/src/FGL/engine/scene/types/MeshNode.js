@@ -18,7 +18,10 @@ export default class MeshNode extends SceneNode {
   }
 
   setRenderer(renderer) {
-    this.release();
+    if (renderer === this.renderer)
+      return;
+
+    this.renderer && this.release();
     super.setRenderer(renderer);
   }
 

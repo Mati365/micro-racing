@@ -1,17 +1,22 @@
 import * as R from 'ramda';
 
-import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
 import PALETTE from '@pkg/isometric-renderer/FGL/core/constants/colors';
+
+import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
+import {BARRIER_MESHES} from '@game/shared/sceneResources/meshes';
 
 import {
   findByID,
   mapObjValuesToPromise,
 } from '@pkg/basic-helpers';
 
+import createTerrain from '@game/shared/sceneResources/terrain';
+import {fetchCachedMesh} from '@game/shared/sceneResources/utils';
+
 import PhysicsScene from '@pkg/physics-scene';
 import {RoadMapElement} from '@game/network/shared/map';
 
-import * as Factory from '../factory';
+import MeshNode from '@pkg/isometric-renderer/FGL/engine/scene/types/MeshNode';
 import CarNode from './Car';
 import RoadNode from './RoadNode/RoadNode';
 
@@ -38,7 +43,7 @@ export const appendToSceneBuffer = f => ({
             async () => ({
               ...renderParams,
               id,
-              renderer: await Factory.createTerrain(f)(
+              renderer: await createTerrain(f)(
                 {
                   size,
                   items,
@@ -97,6 +102,27 @@ export const appendToSceneBuffer = f => ({
               player: findByID(playerID, players),
             },
           ));
+
+          mapNodes[`${id}-test`] = buffer.createNode(
+            async sceneParams => new MeshNode(
+              {
+                ...sceneParams,
+                id: `${id}-test`,
+                renderer: f.loaders.mesh.from(
+                  await fetchCachedMesh(BARRIER_MESHES.BASIC),
+                ),
+                transform: {
+                  rotate: [0, 0, 0],
+                  translate: [
+                    renderParams.transform.translate[0],
+                    renderParams.transform.translate[1],
+                    renderParams.transform.translate[2] - 1,
+                  ],
+                  scale: [1.15, 1.15, 1.15],
+                },
+              },
+            ),
+          );
         } break;
 
         default:

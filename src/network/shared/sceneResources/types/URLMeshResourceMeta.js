@@ -7,8 +7,9 @@
  *  Check if size param is sufficient
  */
 export default class URLMeshResourceMeta {
-  constructor({url, normalizedSize}) {
+  constructor({url, normalizedSize, textures}) {
     this.url = url;
     this.normalizedSize = normalizedSize;
+    this.textures = textures;
   }
 }

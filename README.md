@@ -1,7 +1,7 @@
 [![License: CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/80x15.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 # kart-racing
-online 2D multiplayer go-carts racing game
+multiplayer 2.5D isometric racing game written in WebGL 2.x
 
 ## Gameplay
 ![Screen](/doc/screens/screen.png) <br />

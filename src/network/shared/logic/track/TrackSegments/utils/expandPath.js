@@ -70,4 +70,4 @@ const expandPath = (width, path) => {
   ];
 };
 
-export default expandPath;
+export default R.curry(expandPath);

@@ -76,15 +76,18 @@ export const drawPolygon = (points, color, width, loop, ctx) => {
   ctx.stroke();
 };
 
-export const drawPoints = (color, r, points, ctx) => {
-  for (let i = points.length - 1; i >= 0; --i) {
-    const [x, y] = points[i];
+export const drawPoint = (color, r, point, ctx) => {
+  const [x, y] = point;
 
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, 2 * Math.PI);
-    ctx.fill();
-  }
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, 2 * Math.PI);
+  ctx.fill();
+};
+
+export const drawPoints = (color, r, points, ctx) => {
+  for (let i = points.length - 1; i >= 0; --i)
+    drawPoint(color, r, points[i], ctx);
 };
 
 export const drawTriangles = (color, lineWidth, triangles, ctx) => {

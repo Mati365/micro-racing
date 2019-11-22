@@ -3,7 +3,7 @@ import * as R from 'ramda';
 import PALETTE from '@pkg/isometric-renderer/FGL/core/constants/colors';
 
 import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
-import {BARRIER_MESHES} from '@game/shared/sceneResources/meshes';
+import {BARRIERS_RESOURCES} from '@game/shared/sceneResources/meshes';
 
 import {
   findByID,
@@ -87,6 +87,23 @@ export const appendToSceneBuffer = f => ({
           );
         } break;
 
+        case OBJECT_TYPES.MESH: {
+          const {name, constructor, ...renderParams} = params;
+
+          mapNodes[id] = buffer.createNode(
+            async sceneParams => new MeshNode(
+              {
+                ...sceneParams,
+                ...renderParams,
+                id,
+                renderer: f.loaders.mesh.from(
+                  await fetchCachedMesh(BARRIERS_RESOURCES.BASIC),
+                ),
+              },
+            ),
+          );
+        } break;
+
         /**
          * Each player should contain **id**, **type**
          */
@@ -102,27 +119,6 @@ export const appendToSceneBuffer = f => ({
               player: findByID(playerID, players),
             },
           ));
-
-          mapNodes[`${id}-test`] = buffer.createNode(
-            async sceneParams => new MeshNode(
-              {
-                ...sceneParams,
-                id: `${id}-test`,
-                renderer: f.loaders.mesh.from(
-                  await fetchCachedMesh(BARRIER_MESHES.BASIC),
-                ),
-                transform: {
-                  rotate: [0, 0, 0],
-                  translate: [
-                    renderParams.transform.translate[0],
-                    renderParams.transform.translate[1],
-                    renderParams.transform.translate[2] - 1,
-                  ],
-                  scale: [1.15, 1.15, 1.15],
-                },
-              },
-            ),
-          );
         } break;
 
         default:

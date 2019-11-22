@@ -20,7 +20,7 @@ export class TrackSegment {
     this.point = point;
 
     this.vector = vector;
-    this.normalizedVector = vec3.normalize(vector);
+    this.normalizedVector = vec2.normalize(vector);
 
     this.angle = vec2.vectorAngle(this.normalizedVector) + toRadians(90);
   }

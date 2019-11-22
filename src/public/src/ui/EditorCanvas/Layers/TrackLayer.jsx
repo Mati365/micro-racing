@@ -3,16 +3,26 @@ import * as R from 'ramda';
 import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
 import PALETTE from '@pkg/isometric-renderer/FGL/core/constants/colors';
 
-import segmentizePath from '@game/logic/track/TrackSegments/utils/segmentizePath';
-import {getPathCornersBox, Vector} from '@pkg/gl-math';
+import {
+  segmentizePath,
+  expandPath,
+} from '@game/logic/track/TrackSegments/utils';
 
 import {
+  vec2, toRadians,
+  getPathCornersBox, Vector,
+} from '@pkg/gl-math';
+
+import {
+  drawPoint,
   drawPoints,
+  drawRect,
   drawTriangles,
 } from '@pkg/ctx';
 
 import {
   MapElement,
+  MeshMapElement,
   RoadMapElement,
 } from '@game/shared/map';
 
@@ -23,6 +33,60 @@ import TrackPath, {
 } from '@game/logic/track/TrackPath';
 
 import AbstractDraggableEditorLayer from './AbstractDraggableEditorLayer';
+
+class EditorMesh {
+  constructor(meshResPath, angle, point) {
+    this.meshResPath = meshResPath;
+    this.angle = angle;
+    this.point = point;
+  }
+}
+
+const getTrackBarriers = (
+  {
+    points,
+    meshResPath = 'BARRIERS.BASIC',
+    spacing = 20,
+    width = 40,
+  },
+) => {
+  const generateMeshes = (meshPoints) => {
+    const meshes = [];
+    let prevPoint = meshPoints[
+      meshPoints.length - 1
+    ];
+
+    for (let i = 0; i < meshPoints.length; ++i) {
+      let point = meshPoints[i];
+      const nextPoint = meshPoints[(i + 1) % meshPoints.length];
+
+      const dist = vec2.dist(prevPoint, point);
+      if (dist >= spacing) {
+        const missDist = dist - spacing;
+        const prevPointVector = vec2.normalize(vec2.sub(prevPoint, point));
+
+        point = vec2.add(point, vec2.mul(missDist, prevPointVector));
+        prevPoint = point;
+
+        meshes.push(
+          new EditorMesh(
+            meshResPath,
+            vec2.vectorAngle(vec2.sub(nextPoint, prevPoint)),
+            point,
+          ),
+        );
+      }
+    }
+
+    return meshes;
+  };
+
+  return R.compose(
+    R.unnest,
+    R.map(generateMeshes),
+    expandPath(width),
+  )(points);
+};
 
 /**
  * It should be outside track, track is just container holding
@@ -39,6 +103,7 @@ const renderTrack = ({
     points: '#0000ff',
     segments: '#666',
   },
+  barrierSize = vec2(15, 8),
 } = {}) => (ctx, track) => {
   const {path, realPointsLength} = track;
   const looped = realPointsLength > 2;
@@ -59,6 +124,43 @@ const renderTrack = ({
 
       segments.forEach((segment) => {
         drawTriangles(colors.segments, 1, segment.triangles, ctx);
+      });
+
+      // barriers
+      const barriers = getTrackBarriers(
+        {
+          points: interpolated,
+        },
+      );
+
+      barriers.forEach((barrier) => {
+        drawPoint(
+          '#ff0000',
+          2,
+          barrier.point,
+          ctx,
+        );
+
+        const cx = barrier.point.x;
+        const cy = barrier.point.y;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(barrier.angle);
+        ctx.translate(-cx, -cy);
+
+        drawRect(
+          {
+            x: cx - barrierSize.x / 2,
+            y: cy - barrierSize.y / 2,
+            w: barrierSize.x,
+            h: barrierSize.y,
+          },
+          2,
+          '#00ff00',
+          ctx,
+        );
+        ctx.restore();
       });
     }
   }
@@ -173,9 +275,11 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
   toBSON() {
     const points = this.track.getRealPathPoints();
     const {transform} = this.sceneMeta;
-    const {topLeft, width, height} = getPathCornersBox(
-      this.track.getInterpolatedPathPoints(),
-    );
+
+    const interpolated = this.track.getInterpolatedPathPoints();
+    const roadBox = getPathCornersBox(interpolated);
+
+    const {topLeft, width, height} = roadBox;
 
     const terrainMargin = 80;
     const terrainTransform = {
@@ -191,8 +295,40 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
       ],
     };
 
+    const barriers = R.compose(
+      R.map(({point, angle, meshResPath}) => new MeshMapElement(
+        meshResPath,
+        {
+          moveable: false,
+          transform: {
+            rotate: [
+              0, 0,
+              angle + toRadians(90),
+            ],
+            translate: [
+              point.x * transform.scale[0],
+              point.y * transform.scale[1],
+              0,
+            ],
+            scale: [1.15, 1.15, 1.15],
+          },
+        },
+      )),
+      getTrackBarriers,
+    )(
+      {
+        points: interpolated,
+      },
+    );
+
     return [
-      new RoadMapElement(points, this.sceneMeta),
+      new RoadMapElement(
+        points,
+        {
+          ...this.sceneMeta,
+          box: roadBox,
+        },
+      ),
       new MapElement(
         OBJECT_TYPES.TERRAIN,
         {
@@ -224,6 +360,8 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
           transform: terrainTransform,
         },
       ),
+
+      ...barriers,
     ];
   }
 

@@ -4,6 +4,7 @@
 online 2D multiplayer go-carts racing game
 
 ## Gameplay
+![Screen](/doc/screens/screen.png) <br />
 ![GIF](/doc/screens/gameplay.gif)
 
 ## Goals

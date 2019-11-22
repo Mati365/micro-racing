@@ -27,6 +27,8 @@ export {default as exportBlobToFile} from './dom/exportBlobToFile';
 export {default as importBlobFromFile} from './dom/importBlobFromFile';
 export {default as inputValue} from './dom/inputValue';
 
+export {default as requiredParam} from './params/requiredParam';
+
 export * from './text';
 export * from './async';
 

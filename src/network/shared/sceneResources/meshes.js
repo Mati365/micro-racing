@@ -5,8 +5,9 @@ import barrierResourceUrl from '@game/res/model/barriers/basic/basic-barrier.obj
 
 import URLMeshResourceMeta from './types/URLMeshResourceMeta';
 
-/* eslint-disable import/prefer-default-export */
-export const BARRIER_MESHES = {
+import {CARS_RESOURCES} from './cars';
+
+export const BARRIERS_RESOURCES = {
   BASIC: new URLMeshResourceMeta(
     {
       url: barrierResourceUrl,
@@ -16,4 +17,9 @@ export const BARRIER_MESHES = {
       ],
     },
   ),
+};
+
+export const MESHES = {
+  BARRIERS: BARRIERS_RESOURCES,
+  CARS: CARS_RESOURCES,
 };

@@ -53,4 +53,5 @@ export const OBJECT_TYPES = {
   ROAD: 1,
   TERRAIN: 2,
   PLAYER: 3,
+  MESH: 4,
 };

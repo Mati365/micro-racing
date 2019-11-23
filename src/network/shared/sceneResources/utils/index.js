@@ -1,2 +1,2 @@
-export {default as fetchCachedMesh} from './fetchCachedMesh';
+export {default as fetchMeshURLResource} from './fetchMeshURLResource';
 export {default as fetchCachedTexture} from './fetchCachedTexture';

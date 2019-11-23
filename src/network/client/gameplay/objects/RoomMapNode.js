@@ -3,15 +3,16 @@ import * as R from 'ramda';
 import PALETTE from '@pkg/isometric-renderer/FGL/core/constants/colors';
 
 import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
-import {BARRIERS_RESOURCES} from '@game/shared/sceneResources/meshes';
+import {MESHES} from '@game/shared/sceneResources/meshes';
 
 import {
+  dig,
   findByID,
   mapObjValuesToPromise,
 } from '@pkg/basic-helpers';
 
 import createTerrain from '@game/shared/sceneResources/terrain';
-import {fetchCachedMesh} from '@game/shared/sceneResources/utils';
+import {fetchMeshURLResource} from '@game/shared/sceneResources/utils';
 
 import PhysicsScene from '@pkg/physics-scene';
 import {RoadMapElement} from '@game/network/shared/map';
@@ -88,16 +89,21 @@ export const appendToSceneBuffer = f => ({
         } break;
 
         case OBJECT_TYPES.MESH: {
-          const {name, constructor, ...renderParams} = params;
+          const {meshResPath, ...renderParams} = params;
 
           mapNodes[id] = buffer.createNode(
-            async sceneParams => new MeshNode(
+            sceneParams => new MeshNode(
               {
                 ...sceneParams,
                 ...renderParams,
                 id,
-                renderer: f.loaders.mesh.from(
-                  await fetchCachedMesh(BARRIERS_RESOURCES.BASIC),
+                renderer: f.loaders.mesh.from.cached(
+                  {
+                    key: `mesh-${meshResPath}`,
+                    resolver: () => fetchMeshURLResource(
+                      dig(meshResPath, MESHES),
+                    ),
+                  },
                 ),
               },
             ),

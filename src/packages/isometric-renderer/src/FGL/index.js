@@ -19,7 +19,7 @@ import {
 // ENGINE
 import * as meshLoaders from './engine/loaders/mesh';
 
-import getMaterialMeshFrom from './engine/loaders/mesh/utils/getMaterialMeshFrom';
+import getMaterialMeshFrom, {getCachedMaterialMeshFrom} from './engine/loaders/mesh/utils/getMaterialMeshFrom';
 import createSceneBuffer from './engine/scene/createSceneBuffer';
 
 import {
@@ -55,6 +55,15 @@ const createRenderContext = (canvasElement, glContextFlags) => {
     ),
   );
 
+  // creates based on mesh data mesh renderer with FBO
+  const meshFrom = getMaterialMeshFrom(fgl, gl);
+  Object.assign(
+    meshFrom,
+    {
+      cached: getCachedMaterialMeshFrom(fgl, gl),
+    },
+  );
+
   // Object.assign due to shared fglContext between callers
   Object.assign(
     fgl,
@@ -64,7 +73,7 @@ const createRenderContext = (canvasElement, glContextFlags) => {
       loaders: {
         mesh: {
           ...meshLoaders,
-          from: getMaterialMeshFrom(fgl, gl),
+          from: meshFrom,
         },
       },
 

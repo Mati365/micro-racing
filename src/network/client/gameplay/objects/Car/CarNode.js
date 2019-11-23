@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import {fetchCachedCarResource} from '@game/shared/sceneResources/cars';
+import {fetchCarMeshURLResource} from '@game/shared/sceneResources/cars';
 
 import {
   HTMLTextNode,
@@ -12,13 +12,16 @@ import CarNodeEffects from './CarNodeEffects';
 
 const createTexturedCarRenderer = f => R.memoizeWith(
   R.identity,
-  async type => (
-    f.loaders.mesh.from(
-      await fetchCachedCarResource(
-        {
-          type,
-        },
-      ),
+  type => (
+    f.loaders.mesh.from.cached(
+      {
+        key: `car-${type}`,
+        resolver: () => fetchCarMeshURLResource(
+          {
+            type,
+          },
+        ),
+      },
     )
   ),
 );

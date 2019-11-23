@@ -7,7 +7,7 @@ import blueCarResourceUrl from '@game/res/model/cars/blue.obj';
 import redCarResourceUrl from '@game/res/model/cars/red.obj';
 
 import URLMeshResourceMeta from './types/URLMeshResourceMeta';
-import {fetchCachedMesh} from './utils';
+import {fetchMeshURLResource} from './utils';
 
 /**
  * @todo
@@ -42,9 +42,9 @@ export const CARS_RESOURCES = {
  *
  * @returns {MeshVertexResource}
  */
-export const fetchCachedCarResource = ({
+export const fetchCarMeshURLResource = ({
   withTextures = true,
   type = CAR_TYPES.RED,
 } = {}) => (
-  fetchCachedMesh(CARS_RESOURCES[type], withTextures)
+  fetchMeshURLResource(CARS_RESOURCES[type], withTextures)
 );

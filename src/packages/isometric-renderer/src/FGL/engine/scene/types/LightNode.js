@@ -3,16 +3,18 @@ import {Light} from '../../lighting';
 
 export default class LightNode extends SceneNode {
   constructor({f, light}) {
-    super({
-      renderer: f.mesh.box(),
-      uniforms: {
-        color: f.colors.PURPLE,
+    super(
+      {
+        renderer: f.mesh.box(),
+        uniforms: {
+          color: f.colors.PURPLE,
+        },
+        transform: {
+          scale: [0.25, 0.25, 0.25],
+          translate: light.pos,
+        },
       },
-      transform: {
-        scale: [0.25, 0.25, 0.25],
-        translate: light.pos,
-      },
-    });
+    );
 
     // do not change reference! mem leak in SceneBuffer
     this.light = new Light(light);

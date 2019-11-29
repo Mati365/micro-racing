@@ -1,4 +1,4 @@
-import {Size, vec2, vec3} from '@pkg/gl-math';
+import {vec2, vec3} from '@pkg/gl-math';
 
 import {
   CAR_TYPES,
@@ -64,11 +64,7 @@ export default class PlayerMapElement extends MapElement {
     this.body = new CarPhysicsBody(
       {
         ...body,
-        size: new Size(
-          normalizedSize.w * scale[0],
-          normalizedSize.h * scale[1],
-          normalizedSize.z * scale[2],
-        ),
+        size: normalizedSize.scale(scale),
       },
     );
   }

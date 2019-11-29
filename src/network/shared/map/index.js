@@ -1,3 +1,5 @@
+import {OBJECT_TYPES} from '../../constants/serverCodes';
+
 import PlayerMapElement from './PlayerMapElement';
 import RoadMapElement from './RoadMapElement';
 import MapElement from './MapElement';
@@ -10,4 +12,8 @@ export {
   PlayerMapElement,
   RoadMapElement,
   MapElement,
+};
+
+export const MAP_BINARY_ELEMENTS_DESERIALIZERS = {
+  [OBJECT_TYPES.MESH]: MeshMapElement.fromBSON,
 };

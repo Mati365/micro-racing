@@ -17,7 +17,7 @@ import {fetchMeshURLResource} from '@game/shared/sceneResources/utils';
 import PhysicsScene from '@pkg/physics-scene';
 import {RoadMapElement} from '@game/network/shared/map';
 
-import MeshNode from '@pkg/isometric-renderer/FGL/engine/scene/types/MeshNode';
+import PhysicsMeshNode from './PhysicsMeshNode';
 import CarNode from './Car';
 import RoadNode from './RoadNode/RoadNode';
 
@@ -92,7 +92,7 @@ export const appendToSceneBuffer = f => ({
           const {meshResPath, ...renderParams} = params;
 
           mapNodes[id] = buffer.createNode(
-            sceneParams => new MeshNode(
+            sceneParams => new PhysicsMeshNode(
               {
                 ...sceneParams,
                 ...renderParams,

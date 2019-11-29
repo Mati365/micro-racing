@@ -1,8 +1,8 @@
 import * as R from 'ramda';
 
 import {
-  clamp, lerp,
-  toRadians, vec2, Size,
+  clamp, toRadians,
+  vec2, Size,
 } from '@pkg/gl-math';
 
 import PhysicsBody from '@pkg/physics/types/PhysicsBody';
@@ -63,16 +63,10 @@ export default class CarPhysicsBody extends PhysicsBody {
       },
     } = {},
   ) {
-    const [pW, pH] = [size.w / 2, size.h / 2];
     super(
       {
         moveable: true,
-        points: [
-          vec2(-pW, pH),
-          vec2(pW, pH),
-          vec2(pW, -pH),
-          vec2(-pW, -pH),
-        ],
+        size,
         pos,
       },
     );
@@ -92,9 +86,7 @@ export default class CarPhysicsBody extends PhysicsBody {
     this.massCenter = massCenter;
     this.throttle = 0;
     this.maxThrottle = 300;
-
     this.brake = 0;
-    this.size = size;
 
     // wheelBase is distance betwen axles
     this.axles = axles;
@@ -265,47 +257,6 @@ export default class CarPhysicsBody extends PhysicsBody {
       this.corneringIntensity = vec2.len(fCornering) / 8000;
     }
   }
-
-  interpolatedUpdate = (() => {
-    const interpolationCache = {};
-    const interpolateState = {
-      prevState: null,
-      state: null,
-    };
-
-    return (interpolate) => {
-      const {alpha} = interpolate;
-
-      if (interpolate.fixedStepUpdate) {
-        this.update();
-
-        interpolateState.prevState = interpolateState.state;
-        interpolateState.state = {
-          pos: vec2.clone(this.pos),
-          angle: this.angle,
-        };
-      }
-
-      if (!interpolateState.prevState || (!interpolate.lerpUpdate && !interpolationCache.pos))
-        return this;
-
-      if (interpolate.lerpUpdate) {
-        interpolationCache.angle = lerp(
-          interpolateState.prevState.angle,
-          interpolateState.state.angle,
-          alpha,
-        );
-
-        interpolationCache.pos = vec2.lerp(
-          alpha,
-          interpolateState.prevState.pos,
-          interpolateState.state.pos,
-        );
-      }
-
-      return interpolationCache;
-    };
-  })();
 
   toJSON = (() => {
     const serializer = R.pick(

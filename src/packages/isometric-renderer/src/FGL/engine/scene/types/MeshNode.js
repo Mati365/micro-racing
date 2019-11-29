@@ -13,8 +13,9 @@ export default class MeshNode extends SceneNode {
   constructor(config) {
     super(config);
 
-    if (config.f)
-      this.wireframe = new MeshWireframe(config.f, this);
+    const {f} = this;
+    if (f)
+      this.wireframe = new MeshWireframe(f, this);
   }
 
   setRenderer(renderer) {

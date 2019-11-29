@@ -8,6 +8,11 @@ import {
 import PhysicsScene from '@pkg/physics-scene';
 import PlayerMapElement, {genCarSegmentTransform} from '../shared/map/PlayerMapElement';
 
+import {
+  MAP_BINARY_ELEMENTS_DESERIALIZERS,
+  MapElement,
+} from '../shared/map';
+
 /**
  * Manage map, align players on road etc
  */
@@ -36,6 +41,10 @@ export default class RoadMapObjectsManager {
 
     R.forEach(
       (object) => {
+        // map loaded directly from binary
+        if (!(object instanceof MapElement))
+          object = MAP_BINARY_ELEMENTS_DESERIALIZERS[object.type]?.(object) || object;
+
         object.id = this.generateID();
         items.push(object);
       },

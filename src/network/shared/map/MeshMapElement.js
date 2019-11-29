@@ -1,8 +1,12 @@
-import {requiredParam} from '@pkg/basic-helpers';
+import {vec2} from '@pkg/gl-math';
 
+import {dig, requiredParam} from '@pkg/basic-helpers';
+
+import {MESHES} from '@game/shared/sceneResources/meshes';
+import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
+
+import PhysicsBody from '@pkg/physics-scene/src/types/PhysicsBody';
 import MapElement from './MapElement';
-
-import {OBJECT_TYPES} from '../../constants/serverCodes';
 
 export default class MeshMapElement extends MapElement {
   constructor(
@@ -16,5 +20,25 @@ export default class MeshMapElement extends MapElement {
         ...params,
       },
     );
+
+    const {
+      transform: {
+        translate = [0, 0, 0],
+        scale = [1, 1, 1],
+      },
+    } = params;
+
+    const {normalizedSize} = dig(meshResPath, MESHES);
+    this.body = new PhysicsBody(
+      {
+        moveable: false,
+        pos: vec2(translate[0], translate[1]),
+        size: normalizedSize.scale(scale),
+      },
+    );
+  }
+
+  static fromBSON({params}) {
+    return new MeshMapElement(params.meshResPath, params);
   }
 }

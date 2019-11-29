@@ -2,13 +2,11 @@ import * as R from 'ramda';
 
 import {fetchCarMeshURLResource} from '@game/shared/sceneResources/cars';
 
-import {
-  HTMLTextNode,
-  MeshNode,
-} from '@pkg/isometric-renderer/FGL/engine/scene';
+import {HTMLTextNode} from '@pkg/isometric-renderer/FGL/engine/scene';
+import CarPhysicsBody from '@game/shared/logic/physics/CarPhysicsBody';
 
-import CarPhysicsBody from '@game/logic/physics/CarPhysicsBody';
 import CarNodeEffects from './CarNodeEffects';
+import PhysicsMeshNode from '../PhysicsMeshNode';
 
 const createTexturedCarRenderer = f => R.memoizeWith(
   R.identity,
@@ -31,46 +29,28 @@ const createTexturedCarRenderer = f => R.memoizeWith(
  *  CarNode receives mesh size both from server and client
  *  for CarPhysicsBody it will be better to use server size
  */
-export default class CarNode extends MeshNode {
+export default class CarNode extends PhysicsMeshNode {
   constructor({
-    f,
     player,
     type,
-    body,
     ...meshConfig
   }) {
     super(
       {
         ...meshConfig,
-        renderer: createTexturedCarRenderer(f)(type),
+        physicsBodyEngine: CarPhysicsBody,
+        renderer: createTexturedCarRenderer(meshConfig.f)(type),
       },
     );
 
-    this.f = f;
     this.player = player;
     this.type = type;
-    this.bodyConfig = body;
   }
 
   setRenderer(renderer) {
-    const {player, f, bodyConfig} = this;
+    const {player, f} = this;
 
     super.setRenderer(renderer);
-
-    if (bodyConfig) {
-      if (bodyConfig instanceof CarPhysicsBody)
-        this.body = bodyConfig;
-      else
-        this.body = CarPhysicsBody.fromJSON(bodyConfig);
-    } else {
-      this.body = new CarPhysicsBody(
-        {
-          angle: this.rotate.z,
-          pos: this.translate,
-          size: this.size.toVec(),
-        },
-      );
-    }
 
     this.wireframe = new CarNodeEffects(f, this);
     this.nickNode = new HTMLTextNode(
@@ -89,26 +69,11 @@ export default class CarNode extends MeshNode {
   }
 
   update(interpolate) {
-    const {
-      nickNode, body,
-      translate, rotate,
-    } = this;
-
-    if (!body)
-      return;
-
-    // physics is slower than renderer
-    // interpolate between frames
-    const interpolatedBody = body.interpolatedUpdate(interpolate);
-
-    rotate.z = interpolatedBody.angle;
-    translate.xy = interpolatedBody.pos;
-    nickNode.translate.xy = interpolatedBody.pos;
-
-    this.updateTransformCache();
-
-    // updated linked meshes
     super.update(interpolate);
+
+    const {nickNode, interpolatedBody} = this;
+    if (nickNode)
+      nickNode.translate.xy = interpolatedBody.pos;
   }
 
   render(interpolate, mpMatrix, f) {

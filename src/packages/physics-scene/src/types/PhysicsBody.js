@@ -1,5 +1,7 @@
 import * as R from 'ramda';
+
 import {
+  lerp,
   wrapAngleTo2PI,
   vec2,
   getPathCornersBox,
@@ -9,12 +11,14 @@ export default class PhysicsBody {
   constructor({
     pos,
     points,
-    moveable,
+    size,
+    moveable = false,
     angle = 0,
     speed = 0,
   }) {
     this.pos = pos;
-    this.points = points;
+    this.points = points || PhysicsBody.genRectanglePoints(size);
+    this.size = size; // todo: add autodetect if not present
     this.moveable = R.defaultTo(true, moveable);
     this.angle = angle;
     this.angularVelocity = 0;
@@ -33,6 +37,17 @@ export default class PhysicsBody {
         () => getPathCornersBox(this.vertices),
       ),
     });
+  }
+
+  static genRectanglePoints(size) {
+    const [pW, pH] = [size.w / 2, size.h / 2];
+
+    return [
+      vec2(-pW, pH),
+      vec2(pW, pH),
+      vec2(pW, -pH),
+      vec2(-pW, -pH),
+    ];
   }
 
   cacheByPos(fn) {
@@ -91,8 +106,59 @@ export default class PhysicsBody {
     );
   }
 
+  interpolatedUpdate = (() => {
+    const interpolationCache = {};
+    const interpolateState = {
+      prevState: null,
+      state: null,
+    };
+
+    return (interpolate) => {
+      const {moveable} = this;
+      const {alpha} = interpolate;
+
+      if (!moveable)
+        return this;
+
+      if (interpolate.fixedStepUpdate) {
+        this.update();
+
+        interpolateState.prevState = interpolateState.state;
+        interpolateState.state = {
+          pos: vec2.clone(this.pos),
+          angle: this.angle,
+        };
+      }
+
+      if (!interpolateState.prevState || (!interpolate.lerpUpdate && !interpolationCache.pos))
+        return this;
+
+      if (interpolate.lerpUpdate) {
+        interpolationCache.angle = lerp(
+          interpolateState.prevState.angle,
+          interpolateState.state.angle,
+          alpha,
+        );
+
+        interpolationCache.pos = vec2.lerp(
+          alpha,
+          interpolateState.prevState.pos,
+          interpolateState.state.pos,
+        );
+      }
+
+      return interpolationCache;
+    };
+  })();
+
   update() {
-    const {pos, angle, velocityVector, angularVelocity} = this;
+    const {
+      moveable, pos, angle,
+      velocityVector, angularVelocity,
+    } = this;
+
+    if (!moveable)
+      return;
 
     this.pos = vec2.add(pos, velocityVector);
     this.angle = wrapAngleTo2PI(angle + angularVelocity);

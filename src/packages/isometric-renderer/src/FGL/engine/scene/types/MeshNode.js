@@ -10,11 +10,16 @@ export default class MeshNode extends SceneNode {
    *
    * @param {Object} config
    */
-  constructor(config) {
+  constructor(
+    {
+      renderWireframe = false,
+      ...config
+    },
+  ) {
     super(config);
 
     const {f} = this;
-    if (f)
+    if (f && renderWireframe)
       this.wireframe = new MeshWireframe(f, this);
   }
 

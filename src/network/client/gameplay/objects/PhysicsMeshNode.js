@@ -32,7 +32,7 @@ export default class PhysicsMeshNode extends MeshNode {
         {
           angle: this.rotate.z,
           pos: this.translate,
-          size: this.size.toVec(),
+          size: this.size,
         },
       );
     }

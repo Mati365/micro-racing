@@ -20,6 +20,10 @@ export default class RemoteRoomStateListener {
       let offset = 1;
       const serializer = PlayerMapElement.binarySnapshotSerializer;
 
+      // this.c = (this.c || 0) + 1;
+      // if (this.c > 10)
+      //   return;
+
       for (let i = itemsCount - 1; i >= 0; --i) {
         this.onSyncObject(
           serializer.load(buffer, offset),

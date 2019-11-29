@@ -51,10 +51,14 @@ export default class PhysicsScene {
             a.angularVelocity += -angleDelta / (1 / a.speed * 40);
         }
       }
+
+      a.updateVerticesShapeCache();
     }
 
-    if (b.moveable)
+    if (b.moveable) {
       b.pos = vec2.sub(b.pos, vec2.mul(0.1, mtv.translate));
+      b.updateVerticesShapeCache();
+    }
   }
 
   updateObjectPhysics(a) {

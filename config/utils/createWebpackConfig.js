@@ -126,6 +126,12 @@ const createWebpackConfig = ({
                   loose: true,
                 },
               ],
+              [
+                '@babel/plugin-proposal-private-methods',
+                {
+                  loose: true,
+                },
+              ],
             ],
           },
         },

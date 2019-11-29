@@ -256,6 +256,8 @@ export default class CarPhysicsBody extends PhysicsBody {
 
       this.corneringIntensity = vec2.len(fCornering) / 8000;
     }
+
+    this.updateVerticesShapeCache();
   }
 
   toJSON = (() => {

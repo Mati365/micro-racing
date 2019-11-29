@@ -24,20 +24,28 @@ export default class PhysicsBody {
     this.angularVelocity = 0;
     this.speed = speed;
 
-    Object.defineProperty(this, 'vertices', {
-      get: this.cacheByPos(
-        () => this.points.map(
-          p => this.relativeBodyVector(p),
-        ),
-      ),
-    });
+    this.shapeCache = {
+      vertices: [],
+      box: null,
+    };
 
-    Object.defineProperty(this, 'box', {
-      get: this.cacheByPos(
-        () => getPathCornersBox(this.vertices),
-      ),
-    });
+    this.updateVerticesShapeCache();
   }
+
+  get box() { return this.shapeCache.box; }
+
+  get vertices() { return this.shapeCache.vertices; }
+
+  updateVerticesShapeCache = this.cacheByPos(() => {
+    const {shapeCache, points} = this;
+    const {vertices} = shapeCache;
+
+    for (let i = 0; i < points.length; ++i)
+      vertices[i] = this.relativeBodyVector(points[i]);
+
+    shapeCache.box = getPathCornersBox(vertices);
+    return shapeCache;
+  });
 
   static genRectanglePoints(size) {
     const [pW, pH] = [size.w / 2, size.h / 2];
@@ -164,5 +172,7 @@ export default class PhysicsBody {
     this.angle = wrapAngleTo2PI(angle + angularVelocity);
     this.angularVelocity *= 0.9;
     this.velocity *= 0.99;
+
+    this.updateVerticesShapeCache();
   }
 }

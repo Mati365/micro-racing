@@ -7,10 +7,12 @@ const FLOATING_HTML_TEXT_CLASS = singleClassCSS(
     position: 'absolute',
     left: 0,
     top: 0,
+    padding: [2, 4],
     userSelect: 'none',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 700,
     fontSmooth: 'never',
+    background: 'rgba(0, 0, 0, 0.35)',
   },
 ).className;
 
@@ -27,7 +29,7 @@ export default class HTMLTextNode {
     f,
     text,
     opacity = 1.0,
-    margin = vec2(0, -55), // in pixels
+    margin = vec2(0, -45), // in pixels
     translate = vec4(0, 0, 0, 1),
     outlineColor = f.colors.hex.BLACK,
     color = f.colors.hex.WHITE,

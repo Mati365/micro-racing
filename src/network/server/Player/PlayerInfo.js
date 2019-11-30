@@ -3,13 +3,29 @@ import uniqid from 'uniqid';
 import {PLAYER_TYPES} from '@game/network/constants/serverCodes';
 import generateName from '@pkg/name-generator';
 
+export class PlayerRacingState {
+  constructor(
+    {
+      color,
+    },
+  ) {
+    this.color = color;
+  }
+
+  getBroadcastSocketJSON() {
+    return {
+      color: this.color,
+    };
+  }
+}
+
 export default class PlayerInfo {
   constructor(
     {
       nick = generateName(),
       id = uniqid(),
       kind = PLAYER_TYPES.HUMAN,
-      color = null,
+      racingState = null,
       room = null,
     } = {},
   ) {
@@ -17,9 +33,9 @@ export default class PlayerInfo {
     this.id = id;
     this.kind = kind;
     this.room = room;
-    this.color = color;
     this.inputs = [];
     this.lastProcessedInput = -1;
+    this.racingState = racingState;
   }
 
   getBroadcastSocketJSON() {
@@ -27,7 +43,7 @@ export default class PlayerInfo {
       id: this.id,
       kind: this.kind,
       nick: this.nick,
-      color: this.color,
+      racingState: this.racingState?.getBroadcastSocketJSON(),
     };
   }
 }

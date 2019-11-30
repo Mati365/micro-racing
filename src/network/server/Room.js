@@ -18,6 +18,7 @@ import createActionMessage from '../shared/utils/createActionMessage';
 import ServerError from '../shared/ServerError';
 import RoomRacing from './RoomRacing';
 import {PlayerBot} from './Player/types';
+import {PlayerRacingState} from './Player/PlayerInfo';
 
 export default class Room {
   constructor(
@@ -148,7 +149,7 @@ export default class Room {
       R.map(
         (templateColor) => {
           const occurrences = R.reduce(
-            (acc, player) => acc + +(player.info.color === templateColor),
+            (acc, player) => acc + +(player.info.racingState?.color === templateColor),
             0,
             this.players,
           );
@@ -245,7 +246,11 @@ export default class Room {
         {
           car: playerCar,
           room: this,
-          color: this.genUniquePlayerColor(),
+          racingState: new PlayerRacingState(
+            {
+              color: this.genUniquePlayerColor(),
+            },
+          ),
         },
       );
 

@@ -1,3 +1,5 @@
+import * as R from 'ramda';
+
 import {getIndexByID} from '@pkg/basic-helpers';
 import {createIsometricScene} from '@pkg/isometric-renderer';
 import {vec2, lerp} from '@pkg/gl-math';
@@ -7,10 +9,25 @@ import carKeyboardDriver, {GameKeyboardController} from '@game/logic/drivers/car
 import RoomMapNode from '../objects/RoomMapNode';
 import RemoteRoomStateListener from '../RemoteRoomStateListener';
 
+const DEFAULT_GAMEBOARD_LISTENERS = {
+  onJoinPlayer: R.T,
+  onLeavePlayer: R.T,
+  onLoadRoomState: R.T,
+};
+
 export default class GameBoard {
-  constructor({client}) {
+  constructor(
+    {
+      client,
+      listeners,
+    },
+  ) {
     this.client = client;
     this.frameId = 1;
+    this.listeners = Object.assign(
+      DEFAULT_GAMEBOARD_LISTENERS,
+      listeners || {},
+    );
   }
 
   async setCanvas({
@@ -31,7 +48,7 @@ export default class GameBoard {
 
   async loadInitialRoomState(initialRoomState) {
     const {f} = this.scene;
-    const {client} = this;
+    const {listeners, client} = this;
 
     this.roomMapNode = new RoomMapNode(
       {
@@ -47,10 +64,6 @@ export default class GameBoard {
 
         onSyncObject: this.onSyncObject,
 
-        onLeavePlayer: (player) => {
-          this.roomMapNode.removePlayerCar(player);
-        },
-
         onJoinPlayer: (player, carObject) => {
           this.roomMapNode.appendObjects(
             {
@@ -58,7 +71,30 @@ export default class GameBoard {
               objects: [carObject],
             },
           );
+          listeners.onJoinPlayer(
+            {
+              map: this.roomMapNode,
+              player,
+              carObject,
+            },
+          );
         },
+
+        onLeavePlayer: (player) => {
+          this.roomMapNode.removePlayerCar(player);
+          listeners.onLeavePlayer(
+            {
+              map: this.roomMapNode,
+              player,
+            },
+          );
+        },
+      },
+    );
+
+    listeners.onLoadRoomState(
+      {
+        map: this.roomMapNode,
       },
     );
 
@@ -177,8 +213,6 @@ export default class GameBoard {
   stop() {
     this.roomState?.releaseListeners();
   }
-
-  SERVER_FRAME_CACHE = {};
 
   update(interpolate) {
     const {

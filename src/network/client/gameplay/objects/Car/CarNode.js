@@ -34,7 +34,7 @@ class PlayerNickTextNode extends HTMLTextNode {
     arrowSize = 6,
   }) {
     const {current} = player;
-    const backgroundColor = `${player.color}${current ? '88' : '66'}`;
+    const backgroundColor = `${player.racingState.color}${current ? '88' : '66'}`;
 
     super(
       {
@@ -96,7 +96,7 @@ export default class CarNode extends PhysicsMeshNode {
       f, this,
       {
         renderBorders: player.current,
-        wireframeColor: hexToVec4(player.color),
+        wireframeColor: hexToVec4(player.racingState.color),
       },
     );
 

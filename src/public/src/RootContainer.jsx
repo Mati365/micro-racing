@@ -25,6 +25,7 @@ const Container = styled.div(
       justifyContent: 'center',
       height: '100vh',
       background: 'black',
+      fontFamily: 'Arial',
     },
 
     '@global': {

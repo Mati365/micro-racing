@@ -6,5 +6,8 @@ export default {
     },
   },
   game: {
+    racing: {
+      current_lap: 'okrążenie:',
+    },
   },
 };

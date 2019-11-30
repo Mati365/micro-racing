@@ -5,8 +5,14 @@ import {DIMENSIONS_SCHEMA} from '@ui/schemas';
 import {ssr} from '@pkg/basic-helpers';
 import usePromise from '@ui/basic-hooks/async/usePromise';
 
+import {Flex} from '@ui/basic-components/styled';
 import PlayerClientSocket from '../protocol/PlayerClientSocket';
+
 import GameBoard from './states/GameBoard';
+import {
+  RaceRoomInfoToolbar,
+  RaceLapToolbar,
+} from './components';
 
 const useClientSocket = (
   {
@@ -63,14 +69,23 @@ const GameCanvas = ({dimensions}) => {
     [connecting],
   );
 
+  /* eslint-disable jsx-a11y/tabindex-no-positive */
   return (
-    <canvas
-      tabIndex={-1}
-      ref={canvasRef}
-      width={dimensions.w}
-      height={dimensions.h}
-    />
+    <Flex direction='column'>
+      <RaceLapToolbar
+        lap={1}
+        totalLaps={3}
+      />
+      <canvas
+        tabIndex={1}
+        ref={canvasRef}
+        width={dimensions.w}
+        height={dimensions.h}
+      />
+      <RaceRoomInfoToolbar />
+    </Flex>
   );
+  /* eslint-enable */
 };
 
 GameCanvas.displayName = 'GameCanvas';

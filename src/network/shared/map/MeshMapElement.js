@@ -25,6 +25,7 @@ export default class MeshMapElement extends MapElement {
       transform: {
         translate = [0, 0, 0],
         scale = [1, 1, 1],
+        rotate = [0, 0, 0],
       },
     } = params;
 
@@ -34,6 +35,7 @@ export default class MeshMapElement extends MapElement {
         moveable: false,
         pos: vec2(translate[0], translate[1]),
         size: normalizedSize.scale(scale),
+        angle: rotate[2],
       },
     );
   }

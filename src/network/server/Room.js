@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 
+import PLAYERS_COLORS from '@game/network/constants/playersColors';
 import {
   PLAYER_TYPES,
   ERROR_CODES,
@@ -133,6 +134,34 @@ export default class Room {
     };
   }
 
+  /**
+   * Generates color based on players list
+   *
+   * @returns {String}
+   */
+  genUniquePlayerColor() {
+    return R.compose(
+      arr => arr[0].templateColor,
+      R.sortWith([
+        R.ascend(R.prop('occurrences')),
+      ]),
+      R.map(
+        (templateColor) => {
+          const occurrences = R.reduce(
+            (acc, player) => acc + +(player.info.color === templateColor),
+            0,
+            this.players,
+          );
+
+          return {
+            occurrences,
+            templateColor,
+          };
+        },
+      ),
+    )(PLAYERS_COLORS);
+  }
+
   get bots() {
     return R.filter(
       ({info}) => hasFlag(PLAYER_TYPES.BOT, info.kind),
@@ -214,8 +243,9 @@ export default class Room {
       Object.assign(
         player.info,
         {
-          room: this,
           car: playerCar,
+          room: this,
+          color: this.genUniquePlayerColor(),
         },
       );
 

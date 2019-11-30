@@ -13,14 +13,20 @@ import {
 import WheelTrack from './WheelTrack';
 
 export default class CarNodeEffects extends MeshWireframe {
-  constructor(f, sceneNode) {
-    super(f, sceneNode);
+  constructor(f, sceneNode, config = {}) {
+    const {
+      wireframeColor = f.colors.BLUE,
+    } = config;
 
     const {
       size,
-      body: {wheels},
+      body: {
+        wheels,
+      },
     } = sceneNode;
 
+    super(f, sceneNode, wireframeColor);
+    this.config = config;
     this.wheelMeshSize = new Size(
       size.w * 0.2,
       size.h * 0.25,
@@ -35,7 +41,7 @@ export default class CarNodeEffects extends MeshWireframe {
         {
           renderer: f.mesh.box(),
           uniforms: {
-            color: f.colors.BLUE,
+            color: wireframeColor,
           },
           attributes: {
             wheel,
@@ -136,10 +142,7 @@ export default class CarNodeEffects extends MeshWireframe {
   }
 
   render(interpolate, mpMatrix) {
-    const {wheelTracks, meshWheels} = this;
-
-    for (let i = meshWheels.length - 1; i >= 0; --i)
-      meshWheels[i].render(interpolate, mpMatrix);
+    const {wheelTracks, meshWheels, config} = this;
 
     for (let i = wheelTracks.length - 1; i >= 0; --i) {
       const wheelTrack = wheelTracks[i];
@@ -147,6 +150,11 @@ export default class CarNodeEffects extends MeshWireframe {
         wheelTrack.render(interpolate, mpMatrix);
     }
 
-    super.render(interpolate, mpMatrix);
+    if (config.renderBorders) {
+      for (let i = meshWheels.length - 1; i >= 0; --i)
+        meshWheels[i].render(interpolate, mpMatrix);
+
+      super.render(interpolate, mpMatrix);
+    }
   }
 }

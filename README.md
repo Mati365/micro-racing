@@ -58,6 +58,10 @@ https://www.gdcvault.com/play/1022055/How-to-Implement-AAA-Game
 [Attribution-NonCommercial-ShareAlike 4.0 International](https://github.com/Mati365/kart-racing/blob/master/LICENSE.md)
 
 ## Resources
+Icons:
+https://png.is/f/chatbot-robot-internet-bot-artificial-intelligence-icon-vector-robot/6051723894325248-201812161840.html
+https://icons8.com/icon/38824/meat
+
 Cars:
 https://opengameart.org/content/low-poly-cars
 https://free3d.com/3d-model/cartoon-low-poly-city-cars-pack-32084.html

@@ -80,4 +80,14 @@ export default class PlayerClientSocket {
     this.rpc = new BinarySocketRPCWrapper(ws, this.listeners);
     this.info = await this.fetchPlayerInfo();
   }
+
+  /**
+   * Assign new player info
+   *
+   * @param {PlayerInfo} info
+   */
+  assignInfo(info) {
+    this.info = info;
+    return this;
+  }
 }

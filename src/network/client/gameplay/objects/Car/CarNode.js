@@ -1,5 +1,8 @@
 import * as R from 'ramda';
 
+import {PLAYERS_CARS_ICONS} from '@game/shared/sceneResources/icons';
+
+import {hexToVec4} from '@pkg/isometric-renderer/FGL/core/utils';
 import {fetchCarMeshURLResource} from '@game/shared/sceneResources/cars';
 
 import {HTMLTextNode} from '@pkg/isometric-renderer/FGL/engine/scene';
@@ -23,6 +26,43 @@ const createTexturedCarRenderer = f => R.memoizeWith(
     )
   ),
 );
+
+class PlayerNickTextNode extends HTMLTextNode {
+  constructor({
+    f,
+    player,
+    arrowSize = 6,
+  }) {
+    const {current} = player;
+    const backgroundColor = `${player.color}${current ? '88' : '66'}`;
+
+    super(
+      {
+        f,
+        text: player.nick,
+        icon: PLAYERS_CARS_ICONS[player.kind],
+        css: {
+          backgroundColor,
+          opacity: current ? 1.0 : 0.5,
+          zIndex: current ? 2 : 1,
+
+          '&:after': {
+            content: '""',
+            position: 'absolute',
+            top: '100%',
+            left: '50%',
+            marginLeft: `-${arrowSize}px`,
+            width: 0,
+            height: 0,
+            borderTop: `solid ${arrowSize}px ${backgroundColor}`,
+            borderLeft: `solid ${arrowSize}px transparent`,
+            borderRight: `solid ${arrowSize}px transparent`,
+          },
+        },
+      },
+    );
+  }
+}
 
 /**
  * @see
@@ -52,11 +92,18 @@ export default class CarNode extends PhysicsMeshNode {
 
     super.setRenderer(renderer);
 
-    this.wireframe = new CarNodeEffects(f, this);
-    this.nickNode = new HTMLTextNode(
+    this.wireframe = new CarNodeEffects(
+      f, this,
+      {
+        renderBorders: player.current,
+        wireframeColor: hexToVec4(player.color),
+      },
+    );
+
+    this.nickNode = new PlayerNickTextNode(
       {
         f,
-        text: player.nick,
+        player,
       },
     );
   }

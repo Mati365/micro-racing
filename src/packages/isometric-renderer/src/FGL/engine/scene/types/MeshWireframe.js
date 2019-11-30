@@ -1,12 +1,12 @@
 import SceneNode from './SceneNode';
 
 export default class MeshWireframe extends SceneNode {
-  constructor(f, sceneNode) {
+  constructor(f, sceneNode, color) {
     super(
       {
         renderer: f.mesh.box(),
         uniforms: {
-          color: f.colors.BLUE,
+          color: color || f.colors.BLUE,
         },
       },
     );

@@ -13,6 +13,7 @@ export default class MeshNode extends SceneNode {
   constructor(
     {
       renderWireframe = false,
+      wireframeColor = null,
       ...config
     },
   ) {
@@ -20,7 +21,7 @@ export default class MeshNode extends SceneNode {
 
     const {f} = this;
     if (f && renderWireframe)
-      this.wireframe = new MeshWireframe(f, this);
+      this.wireframe = new MeshWireframe(f, this, wireframeColor);
   }
 
   setRenderer(renderer) {

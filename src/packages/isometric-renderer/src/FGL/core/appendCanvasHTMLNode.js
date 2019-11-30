@@ -22,6 +22,10 @@ const appendCanvasHTMLNode = canvas => (
         display: 'inline-block',
         position: 'relative',
         overflow: 'hidden',
+
+        '& canvas': {
+          outline: 0,
+        },
       },
     ).className;
 
@@ -33,7 +37,11 @@ const appendCanvasHTMLNode = canvas => (
 
   // append elements
   const node = document.createElement(tag);
-  node.innerHTML = children;
+
+  if (R.is(String, children))
+    node.innerHTML = children;
+  else
+    node.appendChild(children);
 
   if (className)
     node.classList.add(className);

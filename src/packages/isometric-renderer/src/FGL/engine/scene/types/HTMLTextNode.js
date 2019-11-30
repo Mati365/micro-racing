@@ -7,12 +7,21 @@ const FLOATING_HTML_TEXT_CLASS = singleClassCSS(
     position: 'absolute',
     left: 0,
     top: 0,
-    padding: [2, 4],
+    padding: 2,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'row',
     userSelect: 'none',
     fontSize: 11,
     fontWeight: 700,
     fontSmooth: 'never',
     background: 'rgba(0, 0, 0, 0.35)',
+
+    '& > img': {
+      height: 14,
+      marginRight: 4,
+      imageRendering: 'pixelated',
+    },
   },
 ).className;
 
@@ -28,26 +37,40 @@ export default class HTMLTextNode {
   constructor({
     f,
     text,
+    icon,
     opacity = 1.0,
-    margin = vec2(0, -45), // in pixels
+    margin = vec2(0, -55), // in pixels
     translate = vec4(0, 0, 0, 1),
     outlineColor = f.colors.hex.BLACK,
     color = f.colors.hex.WHITE,
     css,
   }) {
     this.text = text;
+    this.icon = icon;
     this.translate = translate;
     this.margin = margin;
+    this.initialHidden = true;
 
     this.cache = {
       translateMatrix: mat.create(1, 4),
     };
 
-    this.initialHidden = true;
+    let html = text;
+    if (icon) {
+      const iconElement = document.createElement('img');
+      iconElement.src = icon;
+
+      html = document.createDocumentFragment();
+      html.appendChild(iconElement);
+      html.appendChild(
+        document.createTextNode(text),
+      );
+    }
+
     this.htmlNode = f.appendCanvasHTMLNode(
       {
         tag: 'span',
-        children: text,
+        children: html,
         css: {
           composes: [FLOATING_HTML_TEXT_CLASS],
           color,
@@ -109,7 +132,7 @@ export default class HTMLTextNode {
     cache.prevY = y;
 
     if (initialHidden) {
-      htmlNode.style.display = 'initial';
+      htmlNode.style.display = 'flex';
       this.initialHidden = false;
     }
   }

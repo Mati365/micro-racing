@@ -153,11 +153,13 @@ export const appendToSceneBuffer = f => ({
 };
 
 export default class RoomMapNode {
-  constructor({
-    f,
-    initialRoomState,
-    currentPlayer,
-  }) {
+  constructor(
+    {
+      f,
+      initialRoomState,
+      currentPlayer,
+    },
+  ) {
     this.f = f;
     this.currentPlayer = currentPlayer;
     this.physics = new PhysicsScene;
@@ -167,6 +169,16 @@ export default class RoomMapNode {
   }
 
   async loadInitialRoomState({players, objects, ...roomInfo}) {
+    // assign new player info after loading scene
+    const updatedCurrentPlayerInfo = findByID(this.currentPlayer.id, players);
+    if (updatedCurrentPlayerInfo) {
+      updatedCurrentPlayerInfo.current = true;
+      Object.assign(
+        this.currentPlayer,
+        updatedCurrentPlayerInfo,
+      );
+    }
+
     const {f, currentPlayer} = this;
     const {
       buffer,
@@ -213,7 +225,12 @@ export default class RoomMapNode {
     delete refs.objects[carNode.id];
   }
 
-  async appendObjects({players = [], objects}) {
+  async appendObjects(
+    {
+      players = [],
+      objects,
+    },
+  ) {
     const {refs} = await appendToSceneBuffer(this.f)(
       {
         players,

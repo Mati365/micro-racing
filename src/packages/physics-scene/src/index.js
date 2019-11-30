@@ -1,8 +1,4 @@
-import {
-  smallestAngleDistance,
-  wrapAngleTo2PI,
-  vec2,
-} from '@pkg/gl-math';
+import {vec2} from '@pkg/gl-math';
 
 import {
   aabb,
@@ -23,33 +19,25 @@ export default class PhysicsScene {
     if (!mtv)
       return;
 
-    if (a.moveable) {
-      a.pos = vec2.add(a.pos, mtv.translate);
-
-      // apply impulses
-      const {intersections} = mtv;
-
-      for (let k = 0; k < intersections.length; ++k) {
-        const intersection = intersections[k];
-        const edgeNormal = intersection.edgeB.normal(true);
-
-        const newVelocity = vec2.reflectByNormal(edgeNormal, a.velocityVector, true);
-        const newAngle = wrapAngleTo2PI(
-          Math.atan2(newVelocity.y, newVelocity.x),
-        );
-
-        const angleDelta = -smallestAngleDistance(a.angle, newAngle);
-        a.velocity = vec2.orthogonal(vec2.mul(0.5, a.velocity));
-        a.angle += -angleDelta * 0.01;
-      }
-
-      a.updateVerticesShapeCache();
+    if (!a.moveable && b.moveable) {
+      [a, b] = [b, a];
+      mtv.translate = vec2.mul(-1, mtv.translate);
     }
 
-    if (b.moveable) {
-      b.pos = vec2.sub(b.pos, mtv.translate);
-      b.updateVerticesShapeCache();
+    a.pos = vec2.add(a.pos, mtv.translate);
+
+    // apply impulses
+    const {intersections} = mtv;
+
+    for (let k = 0; k < intersections.length; ++k) {
+      const intersection = intersections[k];
+      const edgeNormal = intersection.edgeB.normal(true);
+
+      const newVelocity = vec2.reflectByNormal(edgeNormal, a.velocityVector, true);
+      a.velocity = vec2.mul(0.5, newVelocity);
     }
+
+    a.updateVerticesShapeCache();
   }
 
   updateObjectPhysics(a) {
@@ -73,10 +61,12 @@ export default class PhysicsScene {
 
       // DIAGONAL
       const mtv = diagonal(a, b);
-      if (mtv) {
+      if (mtv)
         PhysicsScene.performBodyReaction(a, b, mtv);
-        // debugger;
-      }
+
+      const mtv2 = diagonal(b, a);
+      if (mtv2)
+        PhysicsScene.performBodyReaction(b, a, mtv2);
     }
   }
 

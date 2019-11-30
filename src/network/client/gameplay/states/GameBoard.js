@@ -150,6 +150,7 @@ export default class GameBoard {
     body.velocity = vec2.lerp(0.05, prevVelocity, body.velocity);
 
     node.body.updateVerticesShapeCache();
+    physics.updateObjectPhysics(body);
 
     this.waitForSync = false;
   };

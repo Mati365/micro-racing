@@ -24,6 +24,7 @@ const Container = styled.div(
       alignItems: 'center',
       justifyContent: 'center',
       height: '100vh',
+      background: 'black',
     },
 
     '@global': {

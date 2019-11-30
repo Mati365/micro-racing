@@ -198,7 +198,8 @@ export default class RoomMapNode {
       const item = list[i];
 
       item.update && item.update(interpolate);
-      item.body && physics.updateObjectPhysics(item.body);
+      if (item.body && interpolate.fixedStepUpdate)
+        physics.updateObjectPhysics(item.body);
     }
   }
 

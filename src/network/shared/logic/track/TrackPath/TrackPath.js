@@ -14,7 +14,7 @@ const isPointInsideRect = (point, rect) => (
     && point.y < rect.y + rect.h
 );
 
-export const CHUNK_SIZE = 3;
+export const CURVE_CHUNK_SIZE = 3;
 
 /**
  * Point creators
@@ -106,7 +106,7 @@ export default class TrackPath {
    */
   get realPointsLength() {
     const {path} = this;
-    return path.length / CHUNK_SIZE;
+    return path.length / CURVE_CHUNK_SIZE;
   }
 
   /**
@@ -157,15 +157,19 @@ export default class TrackPath {
   updateHandlersPos() {
     const {path, realPointsLength} = this;
 
-    if (realPointsLength < CHUNK_SIZE)
+    if (realPointsLength < CURVE_CHUNK_SIZE)
       return;
 
     // starts from 1 to prevent glitches
-    for (let i = realPointsLength > 1 ? 0 : CHUNK_SIZE; i < path.length; i += CHUNK_SIZE) {
+    for (
+      let i = realPointsLength > 1 ? 0 : CURVE_CHUNK_SIZE;
+      i < path.length;
+      i += CURVE_CHUNK_SIZE
+    ) {
       const [prev, current, next] = [
-        path[i - CHUNK_SIZE]?.point || path[path.length - 1]?.point, // looping
+        path[i - CURVE_CHUNK_SIZE]?.point || path[path.length - 1]?.point, // looping
         path[i].point,
-        path[i + CHUNK_SIZE]?.point || path[0]?.point, // looping
+        path[i + CURVE_CHUNK_SIZE]?.point || path[0]?.point, // looping
       ];
       if (!prev)
         continue;
@@ -294,7 +298,7 @@ export default class TrackPath {
       {
         spacing: 10,
         loop: realPointsLength > 2,
-        chunkSize: CHUNK_SIZE,
+        chunkSize: CURVE_CHUNK_SIZE,
         selectorFn: R.prop('point'),
         ...config,
       },

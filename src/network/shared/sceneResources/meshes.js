@@ -11,7 +11,7 @@ export const BARRIERS_RESOURCES = {
   BASIC: new URLMeshResourceMeta(
     {
       url: barrierResourceUrl,
-      normalizedSize: new Size(0.4625033788784572, 1.0, 0.4106471677238611),
+      normalizedSize: new Size(0.4130432935245712, 1.0, 0.4473490201696071),
       textures: [
         basicBarrierTexUrl,
       ],

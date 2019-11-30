@@ -70,8 +70,8 @@ export const deCasteljau = (
       const prevPointVector = vec2.normalize(vec2.sub(prevPoint, point));
 
       point = vec2.add(point, vec2.mul(missDist, prevPointVector));
-
       prevPoint = point;
+
       reduced.push(point);
     }
   }

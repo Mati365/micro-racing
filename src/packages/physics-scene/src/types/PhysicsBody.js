@@ -18,7 +18,7 @@ export default class PhysicsBody {
   }) {
     this.pos = pos;
     this.points = points || PhysicsBody.genRectanglePoints(size);
-    this.size = size; // todo: add autodetect if not present
+    this.size = size;
     this.moveable = R.defaultTo(true, moveable);
     this.angle = angle;
     this.angularVelocity = 0;

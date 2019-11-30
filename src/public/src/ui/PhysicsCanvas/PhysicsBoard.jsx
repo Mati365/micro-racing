@@ -76,7 +76,7 @@ export default class PhysicsBoard {
                 vec2(-50, -50),
               ],
               angle: -Math.PI / 3,
-              moveable: true,
+              moveable: false,
             },
           ),
 

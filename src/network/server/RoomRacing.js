@@ -36,7 +36,7 @@ export default class RoomRacing {
    * Update whole map state
    */
   updateMapState() {
-    const {map} = this;
+    const {map: {physics}} = this;
     const {players} = this.room;
 
     for (let i = players.length - 1; i >= 0; --i) {
@@ -69,11 +69,9 @@ export default class RoomRacing {
       }
 
       carBody.idleInputs = prevFrameId === null;
-      carBody.update();
-
-      map.physics.updateObjectPhysics(carBody);
     }
 
+    physics.update();
     this.broadcastRaceState();
   }
 

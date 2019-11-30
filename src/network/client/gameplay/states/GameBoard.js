@@ -66,10 +66,12 @@ export default class GameBoard {
   }
 
   onSyncObject = (playerSyncInfo) => {
-    const node = this.roomMapNode.refs.objects[playerSyncInfo.id];
-    const {lastProcessedInput} = playerSyncInfo;
+    const {roomMapNode} = this;
+    const {physics, currentPlayerCar} = roomMapNode;
 
-    const {currentPlayerCar} = this.roomMapNode;
+    const {lastProcessedInput} = playerSyncInfo;
+    const node = roomMapNode.refs.objects[playerSyncInfo.id];
+
     const currentPlayerSync = (
       currentPlayerCar.id === playerSyncInfo.id
     );
@@ -96,7 +98,7 @@ export default class GameBoard {
         corneringIntensity: playerSyncInfo.corneringIntensity,
         angularVelocity: playerSyncInfo.angularVelocity,
         steerAngle: playerSyncInfo.steerAngle,
-        throttle: playerSyncInfo.throttle,
+        // throttle: playerSyncInfo.throttle,
         pos: vec2(playerSyncInfo.pos[0], playerSyncInfo.pos[1]),
         velocity: vec2(playerSyncInfo.velocity[0], playerSyncInfo.velocity[1]),
       },
@@ -104,42 +106,41 @@ export default class GameBoard {
 
     // try to reply all inputs after response
     const {predictedInputs} = this.keyboardController;
-    if (lastProcessedInput !== -1 && predictedInputs.length && currentPlayerSync) {
-      let serverInputIndex = getIndexByID(lastProcessedInput, predictedInputs);
 
-      if (serverInputIndex !== -1 && serverInputIndex + 1 < predictedInputs.length) {
-        serverInputIndex++;
+    if (predictedInputs.length <= 20) {
+      if (lastProcessedInput !== -1 && predictedInputs.length && currentPlayerSync) {
+        let serverInputIndex = getIndexByID(lastProcessedInput, predictedInputs);
 
-        let prevFrameId = predictedInputs[serverInputIndex].frameId;
-        let skipLastUpdate = null;
+        if (serverInputIndex !== -1 && serverInputIndex + 1 < predictedInputs.length) {
+          serverInputIndex++;
 
-        for (let i = serverInputIndex; i < predictedInputs.length; ++i) {
-          const {bitset, frameId, tempOnly} = predictedInputs[i];
+          let prevFrameId = null;
+          for (let i = serverInputIndex; i < predictedInputs.length; ++i) {
+            const {bitset, frameId, tempOnly} = predictedInputs[i];
 
-          if (skipLastUpdate === null)
-            skipLastUpdate = false;
+            carKeyboardDriver(bitset, body);
+            if (!tempOnly && prevFrameId !== frameId) {
+              body.update();
+              physics.updateObjectPhysics(body);
+            }
 
-          carKeyboardDriver(bitset, body);
-
-          if (!tempOnly && prevFrameId !== frameId) {
-            body.update();
-            if (!skipLastUpdate && i + 1 >= predictedInputs.length)
-              skipLastUpdate = true;
+            prevFrameId = frameId;
           }
-
-          prevFrameId = frameId;
         }
 
-        if (skipLastUpdate === false)
-          body.update();
+        predictedInputs.splice(0, serverInputIndex);
       }
 
-      predictedInputs.splice(0, serverInputIndex);
+      body.angle = lerp(prevAngle, body.angle, 0.05);
+      body.pos = vec2.lerp(0.05, prevPos, body.pos);
+      body.velocity = vec2.lerp(0.05, prevVelocity, body.velocity);
+    } else {
+      console.alert(`Ping to high! Discard predicted inputs: ${predictedInputs.length}!`);
+      this.keyboardController.predictedInputs = [];
     }
 
-    body.angle = lerp(prevAngle, body.angle, 0.05);
-    body.pos = vec2.lerp(0.05, prevPos, body.pos);
-    body.velocity = vec2.lerp(0.05, prevVelocity, body.velocity);
+    node.body.updateVerticesShapeCache();
+    node.updateTransformCache();
 
     this.waitForSync = false;
   };

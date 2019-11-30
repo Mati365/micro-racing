@@ -2,6 +2,7 @@ import React, {useRef, useEffect} from 'react';
 
 import {DIMENSIONS_SCHEMA} from '@ui/schemas';
 
+import {ssr} from '@pkg/basic-helpers';
 import usePromise from '@ui/basic-hooks/async/usePromise';
 
 import PlayerClientSocket from '../protocol/PlayerClientSocket';
@@ -9,7 +10,7 @@ import GameBoard from './states/GameBoard';
 
 const useClientSocket = (
   {
-    uri = 'ws://lvh.me:8080',
+    uri = `ws://${ssr ? 'lvh.me' : document.domain}:8080`,
   } = {},
 ) => {
   const {loading, result} = usePromise(

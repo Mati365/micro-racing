@@ -10,6 +10,8 @@ import PhysicsBody from '@pkg/physics/types/PhysicsBody';
 
 class SimpleBody extends PhysicsBody {
   constructor({
+    moveable = true,
+
     // left top corner
     pos = vec2(0, 0),
     size = vec2(0, 0),
@@ -27,6 +29,7 @@ class SimpleBody extends PhysicsBody {
     super(
       {
         pos,
+        moveable,
         points: [
           vec2(-size.y / 2, size.x / 2),
           vec2(size.y / 2, size.x / 2),

@@ -28,7 +28,7 @@ import {
 
 import TrackPath, {
   TRACK_POINTS,
-  CHUNK_SIZE,
+  CURVE_CHUNK_SIZE,
   getHandlerSiblingParentPoint,
 } from '@game/logic/track/TrackPath';
 
@@ -213,7 +213,7 @@ const renderTrack = ({
       ctx.fill();
 
       // print index
-      ctx.fillText(`#${Number.parseInt(i / CHUNK_SIZE, 10)}`, x, y - 10);
+      ctx.fillText(`#${Number.parseInt(i / CURVE_CHUNK_SIZE, 10)}`, x, y - 10);
     }
   }
 };
@@ -368,7 +368,7 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
   appendTrackPoint(vec) {
     const insertIndex = (
       this.focused
-        ? this.focused.index + CHUNK_SIZE
+        ? this.focused.index + CURVE_CHUNK_SIZE
         : null
     );
 

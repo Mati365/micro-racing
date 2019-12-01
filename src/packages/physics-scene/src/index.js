@@ -32,17 +32,20 @@ export default class PhysicsScene {
       const intersection = intersections[k];
       const cornerCollision = intersection.uB < 0.1 || intersection.uB > 0.9;
 
-      if (cornerCollision) {
-        const newVelocity = vec2.mul(-0.4, a.velocityVector);
+      let newVelocity = null;
 
-        a.velocityVector = newVelocity;
-        a.pos = vec2.add(a.pos, newVelocity);
-      } else {
+      if (cornerCollision)
+        newVelocity = vec2.mul(-0.4, a.velocityVector);
+      else {
         const edgeNormal = intersection.edgeB.normal(true);
-        const newVelocity = vec2.reflectByNormal(edgeNormal, a.velocityVector, true);
-
-        a.velocityVector = vec2.mul(0.7, newVelocity);
+        newVelocity = vec2.mul(
+          0.7,
+          vec2.reflectByNormal(edgeNormal, a.velocityVector, true),
+        );
       }
+
+      a.velocityVector = newVelocity;
+      a.pos = vec2.add(a.pos, newVelocity);
     }
 
     a.updateVerticesShapeCache();

@@ -17,7 +17,7 @@ import genUniquePlayerColor from './utils/genUniquePlayerColor';
 
 import ServerError from '../shared/ServerError';
 import RoomRacing from './RoomRacing';
-import RoomConfig from './RoomConfig';
+import {RoomConfig} from '../shared/room';
 
 import {PlayerBot} from './Player/types';
 import {PlayerRacingState} from './Player/PlayerInfo';
@@ -119,19 +119,22 @@ export default class Room {
    */
   toBSON() {
     const {
-      name, owner,
+      name, owner, config,
       racing, players,
     } = this;
 
     return {
       name,
+      config: config.toBSON(),
+      state: racing.getRaceState().toBSON(),
       ownerID: owner.info.id,
+
+      // objects
       players: R.map(
         ({info}) => info.toBSON(),
         players,
       ),
 
-      // objects
       ...racing.map.toBSON(),
     };
   }

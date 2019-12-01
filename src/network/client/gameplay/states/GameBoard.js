@@ -12,7 +12,8 @@ import RemoteRoomStateListener from '../RemoteRoomStateListener';
 const DEFAULT_GAMEBOARD_LISTENERS = {
   onJoinPlayer: R.T,
   onLeavePlayer: R.T,
-  onLoadRoomState: R.T,
+  onLoadRoomMap: R.T,
+  onUpdateRaceState: R.T,
 };
 
 export default class GameBoard {
@@ -30,10 +31,12 @@ export default class GameBoard {
     );
   }
 
-  async setCanvas({
-    canvas,
-    aspectRatio,
-  }) {
+  async setCanvas(
+    {
+      canvas,
+      aspectRatio,
+    },
+  ) {
     this.canvas = canvas;
     this.keyboardController = new GameKeyboardController(canvas);
     this.scene = createIsometricScene(
@@ -63,6 +66,7 @@ export default class GameBoard {
         client,
 
         onSyncObject: this.onSyncObject,
+        onUpdateRaceState: this.listeners.onUpdateRaceState,
 
         onJoinPlayer: (player, carObject) => {
           this.roomMapNode.appendObjects(
@@ -92,8 +96,9 @@ export default class GameBoard {
       },
     );
 
-    listeners.onLoadRoomState(
+    listeners.onLoadRoomMap(
       {
+        ...initialRoomState,
         map: this.roomMapNode,
       },
     );

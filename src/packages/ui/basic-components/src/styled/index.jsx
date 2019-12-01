@@ -4,3 +4,4 @@ export {default as TextButton} from './TextButton';
 export {default as UnorderedList} from './UnorderedList';
 export {default as Wrapper} from './Wrapper';
 export {default as Pull} from './Pull';
+export {default as Layer} from './Layer';

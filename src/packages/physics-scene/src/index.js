@@ -39,7 +39,7 @@ export default class PhysicsScene {
       else {
         const edgeNormal = intersection.edgeB.normal(true);
         newVelocity = vec2.mul(
-          0.7,
+          0.5,
           vec2.reflectByNormal(edgeNormal, a.velocityVector, true),
         );
       }

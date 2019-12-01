@@ -1,18 +1,21 @@
-import React, {useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 
 import {DIMENSIONS_SCHEMA} from '@ui/schemas';
+import {RACE_STATES} from '@game/network/constants/serverCodes';
 
 import {ssr} from '@pkg/basic-helpers';
 import usePromise from '@ui/basic-hooks/async/usePromise';
 
-import {Flex} from '@ui/basic-components/styled';
 import PlayerClientSocket from '../protocol/PlayerClientSocket';
 
-import GameBoard from './states/GameBoard';
 import {
   RaceRoomInfoToolbar,
   RaceLapToolbar,
+  GameCanvasHolder,
 } from './components';
+
+import * as Overlays from './components/overlays';
+import GameBoard from './states/GameBoard';
 
 const useClientSocket = (
   {
@@ -37,6 +40,24 @@ const GameCanvas = ({dimensions}) => {
     client,
   } = useClientSocket();
 
+  const [gameState, setGameState] = useState(
+    {
+      state: {
+        type: RACE_STATES.WAIT_FOR_SERVER,
+      },
+    },
+  );
+
+  const {roomConfig} = gameState;
+  const mergeGameState = useRef();
+
+  mergeGameState.current = data => setGameState(
+    {
+      ...gameState,
+      ...data,
+    },
+  );
+
   useEffect(
     () => {
       if (connecting)
@@ -46,6 +67,20 @@ const GameCanvas = ({dimensions}) => {
         const board = new GameBoard(
           {
             client,
+            listeners: {
+              onUpdateRaceState: state => mergeGameState.current(
+                {
+                  state,
+                },
+              ),
+
+              onLoadRoomMap: ({state, config}) => mergeGameState.current(
+                {
+                  state,
+                  roomConfig: config,
+                },
+              ),
+            },
           },
         );
 
@@ -69,21 +104,42 @@ const GameCanvas = ({dimensions}) => {
     [connecting],
   );
 
+  let overlay = null;
+  switch (gameState.state.type) {
+    case RACE_STATES.WAIT_FOR_SERVER:
+      overlay = <Overlays.WaitingForServer />;
+      break;
+
+    case RACE_STATES.COUNT_TO_START:
+      overlay = <Overlays.RaceCountdown countdown={gameState.state.payload.countdown} />;
+      break;
+
+    default:
+  }
+
   /* eslint-disable jsx-a11y/tabindex-no-positive */
   return (
-    <Flex direction='column'>
-      <RaceLapToolbar
-        lap={1}
-        totalLaps={3}
-      />
-      <canvas
-        tabIndex={1}
-        ref={canvasRef}
-        width={dimensions.w}
-        height={dimensions.h}
-      />
-      <RaceRoomInfoToolbar />
-    </Flex>
+    <GameCanvasHolder freeze={gameState.state.type !== RACE_STATES.RACE}>
+      {roomConfig && (
+        <RaceLapToolbar
+          lap={1}
+          totalLaps={roomConfig.laps}
+        />
+      )}
+      <div>
+        <canvas
+          tabIndex={1}
+          ref={canvasRef}
+          width={dimensions.w}
+          height={dimensions.h}
+        />
+      </div>
+      {roomConfig && (
+        <RaceRoomInfoToolbar />
+      )}
+
+      {overlay}
+    </GameCanvasHolder>
   );
   /* eslint-enable */
 };

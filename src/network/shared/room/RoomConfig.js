@@ -1,13 +1,21 @@
 export default class RoomConfig {
   constructor(
     {
+      laps = 4,
+      countdown = 8,
       playersLimit = 5,
-      maxLaps = 3,
       spawnBotsBeforeStart = true,
     } = {},
   ) {
+    this.laps = laps;
+    this.countdown = countdown;
     this.playersLimit = playersLimit;
-    this.maxLaps = maxLaps;
     this.spawnBotsBeforeStart = spawnBotsBeforeStart;
+  }
+
+  toBSON() {
+    return {
+      laps: this.laps,
+    };
   }
 }

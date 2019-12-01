@@ -1,10 +1,16 @@
+import {intervalCountdown} from '@pkg/basic-helpers';
+
 import {createAnimationFrameRenderer} from '@pkg/isometric-renderer/FGL/core/viewport/createDtRenderLoop';
 import carKeyboardDriver from '../shared/logic/drivers/carKeyboardDriver';
 
-import RoadMapObjectsManager from './RoadMapObjectsManager';
-import {PlayerMapElement} from '../shared/map';
+import {
+  PLAYER_ACTIONS,
+  RACE_STATES,
+} from '../constants/serverCodes';
 
-import {PLAYER_ACTIONS} from '../constants/serverCodes';
+import {PlayerMapElement} from '../shared/map';
+import RoadMapObjectsManager from './RoadMapObjectsManager';
+import RaceState from '../shared/room/RoomRaceState';
 
 export default class RoomRacing {
   constructor(
@@ -14,9 +20,51 @@ export default class RoomRacing {
   ) {
     this.room = room;
     this.map = new RoadMapObjectsManager(room.map);
+    this.state = new RaceState(RACE_STATES.WAIT_FOR_SERVER);
   }
 
-  start() {
+  get config() {
+    return this.room.config;
+  }
+
+  getRaceState() {
+    return this.state;
+  }
+
+  setRaceState(state, broadcast = true) {
+    this.state = state;
+    if (broadcast)
+      this.broadcastRoomState(state);
+
+    return this;
+  }
+
+  async start() {
+    const {config} = this;
+
+    if (config.countdown) {
+      await intervalCountdown(
+        {
+          times: config.countdown,
+        },
+      )(
+        (countdown) => {
+          this.setRaceState(
+            new RaceState(
+              RACE_STATES.COUNT_TO_START,
+              {
+                countdown,
+              },
+            ),
+          );
+        },
+      );
+    }
+
+    this.setRaceState(
+      new RaceState(RACE_STATES.RACE),
+    );
+
     /**
      * setImmediate is more CPU intense and
      * difference between both are small
@@ -76,10 +124,26 @@ export default class RoomRacing {
     }
 
     physics.update();
-    this.broadcastRaceState();
+    this.broadcastBoardObjects();
   }
 
-  broadcastRaceState() {
+  /**
+   * High latency, send race state (total laps and other stuff)
+   */
+  broadcastRoomState(state = this.state) {
+    this.room.sendBroadcastAction(
+      null,
+      PLAYER_ACTIONS.UPDATE_RACE_STATE,
+      null,
+      state,
+    );
+  }
+
+  /**
+   * Low latency binary socket caller, broadcasts cars
+   * positions and low level physics values
+   */
+  broadcastBoardObjects() {
     const {players} = this.room;
     const serializer = PlayerMapElement.binarySnapshotSerializer;
 
@@ -95,7 +159,7 @@ export default class RoomRacing {
 
     this.room.sendBroadcastAction(
       null,
-      PLAYER_ACTIONS.UPDATE_RACE_STATE,
+      PLAYER_ACTIONS.UPDATE_BOARD_OBJECTS,
       null,
       new Uint8Array(buffer),
     );

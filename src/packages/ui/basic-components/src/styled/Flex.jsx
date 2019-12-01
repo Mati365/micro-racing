@@ -1,6 +1,12 @@
 import PropTypes from 'prop-types';
 import {styled} from '@pkg/fast-stylesheet/src/react';
 
+export const flexCenteredStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
 const Flex = styled.div(
   {
     'direction-row': {

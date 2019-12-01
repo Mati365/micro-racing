@@ -7,6 +7,8 @@ import {
 
 import PhysicsBody from '@pkg/physics/types/PhysicsBody';
 
+const PHYSICS_SPEED = 1.0 / 100;
+
 const GRAVITY = 9.81;
 
 const FRONT_TRAIN = 0;
@@ -119,6 +121,20 @@ export default class CarPhysicsBody extends PhysicsBody {
     this.drag = 3.5;
   }
 
+  get velocityVector() {
+    return vec2.mul(
+      PHYSICS_SPEED / 1.5,
+      vec2(this.velocity.x, -this.velocity.y),
+    );
+  }
+
+  set velocityVector(v) {
+    this.velocity = vec2.mul(
+      1 / (PHYSICS_SPEED / 1.5),
+      vec2(v.x, -v.y),
+    );
+  }
+
   turnSteerWheels(delta) {
     this.steerAngle = clamp(
       -this.maxSteerAngle,
@@ -138,8 +154,6 @@ export default class CarPhysicsBody extends PhysicsBody {
   }
 
   update() {
-    const PHYSICS_SPEED = 1.0 / 100;
-
     const {
       angle,
       angularVelocity, velocity,
@@ -235,7 +249,7 @@ export default class CarPhysicsBody extends PhysicsBody {
 
     if (this.speed || this.throttle) {
       this.pos = vec2.add(
-        vec2.mul(PHYSICS_SPEED / 1.5, vec2(this.velocity.x, -this.velocity.y)),
+        this.velocityVector,
         this.pos,
       );
 

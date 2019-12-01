@@ -12,7 +12,7 @@ export class PlayerRacingState {
     this.color = color;
   }
 
-  getBroadcastSocketJSON() {
+  toBSON() {
     return {
       color: this.color,
     };
@@ -38,12 +38,12 @@ export default class PlayerInfo {
     this.racingState = racingState;
   }
 
-  getBroadcastSocketJSON() {
+  toBSON() {
     return {
       id: this.id,
       kind: this.kind,
       nick: this.nick,
-      racingState: this.racingState?.getBroadcastSocketJSON(),
+      racingState: this.racingState?.toBSON(),
     };
   }
 }

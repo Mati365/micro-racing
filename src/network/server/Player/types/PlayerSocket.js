@@ -171,7 +171,7 @@ export default class PlayerSocket extends Player {
     [PLAYER_ACTIONS.PLAYER_INFO]: (cmdID) => {
       this.sendActionResponse(
         cmdID,
-        this.getBroadcastSocketJSON(),
+        this.toBSON(),
       );
     },
 
@@ -187,7 +187,7 @@ export default class PlayerSocket extends Player {
         const room = this.joinRoom(name);
         this.sendActionResponse(
           cmdID,
-          room.getBroadcastSocketJSON(),
+          room.toBSON(),
         );
         return room;
       },

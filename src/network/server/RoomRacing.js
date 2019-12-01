@@ -7,7 +7,11 @@ import {PlayerMapElement} from '../shared/map';
 import {PLAYER_ACTIONS} from '../constants/serverCodes';
 
 export default class RoomRacing {
-  constructor({room}) {
+  constructor(
+    {
+      room,
+    },
+  ) {
     this.room = room;
     this.map = new RoadMapObjectsManager(room.map);
   }

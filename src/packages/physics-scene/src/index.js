@@ -28,13 +28,21 @@ export default class PhysicsScene {
 
     // apply impulses
     const {intersections} = mtv;
-
     for (let k = 0; k < intersections.length; ++k) {
       const intersection = intersections[k];
-      const edgeNormal = intersection.edgeB.normal(true);
+      const cornerCollision = intersection.uB < 0.1 || intersection.uB > 0.9;
 
-      const newVelocity = vec2.reflectByNormal(edgeNormal, a.velocityVector, true);
-      a.velocity = vec2.mul(0.5, newVelocity);
+      if (cornerCollision) {
+        const newVelocity = vec2.mul(-0.4, a.velocityVector);
+
+        a.velocityVector = newVelocity;
+        a.pos = vec2.add(a.pos, newVelocity);
+      } else {
+        const edgeNormal = intersection.edgeB.normal(true);
+        const newVelocity = vec2.reflectByNormal(edgeNormal, a.velocityVector, true);
+
+        a.velocityVector = vec2.mul(0.7, newVelocity);
+      }
     }
 
     a.updateVerticesShapeCache();
@@ -63,10 +71,6 @@ export default class PhysicsScene {
       const mtv = diagonal(a, b);
       if (mtv)
         PhysicsScene.performBodyReaction(a, b, mtv);
-
-      const mtv2 = diagonal(b, a);
-      if (mtv2)
-        PhysicsScene.performBodyReaction(b, a, mtv2);
     }
   }
 

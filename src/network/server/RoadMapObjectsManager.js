@@ -101,7 +101,7 @@ export default class RoadMapObjectsManager {
     );
   }
 
-  getBroadcastSocketJSON() {
+  toBSON() {
     return {
       objects: this.physics.items,
     };

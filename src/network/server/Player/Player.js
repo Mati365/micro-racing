@@ -1,14 +1,16 @@
 import PlayerInfo from './PlayerInfo';
 
 export default class Player {
-  constructor({
-    info = new PlayerInfo,
-  }) {
+  constructor(
+    {
+      info = new PlayerInfo,
+    },
+  ) {
     this.info = info;
   }
 
-  getBroadcastSocketJSON() {
-    return this.info.getBroadcastSocketJSON();
+  toBSON() {
+    return this.info.toBSON();
   }
 
   get id() {

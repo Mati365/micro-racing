@@ -1,6 +1,5 @@
 import * as R from 'ramda';
 
-import PLAYERS_COLORS from '@game/network/constants/playersColors';
 import {
   PLAYER_TYPES,
   ERROR_CODES,
@@ -14,29 +13,29 @@ import {
 } from '@pkg/basic-helpers';
 
 import createActionMessage from '../shared/utils/createActionMessage';
+import genUniquePlayerColor from './utils/genUniquePlayerColor';
 
 import ServerError from '../shared/ServerError';
 import RoomRacing from './RoomRacing';
+import RoomConfig from './RoomConfig';
+
 import {PlayerBot} from './Player/types';
 import {PlayerRacingState} from './Player/PlayerInfo';
 
 export default class Room {
   constructor(
     {
-      options = {
-        spawnBotsBeforeStart: true,
-      },
       owner,
       name,
       map,
       abstract, // its only virtual represenation of list of players
       kickedPlayers = [],
       players = [],
-      playersLimit = 5,
+      config = new RoomConfig,
       onDestroy,
     },
   ) {
-    this.options = options;
+    this.config = config;
     this.map = map;
     this.name = name;
     this.owner = owner;
@@ -51,7 +50,6 @@ export default class Room {
       );
     }
 
-    this.playersLimit = playersLimit;
     this.players = [];
 
     R.map(
@@ -65,14 +63,17 @@ export default class Room {
   }
 
   startRace() {
-    const {spawnBotsBeforeStart} = this.options;
+    const {
+      spawnBotsBeforeStart,
+      playersLimit,
+    } = this.config;
 
     if (this.abstract)
       return;
 
     if (spawnBotsBeforeStart) {
       this.spawnBots(
-        Math.max(0, this.playersLimit - this.players.length - 1),
+        Math.max(0, playersLimit - this.players.length - 1),
       );
     }
 
@@ -116,7 +117,7 @@ export default class Room {
   /**
    * Returns info about map
    */
-  getBroadcastSocketJSON() {
+  toBSON() {
     const {
       name, owner,
       racing, players,
@@ -126,41 +127,13 @@ export default class Room {
       name,
       ownerID: owner.info.id,
       players: R.map(
-        ({info}) => info.getBroadcastSocketJSON(),
+        ({info}) => info.toBSON(),
         players,
       ),
 
       // objects
-      ...racing.map.getBroadcastSocketJSON(),
+      ...racing.map.toBSON(),
     };
-  }
-
-  /**
-   * Generates color based on players list
-   *
-   * @returns {String}
-   */
-  genUniquePlayerColor() {
-    return R.compose(
-      arr => arr[0].templateColor,
-      R.sortWith([
-        R.ascend(R.prop('occurrences')),
-      ]),
-      R.map(
-        (templateColor) => {
-          const occurrences = R.reduce(
-            (acc, player) => acc + +(player.info.racingState?.color === templateColor),
-            0,
-            this.players,
-          );
-
-          return {
-            occurrences,
-            templateColor,
-          };
-        },
-      ),
-    )(PLAYERS_COLORS);
   }
 
   get bots() {
@@ -175,7 +148,7 @@ export default class Room {
   }
 
   get isFull() {
-    return this.playersLimit === this.playersCount - 1;
+    return this.config.playersLimit === this.playersCount - 1;
   }
 
   get isEmpty() {
@@ -248,7 +221,7 @@ export default class Room {
           room: this,
           racingState: new PlayerRacingState(
             {
-              color: this.genUniquePlayerColor(),
+              color: genUniquePlayerColor(this.players),
             },
           ),
         },
@@ -259,7 +232,7 @@ export default class Room {
         PLAYER_ACTIONS.PLAYER_JOINED_TO_ROOM,
         null,
         {
-          player: player.getBroadcastSocketJSON(),
+          player: player.toBSON(),
           car: playerCar,
         },
       );
@@ -292,7 +265,7 @@ export default class Room {
         PLAYER_ACTIONS.PLAYER_LEFT_ROOM,
         null,
         {
-          player: player.getBroadcastSocketJSON(),
+          player: player.toBSON(),
         },
       );
     }

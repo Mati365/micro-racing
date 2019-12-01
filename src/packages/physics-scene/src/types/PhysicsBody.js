@@ -114,6 +114,11 @@ export default class PhysicsBody {
     );
   }
 
+  set velocityVector(v) {
+    this.speed = vec2.len(v);
+    this.angle = vec2.vectorAngle(v);
+  }
+
   interpolatedUpdate = (() => {
     const interpolationCache = {};
     const interpolateState = {

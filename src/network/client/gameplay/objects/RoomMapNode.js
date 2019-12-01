@@ -156,7 +156,7 @@ export default class RoomMapNode {
   constructor(
     {
       f,
-      initialRoomState,
+      initialRoomState, // response from loadInitialRoomState
       currentPlayer,
     },
   ) {

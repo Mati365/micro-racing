@@ -134,7 +134,7 @@ const GameCanvas = ({dimensions}) => {
           height={dimensions.h}
         />
       </div>
-      {roomConfig && (
+      {roomConfig && !overlay && (
         <RaceRoomInfoToolbar />
       )}
 

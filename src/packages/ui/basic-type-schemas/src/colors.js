@@ -5,7 +5,7 @@ export const WHITE = '#ffffff';
 export const BLACK = '#000000';
 export const DARK_GRAY = '#666666';
 
-export const CRIMSON_RED = '#dc143c';
+export const CRIMSON_RED = '#ff1a48';
 export const SPRING_GREEN = '#00ff7f';
 export const DIM_GRAY = '#696969';
 export const DODGER_BLUE = '#1e90ff';

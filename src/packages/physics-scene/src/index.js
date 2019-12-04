@@ -1,3 +1,5 @@
+import * as R from 'ramda';
+
 import {vec2} from '@pkg/gl-math';
 
 import {
@@ -18,11 +20,6 @@ export default class PhysicsScene {
   static performBodyReaction(a, b, mtv) {
     if (!mtv)
       return;
-
-    if (!a.moveable && b.moveable) {
-      [a, b] = [b, a];
-      mtv.translate = vec2.mul(-1, mtv.translate);
-    }
 
     a.pos = vec2.add(a.pos, mtv.translate);
 
@@ -53,9 +50,9 @@ export default class PhysicsScene {
 
   updateObjectPhysics(a) {
     const {items} = this;
-    const {box: boxA} = a;
+    const {box: boxA, moveable} = a;
 
-    if (!boxA)
+    if (!moveable || !boxA)
       return;
 
     for (let j = 0; j < items.length; ++j) {
@@ -74,6 +71,27 @@ export default class PhysicsScene {
       const mtv = diagonal(a, b);
       if (mtv)
         PhysicsScene.performBodyReaction(a, b, mtv);
+
+      let mtv2 = diagonal(b, a);
+      if (mtv2) {
+        mtv2 = R.evolve(
+          {
+            translate: vec => vec2.mul(-1, vec),
+
+            // performs a bit better without it :)
+            // intersection: R.map(
+            //   ({edgeA, edgeB, ...intersection}) => ({
+            //     ...intersection,
+            //     edgeA: edgeB,
+            //     edgeB: edgeA,
+            //   }),
+            // ),
+          },
+          mtv2,
+        );
+
+        PhysicsScene.performBodyReaction(a, b, mtv2);
+      }
     }
   }
 

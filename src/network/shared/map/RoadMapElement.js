@@ -1,5 +1,7 @@
 import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
 
+import {CornersBox} from '@pkg/gl-math';
+
 import TrackPath from '@game/logic/track/TrackPath/TrackPath';
 import TrackSegments from '@game/logic/track/TrackSegments/TrackSegments';
 
@@ -17,11 +19,12 @@ export default class RoadMapElement extends MapElement {
   }
 
   getSegmentsInfo() {
-    const {points, sceneMeta} = this.params;
+    const {points, sceneMeta: {box, ...sceneMeta}} = this.params;
 
     return new TrackSegments(
       {
         ...sceneMeta, // sceneWidth
+        box: CornersBox.fromBSON(box),
         interpolatedPath: new TrackPath(points).getInterpolatedPathPoints(),
       },
     );

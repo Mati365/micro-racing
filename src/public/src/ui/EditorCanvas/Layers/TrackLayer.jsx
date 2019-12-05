@@ -326,7 +326,7 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
         points,
         {
           ...this.sceneMeta,
-          box: roadBox,
+          box: roadBox.scale(transform.scale),
         },
       ),
       new MapElement(

@@ -9,13 +9,14 @@ const GameCanvasHolder = styled(
     base: {
       position: 'relative',
 
-      '& canvas': {
+      '& canvas-html-wrapper > canvas': {
+        display: 'block',
         transition: 'filter 500ms ease-in-out',
       },
     },
 
     freeze: {
-      '& canvas': {
+      '& canvas-html-wrapper > canvas': {
         filter: 'blur(2px) brightness(0.1) grayscale(1.0)',
       },
     },

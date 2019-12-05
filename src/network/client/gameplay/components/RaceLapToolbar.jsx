@@ -33,7 +33,7 @@ const CurrentLapLabel = styled.span(
   },
 );
 
-const RaceLapToolbar = ({lap, totalLaps}) => {
+const RaceLapToolbar = ({loading, lap, totalLaps}) => {
   const t = useI18n();
 
   return (
@@ -44,7 +44,11 @@ const RaceLapToolbar = ({lap, totalLaps}) => {
         </CurrentLapLabel>
 
         <CurrentLapTitle>
-          {`${lap} / ${totalLaps}`}
+          {(
+            loading
+              ? '- / -'
+              : `${lap} / ${totalLaps}`
+          )}
         </CurrentLapTitle>
       </Pull.Right>
     </RaceLapToolbarWrapper>
@@ -54,8 +58,15 @@ const RaceLapToolbar = ({lap, totalLaps}) => {
 RaceLapToolbar.displayName = 'RaceLapToolbar';
 
 RaceLapToolbar.propTypes = {
-  lap: PropTypes.number.isRequired,
-  totalLaps: PropTypes.number.isRequired,
+  loading: PropTypes.bool,
+  totalLaps: PropTypes.number,
+  lap: PropTypes.number,
+};
+
+RaceLapToolbar.defaultProps = {
+  loading: false,
+  totalLaps: null,
+  lap: null,
 };
 
 export default RaceLapToolbar;

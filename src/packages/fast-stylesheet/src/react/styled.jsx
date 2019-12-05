@@ -48,7 +48,7 @@ const styled = (Tag, classes, params = {}) => {
   'ul', 'li', 'ol',
   'header', 'section',
   'article', 'footer',
-  'img',
+  'img', 'canvas',
 ].forEach(
   (tag) => {
     styled[tag] = (classes, params) => styled(tag, classes, params);

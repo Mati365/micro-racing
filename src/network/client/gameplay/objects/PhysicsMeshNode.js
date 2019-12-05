@@ -11,7 +11,7 @@ export default class PhysicsMeshNode extends MeshNode {
 
     this.physicsBodyEngine = physicsBodyEngine;
     this.bodyConfig = body;
-    this.interpolatedBody = null; // see update()
+    this.cachedInterpolatedBody = null; // see update()
   }
 
   setRenderer(renderer) {
@@ -39,15 +39,15 @@ export default class PhysicsMeshNode extends MeshNode {
   }
 
   update(interpolate) {
-    const {body, translate, rotate, interpolatedBody} = this;
+    const {body, translate, rotate, cachedInterpolatedBody} = this;
 
-    if (body && (!interpolatedBody || body.moveable)) {
+    if (body && (!cachedInterpolatedBody || body.moveable)) {
       // physics is slower than renderer
       // interpolate between frames
-      this.interpolatedBody = body.interpolatedUpdate(interpolate);
+      this.cachedInterpolatedBody = body.interpolatedUpdate(interpolate);
 
-      rotate.z = this.interpolatedBody.angle;
-      translate.xy = this.interpolatedBody.pos;
+      rotate.z = this.cachedInterpolatedBody.angle;
+      translate.xy = this.cachedInterpolatedBody.pos;
 
       this.updateTransformCache();
     }

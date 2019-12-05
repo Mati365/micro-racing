@@ -1,4 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
+import * as R from 'ramda';
 
 import {DIMENSIONS_SCHEMA} from '@ui/schemas';
 import {RACE_STATES} from '@game/network/constants/serverCodes';
@@ -8,8 +9,8 @@ import usePromise from '@ui/basic-hooks/async/usePromise';
 
 import PlayerClientSocket from '../protocol/PlayerClientSocket';
 
+import * as Hud from './components/hud';
 import {
-  RaceRoomInfoToolbar,
   RaceLapToolbar,
   GameCanvasHolder,
 } from './components';
@@ -35,6 +36,7 @@ const useClientSocket = (
 
 const GameCanvas = ({dimensions}) => {
   const canvasRef = useRef();
+
   const {
     connecting,
     client,
@@ -42,13 +44,14 @@ const GameCanvas = ({dimensions}) => {
 
   const [gameState, setGameState] = useState(
     {
+      board: null,
       state: {
         type: RACE_STATES.WAIT_FOR_SERVER,
       },
     },
   );
 
-  const {roomConfig} = gameState;
+  const {roadsSegments, roomConfig} = gameState;
   const mergeGameState = useRef();
 
   mergeGameState.current = data => setGameState(
@@ -74,10 +77,11 @@ const GameCanvas = ({dimensions}) => {
                 },
               ),
 
-              onLoadRoomMap: ({state, config}) => mergeGameState.current(
+              onLoadRoomMap: ({state, config, map}) => mergeGameState.current(
                 {
                   state,
                   roomConfig: config,
+                  roadsSegments: R.pluck('segmentsInfo', map.roadNodes),
                 },
               ),
             },
@@ -88,6 +92,12 @@ const GameCanvas = ({dimensions}) => {
           {
             canvas: canvasRef.current,
             aspectRatio: 1.05,
+          },
+        );
+
+        mergeGameState.current(
+          {
+            board,
           },
         );
 
@@ -104,41 +114,56 @@ const GameCanvas = ({dimensions}) => {
     [connecting],
   );
 
-  let overlay = null;
+  let overlayModal = null;
   switch (gameState.state.type) {
     case RACE_STATES.WAIT_FOR_SERVER:
-      overlay = <Overlays.WaitingForServer />;
+      overlayModal = <Overlays.WaitingForServer />;
       break;
 
     case RACE_STATES.COUNT_TO_START:
-      overlay = <Overlays.RaceCountdown countdown={gameState.state.payload.countdown} />;
+      overlayModal = (
+        <Overlays.RaceCountdown countdown={gameState.state.payload.countdown} />
+      );
       break;
 
     default:
   }
 
+  const hud = !overlayModal && roomConfig && gameState.board && (
+    <>
+      <Hud.Minimap
+        roadsSegments={roadsSegments}
+        playersAccessorFn={
+          () => gameState.board.roomMapNode.refs.players
+        }
+      />
+    </>
+  );
+
+
   /* eslint-disable jsx-a11y/tabindex-no-positive */
   return (
     <GameCanvasHolder freeze={gameState.state.type !== RACE_STATES.RACE}>
-      {roomConfig && (
-        <RaceLapToolbar
-          lap={1}
-          totalLaps={roomConfig.laps}
-        />
-      )}
-      <div>
-        <canvas
-          tabIndex={1}
-          ref={canvasRef}
-          width={dimensions.w}
-          height={dimensions.h}
-        />
+      <RaceLapToolbar
+        loading={!roomConfig}
+        lap={1}
+        totalLaps={roomConfig?.laps}
+      />
+      <div style={{position: 'relative'}}>
+        <canvas-html-wrapper>
+          <canvas
+            tabIndex={1}
+            ref={canvasRef}
+            width={dimensions.w}
+            height={dimensions.h}
+          />
+        </canvas-html-wrapper>
+        {hud}
+        {overlayModal}
       </div>
-      {roomConfig && !overlay && (
-        <RaceRoomInfoToolbar />
-      )}
-
-      {overlay}
+      {/* {roomConfig && (
+        <RaceRoomInfoToolbar roadsSegments={roadsSegments} />
+      )} */}
     </GameCanvasHolder>
   );
   /* eslint-enable */

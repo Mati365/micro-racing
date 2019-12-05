@@ -1,3 +1,5 @@
+import vec2 from '../matrix/types/vec2';
+
 export default class CornersBox {
   constructor(topLeft, bottomRight) {
     this.topLeft = topLeft;
@@ -22,5 +24,32 @@ export default class CornersBox {
     const {bottomRight, topLeft} = this;
 
     return bottomRight[1] - topLeft[1];
+  }
+
+  toBSON() {
+    return {
+      topLeft: this.topLeft,
+      bottomRight: this.bottomRight,
+    };
+  }
+
+  static fromBSON(box) {
+    if (!box)
+      return null;
+
+    return new CornersBox(box.topLeft, box.bottomRight);
+  }
+
+  scale(scale) {
+    return new CornersBox(
+      vec2(
+        this.topLeft[0] * scale[0],
+        this.topLeft[1] * scale[1],
+      ),
+      vec2(
+        this.bottomRight[0] * scale[0],
+        this.bottomRight[1] * scale[1],
+      ),
+    );
   }
 }

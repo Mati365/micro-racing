@@ -5,7 +5,7 @@ import * as COLORS from '@ui/colors';
 import {styled} from '@pkg/fast-stylesheet/src/react';
 import {Layer} from '@ui/basic-components/styled';
 
-const OverlayTitle = styled.span(
+export const OverlayTitle = styled.span(
   {
     color: COLORS.WHITE,
     textShadow: '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black',

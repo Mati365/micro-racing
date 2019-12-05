@@ -164,6 +164,10 @@ export default class RoomMapNode {
     this.currentPlayer = currentPlayer;
     this.physics = new PhysicsScene;
 
+    // variables that are set after load map
+    this.currentPlayerCar = null;
+    this.roadNodes = [];
+
     if (initialRoomState)
       this.loadInitialRoomState(initialRoomState);
   }
@@ -192,9 +196,13 @@ export default class RoomMapNode {
 
     this.roomInfo = roomInfo;
     this.sceneBuffer = buffer;
-
     this.refs = refs;
+
     this.currentPlayerCar = refs.players[currentPlayer.id];
+    this.roadNodes = R.filter(
+      R.is(RoadNode),
+      this.sceneBuffer.list || [],
+    );
 
     this.render = ::this.sceneBuffer.render;
   }

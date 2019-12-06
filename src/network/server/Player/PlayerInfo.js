@@ -6,15 +6,28 @@ import generateName from '@pkg/name-generator';
 export class PlayerRacingState {
   constructor(
     {
+      position = null,
+      currentLapTime = 0,
+      lap = 0,
       color,
     },
   ) {
     this.color = color;
+    this.position = position;
+    this.currentLapTime = currentLapTime;
+    this.lap = lap;
   }
 
+  /**
+   * @see
+   *  PlayerMapElement.raceStateBinarySnapshotSerializer
+   */
   toBSON() {
     return {
       color: this.color,
+      currentLapTime: this.currentLapTime,
+      lap: this.lap,
+      position: this.position,
     };
   }
 }

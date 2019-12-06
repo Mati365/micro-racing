@@ -28,6 +28,10 @@ const KeymapTableHolder = styled.table(
       verticalAlign: 'top',
       textAlign: 'center',
     },
+
+    '& *': {
+      boxSizing: 'content-box',
+    },
   },
 );
 

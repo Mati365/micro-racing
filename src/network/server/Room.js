@@ -77,6 +77,13 @@ export default class Room {
       );
     }
 
+    R.addIndex(R.forEach)(
+      ({info}, index) => {
+        info.racingState.position = this.players.length - index;
+      },
+      this.players,
+    );
+
     this.racing.start();
   }
 
@@ -163,7 +170,7 @@ export default class Room {
    *
    * @param {Number} count
    */
-  spawnBots(count) {
+  spawnBots(count, broadcast = true) {
     if (!count || count < 0 || this.isFull)
       return false;
 
@@ -175,12 +182,27 @@ export default class Room {
               room: this,
             },
           ),
+          broadcast,
         );
       },
       count,
     );
 
     return true;
+  }
+
+  /**
+   * Sends playerInfo
+   */
+  broadcastPlayersRoomState() {
+    this.sendBroadcastAction(
+      null,
+      PLAYER_ACTIONS.UPDATE_PLAYERS_ROOM_STATE,
+      null,
+      {
+        players: this.players,
+      },
+    );
   }
 
   /**
@@ -195,10 +217,14 @@ export default class Room {
       abstract,
       kickedPlayers,
       players,
+      racing,
     } = this;
 
     if (this.isFull)
       throw new ServerError(ERROR_CODES.ROOM_FULL);
+
+    if (racing?.allowPlayerJoin === false)
+      throw new ServerError(ERROR_CODES.RACING_ALREADY_ACTIVE);
 
     const {id} = player.info;
     if (findByID(id, players))

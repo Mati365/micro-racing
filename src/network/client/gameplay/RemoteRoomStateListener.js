@@ -14,21 +14,23 @@ export default class RemoteRoomStateListener {
     },
 
     [PLAYER_ACTIONS.UPDATE_BOARD_OBJECTS]: ({buffer}) => {
-      const view = new DataView(buffer);
-      const itemsCount = view.getInt8(0);
+      this.onUpdateBoardObjects(
+        PlayerMapElement
+          .binarySnapshotSerializer
+          .loadPackedArrayFrame(R.identity, buffer, true),
+      );
+    },
 
-      let offset = 1;
-      const serializer = PlayerMapElement.binarySnapshotSerializer;
+    [PLAYER_ACTIONS.UPDATE_PLAYERS_RACE_STATE]: ({buffer}) => {
+      this.onUpdatePlayersRaceState(
+        PlayerMapElement
+          .raceStateBinarySnapshotSerializer
+          .loadPackedArrayFrame(R.identity, buffer, true),
+      );
+    },
 
-      for (let i = itemsCount - 1; i >= 0; --i) {
-        this.onSyncObject(
-          serializer.load(buffer, offset),
-        );
-
-        offset += serializer.size;
-      }
-
-      this.onSynchronized?.();
+    [PLAYER_ACTIONS.UPDATE_PLAYERS_ROOM_STATE]: (players) => {
+      this.onUpdatePlayersRoomState(players);
     },
 
     [PLAYER_ACTIONS.UPDATE_RACE_STATE]: (data) => {
@@ -39,18 +41,21 @@ export default class RemoteRoomStateListener {
   constructor(
     {
       client,
-      onSynchronized,
-      onSyncObject,
-      onLeavePlayer,
-      onJoinPlayer,
-      onUpdateRaceState,
+      onLeavePlayer = R.F,
+      onJoinPlayer = R.F,
+      onUpdateBoardObjects = R.F,
+      onUpdateRaceState = R.F,
+      onUpdatePlayersRoomState = R.F,
+      onUpdatePlayersRaceState = R.F,
     } = {},
   ) {
-    this.onSyncObject = onSyncObject;
-    this.onSynchronized = onSynchronized;
+    this.onUpdateBoardObjects = onUpdateBoardObjects;
     this.onLeavePlayer = onLeavePlayer;
     this.onJoinPlayer = onJoinPlayer;
+
     this.onUpdateRaceState = onUpdateRaceState;
+    this.onUpdatePlayersRaceState = onUpdatePlayersRaceState;
+    this.onUpdatePlayersRoomState = onUpdatePlayersRoomState;
 
     this.socketListeners = this.mountSocketListeners(client);
   }

@@ -21,7 +21,7 @@ const prerenderMapThumbnail = (
     padding = vec2(10, 10),
     color = LIGHT_GRAY,
     pointColor = CRIMSON_RED,
-    lineWidth = 4,
+    lineWidth = 6,
     pointRadius = null,
     dimensions,
     roadSegment,

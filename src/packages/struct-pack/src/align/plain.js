@@ -103,10 +103,60 @@ const parseStruct = ({fields}) => {
   `);
   /* eslint-enable no-new-func */
 
+  const size = offset;
+
+  /**
+   * @param {Function} mapperFn
+   * @param {Object[]} items
+   *
+   * @returns Uint8Array
+   */
+  const createPackedArrayFrame = (mapperFn, items) => {
+    let arrayOffset = 0;
+    const buffer = new ArrayBuffer(1 + size * items.length);
+    const view = new DataView(buffer);
+
+    view.setInt8(arrayOffset++, items.length);
+    for (let i = items.length - 1; i >= 0; --i) {
+      pack(mapperFn(items[i]), buffer, arrayOffset);
+      arrayOffset += size;
+    }
+
+    return new Uint8Array(buffer);
+  };
+
+  /**
+   * @param {Function} mapperFn
+   * @param {Array} frame
+   * @param {Boolean} returnArray
+   */
+  const loadPackedArrayFrame = (mapperFn, frame, returnArray = false) => {
+    const view = new DataView(frame);
+    const itemsCount = view.getInt8(0);
+
+    let arrayOffset = 1;
+    const array = returnArray && new Array(itemsCount);
+
+    for (let i = itemsCount - 1; i >= 0; --i) {
+      const value = mapperFn(
+        load(frame, arrayOffset),
+      );
+
+      if (array)
+        array[i] = value;
+
+      arrayOffset += size;
+    }
+
+    return array;
+  };
+
   return {
-    size: offset,
+    size,
     offsets,
     pack,
+    createPackedArrayFrame,
+    loadPackedArrayFrame,
     load,
   };
 };

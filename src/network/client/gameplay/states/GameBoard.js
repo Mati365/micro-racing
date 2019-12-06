@@ -1,6 +1,8 @@
-import * as R from 'ramda';
+import {
+  getIndexByID,
+  createObservable,
+} from '@pkg/basic-helpers';
 
-import {getIndexByID} from '@pkg/basic-helpers';
 import {createIsometricScene} from '@pkg/isometric-renderer';
 import {vec2, lerp} from '@pkg/gl-math';
 
@@ -9,26 +11,24 @@ import carKeyboardDriver, {GameKeyboardController} from '@game/logic/drivers/car
 import RoomMapNode from '../objects/RoomMapNode';
 import RemoteRoomStateListener from '../RemoteRoomStateListener';
 
-const DEFAULT_GAMEBOARD_LISTENERS = {
-  onJoinPlayer: R.T,
-  onLeavePlayer: R.T,
-  onLoadRoomMap: R.T,
-  onUpdateRaceState: R.T,
-};
-
 export default class GameBoard {
   constructor(
     {
       client,
-      listeners,
     },
   ) {
     this.client = client;
     this.frameId = 1;
-    this.listeners = Object.assign(
-      DEFAULT_GAMEBOARD_LISTENERS,
-      listeners || {},
-    );
+
+    this.observers = {
+      roomMap: createObservable(),
+      raceState: createObservable(),
+      players: createObservable(),
+    };
+
+    this.roomConfig = null;
+    this.roomMapNode = null;
+    this.roomRemoteListener = null;
   }
 
   async setCanvas(
@@ -49,10 +49,22 @@ export default class GameBoard {
     return this;
   }
 
+  notifyPlayersChange(left, join) {
+    this.observers.players.notify(
+      {
+        nodes: this.roomMapNode.players,
+        currentPlayerNode: this.roomMapNode.currentPlayerCar,
+        left,
+        join,
+      },
+    );
+  }
+
   async loadInitialRoomState(initialRoomState) {
     const {f} = this.scene;
-    const {listeners, client} = this;
+    const {client, observers} = this;
 
+    this.roomConfig = initialRoomState.config;
     this.roomMapNode = new RoomMapNode(
       {
         currentPlayer: client.info,
@@ -61,21 +73,33 @@ export default class GameBoard {
     );
 
     await this.roomMapNode.loadInitialRoomState(initialRoomState);
-    this.roomState = new RemoteRoomStateListener(
+
+    this.notifyPlayersChange();
+    this.roomRemoteListener = new RemoteRoomStateListener(
       {
         client,
 
-        onSyncObject: this.onSyncObject,
-        onUpdateRaceState: this.listeners.onUpdateRaceState,
+        onUpdateBoardObjects: (players) => {
+          players.forEach(this.onSyncObject);
+        },
 
-        onJoinPlayer: (player, carObject) => {
-          this.roomMapNode.appendObjects(
+        onUpdatePlayersRaceState: (playersStates) => {
+          playersStates.forEach(this.onSyncPlayerRaceState);
+          this.notifyPlayersChange();
+        },
+
+        onUpdateRaceState: observers.raceState.notify,
+
+        onJoinPlayer: async (player, carObject) => {
+          await this.roomMapNode.appendObjects(
             {
               players: [player],
               objects: [carObject],
             },
           );
-          listeners.onJoinPlayer(
+
+          this.notifyPlayersChange(
+            null,
             {
               map: this.roomMapNode,
               player,
@@ -86,17 +110,18 @@ export default class GameBoard {
 
         onLeavePlayer: (player) => {
           this.roomMapNode.removePlayerCar(player);
-          listeners.onLeavePlayer(
+          this.notifyPlayersChange(
             {
               map: this.roomMapNode,
               player,
             },
+            null,
           );
         },
       },
     );
 
-    listeners.onLoadRoomMap(
+    observers.roomMap.notify(
       {
         ...initialRoomState,
         map: this.roomMapNode,
@@ -105,6 +130,23 @@ export default class GameBoard {
 
     return this;
   }
+
+  onSyncPlayerRaceState = (playerRaceState) => {
+    const playerNode = this.roomMapNode.refs.objects[playerRaceState.id];
+    if (!playerNode) {
+      console.warn(`Unknown sync player race state(id: ${playerNode.id})!`);
+      return;
+    }
+
+    Object.assign(
+      playerNode.player.racingState,
+      {
+        position: playerRaceState.position,
+        currentLapTime: playerRaceState.currentLapTime,
+        lap: playerRaceState.lap,
+      },
+    );
+  };
 
   onSyncObject = (playerSyncInfo) => {
     const node = this.roomMapNode.refs.objects[playerSyncInfo.id];
@@ -134,9 +176,9 @@ export default class GameBoard {
       body,
       {
         angle: playerSyncInfo.angle,
+        steerAngle: playerSyncInfo.steerAngle,
         corneringIntensity: playerSyncInfo.corneringIntensity,
         angularVelocity: playerSyncInfo.angularVelocity,
-        steerAngle: playerSyncInfo.steerAngle,
         throttle: playerSyncInfo.throttle,
         pos: vec2(playerSyncInfo.pos[0], playerSyncInfo.pos[1]),
         velocity: vec2(playerSyncInfo.velocity[0], playerSyncInfo.velocity[1]),
@@ -216,7 +258,7 @@ export default class GameBoard {
   }
 
   stop() {
-    this.roomState?.releaseListeners();
+    this.roomRemoteListener?.releaseListeners();
   }
 
   update(interpolate) {

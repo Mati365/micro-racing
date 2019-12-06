@@ -70,22 +70,25 @@ const GameCanvas = ({dimensions}) => {
         const board = new GameBoard(
           {
             client,
-            listeners: {
-              onUpdateRaceState: state => mergeGameState.current(
-                {
-                  state,
-                },
-              ),
-
-              onLoadRoomMap: ({state, config, map}) => mergeGameState.current(
-                {
-                  state,
-                  roomConfig: config,
-                  roadsSegments: R.pluck('segmentsInfo', map.roadNodes),
-                },
-              ),
-            },
           },
+        );
+
+        board.observers.raceState.subscribe(
+          state => mergeGameState.current(
+            {
+              state,
+            },
+          ),
+        );
+
+        board.observers.roomMap.subscribe(
+          ({state, config, map}) => mergeGameState.current(
+            {
+              state,
+              roomConfig: config,
+              roadsSegments: R.pluck('segmentsInfo', map.roadNodes),
+            },
+          ),
         );
 
         await board.setCanvas(
@@ -134,7 +137,7 @@ const GameCanvas = ({dimensions}) => {
       <Hud.Minimap
         roadsSegments={roadsSegments}
         playersAccessorFn={
-          () => gameState.board.roomMapNode.refs.players
+          () => gameState.board.roomMapNode.players
         }
       />
     </>
@@ -144,11 +147,7 @@ const GameCanvas = ({dimensions}) => {
   /* eslint-disable jsx-a11y/tabindex-no-positive */
   return (
     <GameCanvasHolder freeze={gameState.state.type !== RACE_STATES.RACE}>
-      <RaceLapToolbar
-        loading={!roomConfig}
-        lap={1}
-        totalLaps={roomConfig?.laps}
-      />
+      <RaceLapToolbar gameBoard={gameState.board} />
       <div style={{position: 'relative'}}>
         <canvas-html-wrapper>
           <canvas

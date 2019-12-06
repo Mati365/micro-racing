@@ -207,6 +207,10 @@ export default class RoomMapNode {
     this.render = ::this.sceneBuffer.render;
   }
 
+  get players() {
+    return this.refs.players;
+  }
+
   update(interpolate) {
     const {physics} = this;
     const {list} = this.sceneBuffer;

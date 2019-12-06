@@ -91,6 +91,30 @@ export default class PlayerMapElement extends MapElement {
     };
   }
 
+  static raceStateBinarySnapshotSerializer = createPackedStruct(
+    {
+      align: 'plain',
+      wrapToType: false,
+      fields: {
+        id: {
+          type: 'int16',
+        },
+        lap: {
+          type: 'int8',
+          srcPath: 'player.info.racingState.lap',
+        },
+        position: {
+          type: 'int8',
+          srcPath: 'player.info.racingState.position',
+        },
+        currentLapTime: {
+          type: 'int32',
+          srcPath: 'player.info.racingState.currentLapTime',
+        },
+      },
+    },
+  );
+
   static binarySnapshotSerializer = createPackedStruct(
     {
       align: 'plain',

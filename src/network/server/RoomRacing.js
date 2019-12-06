@@ -19,8 +19,18 @@ export default class RoomRacing {
     },
   ) {
     this.room = room;
+    this.startTime = null;
     this.map = new RoadMapObjectsManager(room.map);
     this.state = new RaceState(RACE_STATES.WAIT_FOR_SERVER);
+  }
+
+  get allowPlayerJoin() {
+    const {type} = this.state;
+
+    return (
+      type === RACE_STATES.COUNT_TO_START
+        || type === RACE_STATES.WAIT_FOR_SERVER
+    );
   }
 
   get config() {
@@ -69,6 +79,7 @@ export default class RoomRacing {
      * setImmediate is more CPU intense and
      * difference between both are small
      */
+    this.startTime = Date.now();
     this.renderLoop = createAnimationFrameRenderer(
       {
         allowLerpUpdate: false,
@@ -88,8 +99,9 @@ export default class RoomRacing {
    * Update whole map state
    */
   updateMapState() {
-    const {map: {physics}} = this;
-    const {players} = this.room;
+    const {room, startTime, map: {physics}} = this;
+    const {players} = room;
+    const now = Date.now();
 
     for (let i = players.length - 1; i >= 0; --i) {
       const player = players[i];
@@ -121,10 +133,19 @@ export default class RoomRacing {
       }
 
       carBody.idleInputs = prevFrameId === null;
+
+      // update racing state
+      info.racingState.currentLapTime = now - startTime;
     }
 
     physics.update();
     this.broadcastBoardObjects();
+
+    // broadcast information about time and other stuff from players
+    if (!this._framePlayersStateCounter)
+      this.broadcastPlayersRaceState();
+
+    this._framePlayersStateCounter = ((this._framePlayersStateCounter || 0) + 1) % 20;
   }
 
   /**
@@ -140,28 +161,40 @@ export default class RoomRacing {
   }
 
   /**
+   * Low latency binary socket caller, tracks players meta info
+   * that can be sent later than broadcastBoardObjects()
+   */
+  broadcastPlayersRaceState() {
+    const {players} = this.room;
+    const frame = PlayerMapElement.raceStateBinarySnapshotSerializer.createPackedArrayFrame(
+      player => player.info.car,
+      players,
+    );
+
+    this.room.sendBroadcastAction(
+      null,
+      PLAYER_ACTIONS.UPDATE_PLAYERS_RACE_STATE,
+      null,
+      frame,
+    );
+  }
+
+  /**
    * Low latency binary socket caller, broadcasts cars
    * positions and low level physics values
    */
   broadcastBoardObjects() {
     const {players} = this.room;
-    const serializer = PlayerMapElement.binarySnapshotSerializer;
-
-    let offset = 0;
-    const buffer = new ArrayBuffer(1 + serializer.size * players.length);
-    const view = new DataView(buffer);
-
-    view.setInt8(offset++, players.length);
-    for (let i = players.length - 1; i >= 0; --i) {
-      serializer.pack(players[i].info.car, buffer, offset);
-      offset += serializer.size;
-    }
+    const frame = PlayerMapElement.binarySnapshotSerializer.createPackedArrayFrame(
+      player => player.info.car,
+      players,
+    );
 
     this.room.sendBroadcastAction(
       null,
       PLAYER_ACTIONS.UPDATE_BOARD_OBJECTS,
       null,
-      new Uint8Array(buffer),
+      frame,
     );
   }
 }

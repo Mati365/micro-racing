@@ -32,7 +32,7 @@ export default class PhysicsScene {
       let newVelocity = null;
 
       if (cornerCollision)
-        newVelocity = vec2.mul(-0.4, a.velocityVector);
+        newVelocity = vec2.mul(-0.8, a.velocityVector);
       else {
         const edgeNormal = intersection.edgeB.normal(true);
         newVelocity = vec2.mul(

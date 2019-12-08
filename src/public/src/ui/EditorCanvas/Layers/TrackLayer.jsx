@@ -5,6 +5,7 @@ import PALETTE from '@pkg/isometric-renderer/FGL/core/constants/colors';
 
 import {
   segmentizePath,
+  getExpandedPathCheckpoints,
   expandPath,
 } from '@game/logic/track/TrackSegments/utils';
 
@@ -14,6 +15,7 @@ import {
 } from '@pkg/gl-math';
 
 import {
+  drawLine,
   drawPoint,
   drawPoints,
   drawRect,
@@ -45,6 +47,7 @@ class EditorMesh {
 const getTrackBarriers = (
   {
     points,
+    scale = [1, 1],
     meshResPath = 'BARRIERS.BASIC',
     spacing = 20,
     width = 40,
@@ -72,7 +75,10 @@ const getTrackBarriers = (
           new EditorMesh(
             meshResPath,
             vec2.vectorAngle(vec2.sub(nextPoint, prevPoint)),
-            point,
+            vec2(
+              point.x * scale[0],
+              point.y * scale[1],
+            ),
           ),
         );
       }
@@ -81,11 +87,12 @@ const getTrackBarriers = (
     return meshes;
   };
 
-  return R.compose(
-    R.unnest,
-    R.map(generateMeshes),
-    expandPath(width),
-  )(points);
+  const expandedPath = expandPath(width)(points);
+
+  return {
+    barriers: R.unnest(R.map(generateMeshes, expandedPath)),
+    expandedPath,
+  };
 };
 
 /**
@@ -127,7 +134,7 @@ const renderTrack = ({
       });
 
       // barriers
-      const barriers = getTrackBarriers(
+      const {barriers, expandedPath} = getTrackBarriers(
         {
           points: interpolated,
         },
@@ -161,6 +168,17 @@ const renderTrack = ({
           ctx,
         );
         ctx.restore();
+      });
+
+      // checkpoints
+      getExpandedPathCheckpoints()(expandedPath).forEach((edge) => {
+        drawLine(
+          edge.from,
+          edge.to,
+          '#ff0000',
+          1,
+          ctx,
+        );
       });
     }
   }
@@ -295,8 +313,18 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
       ],
     };
 
-    const barriers = R.compose(
-      R.map(({point, angle, meshResPath}) => new MeshMapElement(
+    const {
+      barriers,
+      expandedPath: expandedBarriersPath,
+    } = getTrackBarriers(
+      {
+        scale: transform.scale,
+        points: interpolated,
+      },
+    );
+
+    const barriersMeshes = R.map(
+      ({point, angle, meshResPath}) => new MeshMapElement(
         meshResPath,
         {
           moveable: false,
@@ -305,20 +333,12 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
               0, 0,
               angle + toRadians(90),
             ],
-            translate: [
-              point.x * transform.scale[0],
-              point.y * transform.scale[1],
-              0,
-            ],
+            translate: [point.x, point.y, 0],
             scale: [1.15, 1.15, 1.15],
           },
         },
-      )),
-      getTrackBarriers,
-    )(
-      {
-        points: interpolated,
-      },
+      ),
+      barriers,
     );
 
     return [
@@ -327,6 +347,11 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
         {
           ...this.sceneMeta,
           box: roadBox.scale(transform.scale),
+          checkpoints: getExpandedPathCheckpoints(
+            {
+              scale: transform.scale,
+            },
+          )(expandedBarriersPath),
         },
       ),
       new MapElement(
@@ -361,7 +386,7 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
         },
       ),
 
-      ...barriers,
+      ...barriersMeshes,
     ];
   }
 

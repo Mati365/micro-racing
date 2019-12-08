@@ -1,7 +1,8 @@
+import * as R from 'ramda';
+
 import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
 
-import {CornersBox} from '@pkg/gl-math';
-
+import {CornersBox, Edge} from '@pkg/gl-math';
 import TrackPath from '@game/logic/track/TrackPath/TrackPath';
 import TrackSegments from '@game/logic/track/TrackSegments/TrackSegments';
 
@@ -19,11 +20,15 @@ export default class RoadMapElement extends MapElement {
   }
 
   getSegmentsInfo() {
-    const {points, sceneMeta: {box, ...sceneMeta}} = this.params;
+    const {
+      points,
+      sceneMeta: {box, checkpoints, ...sceneMeta},
+    } = this.params;
 
     return new TrackSegments(
       {
         ...sceneMeta, // sceneWidth
+        checkpoints: R.map(Edge.fromBSON, checkpoints),
         box: CornersBox.fromBSON(box),
         interpolatedPath: new TrackPath(points).getInterpolatedPathPoints(),
       },

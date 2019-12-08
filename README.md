@@ -63,6 +63,7 @@ https://www.gdcvault.com/play/1022055/How-to-Implement-AAA-Game
 Icons:
 https://png.is/f/chatbot-robot-internet-bot-artificial-intelligence-icon-vector-robot/6051723894325248-201812161840.html
 https://icons8.com/icon/38824/meat
+https://www.kisscc0.com/clipart/u-turn-traffic-sign-turnaround-computer-icons-caut-y4h8ur/
 
 Cars:
 https://opengameart.org/content/low-poly-cars

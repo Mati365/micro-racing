@@ -1,12 +1,12 @@
 import {getPathCornersBox} from '@pkg/gl-math';
-
-import transformSegmentizePath from './utils/transformSegmentizePath';
+import {transformSegmentizePath} from './utils';
 
 export default class TrackSegments {
   constructor(
     {
       segmentWidth,
       interpolatedPath,
+      checkpoints,
 
       // optionals:
       transform = null,
@@ -26,6 +26,7 @@ export default class TrackSegments {
     this.box = box || getPathCornersBox(path);
     this.segments = segments;
     this.path = path;
+    this.checkpoints = checkpoints || [];
     this.innerPath = innerPath;
     this.outerPath = outerPath;
   }

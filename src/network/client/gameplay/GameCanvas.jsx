@@ -162,9 +162,6 @@ const GameCanvas = ({dimensions}) => {
         {hud}
         {overlayModal}
       </div>
-      {/* {roomConfig && (
-        <RaceRoomInfoToolbar roadsSegments={roadsSegments} />
-      )} */}
     </GameCanvasHolder>
   );
   /* eslint-enable */

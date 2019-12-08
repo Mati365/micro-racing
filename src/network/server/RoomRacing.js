@@ -1,6 +1,8 @@
 import {intervalCountdown} from '@pkg/basic-helpers';
 
 import {createAnimationFrameRenderer} from '@pkg/isometric-renderer/FGL/core/viewport/createDtRenderLoop';
+import {isCollisionWithEdge} from '@pkg/physics-scene/src/engines/diagonal';
+
 import carKeyboardDriver from '../shared/logic/drivers/carKeyboardDriver';
 
 import {
@@ -99,13 +101,22 @@ export default class RoomRacing {
    * Update whole map state
    */
   updateMapState() {
-    const {room, startTime, map: {physics}} = this;
+    const {
+      room,
+      startTime,
+      map: {
+        physics,
+        segmentsInfo: {checkpoints},
+      },
+    } = this;
+
     const {players} = room;
     const now = Date.now();
 
     for (let i = players.length - 1; i >= 0; --i) {
       const player = players[i];
       const {info} = player;
+      const {racingState} = info;
       const {body: carBody} = info.car;
 
       // process inputs from oldest to newest
@@ -135,7 +146,18 @@ export default class RoomRacing {
       carBody.idleInputs = prevFrameId === null;
 
       // update racing state
-      info.racingState.currentLapTime = now - startTime;
+      racingState.currentLapTime = now - startTime;
+
+      // check checkpoints intersection
+      const checkpointEdge = checkpoints[racingState.currentCheckpoint];
+      if (checkpointEdge && isCollisionWithEdge(carBody, checkpointEdge)) {
+        racingState.currentCheckpoint++;
+
+        if (racingState.currentCheckpoint >= checkpoints.length) {
+          racingState.lap++;
+          racingState.currentCheckpoint = 0;
+        }
+      }
     }
 
     physics.update();

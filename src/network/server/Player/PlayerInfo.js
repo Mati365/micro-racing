@@ -8,6 +8,7 @@ export class PlayerRacingState {
     {
       position = null,
       currentLapTime = 0,
+      currentCheckpoint = 0,
       lap = 0,
       color,
     },
@@ -16,6 +17,9 @@ export class PlayerRacingState {
     this.position = position;
     this.currentLapTime = currentLapTime;
     this.lap = lap;
+
+    // do not leak info to client:
+    this.currentCheckpoint = currentCheckpoint;
   }
 
   /**

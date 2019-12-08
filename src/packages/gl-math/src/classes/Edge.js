@@ -37,4 +37,11 @@ export default class Edge {
         : normal
     );
   }
+
+  static fromBSON(edge) {
+    return new Edge(
+      vec2(edge.a[0], edge.a[1]),
+      vec2(edge.b[0], edge.b[1]),
+    );
+  }
 }

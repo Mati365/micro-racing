@@ -71,3 +71,9 @@ export const RACE_STATES = {
   RACE: 3,
   ALL_FINISH: 4,
 };
+
+export const PLAYER_RACE_STATES = {
+  RACE: 1 << 0,
+  WRONG_DIRECTION: 1 << 1,
+  FINISH: 1 << 2,
+};

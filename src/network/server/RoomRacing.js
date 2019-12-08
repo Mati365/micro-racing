@@ -149,17 +149,28 @@ export default class RoomRacing {
       racingState.currentLapTime = now - startTime;
 
       // check checkpoints intersection
-      const checkpointEdge = checkpoints[racingState.currentCheckpoint];
+      const lapCheckpoint = racingState.currentCheckpoint % checkpoints.length;
+      const checkpointEdge = checkpoints[lapCheckpoint];
+
       if (checkpointEdge && isCollisionWithEdge(carBody, checkpointEdge)) {
         racingState.currentCheckpoint++;
-
-        if (racingState.currentCheckpoint >= checkpoints.length) {
+        if (lapCheckpoint + 1 >= checkpoints.length)
           racingState.lap++;
-          racingState.currentCheckpoint = 0;
-        }
       }
     }
 
+    // calculate player positions
+    const sortPlayers = players.sort(
+      (p1, p2) => p2.info.racingState.currentCheckpoint - p1.info.racingState.currentCheckpoint,
+    );
+
+    // reassign position
+    for (let i = sortPlayers.length - 1; i >= 0; --i) {
+      const {racingState} = sortPlayers[i].info;
+      racingState.position = i + 1;
+    }
+
+    // update physics
     physics.update();
     this.broadcastBoardObjects();
 

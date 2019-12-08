@@ -32,7 +32,7 @@ export default class PhysicsScene {
       let newVelocity = null;
 
       if (cornerCollision)
-        newVelocity = vec2.mul(-0.8, a.velocityVector);
+        newVelocity = vec2.mul(-0.5, a.velocityVector);
       else {
         const edgeNormal = intersection.edgeB.normal(true);
         newVelocity = vec2.mul(
@@ -77,15 +77,13 @@ export default class PhysicsScene {
         mtv2 = R.evolve(
           {
             translate: vec => vec2.mul(-1, vec),
-
-            // performs a bit better without it :)
-            // intersection: R.map(
-            //   ({edgeA, edgeB, ...intersection}) => ({
-            //     ...intersection,
-            //     edgeA: edgeB,
-            //     edgeB: edgeA,
-            //   }),
-            // ),
+            intersection: R.map(
+              ({edgeA, edgeB, ...intersection}) => ({
+                ...intersection,
+                edgeA: edgeB,
+                edgeB: edgeA,
+              }),
+            ),
           },
           mtv2,
         );

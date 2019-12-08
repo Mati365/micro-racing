@@ -77,13 +77,6 @@ export default class Room {
       );
     }
 
-    R.addIndex(R.forEach)(
-      ({info}, index) => {
-        info.racingState.position = this.players.length - index;
-      },
-      this.players,
-    );
-
     this.racing.start();
   }
 

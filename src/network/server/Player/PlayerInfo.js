@@ -1,20 +1,28 @@
 import uniqid from 'uniqid';
 
-import {PLAYER_TYPES} from '@game/network/constants/serverCodes';
+import {
+  PLAYER_RACE_STATES,
+  PLAYER_TYPES,
+} from '@game/network/constants/serverCodes';
+
 import generateName from '@pkg/name-generator';
 
 export class PlayerRacingState {
   constructor(
     {
+      state = PLAYER_RACE_STATES.RACE,
       position = null,
-      currentLapTime = 0,
+      time = 0,
       currentCheckpoint = 0,
+      currentLapTime = 0,
       lap = 0,
       color,
     },
   ) {
+    this.state = state;
     this.color = color;
     this.position = position;
+    this.time = time;
     this.currentLapTime = currentLapTime;
     this.lap = lap;
 
@@ -30,6 +38,7 @@ export class PlayerRacingState {
     return {
       color: this.color,
       currentLapTime: this.currentLapTime,
+      time: this.time,
       lap: this.lap,
       position: this.position,
     };

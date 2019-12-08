@@ -74,7 +74,7 @@ export default class RoadMapObjectsManager {
         ),
         body: alignFn(
           {
-            segment: segments[this.totalPlayers],
+            segment: segments[segments.length - this.totalPlayers - 1],
             align: CAR_ALIGN[this.totalPlayers % 2 ? 'LEFT_CORNER' : 'RIGHT_CORNER'],
           },
         ),

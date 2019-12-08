@@ -107,6 +107,10 @@ export default class PlayerMapElement extends MapElement {
           type: 'int8',
           srcPath: 'player.info.racingState.position',
         },
+        time: {
+          type: 'int32',
+          srcPath: 'player.info.racingState.time',
+        },
         currentLapTime: {
           type: 'int32',
           srcPath: 'player.info.racingState.currentLapTime',

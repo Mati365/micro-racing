@@ -1,4 +1,6 @@
 import * as R from 'ramda';
+import {interval} from 'rxjs';
+import {mergeMap} from 'rxjs/operators';
 
 import {PLAYER_ACTIONS} from '@game/network/constants/serverCodes';
 import BinarySocketRPCWrapper from './BinarySocketRPCWrapper';
@@ -34,6 +36,13 @@ export default class PlayerClientSocket {
         waitForResponse: true,
       },
     },
+
+    ping: {
+      action: PLAYER_ACTIONS.PING,
+      flags: {
+        waitForResponse: true,
+      },
+    },
   };
 
   /**
@@ -64,7 +73,12 @@ export default class PlayerClientSocket {
    *
    * @param {Object} config
    */
-  async init({ws} = {}) {
+  async init(
+    {
+      ws,
+      pingInterval = 500,
+    } = {},
+  ) {
     R.forEachObjIndexed(
       ({action, serialize = R.identity, flags}, methodName) => {
         this[methodName] = (...args) => this.rpc.sendBinaryRequest(
@@ -79,6 +93,17 @@ export default class PlayerClientSocket {
     this.listeners = {};
     this.rpc = new BinarySocketRPCWrapper(ws, this.listeners);
     this.info = await this.fetchPlayerInfo();
+    this.observers = {
+      ping: interval(pingInterval)
+        .pipe(
+          mergeMap(async () => {
+            const date = Date.now();
+            await this.ping();
+
+            return Date.now() - date;
+          }),
+        ),
+    };
   }
 
   /**

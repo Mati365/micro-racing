@@ -9,7 +9,7 @@ import {
   CRIMSON_RED,
 } from '@ui/colors';
 
-import {styled} from '@pkg/fast-stylesheet/src/react';
+import {injectClassesStylesheet} from '@pkg/fast-stylesheet/src/react';
 import {Size, vec2} from '@pkg/gl-math';
 import {drawPolygon, drawPoint} from '@pkg/ctx-utils';
 
@@ -91,6 +91,7 @@ const renderPlayersOnMinimap = (
 export const MapThumbnail = ({
   dimensions, roadsSegments, renderConfig, className,
   rootCanvasProps, playersCanvasProps, playersAccessorFn,
+  children,
   ...props
 }) => {
   const canvasRef = useRef();
@@ -136,13 +137,7 @@ export const MapThumbnail = ({
   );
 
   return (
-    <div
-      className={className}
-      style={{
-        position: 'relative',
-        transform: 'rotate(-135deg)', // perspective fix due to isometric engine
-      }}
-    >
+    <div className={className}>
       <canvas
         ref={canvasRef}
         width={dimensions.w}
@@ -159,6 +154,7 @@ export const MapThumbnail = ({
           {...playersCanvasProps}
         />
       )}
+      {children}
     </div>
   );
 };
@@ -184,22 +180,28 @@ MapThumbnail.defaultProps = {
   rootCanvasProps: {},
 };
 
-const HudMinimap = styled(
-  MapThumbnail,
+const HudMinimap = injectClassesStylesheet(
   {
-    position: 'absolute !important',
-    left: 20,
-    top: 20,
-  },
-  {
-    props: {
-      rootCanvasProps: {
-        style: {
-          opacity: 0.3,
-        },
+    base: {
+      position: 'absolute !important',
+      left: 20,
+      top: 20,
+
+      '& canvas': {
+        transform: 'rotate(-135deg)', // perspective fix due to isometric engine
       },
     },
   },
-);
+)(({classes, ...props}) => (
+  <MapThumbnail
+    {...props}
+    className={classes.base}
+    rootCanvasProps={{
+      style: {
+        opacity: 0.3,
+      },
+    }}
+  />
+));
 
 export default React.memo(HudMinimap);

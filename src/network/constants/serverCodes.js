@@ -41,6 +41,9 @@ export const PLAYER_ACTIONS = {
 
   // LOW LATENCY BROADCAST
   UPDATE_BOARD_OBJECTS: 8,
+
+  // PING CHECK
+  PING: 9,
 };
 
 export const CAR_TYPES = {

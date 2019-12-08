@@ -13,7 +13,7 @@ import {
   injectClassesStylesheet,
 } from '@pkg/fast-stylesheet/src/react';
 
-import {createObservablesUnmounter} from '@pkg/basic-helpers/async/createObservable';
+import {createObservablesUnmounter} from '@pkg/basic-helpers/async/createLowLatencyObservable';
 
 import UnorderedList from '@ui/basic-components/styled/UnorderedList';
 import GameBoard from '../../states/GameBoard';

@@ -1,6 +1,6 @@
 import {
   getIndexByID,
-  createObservable,
+  createLowLatencyObservable,
 } from '@pkg/basic-helpers';
 
 import {createIsometricScene} from '@pkg/isometric-renderer';
@@ -21,9 +21,9 @@ export default class GameBoard {
     this.frameId = 1;
 
     this.observers = {
-      roomMap: createObservable(),
-      raceState: createObservable(),
-      players: createObservable(),
+      roomMap: createLowLatencyObservable(),
+      raceState: createLowLatencyObservable(),
+      players: createLowLatencyObservable(),
     };
 
     this.roomConfig = null;
@@ -188,7 +188,7 @@ export default class GameBoard {
     // try to reply all inputs after response
     const {predictedInputs} = this.keyboardController;
 
-    if (predictedInputs.length > 15) {
+    if (predictedInputs.length > 20) {
       console.warn(`Skipping prediction! Predicted inputs: ${predictedInputs.length}!`);
       this.keyboardController.predictedInputs = [];
     } else if (lastProcessedInput !== -1 && predictedInputs.length && currentPlayerSync) {

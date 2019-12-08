@@ -140,6 +140,8 @@ const GameCanvas = ({dimensions}) => {
           () => gameState.board.roomMapNode.players
         }
       />
+
+      <Hud.NetworkStats client={client} />
     </>
   );
 

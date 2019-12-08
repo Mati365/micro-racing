@@ -168,6 +168,15 @@ export default class PlayerSocket extends Player {
       this.info.inputs.push(...list);
     },
 
+    [PLAYER_ACTIONS.PING]: (cmdID) => {
+      this.sendActionResponse(
+        cmdID,
+        {
+          time: Date.now(),
+        },
+      );
+    },
+
     [PLAYER_ACTIONS.PLAYER_INFO]: (cmdID) => {
       this.sendActionResponse(
         cmdID,

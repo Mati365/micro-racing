@@ -1,6 +1,10 @@
 import * as R from 'ramda';
 
-const createObservable = () => {
+/**
+ * Rx.JS performance is not good enough for
+ * e.g. map items position update
+ */
+const createLowLatencyObservable = () => {
   const observers = {
     current: [],
   };
@@ -28,4 +32,4 @@ export const createObservablesUnmounter = (...observables) => () => {
     observables[i]();
 };
 
-export default createObservable;
+export default createLowLatencyObservable;

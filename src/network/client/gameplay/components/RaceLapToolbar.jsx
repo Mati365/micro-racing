@@ -6,7 +6,7 @@ import * as COLORS from '@ui/colors';
 
 import {styled} from '@pkg/fast-stylesheet/src/react';
 import {useI18n} from '@ui/i18n';
-import {createObservablesUnmounter} from '@pkg/basic-helpers/async/createObservable';
+import {createObservablesUnmounter} from '@pkg/basic-helpers/async/createLowLatencyObservable';
 
 import {PlayersTabs} from './hud';
 import GameBoard from '../states/GameBoard';

@@ -132,7 +132,7 @@ export default class PhysicsBoard {
     for (let i = 0, len = list.length; i < len; ++i) {
       const item = list[i];
 
-      item.update && item.update(delta);
+      item.update && item.update(physics);
       if (item.body)
         physics.updateObjectPhysics(item.body);
     }

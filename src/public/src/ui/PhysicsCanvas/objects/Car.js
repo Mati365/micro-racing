@@ -52,9 +52,9 @@ export default class Car {
     this.intersectRays = new CarIntersectRays(this.body);
   }
 
-  update(delta) {
-    this.body.update(delta);
-    this.intersectRays.update();
+  update(physicsScene) {
+    this.body.update();
+    this.intersectRays.update(physicsScene);
   }
 
   renderRays(ctx) {
@@ -67,15 +67,15 @@ export default class Car {
       const {collisionPoints} = ray;
 
       drawLine(
-        ray.from,
-        ray.to,
+        ray.edge.from,
+        ray.edge.to,
         '#444',
         1,
         ctx,
       );
 
       fillCircle(
-        rays[i].from,
+        rays[i].edge.from,
         2,
         '#ff0000',
         ctx,
@@ -85,7 +85,7 @@ export default class Car {
       if (collisionPoints.length) {
         for (let j = collisionPoints.length - 1; j >= 0; --j) {
           fillCircle(
-            collisionPoints[j],
+            collisionPoints[j].point,
             2,
             '#00ff00',
             ctx,

@@ -6,6 +6,14 @@ import {
   toRadians, vec2,
 } from '@pkg/gl-math';
 
+export class CarCollidableRay {
+  constructor(edge = new Edge) {
+    this.edge = edge;
+    this.bodyAttachPoint = null; // absolute point,
+    this.collisionPoints = [];
+  }
+}
+
 export default class CarIntersectRays {
   constructor(
     body,
@@ -27,8 +35,40 @@ export default class CarIntersectRays {
     this.rays = this.createRays();
   }
 
-  update() {
+  update(physicsScene) {
     this.updateRaysPositions();
+    this.checkCollisions(physicsScene);
+  }
+
+  /**
+   * Check position between each ray and each element on board
+   *
+   * @todo
+   *  Add box rays
+   *
+   * @param {PhysicsScene} physicsScene
+   */
+  checkCollisions(physicsScene) {
+    const {body, rays} = this;
+    const {items} = physicsScene;
+
+    for (let i = rays.length - 1; i >= 0; --i) {
+      const ray = rays[i];
+      ray.collisionPoints = [];
+
+      for (let j = 0, n = items.length; j < n; ++j) {
+        let boardItem = items[j];
+        if (boardItem.body)
+          boardItem = boardItem.body;
+
+        if (boardItem === body)
+          continue;
+
+        const intersectPoint = isCornerCollisionWithEdge(boardItem, ray.edge);
+        if (intersectPoint)
+          ray.collisionPoints.push(intersectPoint);
+      }
+    }
   }
 
   /**
@@ -51,17 +91,10 @@ export default class CarIntersectRays {
      *  ...due to rotation issues
      */
     const setBodyAttachPoints = (ray) => {
-      const bodyIntersectPoint = isCornerCollisionWithEdge(body, ray)?.point || pos;
+      const bodyIntersectPoint = isCornerCollisionWithEdge(body, ray.edge)?.point || pos;
+      ray.bodyAttachPoint = body.absoluteToBodyRelativeVector(bodyIntersectPoint);
 
-      return {
-        ...ray,
-        // make it relative to center pos of body
-        // bodyAttachPoint: ZERO_VEC2,
-        bodyAttachPoint: body.absoluteToBodyRelativeVector(bodyIntersectPoint),
-
-        // used in collision updater
-        collisionPoints: [],
-      };
+      return ray;
     };
 
     /**
@@ -71,10 +104,10 @@ export default class CarIntersectRays {
     return R.compose(
       ::this.updateRaysPositions,
       R.map(setBodyAttachPoints),
-      edges => (
-        this.updateRaysPositions(edges, 20000)
+      edges => this.updateRaysPositions(edges, 20000),
+      R.times(
+        () => new CarCollidableRay,
       ),
-      Edge.createBlankEdges,
     )(raysCount);
   }
 
@@ -105,8 +138,8 @@ export default class CarIntersectRays {
       const ray = rays[i];
       const attachPoint = ray.bodyAttachPoint || Vector.ZERO;
 
-      ray.from = body.relativeBodyVectorToAbsolute(attachPoint);
-      ray.to = body.relativeBodyVectorToAbsolute(
+      ray.edge.from = body.relativeBodyVectorToAbsolute(attachPoint);
+      ray.edge.to = body.relativeBodyVectorToAbsolute(
         vec2.add(
           attachPoint,
           vec2.fromScalar(

@@ -81,21 +81,16 @@ export class GameKeyboardController {
 
   storeInputs(frameId) {
     const {predictedInputs, batch} = this;
+    const input = new PlayerInput(
+      (this.inputsCounter++) % 0xFFFF, // due to binary serializer
+      frameId,
+      this.inputs,
+    );
 
-    if (this.inputs) {
-      const input = new PlayerInput(
-        (this.inputsCounter++) % 0xFFFF, // due to binary serializer
-        frameId,
-        this.inputs,
-      );
+    batch.push(input);
+    predictedInputs.push(input);
 
-      batch.push(input);
-      predictedInputs.push(input);
-
-      return input;
-    }
-
-    return null;
+    return input;
   }
 
   /**

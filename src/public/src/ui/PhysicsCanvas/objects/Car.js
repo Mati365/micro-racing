@@ -7,6 +7,7 @@ import {
 } from '@pkg/ctx';
 
 import PhysicsBody from '@pkg/physics/types/PhysicsBody';
+import {CarIntersectRays} from '@game/logic/drivers/neural';
 
 class SimpleBody extends PhysicsBody {
   constructor({
@@ -48,15 +49,56 @@ class SimpleBody extends PhysicsBody {
 export default class Car {
   constructor(bodyConfig) {
     this.body = new SimpleBody(bodyConfig);
+    this.intersectRays = new CarIntersectRays(this.body);
   }
 
   update(delta) {
     this.body.update(delta);
+    this.intersectRays.update();
+  }
+
+  renderRays(ctx) {
+    const {
+      intersectRays: {rays},
+    } = this;
+
+    for (let i = rays.length - 1; i >= 0; --i) {
+      const ray = rays[i];
+      const {collisionPoints} = ray;
+
+      drawLine(
+        ray.from,
+        ray.to,
+        '#444',
+        1,
+        ctx,
+      );
+
+      fillCircle(
+        rays[i].from,
+        2,
+        '#ff0000',
+        ctx,
+      );
+
+      // draw collision points
+      if (collisionPoints.length) {
+        for (let j = collisionPoints.length - 1; j >= 0; --j) {
+          fillCircle(
+            collisionPoints[j],
+            2,
+            '#00ff00',
+            ctx,
+          );
+        }
+      }
+    }
   }
 
   render(ctx) {
     const {pos, vertices, box} = this.body;
 
+    this.renderRays(ctx);
     fillCircle(
       pos,
       2,

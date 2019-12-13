@@ -1,4 +1,4 @@
-import {vec2} from '@pkg/gl-math';
+import {Edge, vec2} from '@pkg/gl-math';
 
 export default class RaysIntersection {
   constructor(point, uA, uB, edgeA, edgeB) {
@@ -23,7 +23,7 @@ export default class RaysIntersection {
  * @param {Edge}  edge1  First line
  * @param {Edge}  edge2  Second line
  *
- * @returns {Vec2}
+ * @returns {RaysIntersection}
  */
 export const intersectVec2Point = (edge1, edge2) => {
   const {from: p1, to: p2} = edge1;
@@ -59,6 +59,30 @@ export const intersectVec2Point = (edge1, edge2) => {
       edge1,
       edge2,
     );
+  }
+
+  return null;
+};
+
+/**
+ * Check collision with border of object
+ *
+ * @param {Body} body
+ * @param {Edge} edge
+ *
+ * @returns {RaysIntersection}
+ */
+export const isCornerCollisionWithEdge = (body, edge) => {
+  const {vertices} = body;
+  const corner = new Edge(null, null);
+
+  for (let i = 0; i < vertices.length; ++i) {
+    corner.from = vertices[i];
+    corner.to = vertices[(i + 1) % vertices.length];
+
+    const intersection = intersectVec2Point(corner, edge);
+    if (intersection)
+      return intersection;
   }
 
   return null;

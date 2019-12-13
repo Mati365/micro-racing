@@ -36,12 +36,30 @@ export default class PhysicsBody {
 
   get vertices() { return this.shapeCache.vertices; }
 
+  get center() {
+    return this.pos;
+  }
+
+  get velocityVector() {
+    const {angle, speed} = this;
+
+    return vec2(
+      Math.cos(angle) * speed,
+      Math.sin(angle) * speed,
+    );
+  }
+
+  set velocityVector(v) {
+    this.speed = vec2.len(v);
+    this.angle = vec2.vectorAngle(v);
+  }
+
   updateVerticesShapeCache = this.cacheByPos(() => {
     const {shapeCache, points} = this;
     const {vertices} = shapeCache;
 
     for (let i = 0; i < points.length; ++i)
-      vertices[i] = this.relativeBodyVector(points[i]);
+      vertices[i] = this.relativeBodyVectorToAbsolute(points[i]);
 
     shapeCache.box = getPathCornersBox(vertices);
     return shapeCache;
@@ -80,16 +98,37 @@ export default class PhysicsBody {
     };
   }
 
+  /**
+   * Throttle velocity
+   *
+   * @param {*} delta
+   * @memberof PhysicsBody
+   */
   speedUp(delta) {
     this.speed += delta;
   }
 
+  /**
+   * Rotate body
+   *
+   * @param {*} delta
+   * @memberof PhysicsBody
+   */
   turn(delta) {
     this.angularVelocity *= 0.3;
     this.angle += delta;
   }
 
-  relativeBodyVector(v) {
+  /**
+   * Converts vector that is relative to body to absolute
+   * world wide coordinates
+   *
+   * @param {Vector} v
+   * @returns {Vector}
+   *
+   * @memberof PhysicsBody
+   */
+  relativeBodyVectorToAbsolute(v) {
     const {angle, pos} = this;
 
     if (!angle)
@@ -101,22 +140,22 @@ export default class PhysicsBody {
     );
   }
 
-  get center() {
-    return this.pos;
-  }
+  /**
+   * Converts vector from world coordinates to
+   * center body related
+   *
+   * @param {Vector} v
+   * @returns {Vector}
+   *
+   * @memberof PhysicsBody
+   */
+  absoluteToBodyRelativeVector(v) {
+    const {angle, pos} = this;
 
-  get velocityVector() {
-    const {angle, speed} = this;
-
-    return vec2(
-      Math.cos(angle) * speed,
-      Math.sin(angle) * speed,
+    return vec2.rotate(
+      -angle,
+      vec2.sub(v, pos),
     );
-  }
-
-  set velocityVector(v) {
-    this.speed = vec2.len(v);
-    this.angle = vec2.vectorAngle(v);
   }
 
   interpolatedUpdate = (() => {

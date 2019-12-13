@@ -1,7 +1,7 @@
 import {intervalCountdown} from '@pkg/basic-helpers';
 
 import {createAnimationFrameRenderer} from '@pkg/isometric-renderer/FGL/core/viewport/createDtRenderLoop';
-import {isCollisionWithEdge} from '@pkg/physics-scene/src/engines/diagonal';
+import {isDiagonalCollisionWithEdge} from '@pkg/physics-scene/src/engines/diagonal';
 
 import carKeyboardDriver from '../shared/logic/drivers/carKeyboardDriver';
 
@@ -152,7 +152,7 @@ export default class RoomRacing {
       const lapCheckpoint = racingState.currentCheckpoint % checkpoints.length;
       const checkpointEdge = checkpoints[lapCheckpoint];
 
-      if (checkpointEdge && isCollisionWithEdge(carBody, checkpointEdge)) {
+      if (checkpointEdge && isDiagonalCollisionWithEdge(carBody, checkpointEdge)) {
         racingState.currentCheckpoint++;
         if (lapCheckpoint + 1 >= checkpoints.length)
           racingState.lap++;

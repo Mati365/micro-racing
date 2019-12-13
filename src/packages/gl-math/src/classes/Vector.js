@@ -44,6 +44,9 @@ export default class Vector extends Float32Array {
   static fromArray(arr) {
     return new Vector(arr);
   }
+
+  // unsafe
+  static ZERO = new Vector([0, 0, 0, 0]);
 }
 
 // unroll operation global scope fix

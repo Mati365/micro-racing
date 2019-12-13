@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import vec2 from '../matrix/types/vec2';
 
 export default class Edge {
@@ -35,6 +36,13 @@ export default class Edge {
       normalize
         ? vec2.normalize(normal)
         : normal
+    );
+  }
+
+  static createBlankEdges(nth) {
+    return R.times(
+      () => new Edge(vec2(0, 0), vec2(0, 0)),
+      nth,
     );
   }
 

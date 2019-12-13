@@ -52,13 +52,14 @@ const diagonalCollisionsCheck = (a, b) => {
   return mtv;
 };
 
-export const isCollisionWithEdge = (body, edge) => {
+export const isDiagonalCollisionWithEdge = (body, edge) => {
   const {vertices} = body;
+  const diagonal = new Edge(body.center, null);
 
   for (let i = 0; i < vertices.length; ++i) {
-    const diagonal = new Edge(body.center, vertices[i]);
-    const intersection = intersectVec2Point(diagonal, edge);
+    diagonal.to = vertices[i];
 
+    const intersection = intersectVec2Point(diagonal, edge);
     if (intersection)
       return intersection;
   }

@@ -38,7 +38,7 @@ export default class PhysicsBoard {
     this.physics = new PhysicsScene(
       {
         items: [
-          this.car.body,
+          this.car,
           new Shape(
             {
               pos: vec2(dimensions.w / 2 + 200, dimensions.h / 2 - 30),
@@ -127,6 +127,15 @@ export default class PhysicsBoard {
       body.speedUp(-0.1);
 
     physics.update(delta);
+
+    const {items: list} = physics;
+    for (let i = 0, len = list.length; i < len; ++i) {
+      const item = list[i];
+
+      item.update && item.update(delta);
+      if (item.body)
+        physics.updateObjectPhysics(item.body);
+    }
   }
 
   render(delta) {

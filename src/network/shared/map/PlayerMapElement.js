@@ -99,6 +99,10 @@ export default class PlayerMapElement extends MapElement {
         id: {
           type: 'int16',
         },
+        kind: {
+          type: 'int8',
+          srcPath: 'player.info.kind',
+        },
         lap: {
           type: 'int8',
           srcPath: 'player.info.racingState.lap',

@@ -4,10 +4,13 @@ import chalk from 'chalk';
 import logMethod, {logFunction} from '@pkg/basic-helpers/decorators/logMethod';
 
 import {
+  PLAYER_TYPES,
   ERROR_CODES,
   PLAYER_ACTIONS,
   ACTION_FLAGS,
 } from '@game/network/constants/serverCodes';
+
+import CarNeuralAI from '@game/logic/drivers/neural';
 
 import createActionMessage, {
   getMessageMeta,
@@ -39,6 +42,35 @@ export default class PlayerSocket extends Player {
     this.onDisconnect = onDisconnect;
 
     this.mountMessagesHandler();
+  }
+
+  transformToZombie() {
+    const {info} = this;
+
+    if (info.kind !== PLAYER_TYPES.ZOMBIE) {
+      info.kind = PLAYER_TYPES.ZOMBIE;
+      info.inputs = [];
+
+      this.ai = new CarNeuralAI(
+        {
+          car: info.car,
+        },
+      );
+    }
+
+    return this;
+  }
+
+  transformToHuman() {
+    const {info} = this;
+
+    if (info.kind !== PLAYER_TYPES.HUMAN) {
+      info.kind = PLAYER_TYPES.HUMAN;
+      info.lastIdleTime = null;
+      this.ai = null;
+    }
+
+    return this;
   }
 
   @logMethod(
@@ -165,7 +197,12 @@ export default class PlayerSocket extends Player {
    */
   listeners = {
     [PLAYER_ACTIONS.SEND_KEYMAP]: (cmdID, {list}) => {
-      this.info.inputs.push(...list);
+      const {info} = this;
+
+      if (info.kind !== PLAYER_TYPES.HUMAN)
+        this.transformToHuman();
+
+      info.inputs.push(...list);
     },
 
     [PLAYER_ACTIONS.PING]: (cmdID) => {

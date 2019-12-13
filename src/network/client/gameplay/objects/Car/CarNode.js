@@ -28,11 +28,13 @@ const createTexturedCarRenderer = f => R.memoizeWith(
 );
 
 class PlayerNickTextNode extends HTMLTextNode {
-  constructor({
-    f,
-    player,
-    arrowSize = 6,
-  }) {
+  constructor(
+    {
+      f,
+      player,
+      arrowSize = 6,
+    },
+  ) {
     const {current} = player;
     const backgroundColor = `${player.racingState.color}${current ? '88' : '66'}`;
 
@@ -61,6 +63,14 @@ class PlayerNickTextNode extends HTMLTextNode {
         },
       },
     );
+
+    this.player = player;
+  }
+
+  update(interpolate, cachedInterpolatedBody) {
+    this.translate.xy = cachedInterpolatedBody.pos;
+    if (interpolate.fixedStepUpdate)
+      this.setIcon(PLAYERS_CARS_ICONS[this.player.kind]);
   }
 }
 
@@ -70,11 +80,13 @@ class PlayerNickTextNode extends HTMLTextNode {
  *  for CarPhysicsBody it will be better to use server size
  */
 export default class CarNode extends PhysicsMeshNode {
-  constructor({
-    player,
-    type,
-    ...meshConfig
-  }) {
+  constructor(
+    {
+      player,
+      type,
+      ...meshConfig
+    },
+  ) {
     super(
       {
         ...meshConfig,
@@ -119,8 +131,7 @@ export default class CarNode extends PhysicsMeshNode {
     super.update(interpolate);
 
     const {nickNode, cachedInterpolatedBody} = this;
-    if (nickNode)
-      nickNode.translate.xy = cachedInterpolatedBody.pos;
+    nickNode.update(interpolate, cachedInterpolatedBody);
   }
 
   render(interpolate, mpMatrix, f) {

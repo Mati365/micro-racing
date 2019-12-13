@@ -59,11 +59,11 @@ export class GameKeyboardController {
   }
 
   storeInputs(frameId) {
-    const {predictedInputs, batch} = this;
+    const {predictedInputs, batch, inputs} = this;
     const input = new PlayerInput(
       (this.inputsCounter++) % 0xFFFF, // due to binary serializer
       frameId,
-      this.inputs,
+      inputs,
     );
 
     batch.push(input);

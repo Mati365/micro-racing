@@ -53,6 +53,9 @@ const diagonalCollisionsCheck = (a, b) => {
 };
 
 export const isDiagonalCollisionWithEdge = (body, edge) => {
+  if (!body || !edge)
+    return null;
+
   const {vertices} = body;
   const diagonal = new Edge(body.center, null);
 

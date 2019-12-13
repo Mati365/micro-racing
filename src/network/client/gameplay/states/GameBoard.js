@@ -4,7 +4,7 @@ import {
 } from '@pkg/basic-helpers';
 
 import {createIsometricScene} from '@pkg/isometric-renderer';
-import {vec2, lerp} from '@pkg/gl-math';
+import {lerp, vec2} from '@pkg/gl-math';
 
 import carKeyboardDriver, {GameKeyboardController} from '@game/logic/drivers/carKeyboardDriver';
 
@@ -138,6 +138,7 @@ export default class GameBoard {
       return;
     }
 
+    playerNode.player.kind = playerRaceState.kind;
     Object.assign(
       playerNode.player.racingState,
       {
@@ -188,44 +189,45 @@ export default class GameBoard {
     // try to reply all inputs after response
     const {predictedInputs} = this.keyboardController;
 
-    if (predictedInputs.length > 20) {
-      console.warn(`Skipping prediction! Predicted inputs: ${predictedInputs.length}!`);
-      this.keyboardController.predictedInputs = [];
-    } else if (lastProcessedInput !== -1 && predictedInputs.length && currentPlayerSync) {
-      let serverInputIndex = getIndexByID(lastProcessedInput, predictedInputs);
+    if (lastProcessedInput !== -1) {
+      if (predictedInputs.length < 20 && predictedInputs.length && currentPlayerSync) {
+        let serverInputIndex = getIndexByID(lastProcessedInput, predictedInputs);
 
-      if (serverInputIndex !== -1 && serverInputIndex + 1 < predictedInputs.length) {
-        serverInputIndex++;
+        if (serverInputIndex !== -1 && serverInputIndex + 1 < predictedInputs.length) {
+          serverInputIndex++;
 
-        let prevFrameId = predictedInputs[serverInputIndex].frameId;
-        let skipLastUpdate = null;
+          let prevFrameId = predictedInputs[serverInputIndex].frameId;
 
-        for (let i = serverInputIndex; i < predictedInputs.length; ++i) {
-          const {bitset, frameId, tempOnly} = predictedInputs[i];
+          for (let i = serverInputIndex; i < predictedInputs.length; ++i) {
+            const {bitset, frameId, tempOnly} = predictedInputs[i];
+            if (tempOnly)
+              break;
 
-          if (skipLastUpdate === null)
-            skipLastUpdate = false;
+            carKeyboardDriver(bitset, body);
 
-          carKeyboardDriver(bitset, body);
+            if (!tempOnly && (
+              prevFrameId !== frameId
+                  || i + 1 >= predictedInputs.length
+                  || predictedInputs[i + 1].tempOnly)) {
+              body.update();
+              physics.updateObjectPhysics(body);
+            }
 
-          if (!tempOnly && prevFrameId !== frameId) {
-            body.update();
-            physics.updateObjectPhysics(body);
-
-            if (!skipLastUpdate && i + 1 >= predictedInputs.length)
-              skipLastUpdate = true;
+            prevFrameId = frameId;
           }
-
-          prevFrameId = frameId;
         }
 
-        if (skipLastUpdate === false) {
-          body.update();
-          physics.updateObjectPhysics(body);
-        }
+        predictedInputs.splice(0, serverInputIndex);
+      } else {
+        console.warn(`Skipping prediction! Predicted inputs: ${predictedInputs.length}!`);
+        Object.assign(
+          this.keyboardController,
+          {
+            predictedInputs: [],
+            batch: [],
+          },
+        );
       }
-
-      predictedInputs.splice(0, serverInputIndex);
     }
 
     body.angle = lerp(prevAngle, body.angle, 0.05);

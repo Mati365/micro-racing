@@ -48,7 +48,7 @@ export default class PhysicsScene {
     a.updateVerticesShapeCache();
   }
 
-  updateObjectPhysics(a) {
+  updateObjectPhysics(a, checkOnlyWithStatic) {
     const {items} = this;
     const {box: boxA, moveable} = a;
 
@@ -58,6 +58,10 @@ export default class PhysicsScene {
     for (let j = 0; j < items.length; ++j) {
       const item = items[j];
       const b = item.body || item;
+
+      // ignore if e.g. AI is testing neural network
+      if ((a.moveable || b.moveable) && checkOnlyWithStatic)
+        continue;
 
       if (a === b || (!a.moveable && !b.moveable))
         continue;
@@ -93,7 +97,11 @@ export default class PhysicsScene {
     }
   }
 
-  update() {
+  update(
+    {
+      checkOnlyWithStatic = false,
+    } = {},
+  ) {
     const {items} = this;
 
     for (let i = 0; i < items.length; ++i) {
@@ -101,7 +109,7 @@ export default class PhysicsScene {
       const body = item.body || item;
 
       body.update && body.update();
-      this.updateObjectPhysics(body);
+      this.updateObjectPhysics(body, checkOnlyWithStatic);
     }
 
     return false;

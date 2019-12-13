@@ -14,6 +14,8 @@ const NEURAL_CAR_OUTPUTS = {
   TURN_INPUT: 1,
 };
 
+export const MAX_TANH_DISTANCE = 2.5;
+
 const createTanH = T.createLayer(T.NEURAL_ACTIVATION_TYPES.TAN_H);
 
 /**
@@ -49,10 +51,31 @@ export default class CarNeuralAI {
     this.intersections = new CarIntersectRays(
       car.body,
       {
-        viewDistance: 3,
+        viewDistance: 10,
         raysCount,
       },
     );
+  }
+
+  getNeuralInputs() {
+    const {
+      car: {body},
+      intersections,
+    } = this;
+
+    return [
+      body.speed / MAX_CAR_SPEED, // nornalize speed
+      (body.steerAngle / body.maxSteerAngle) * 3,
+      ...R.map(
+        (intersection) => {
+          if (!intersection)
+            return MAX_TANH_DISTANCE;
+
+          return (1 - intersection.uB) * MAX_TANH_DISTANCE;
+        },
+        intersections.pickRaysClosestIntersects(),
+      ),
+    ];
   }
 
   drive({physics}) {
@@ -65,23 +88,11 @@ export default class CarNeuralAI {
     // neural control
     intersections.update(physics);
     const neuralOutput = T.exec(
-      [
-        body.speed / MAX_CAR_SPEED, // nornalize speed
-        (body.steerAngle / body.maxSteerAngle) * 3,
-        ...R.map(
-          (intersection) => {
-            if (!intersection)
-              return 0;
-
-            return (1 - intersection.uB) * 3;
-          },
-          intersections.pickRaysClosestIntersects(),
-        ),
-      ],
+      this.getNeuralInputs(),
       neural,
     );
 
-    body.speedUp(Math.abs(neuralOutput[0]) * 20);
+    body.speedUp(neuralOutput[0] * 10);
     body.turnSteerWheels(neuralOutput[1]);
   }
 }

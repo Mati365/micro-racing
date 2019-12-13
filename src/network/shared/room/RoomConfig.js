@@ -3,7 +3,8 @@ export default class RoomConfig {
     {
       laps = 4,
       countdown = 0,
-      playersLimit = 5,
+      playersLimit = 2,
+      playerIdleTime = 6000,
       spawnBotsBeforeStart = true,
     } = {},
   ) {
@@ -11,6 +12,7 @@ export default class RoomConfig {
     this.countdown = countdown;
     this.playersLimit = playersLimit;
     this.spawnBotsBeforeStart = spawnBotsBeforeStart;
+    this.playerIdleTime = playerIdleTime;
   }
 
   toBSON() {

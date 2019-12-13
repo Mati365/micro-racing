@@ -20,6 +20,7 @@ export const ACTION_FLAGS = {
 export const PLAYER_TYPES = {
   BOT: 1,
   HUMAN: 2,
+  ZOMBIE: 3,
 };
 
 export const PLAYER_ACTIONS = {

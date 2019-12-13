@@ -15,14 +15,18 @@ import {PlayerMapElement} from '../shared/map';
 import RoadMapObjectsManager from './RoadMapObjectsManager';
 import RaceState from '../shared/room/RoomRaceState';
 
+const wrapAroundMod = (num, length) => (num + length) % length;
+
 export default class RoomRacing {
   constructor(
     {
       room,
+      aiTraining = true,
     },
   ) {
     this.room = room;
     this.startTime = null;
+    this.aiTraining = aiTraining;
     this.map = new RoadMapObjectsManager(room.map);
     this.state = new RaceState(RACE_STATES.WAIT_FOR_SERVER);
   }
@@ -104,10 +108,8 @@ export default class RoomRacing {
   updateMapState() {
     const {
       room,
-      startTime,
       map: {
         physics,
-        segmentsInfo: {checkpoints},
       },
     } = this;
 
@@ -121,16 +123,20 @@ export default class RoomRacing {
     for (let i = players.length - 1; i >= 0; --i) {
       const player = players[i];
       const {info, ai} = player;
-      const {racingState} = info;
       const {body: carBody} = info.car;
 
       if (info.kind === PLAYER_TYPES.HUMAN) {
         /**
          * HUMAN
          */
+        if (info.inputs.length > 15)
+          info.inputs = info.inputs.slice(0, 2);
+
         const {inputs} = info;
+
         let prevFrameId = null;
         let processedInputs = 0;
+        let idle = true;
 
         info.lastProcessedInput = -1;
         if (inputs.length) {
@@ -144,6 +150,9 @@ export default class RoomRacing {
             prevFrameId = input.frameId;
             info.lastProcessedInput = input.id;
 
+            if (input.bitset)
+              idle = false;
+
             carKeyboardDriver(input.bitset, carBody);
           }
 
@@ -151,7 +160,8 @@ export default class RoomRacing {
           info.inputs.splice(0, processedInputs);
         }
 
-        carBody.idleInputs = prevFrameId === null;
+        if (idle && info.lastIdleTime === null)
+          info.lastIdleTime = Date.now();
       } else {
         /**
          * AI
@@ -159,18 +169,8 @@ export default class RoomRacing {
         ai.drive(aiWorldParams);
       }
 
-      // update racing state
-      racingState.currentLapTime = now - startTime;
-
-      // check checkpoints intersection
-      const lapCheckpoint = racingState.currentCheckpoint % checkpoints.length;
-      const checkpointEdge = checkpoints[lapCheckpoint];
-
-      if (checkpointEdge && isDiagonalCollisionWithEdge(carBody, checkpointEdge)) {
-        racingState.currentCheckpoint++;
-        if (lapCheckpoint + 1 >= checkpoints.length)
-          racingState.lap++;
-      }
+      this.checkPlayerLaps(now, player);
+      this.checkPlayerIdle(now, player);
     }
 
     // calculate player positions
@@ -193,6 +193,72 @@ export default class RoomRacing {
       this.broadcastPlayersRaceState();
 
     this._framePlayersStateCounter = ((this._framePlayersStateCounter || 0) + 1) % 20;
+  }
+
+  /**
+   * Count player laps using checkpoints
+   *
+   * @param {Date} time
+   * @param {Player} player
+   * @memberof RoomRacing
+   */
+  checkPlayerLaps(time, player) {
+    const {
+      startTime,
+      map: {
+        segmentsInfo: {checkpoints},
+      },
+    } = this;
+
+    const {info} = player;
+    const {racingState} = info;
+    const {body: carBody} = info.car;
+
+    // update racing state
+    racingState.currentLapTime = time - startTime;
+
+    // check checkpoints intersection
+    const nextCheckpoint = wrapAroundMod(racingState.currentCheckpoint + 1, checkpoints.length);
+    const prevCheckpoint = wrapAroundMod(racingState.currentCheckpoint - 1, checkpoints.length);
+
+    if (isDiagonalCollisionWithEdge(carBody, checkpoints[nextCheckpoint])) {
+      racingState.currentCheckpoint++;
+      racingState.lastCheckpointTime = racingState.currentLapTime;
+
+      if (!nextCheckpoint)
+        racingState.lap++;
+    } else if (racingState.lastCheckpointTime !== null
+        && isDiagonalCollisionWithEdge(carBody, checkpoints[prevCheckpoint])) {
+      racingState.currentCheckpoint = Math.max(0, racingState.currentCheckpoint - 1);
+      if (prevCheckpoint < 0)
+        racingState.lap = Math.max(0, racingState.lap - 1);
+
+      // todo: add lower score
+    }
+  }
+
+  /**
+   * Perform punishment for idle players!
+   *
+   * @param {Date} time
+   * @param {Player} player
+   * @memberof RoomRacing
+   */
+  checkPlayerIdle(time, player) {
+    const {playerIdleTime} = this.room.config;
+
+    const {info} = player;
+    const {racingState} = info;
+
+    // detect non progress players
+    const nonProgressTime = racingState.currentLapTime - (racingState.lastCheckpointTime || 0);
+    if (info.kind === PLAYER_TYPES.HUMAN && nonProgressTime > playerIdleTime) {
+      // todo: kill bots in tutorial mode
+    }
+
+    // transform to bots idle players
+    if (info.lastIdleTime - time > playerIdleTime)
+      player.transformToZombie();
   }
 
   /**

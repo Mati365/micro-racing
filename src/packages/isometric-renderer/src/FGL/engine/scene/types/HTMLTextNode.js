@@ -55,22 +55,16 @@ export default class HTMLTextNode {
       translateMatrix: mat.create(1, 4),
     };
 
-    let html = text;
-    if (icon) {
-      const iconElement = document.createElement('img');
-      iconElement.src = icon;
+    this.html = document.createDocumentFragment();
+    this.html.appendChild(
+      document.createTextNode(text),
+    );
 
-      html = document.createDocumentFragment();
-      html.appendChild(iconElement);
-      html.appendChild(
-        document.createTextNode(text),
-      );
-    }
-
+    this.setIcon(icon);
     this.htmlNode = f.appendCanvasHTMLNode(
       {
         tag: 'span',
-        children: html,
+        children: this.html,
         css: {
           composes: [FLOATING_HTML_TEXT_CLASS],
           color,
@@ -88,6 +82,23 @@ export default class HTMLTextNode {
         },
       },
     );
+  }
+
+  setIcon(icon) {
+    if (!this.iconElement) {
+      const iconElement = document.createElement('img');
+      iconElement.src = icon;
+
+      this.html.prepend(iconElement);
+      this.iconElement = iconElement;
+    }
+
+    if (icon !== this.icon) {
+      this.icon = icon;
+      this.iconElement.src = icon;
+    }
+
+    return this;
   }
 
   release() {

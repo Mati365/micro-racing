@@ -1,7 +1,12 @@
 import * as R from 'ramda';
 
 import {isCornerCollisionWithEdge} from '@pkg/physics-scene/src/utils/getRaysIntersection';
-import {Vector, toRadians, vec2} from '@pkg/gl-math';
+import {aabb} from '@pkg/physics-scene/src/engines';
+
+import {
+  CornersBox, Vector,
+  toRadians, vec2,
+} from '@pkg/gl-math';
 
 import CarCollidableRay from './CarCollidableRay';
 
@@ -23,6 +28,11 @@ export default class CarIntersectRays {
     this.raysViewportAngle = raysViewportAngle;
 
     // edges
+    this.raysBox = new CornersBox(
+      vec2(0, 0),
+      vec2(0, 0),
+    );
+
     this.rays = this.createRays();
   }
 
@@ -62,22 +72,31 @@ export default class CarIntersectRays {
    * @param {PhysicsScene} physicsScene
    */
   checkCollisions(physicsScene) {
-    const {body, rays} = this;
+    const {body, rays, raysBox} = this;
     const {items} = physicsScene;
 
-    for (let i = rays.length - 1; i >= 0; --i) {
-      const ray = rays[i];
-      ray.collisionPoints = [];
+    // reset collisions
+    for (let i = rays.length - 1; i >= 0; --i)
+      rays[i].collisionPoints = [];
 
-      for (let j = 0, n = items.length; j < n; ++j) {
-        let boardItem = items[j];
-        if (boardItem.body)
-          boardItem = boardItem.body;
+    // check with all bodies
+    for (let j = 0, n = items.length; j < n; ++j) {
+      let boardItemBody = items[j];
+      if (boardItemBody.body)
+        boardItemBody = boardItemBody.body;
 
-        if (!boardItem || !boardItem.vertices || boardItem === body)
-          continue;
+      if (!boardItemBody || !boardItemBody.vertices || boardItemBody === body)
+        continue;
 
-        const intersectPoints = isCornerCollisionWithEdge(boardItem, ray.edge, true);
+      // skip if body not match rays aabb
+      if (!aabb(raysBox, boardItemBody.box))
+        continue;
+
+      // check all rays collisions with body
+      for (let i = rays.length - 1; i >= 0; --i) {
+        const ray = rays[i];
+        const intersectPoints = isCornerCollisionWithEdge(boardItemBody, ray.edge, true);
+
         if (intersectPoints.length)
           ray.collisionPoints = ray.collisionPoints.concat(intersectPoints);
       }
@@ -139,6 +158,7 @@ export default class CarIntersectRays {
     viewDistance = this.viewDistance,
   ) {
     const {
+      raysBox,
       body,
       raysCount,
       raysViewportAngle,
@@ -147,12 +167,18 @@ export default class CarIntersectRays {
     const rayAngle = raysViewportAngle / (this.raysCount - 1);
     const offset = -(raysViewportAngle / 2);
 
+    raysBox.topLeft[0] = Infinity;
+    raysBox.topLeft[1] = Infinity;
+
+    raysBox.bottomRight[0] = -Infinity;
+    raysBox.bottomRight[1] = -Infinity;
+
     for (let i = raysCount - 1; i >= 0; --i) {
       const ray = rays[i];
       const attachPoint = ray.bodyAttachPoint || Vector.ZERO;
 
-      ray.edge.from = body.relativeBodyVectorToAbsolute(attachPoint);
-      ray.edge.to = body.relativeBodyVectorToAbsolute(
+      const from = body.relativeBodyVectorToAbsolute(attachPoint);
+      const to = body.relativeBodyVectorToAbsolute(
         vec2.add(
           attachPoint,
           vec2.fromScalar(
@@ -161,6 +187,15 @@ export default class CarIntersectRays {
           ),
         ),
       );
+
+      ray.edge.from = from;
+      ray.edge.to = to;
+
+      raysBox.topLeft[0] = Math.min(raysBox.topLeft[0], from[0], to[0]);
+      raysBox.topLeft[1] = Math.min(raysBox.topLeft[1], from[1], to[1]);
+
+      raysBox.bottomRight[0] = Math.max(raysBox.bottomRight[0], from[0], to[0]);
+      raysBox.bottomRight[1] = Math.max(raysBox.bottomRight[1], from[1], to[1]);
     }
 
     return rays;

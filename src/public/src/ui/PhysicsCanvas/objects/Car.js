@@ -59,7 +59,10 @@ export default class Car {
 
   renderRays(ctx) {
     const {
-      intersectRays: {rays},
+      intersectRays: {
+        raysBox,
+        rays,
+      },
     } = this;
 
     for (let i = rays.length - 1; i >= 0; --i) {
@@ -91,6 +94,13 @@ export default class Car {
         );
       }
     }
+
+    drawRect(
+      raysBox,
+      1,
+      '#00ff00',
+      ctx,
+    );
   }
 
   render(ctx) {

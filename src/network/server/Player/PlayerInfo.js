@@ -25,7 +25,9 @@ export class PlayerRacingState {
     this.position = position;
     this.time = time;
     this.currentLapTime = currentLapTime;
+
     this.lap = lap;
+    this.lapsTimes = [];
 
     // do not leak info to client:
     this.lastCheckpointTime = lastCheckpointTime;
@@ -63,6 +65,7 @@ export default class PlayerInfo {
     this.room = room;
     this.inputs = [];
     this.lastProcessedInput = -1;
+    this.lastIdleTime = null;
     this.racingState = racingState;
   }
 

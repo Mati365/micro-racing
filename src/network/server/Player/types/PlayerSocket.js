@@ -199,7 +199,7 @@ export default class PlayerSocket extends Player {
     [PLAYER_ACTIONS.SEND_KEYMAP]: (cmdID, {list}) => {
       const {info} = this;
 
-      if (info.kind !== PLAYER_TYPES.HUMAN)
+      if (list[0].bitset && info.kind !== PLAYER_TYPES.HUMAN)
         this.transformToHuman();
 
       info.inputs.push(...list);

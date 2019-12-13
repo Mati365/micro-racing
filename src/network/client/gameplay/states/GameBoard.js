@@ -1,3 +1,5 @@
+import {PLAYER_TYPES} from '@game/network/constants/serverCodes';
+
 import {
   getIndexByID,
   createLowLatencyObservable,
@@ -164,7 +166,7 @@ export default class GameBoard {
     }
 
     /** @see PlayerMapElement.binarySnapshotSerializer */
-    const {body} = node;
+    const {body, player: {kind}} = node;
     if (!body)
       return;
 
@@ -188,9 +190,12 @@ export default class GameBoard {
 
     // try to reply all inputs after response
     const {predictedInputs} = this.keyboardController;
+    const human = kind === PLAYER_TYPES.HUMAN;
 
     if (lastProcessedInput !== -1) {
-      if (predictedInputs.length < 20 && predictedInputs.length && currentPlayerSync) {
+      if (human
+          && predictedInputs.length < 20
+          && predictedInputs.length && currentPlayerSync) {
         let serverInputIndex = getIndexByID(lastProcessedInput, predictedInputs);
 
         if (serverInputIndex !== -1 && serverInputIndex + 1 < predictedInputs.length) {
@@ -219,7 +224,9 @@ export default class GameBoard {
 
         predictedInputs.splice(0, serverInputIndex);
       } else {
-        console.warn(`Skipping prediction! Predicted inputs: ${predictedInputs.length}!`);
+        if (human)
+          console.warn(`Skipping prediction! Predicted inputs: ${predictedInputs.length}!`);
+
         Object.assign(
           this.keyboardController,
           {

@@ -1,5 +1,4 @@
 import {intervalCountdown} from '@pkg/basic-helpers';
-
 import {createAnimationFrameRenderer} from '@pkg/isometric-renderer/FGL/core/viewport/createDtRenderLoop';
 import {isDiagonalCollisionWithEdge} from '@pkg/physics-scene/src/engines/diagonal';
 
@@ -160,7 +159,9 @@ export default class RoomRacing {
           info.inputs.splice(0, processedInputs);
         }
 
-        if (idle && info.lastIdleTime === null)
+        if (!idle)
+          info.lastIdleTime = null;
+        else if (info.lastIdleTime === null)
           info.lastIdleTime = Date.now();
       } else {
         /**
@@ -215,7 +216,7 @@ export default class RoomRacing {
     const {body: carBody} = info.car;
 
     // update racing state
-    racingState.currentLapTime = time - startTime;
+    racingState.currentLapTime = time - startTime - racingState.time;
 
     // check checkpoints intersection
     const nextCheckpoint = wrapAroundMod(racingState.currentCheckpoint + 1, checkpoints.length);
@@ -225,15 +226,20 @@ export default class RoomRacing {
       racingState.currentCheckpoint++;
       racingState.lastCheckpointTime = racingState.currentLapTime;
 
-      if (!nextCheckpoint)
+      if (!nextCheckpoint) {
         racingState.lap++;
+
+        racingState.lapsTimes.push(racingState.currentLapTime);
+        racingState.time += racingState.currentLapTime;
+        racingState.currentLapTime = 0;
+      }
     } else if (racingState.lastCheckpointTime !== null
         && isDiagonalCollisionWithEdge(carBody, checkpoints[prevCheckpoint])) {
       racingState.currentCheckpoint = Math.max(0, racingState.currentCheckpoint - 1);
       if (prevCheckpoint < 0)
         racingState.lap = Math.max(0, racingState.lap - 1);
 
-      // todo: add lower score
+      // todo: add lower score for bots
     }
   }
 
@@ -257,7 +263,7 @@ export default class RoomRacing {
     }
 
     // transform to bots idle players
-    if (info.lastIdleTime - time > playerIdleTime)
+    if (info.lastIdleTime !== null && time - info.lastIdleTime > playerIdleTime)
       player.transformToZombie();
   }
 

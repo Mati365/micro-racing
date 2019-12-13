@@ -70,10 +70,12 @@ export const intersectVec2Point = (edge1, edge2) => {
  * @param {Body} body
  * @param {Edge} edge
  *
- * @returns {RaysIntersection}
+ * @returns {RaysIntersection|RaysIntersection[]}
  */
-export const isCornerCollisionWithEdge = (body, edge) => {
+export const isCornerCollisionWithEdge = (body, edge, all = false) => {
   const {vertices} = body;
+
+  const intersections = all ? [] : null;
   const corner = new Edge(null, null);
 
   for (let i = 0; i < vertices.length; ++i) {
@@ -81,9 +83,13 @@ export const isCornerCollisionWithEdge = (body, edge) => {
     corner.to = vertices[(i + 1) % vertices.length];
 
     const intersection = intersectVec2Point(corner, edge);
-    if (intersection)
-      return intersection;
+    if (intersection) {
+      if (all)
+        intersections.push(intersection);
+      else
+        return intersection;
+    }
   }
 
-  return null;
+  return intersections;
 };

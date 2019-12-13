@@ -1,18 +1,9 @@
 import * as R from 'ramda';
 
 import {isCornerCollisionWithEdge} from '@pkg/physics-scene/src/utils/getRaysIntersection';
-import {
-  Edge, Vector,
-  toRadians, vec2,
-} from '@pkg/gl-math';
+import {Vector, toRadians, vec2} from '@pkg/gl-math';
 
-export class CarCollidableRay {
-  constructor(edge = new Edge) {
-    this.edge = edge;
-    this.bodyAttachPoint = null; // absolute point,
-    this.collisionPoints = [];
-  }
-}
+import CarCollidableRay from './CarCollidableRay';
 
 export default class CarIntersectRays {
   constructor(
@@ -41,6 +32,28 @@ export default class CarIntersectRays {
   }
 
   /**
+   * Iterates over all rays and picks closes intersection point,
+   * instead of getClosesRaysIntersect(), returns array
+   *
+   * IT IS DEFAULTED TO 1
+   *
+   * @see
+   *  getClosesRaysIntersect
+   *  neuralControlCar
+   *
+   * @returns {RaysIntersection[]}
+   */
+  pickRaysClosestIntersects() {
+    const {rays} = this;
+    const raysIntersectPoints = [];
+
+    for (let i = rays.length - 1; i >= 0; --i)
+      raysIntersectPoints[i] = rays[i].getClosestRayIntersectPoint();
+
+    return raysIntersectPoints;
+  }
+
+  /**
    * Check position between each ray and each element on board
    *
    * @todo
@@ -64,9 +77,9 @@ export default class CarIntersectRays {
         if (boardItem === body)
           continue;
 
-        const intersectPoint = isCornerCollisionWithEdge(boardItem, ray.edge);
-        if (intersectPoint)
-          ray.collisionPoints.push(intersectPoint);
+        const intersectPoints = isCornerCollisionWithEdge(boardItem, ray.edge, true);
+        if (intersectPoints.length)
+          ray.collisionPoints = ray.collisionPoints.concat(intersectPoints);
       }
     }
   }

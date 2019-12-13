@@ -64,7 +64,7 @@ export default class Car {
 
     for (let i = rays.length - 1; i >= 0; --i) {
       const ray = rays[i];
-      const {collisionPoints} = ray;
+      const intersection = ray.getClosestRayIntersection();
 
       drawLine(
         ray.edge.from,
@@ -82,15 +82,13 @@ export default class Car {
       );
 
       // draw collision points
-      if (collisionPoints.length) {
-        for (let j = collisionPoints.length - 1; j >= 0; --j) {
-          fillCircle(
-            collisionPoints[j].point,
-            2,
-            '#00ff00',
-            ctx,
-          );
-        }
+      if (intersection) {
+        fillCircle(
+          intersection.point,
+          2,
+          '#00ff00',
+          ctx,
+        );
       }
     }
   }

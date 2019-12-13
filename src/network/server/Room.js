@@ -236,8 +236,7 @@ export default class Room {
     if (!abstract) {
       const playerCar = this.racing.map.appendPlayerCar(player);
 
-      Object.assign(
-        player.info,
+      player.assignRoom(
         {
           car: playerCar,
           room: this,
@@ -274,8 +273,8 @@ export default class Room {
 
     if (!abstract) {
       this.racing.map.removePlayerCar(player);
-      Object.assign(
-        player.info,
+
+      player.assignRoom(
         {
           room: null,
           car: null,

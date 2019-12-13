@@ -10,27 +10,6 @@ import PlayerInput from '@game/network/shared/PlayerInput';
 
 const ROTATE_CAR_SPEED = toRadians(1);
 
-const carKeyboardDriver = (input, carBody) => {
-  if (!carBody)
-    return;
-
-  // left
-  if (getBit(INPUT_FLAGS.TURN_LEFT, input))
-    carBody.turnSteerWheels(-ROTATE_CAR_SPEED);
-
-  // right
-  else if (getBit(INPUT_FLAGS.TURN_RIGHT, input))
-    carBody.turnSteerWheels(ROTATE_CAR_SPEED);
-
-  // w
-  if (getBit(INPUT_FLAGS.THROTTLE, input))
-    carBody.speedUp(4);
-
-  // s
-  if (getBit(INPUT_FLAGS.BRAKE, input))
-    carBody.speedUp(-4);
-};
-
 /**
  * @see
  * Class maps keyboard inputs into flags that
@@ -111,5 +90,27 @@ export class GameKeyboardController {
     this.predictedInputs = [];
   }
 }
+
+
+const carKeyboardDriver = (input, carBody) => {
+  if (!carBody)
+    return;
+
+  // left
+  if (getBit(INPUT_FLAGS.TURN_LEFT, input))
+    carBody.turnSteerWheels(-ROTATE_CAR_SPEED);
+
+  // right
+  else if (getBit(INPUT_FLAGS.TURN_RIGHT, input))
+    carBody.turnSteerWheels(ROTATE_CAR_SPEED);
+
+  // w
+  if (getBit(INPUT_FLAGS.THROTTLE, input))
+    carBody.speedUp(4);
+
+  // s
+  if (getBit(INPUT_FLAGS.BRAKE, input))
+    carBody.speedUp(-4);
+};
 
 export default carKeyboardDriver;

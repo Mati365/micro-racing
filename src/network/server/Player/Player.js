@@ -9,6 +9,17 @@ export default class Player {
     this.info = info;
   }
 
+  assignRoom({car, room, racingState}) {
+    Object.assign(
+      this.info,
+      {
+        car,
+        room,
+        racingState,
+      },
+    );
+  }
+
   toBSON() {
     return this.info.toBSON();
   }

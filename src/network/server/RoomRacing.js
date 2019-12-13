@@ -7,6 +7,7 @@ import carKeyboardDriver from '../shared/logic/drivers/carKeyboardDriver';
 
 import {
   PLAYER_ACTIONS,
+  PLAYER_TYPES,
   RACE_STATES,
 } from '../constants/serverCodes';
 
@@ -111,39 +112,52 @@ export default class RoomRacing {
     } = this;
 
     const {players} = room;
-    const now = Date.now();
+    const aiWorldParams = {
+      physics,
+      players,
+    };
 
+    const now = Date.now();
     for (let i = players.length - 1; i >= 0; --i) {
       const player = players[i];
-      const {info} = player;
+      const {info, ai} = player;
       const {racingState} = info;
       const {body: carBody} = info.car;
 
-      // process inputs from oldest to newest
-      const {inputs} = info;
-      let prevFrameId = null;
-      let processedInputs = 0;
+      if (info.kind === PLAYER_TYPES.HUMAN) {
+        /**
+         * HUMAN
+         */
+        const {inputs} = info;
+        let prevFrameId = null;
+        let processedInputs = 0;
 
-      info.lastProcessedInput = -1;
-      if (inputs.length) {
-        prevFrameId = inputs[processedInputs].frameId;
+        info.lastProcessedInput = -1;
+        if (inputs.length) {
+          prevFrameId = inputs[processedInputs].frameId;
 
-        for (;;++processedInputs) {
-          const input = inputs[processedInputs];
-          if (!input || prevFrameId !== input.frameId)
-            break;
+          for (;;++processedInputs) {
+            const input = inputs[processedInputs];
+            if (!input || prevFrameId !== input.frameId)
+              break;
 
-          prevFrameId = input.frameId;
-          info.lastProcessedInput = input.id;
+            prevFrameId = input.frameId;
+            info.lastProcessedInput = input.id;
 
-          carKeyboardDriver(input.bitset, carBody);
+            carKeyboardDriver(input.bitset, carBody);
+          }
+
+          // used for client side prediction checks
+          info.inputs.splice(0, processedInputs);
         }
 
-        // used for client side prediction checks
-        info.inputs.splice(0, processedInputs);
+        carBody.idleInputs = prevFrameId === null;
+      } else {
+        /**
+         * AI
+         */
+        ai.drive(aiWorldParams);
       }
-
-      carBody.idleInputs = prevFrameId === null;
 
       // update racing state
       racingState.currentLapTime = now - startTime;

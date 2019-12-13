@@ -7,11 +7,13 @@ import {
 
 import PhysicsBody from '@pkg/physics/types/PhysicsBody';
 
-const PHYSICS_SPEED = 1.0 / 100;
+export const MAX_CAR_SPEED = 90;
 
-const GRAVITY = 9.81;
+export const PHYSICS_SPEED = 1.0 / 100;
 
-const FRONT_TRAIN = 0;
+export const GRAVITY = 9.81;
+
+export const FRONT_TRAIN = 0;
 
 const makeWheel = (x, y, steering = false) => ({
   pos: vec2(x, y),

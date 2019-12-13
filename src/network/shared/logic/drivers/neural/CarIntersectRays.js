@@ -48,7 +48,7 @@ export default class CarIntersectRays {
     const raysIntersectPoints = [];
 
     for (let i = rays.length - 1; i >= 0; --i)
-      raysIntersectPoints[i] = rays[i].getClosestRayIntersectPoint();
+      raysIntersectPoints[i] = rays[i].getClosestRayIntersection();
 
     return raysIntersectPoints;
   }
@@ -74,7 +74,7 @@ export default class CarIntersectRays {
         if (boardItem.body)
           boardItem = boardItem.body;
 
-        if (boardItem === body)
+        if (!boardItem || !boardItem.vertices || boardItem === body)
           continue;
 
         const intersectPoints = isCornerCollisionWithEdge(boardItem, ray.edge, true);

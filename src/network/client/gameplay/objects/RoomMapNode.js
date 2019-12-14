@@ -15,6 +15,7 @@ import createTerrain from '@game/shared/sceneResources/terrain';
 import {fetchMeshURLResource} from '@game/shared/sceneResources/utils';
 
 import PhysicsScene from '@pkg/physics-scene';
+import PlayerInfo from '@game/server/Player/PlayerInfo';
 import {RoadMapElement} from '@game/network/shared/map';
 
 import PhysicsMeshNode from './PhysicsMeshNode';
@@ -173,6 +174,11 @@ export default class RoomMapNode {
   }
 
   async loadInitialRoomState({players, objects, ...roomInfo}) {
+    players = R.map(
+      PlayerInfo.fromBSON,
+      players,
+    );
+
     // assign new player info after loading scene
     const updatedCurrentPlayerInfo = findByID(this.currentPlayer.id, players);
     if (updatedCurrentPlayerInfo) {

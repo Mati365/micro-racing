@@ -1,12 +1,17 @@
 import * as R from 'ramda';
 
 import {PLAYER_ACTIONS} from '@game/network/constants/serverCodes';
+
+import PlayerInfo from '@game/server/Player/PlayerInfo';
 import {PlayerMapElement} from '../../shared/map';
 
 export default class RemoteRoomStateListener {
   boardListeners = {
     [PLAYER_ACTIONS.PLAYER_JOINED_TO_ROOM]: ({player, car}) => {
-      this.onJoinPlayer(player, car);
+      this.onJoinPlayer(
+        PlayerInfo.fromBSON(player),
+        car,
+      );
     },
 
     [PLAYER_ACTIONS.PLAYER_LEFT_ROOM]: ({player}) => {

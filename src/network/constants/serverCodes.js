@@ -71,10 +71,12 @@ export const RACE_STATES = {
   COUNT_TO_START: 2,
   RACE: 3,
   ALL_FINISH: 4,
+  PAUSE: 5,
 };
 
 export const PLAYER_RACE_STATES = {
   RACE: 1 << 0,
   WRONG_DIRECTION: 1 << 1,
   FINISH: 1 << 2,
+  FREEZE: 1 << 3,
 };

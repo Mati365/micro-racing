@@ -9,3 +9,5 @@ export const toggleBit = (nth, num) => num ^ (1 << nth);
 export const getBit = (nth, value) => (value >> nth) & 0x1;
 
 export const hasFlag = (flag, value) => (value & flag) === flag;
+
+export const removeFlag = (flag, value) => value & (~flag);

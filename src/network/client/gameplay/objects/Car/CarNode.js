@@ -130,8 +130,19 @@ export default class CarNode extends PhysicsMeshNode {
   update(interpolate) {
     super.update(interpolate);
 
-    const {nickNode, cachedInterpolatedBody} = this;
+    const {
+      nickNode, player,
+      renderConfig, cachedInterpolatedBody,
+    } = this;
+
     nickNode && nickNode.update(interpolate, cachedInterpolatedBody);
+    if (interpolate.fixedStepUpdate) {
+      renderConfig.uniforms.opacity = (
+        player.racingState.isFreezed()
+          ? 0.5
+          : 1.0
+      );
+    }
   }
 
   render(interpolate, mpMatrix, f) {

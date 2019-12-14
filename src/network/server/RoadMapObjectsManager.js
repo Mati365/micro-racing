@@ -52,6 +52,16 @@ export default class RoadMapObjectsManager {
     );
   }
 
+  removePlayerCar(player) {
+    const {items} = this.physics;
+
+    this.totalPlayers--;
+    this.physics.items = R.reject(
+      obj => obj.player?.id === player.id,
+      items,
+    );
+  }
+
   appendPlayerCar(
     player,
     {
@@ -59,7 +69,6 @@ export default class RoadMapObjectsManager {
       carType,
     } = {},
   ) {
-    const {segments} = this.segmentsInfo;
     const playerElement = new PlayerMapElement(
       {
         player,
@@ -72,12 +81,15 @@ export default class RoadMapObjectsManager {
           },
           carType,
         ),
-        body: alignFn(
-          {
-            segment: segments[segments.length - this.totalPlayers - 1],
-            align: CAR_ALIGN[this.totalPlayers % 2 ? 'LEFT_CORNER' : 'RIGHT_CORNER'],
-          },
-        ),
+        body: {},
+      },
+    );
+
+    this.resetPlayerPositionToSegment(
+      {
+        position: this.totalPlayers,
+        playerElement,
+        alignFn,
       },
     );
 
@@ -91,14 +103,34 @@ export default class RoadMapObjectsManager {
     return playerElement;
   }
 
-  removePlayerCar(player) {
-    const {items} = this.physics;
-
-    this.totalPlayers--;
-    this.physics.items = R.reject(
-      obj => obj.player?.id === player.id,
-      items,
+  /**
+   * Used in AI training methods
+   *
+   * @param {*} {
+   *       alignFn = genCarSegmentTransform,
+   *       position,
+   *       playerElement,
+   *     }
+   * @returns
+   * @memberof RoadMapObjectsManager
+   */
+  resetPlayerPositionToSegment(
+    {
+      alignFn = genCarSegmentTransform,
+      position,
+      playerElement,
+    },
+  ) {
+    const {segments} = this.segmentsInfo;
+    const bodyParams = alignFn(
+      {
+        segment: segments[segments.length - position - 1],
+        align: CAR_ALIGN[position % 2 ? 'LEFT_CORNER' : 'RIGHT_CORNER'],
+      },
     );
+
+    Object.assign(playerElement.body, bodyParams);
+    return playerElement;
   }
 
   toBSON() {

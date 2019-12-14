@@ -11,6 +11,8 @@ import {
 } from '../constants/serverCodes';
 
 import {PlayerMapElement} from '../shared/map';
+import {CarNeuralTrainer} from '../shared/logic/drivers/neural';
+
 import RoadMapObjectsManager from './RoadMapObjectsManager';
 import RaceState from '../shared/room/RoomRaceState';
 
@@ -25,9 +27,15 @@ export default class RoomRacing {
   ) {
     this.room = room;
     this.startTime = null;
-    this.aiTraining = aiTraining;
+
     this.map = new RoadMapObjectsManager(room.map);
     this.state = new RaceState(RACE_STATES.WAIT_FOR_SERVER);
+    this.aiTrainer = aiTraining && new CarNeuralTrainer(
+      {
+        map: this.map,
+        room: this.room,
+      },
+    );
   }
 
   get allowPlayerJoin() {
@@ -106,6 +114,7 @@ export default class RoomRacing {
    */
   updateMapState() {
     const {
+      aiTrainer,
       room,
       map: {
         physics,
@@ -118,11 +127,16 @@ export default class RoomRacing {
       players,
     };
 
+    let allAiFreezed = true;
     const now = Date.now();
+
     for (let i = players.length - 1; i >= 0; --i) {
       const player = players[i];
       const {info, ai} = player;
       const {body: carBody} = info.car;
+
+      if (info.racingState.isFreezed())
+        continue;
 
       if (info.kind === PLAYER_TYPES.HUMAN) {
         /**
@@ -167,33 +181,76 @@ export default class RoomRacing {
         /**
          * AI
          */
+        allAiFreezed = false;
         ai.drive(aiWorldParams);
       }
 
-      this.checkPlayerLaps(now, player);
-      this.checkPlayerIdle(now, player);
+      this.updatePlayerLaps(now, player);
+      this.updateIdlePlayers(now, player);
+
+      // kill AI if score is not enough good
+      if (aiTrainer && ai && ai.score.value < 0)
+        info.car.freeze();
     }
 
-    // calculate player positions
-    const sortPlayers = players.sort(
-      (p1, p2) => p2.info.racingState.currentCheckpoint - p1.info.racingState.currentCheckpoint,
-    );
-
-    // reassign position
-    for (let i = sortPlayers.length - 1; i >= 0; --i) {
-      const {racingState} = sortPlayers[i].info;
-      racingState.position = i + 1;
+    // AI training
+    if (aiTrainer && allAiFreezed) {
+      aiTrainer.trainPopulation(players);
+      this.startTime = Date.now();
     }
 
     // update physics
-    physics.update();
+    this.updatePhysics();
     this.broadcastBoardObjects();
 
     // broadcast information about time and other stuff from players
-    if (!this._framePlayersStateCounter)
+    if (!this._framePlayersStateCounter) {
+      // calculate player positions
+      const sortPlayers = players.sort(
+        (p1, p2) => p2.info.racingState.currentCheckpoint - p1.info.racingState.currentCheckpoint,
+      );
+
+      // reassign position
+      for (let i = sortPlayers.length - 1; i >= 0; --i) {
+        const {racingState} = sortPlayers[i].info;
+        racingState.position = i + 1;
+      }
+
       this.broadcastPlayersRaceState();
+    }
 
     this._framePlayersStateCounter = ((this._framePlayersStateCounter || 0) + 1) % 20;
+  }
+
+  /**
+   * Perfomrs all bodies physics update
+   *
+   * @memberof RoomRacing
+   */
+  updatePhysics() {
+    const {
+      aiTrainer,
+      map: {
+        physics,
+      },
+    } = this;
+
+    const {items} = physics;
+
+    for (let i = 0; i < items.length; ++i) {
+      const item = items[i];
+      const {player} = item;
+      const body = item.body || item;
+
+      if (player && player.info.racingState.isFreezed())
+        continue;
+
+      body.update && body.update();
+
+      const collision = physics.updateObjectPhysics(body, !!aiTrainer, true);
+      if (aiTrainer && collision && player)
+        item.freeze();
+    }
   }
 
   /**
@@ -203,7 +260,7 @@ export default class RoomRacing {
    * @param {Player} player
    * @memberof RoomRacing
    */
-  checkPlayerLaps(time, player) {
+  updatePlayerLaps(time, player) {
     const {
       startTime,
       map: {
@@ -211,7 +268,7 @@ export default class RoomRacing {
       },
     } = this;
 
-    const {info} = player;
+    const {ai, info} = player;
     const {racingState} = info;
     const {body: carBody} = info.car;
 
@@ -233,13 +290,19 @@ export default class RoomRacing {
         racingState.time += racingState.currentLapTime;
         racingState.currentLapTime = 0;
       }
+
+      // make bot happy
+      if (ai)
+        ai.score.value += 40;
     } else if (racingState.lastCheckpointTime !== null
         && isDiagonalCollisionWithEdge(carBody, checkpoints[prevCheckpoint])) {
       racingState.currentCheckpoint = Math.max(0, racingState.currentCheckpoint - 1);
       if (prevCheckpoint < 0)
         racingState.lap = Math.max(0, racingState.lap - 1);
 
-      // todo: add lower score for bots
+      // punish bot
+      if (ai)
+        ai.score.value -= 30;
     }
   }
 
@@ -250,21 +313,31 @@ export default class RoomRacing {
    * @param {Player} player
    * @memberof RoomRacing
    */
-  checkPlayerIdle(time, player) {
+  updateIdlePlayers(time, player) {
     const {playerIdleTime} = this.room.config;
 
-    const {info} = player;
+    const {ai, info} = player;
     const {racingState} = info;
 
     // detect non progress players
     const nonProgressTime = racingState.currentLapTime - (racingState.lastCheckpointTime || 0);
-    if (info.kind === PLAYER_TYPES.HUMAN && nonProgressTime > playerIdleTime) {
-      // todo: kill bots in tutorial mode
+    if (nonProgressTime > playerIdleTime) {
+      // punish bot
+      if (ai)
+        ai.score.value -= 60;
+
+      return true;
     }
 
     // transform to bots idle players
-    if (info.lastIdleTime !== null && time - info.lastIdleTime > playerIdleTime)
+    if (info.kind === PLAYER_TYPES.HUMAN
+        && info.lastIdleTime !== null
+        && time - info.lastIdleTime > playerIdleTime) {
       player.transformToZombie();
+      return true;
+    }
+
+    return false;
   }
 
   /**

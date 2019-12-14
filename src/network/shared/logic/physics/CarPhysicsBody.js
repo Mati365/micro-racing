@@ -123,6 +123,13 @@ export default class CarPhysicsBody extends PhysicsBody {
     this.drag = 3.5;
   }
 
+  freeze() {
+    this.velocity = vec2(0, 0);
+    this.angularVelocity = 0;
+    this.throttle = 0;
+    return this;
+  }
+
   get velocityVector() {
     return vec2.mul(
       PHYSICS_SPEED / 1.5,

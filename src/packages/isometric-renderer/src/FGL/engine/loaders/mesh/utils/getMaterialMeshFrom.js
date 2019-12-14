@@ -48,6 +48,7 @@ const getMaterialMeshFrom = (f, gl) => async (
       textures: shaderTextures,
       uniforms: {
         textured: !R.isEmpty(shaderTextures),
+        opacity: 1.0,
         ...uniforms,
       },
       ubo: {

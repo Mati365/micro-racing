@@ -69,6 +69,19 @@ export default class PlayerMapElement extends MapElement {
     );
   }
 
+  unfreeze() {
+    const {player} = this;
+
+    player.info.racingState.unfreeze();
+  }
+
+  freeze() {
+    const {body, player} = this;
+
+    body.freeze();
+    player.info.racingState.freeze();
+  }
+
   toBSON() {
     const {
       id, player, type,
@@ -102,6 +115,10 @@ export default class PlayerMapElement extends MapElement {
         kind: {
           type: 'int8',
           srcPath: 'player.info.kind',
+        },
+        state: {
+          type: 'int16',
+          srcPath: 'player.info.racingState.state',
         },
         lap: {
           type: 'int8',

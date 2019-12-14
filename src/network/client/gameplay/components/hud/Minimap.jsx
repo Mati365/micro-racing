@@ -78,6 +78,8 @@ const renderPlayersOnMinimap = (
 
   for (const playerID in players) {
     const {body, player} = players[playerID];
+    if (!body.pos)
+      continue;
 
     drawPoint(
       player.racingState.color,

@@ -5,13 +5,13 @@ import {MAX_CAR_SPEED} from '../../physics/CarPhysicsBody';
 import CarIntersectRays from './CarIntersectRays';
 
 const NEURAL_CAR_INPUTS = {
-  SPEED_INPUT: 0,
-  ANGLE_INPUT: 1,
+  THROTTLE_INPUT: 0,
+  STEER_INPUT: 1,
 };
 
 const NEURAL_CAR_OUTPUTS = {
-  SPEED_INPUT: 0,
-  TURN_INPUT: 1,
+  THROTTLE_OUTPUT: 0,
+  TURN_OUTPUT: 1,
 };
 
 export const MAX_TANH_DISTANCE = 2.5;
@@ -29,13 +29,15 @@ const createCarNeuralNetwork = (raysCount) => {
   const inputCount = raysCount + R.keys(NEURAL_CAR_INPUTS).length;
   const outputsCount = R.keys(NEURAL_CAR_OUTPUTS).length;
 
-  return T.createNeuralNetwork([
-    T.createInputLayer(inputCount),
-    createTanH(
-      Math.floor(inputCount * 2 / 3) + outputsCount,
-    ),
-    createTanH(outputsCount),
-  ]);
+  return T.createNeuralNetwork(
+    [
+      T.createInputLayer(inputCount),
+      createTanH(
+        Math.floor(inputCount * 2 / 3) + outputsCount,
+      ),
+      createTanH(outputsCount),
+    ],
+  );
 };
 
 export default class CarNeuralAI {
@@ -55,6 +57,14 @@ export default class CarNeuralAI {
         raysCount,
       },
     );
+
+    this.resetScore();
+  }
+
+  resetScore() {
+    this.score = {
+      value: 0,
+    };
   }
 
   getNeuralInputs() {
@@ -64,14 +74,14 @@ export default class CarNeuralAI {
     } = this;
 
     return [
-      body.speed / MAX_CAR_SPEED, // nornalize speed
+      body.speed / MAX_CAR_SPEED * 3, // nornalize speed
       (body.steerAngle / body.maxSteerAngle) * 3,
       ...R.map(
         (intersection) => {
           if (!intersection)
-            return MAX_TANH_DISTANCE;
+            return 0;
 
-          return (1 - intersection.uB) * MAX_TANH_DISTANCE;
+          return intersection.uB * MAX_TANH_DISTANCE;
         },
         intersections.pickRaysClosestIntersects(),
       ),
@@ -92,7 +102,11 @@ export default class CarNeuralAI {
       neural,
     );
 
-    body.speedUp(neuralOutput[0] * 10);
-    body.turnSteerWheels(neuralOutput[1]);
+    body.speedUp(
+      neuralOutput[NEURAL_CAR_OUTPUTS.THROTTLE_OUTPUT] * 10,
+    );
+    body.turnSteerWheels(
+      neuralOutput[NEURAL_CAR_OUTPUTS.TURN_OUTPUT] * 10,
+    );
   }
 }

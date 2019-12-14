@@ -82,6 +82,7 @@ const createMaterialMeshMaterial = fgl => fgl.material.shader(
 
         uniform bool textured;
         uniform sampler2D tex0;
+        uniform float opacity;
 
         ${calcLightingFragment}
 
@@ -108,7 +109,7 @@ const createMaterialMeshMaterial = fgl => fgl.material.shader(
 
           fragColor *= vec4(
             calcLighting(vNormal, vPos),
-            1.0 // intense
+            opacity // intense
           );
         }
       `,

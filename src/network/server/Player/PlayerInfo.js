@@ -5,6 +5,11 @@ import {
   PLAYER_TYPES,
 } from '@game/network/constants/serverCodes';
 
+import {
+  removeFlag,
+  hasFlag,
+} from '@pkg/basic-helpers/base/bits';
+
 import generateName from '@pkg/name-generator';
 
 export class PlayerRacingState {
@@ -34,6 +39,34 @@ export class PlayerRacingState {
     this.currentCheckpoint = currentCheckpoint;
   }
 
+  reset() {
+    Object.assign(
+      this,
+      {
+        lastCheckpointTime: null,
+        currentCheckpoint: 0,
+        currentLapTime: 0,
+        lap: 0,
+        time: 0,
+        lapsTimes: [],
+      },
+    );
+  }
+
+  isFreezed() {
+    return hasFlag(PLAYER_RACE_STATES.FREEZE, this.state);
+  }
+
+  freeze() {
+    this.state |= PLAYER_RACE_STATES.FREEZE;
+    return this;
+  }
+
+  unfreeze() {
+    this.state = removeFlag(PLAYER_RACE_STATES.FREEZE, this.state);
+    return this;
+  }
+
   /**
    * @see
    *  PlayerMapElement.raceStateBinarySnapshotSerializer
@@ -45,6 +78,7 @@ export class PlayerRacingState {
       time: this.time,
       lap: this.lap,
       position: this.position,
+      state: this.state,
     };
   }
 }
@@ -67,6 +101,15 @@ export default class PlayerInfo {
     this.lastProcessedInput = -1;
     this.lastIdleTime = null;
     this.racingState = racingState;
+  }
+
+  static fromBSON(json) {
+    return new PlayerInfo(
+      {
+        ...json,
+        racingState: new PlayerRacingState(json.racingState),
+      },
+    );
   }
 
   toBSON() {

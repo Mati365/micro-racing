@@ -2,14 +2,41 @@ import * as R from 'ramda';
 import {vec2} from '@pkg/gl-math/matrix';
 
 /**
- * Returns random int between min and max, includes min and max
+ * Returns random int between min and max, <min, max), casts to int
  *
  * @param {Number} min
  * @param {Number} max
  *
  * @returns {Number}
  */
-export const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+export const getRandomNumber = (min, max) => Number.parseInt(
+  Math.floor(Math.random() * (max - min)) + min,
+  10,
+);
+
+/**
+ * Returns random float between min and max, includes <min, max)
+ *
+ * @param {Number} min
+ * @param {Number} max
+ *
+ * @returns {Number}
+ */
+export const getRandomFloatNumber = (min, max) => (Math.random() * (max - min)) + min;
+
+/**
+ * Gets random number between: [min, max] not (min, max)
+ *
+ * @param {Number} min
+ * @param {Number} max
+ *
+ * @returns {Number}
+ */
+export const getRandomIntInclusive = (min, max) => {
+  const [_min, _max] = [Math.floor(min), Math.ceil(max)];
+
+  return Math.floor(Math.random() * (_max - _min + 1)) + _min;
+};
 
 /**
  * Returns random element from array
@@ -20,7 +47,7 @@ export const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - m
  */
 export const getRandomArrayItem = (array) => {
   if (array.length > 0)
-    return array[getRandomNumber(0, array.length)];
+    return array[getRandomIntInclusive(0, array.length - 1)];
 
   return null;
 };
@@ -38,8 +65,8 @@ export const getRandomPoint = (border, areaSize) => {
   const cy = areaSize.h / 2;
 
   return vec2(
-    cx + getRandomNumber(-cx + border.x, cx - border.x),
-    cy + getRandomNumber(-cy + border.y, cy - border.y),
+    cx + getRandomIntInclusive(-cx + border.x, cx - border.x),
+    cy + getRandomIntInclusive(-cy + border.y, cy - border.y),
   );
 };
 

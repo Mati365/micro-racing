@@ -147,6 +147,7 @@ export default class GameBoard {
         position: playerRaceState.position,
         currentLapTime: playerRaceState.currentLapTime,
         lap: playerRaceState.lap,
+        state: playerRaceState.state,
       },
     );
   };
@@ -237,9 +238,11 @@ export default class GameBoard {
       }
     }
 
-    body.angle = lerp(prevAngle, body.angle, 0.05);
-    body.pos = vec2.lerp(0.05, prevPos, body.pos);
-    body.velocity = vec2.lerp(0.05, prevVelocity, body.velocity);
+    if (currentPlayerSync && human) {
+      body.angle = lerp(prevAngle, body.angle, 0.05);
+      body.pos = vec2.lerp(0.05, prevPos, body.pos);
+      body.velocity = vec2.lerp(0.05, prevVelocity, body.velocity);
+    }
 
     node.body.updateVerticesShapeCache();
     physics.updateObjectPhysics(body);

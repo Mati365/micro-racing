@@ -48,19 +48,20 @@ export default class PhysicsScene {
     a.updateVerticesShapeCache();
   }
 
-  updateObjectPhysics(a, checkOnlyWithStatic) {
+  updateObjectPhysics(a, checkOnlyWithStatic, toggleFlagOnStatic) {
     const {items} = this;
     const {box: boxA, moveable} = a;
+    let collided = null;
 
     if (!moveable || !boxA)
-      return;
+      return collided;
 
     for (let j = 0; j < items.length; ++j) {
       const item = items[j];
       const b = item.body || item;
 
       // ignore if e.g. AI is testing neural network
-      if ((a.moveable || b.moveable) && checkOnlyWithStatic)
+      if (b.moveable && checkOnlyWithStatic)
         continue;
 
       if (a === b || (!a.moveable && !b.moveable))
@@ -94,7 +95,12 @@ export default class PhysicsScene {
 
         PhysicsScene.performBodyReaction(a, b, mtv2);
       }
+
+      if (!collided && (!toggleFlagOnStatic || !b.moveable))
+        collided = !mtv || !mtv2;
     }
+
+    return collided;
   }
 
   update(

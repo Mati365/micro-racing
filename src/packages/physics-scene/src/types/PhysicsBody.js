@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 
 import {
+  toRadians,
   lerp,
   wrapAngleTo2PI,
   vec2,
@@ -8,19 +9,28 @@ import {
 } from '@pkg/gl-math';
 
 export default class PhysicsBody {
-  constructor({
-    pos,
-    points,
-    size,
-    moveable = false,
-    angle = 0,
-    speed = 0,
-  }) {
+  constructor(
+    {
+      pos,
+      points,
+      size,
+      moveable = false,
+      speed = 0,
+
+      angle = 0,
+      perspectiveAngleCorrection = toRadians(90),
+    },
+  ) {
     this.pos = pos;
-    this.points = points || PhysicsBody.genRectanglePoints(size);
+    this.points = points || R.map(
+      v => vec2.rotate(perspectiveAngleCorrection, v),
+      PhysicsBody.genRectanglePoints(size),
+    );
+
     this.size = size;
     this.moveable = R.defaultTo(true, moveable);
     this.angle = angle;
+    this.perspectiveAngleCorrection = perspectiveAngleCorrection;
     this.angularVelocity = 0;
     this.speed = speed;
 
@@ -128,14 +138,18 @@ export default class PhysicsBody {
    *
    * @memberof PhysicsBody
    */
-  relativeBodyVectorToAbsolute(v) {
-    const {angle, pos} = this;
+  relativeBodyVectorToAbsolute(v, interpolated = false) {
+    const {angle, interpolationCache, perspectiveAngleCorrection} = this;
+    const pos = (interpolated && interpolationCache.pos) || this.pos;
 
     if (!angle)
       return vec2.add(pos, v);
 
     return vec2.add(
-      vec2.rotate(angle, v),
+      vec2.rotate(
+        angle - perspectiveAngleCorrection,
+        v,
+      ),
       pos,
     );
   }
@@ -149,24 +163,25 @@ export default class PhysicsBody {
    *
    * @memberof PhysicsBody
    */
-  absoluteToBodyRelativeVector(v) {
-    const {angle, pos} = this;
+  absoluteToBodyRelativeVector(v, interpolated = false) {
+    const {angle, interpolationCache, perspectiveAngleCorrection} = this;
+    const pos = (interpolated && interpolationCache.pos) || this.pos;
 
     return vec2.rotate(
-      -angle,
+      -angle + perspectiveAngleCorrection,
       vec2.sub(v, pos),
     );
   }
 
   interpolatedUpdate = (() => {
-    const interpolationCache = {};
-    const interpolateState = {
+    this.interpolationCache = {};
+    this.interpolateState = {
       prevState: null,
       state: null,
     };
 
     return (interpolate) => {
-      const {moveable} = this;
+      const {interpolationCache, interpolateState, moveable} = this;
       const {alpha} = interpolate;
 
       if (!moveable)

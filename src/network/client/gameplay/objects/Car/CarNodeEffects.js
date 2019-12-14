@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 
 import {
-  vec2, vec3,
+  vec2, vec3, vec4,
   mat4, Size,
 } from '@pkg/gl-math';
 
@@ -10,12 +10,15 @@ import {
   MeshWireframe,
 } from '@pkg/isometric-renderer/FGL/engine/scene';
 
+import CarIntersectRays from '@game/logic/drivers/neural/CarIntersectRays';
 import WheelTrack from './WheelTrack';
+import CarRaysWireframe from './CarRaysWireframe';
 
 export default class CarNodeEffects extends MeshWireframe {
   constructor(f, sceneNode, config = {}) {
     const {
       wireframeColor = f.colors.BLUE,
+      renderRaysWireframe = true,
     } = config;
 
     const {
@@ -70,12 +73,27 @@ export default class CarNodeEffects extends MeshWireframe {
         },
       ),
     ];
+
+    // neural network debug
+    this.rays = renderRaysWireframe && new CarRaysWireframe(
+      f,
+      {
+        color: vec4(wireframeColor[0], wireframeColor[1], wireframeColor[2], 0.8),
+        intersectRays: new CarIntersectRays(
+          sceneNode.body,
+          {
+            renderInterpolation: true,
+          },
+        ),
+      },
+    );
   }
 
   release() {
-    const {meshWheels, wheelTracks} = this;
+    const {meshWheels, wheelTracks, rays} = this;
 
     super.release();
+    rays?.release();
 
     R.forEach(
       meshWheel => meshWheel.release(),
@@ -88,8 +106,8 @@ export default class CarNodeEffects extends MeshWireframe {
     );
   }
 
-  update() {
-    const {prevWheelTrackPos, wheelTracks, meshWheels} = this;
+  update(interpolate) {
+    const {rays, prevWheelTrackPos, wheelTracks, meshWheels} = this;
     const {rotate, translate, body} = this.sceneNode;
 
     const carTransformMatrix = mat4.mutable.translate(
@@ -137,12 +155,16 @@ export default class CarNodeEffects extends MeshWireframe {
     if (wheelTracked || !this.prevWheelTrackPos)
       this.prevWheelTrackPos = vec3(...translate);
 
+    // neural network
+    if (rays)
+      rays.update(interpolate);
+
     // scene node update
-    super.update();
+    super.update(interpolate);
   }
 
   render(interpolate, mpMatrix) {
-    const {wheelTracks, meshWheels, config} = this;
+    const {wheelTracks, meshWheels, config, rays} = this;
 
     for (let i = wheelTracks.length - 1; i >= 0; --i) {
       const wheelTrack = wheelTracks[i];
@@ -156,5 +178,8 @@ export default class CarNodeEffects extends MeshWireframe {
 
       super.render(interpolate, mpMatrix);
     }
+
+    if (rays)
+      rays.render(interpolate, mpMatrix);
   }
 }

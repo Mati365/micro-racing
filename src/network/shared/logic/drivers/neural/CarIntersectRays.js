@@ -14,9 +14,10 @@ export default class CarIntersectRays {
   constructor(
     body,
     {
-      viewDistance = 100,
+      viewDistance = 6,
       raysCount = 6,
       raysViewportAngle = toRadians(80),
+      renderInterpolation = false,
     } = {},
   ) {
     // car body
@@ -26,6 +27,7 @@ export default class CarIntersectRays {
     this.viewDistance = viewDistance;
     this.raysCount = raysCount;
     this.raysViewportAngle = raysViewportAngle;
+    this.renderInterpolation = renderInterpolation;
 
     // edges
     this.raysBox = new CornersBox(
@@ -38,7 +40,9 @@ export default class CarIntersectRays {
 
   update(physicsScene) {
     this.updateRaysPositions();
-    this.checkCollisions(physicsScene);
+
+    if (physicsScene)
+      this.checkCollisions(physicsScene);
   }
 
   /**
@@ -159,6 +163,7 @@ export default class CarIntersectRays {
   ) {
     const {
       raysBox,
+      renderInterpolation,
       body,
       raysCount,
       raysViewportAngle,
@@ -177,7 +182,7 @@ export default class CarIntersectRays {
       const ray = rays[i];
       const attachPoint = ray.bodyAttachPoint || Vector.ZERO;
 
-      const from = body.relativeBodyVectorToAbsolute(attachPoint);
+      const from = body.relativeBodyVectorToAbsolute(attachPoint, renderInterpolation);
       const to = body.relativeBodyVectorToAbsolute(
         vec2.add(
           attachPoint,
@@ -186,6 +191,7 @@ export default class CarIntersectRays {
             -(i * rayAngle) - offset,
           ),
         ),
+        renderInterpolation,
       );
 
       ray.edge.from = from;

@@ -2,6 +2,11 @@ import * as R from 'ramda';
 
 import createBuffer from '../createBuffer';
 
+const safeCreateVerticesArray = R.unless(
+  R.is(Float32Array),
+  v => new Float32Array(R.unnest(v)),
+);
+
 /**
  * Creates OpenGL vertex buffer
  *
@@ -27,7 +32,12 @@ const createVertexBuffer = (
   if (!vertices || !vertices.length)
     throw new Error('createVertexBuffer: not vertices provided!');
 
-  const singleVertexLength = vertices[0].length || prefferedSingleVertexLength;
+  const alreadyBuffer = R.is(Float32Array, vertices);
+
+  const data = safeCreateVerticesArray(vertices);
+  const singleVertexLength = (
+    !alreadyBuffer && vertices[0].length
+  ) || prefferedSingleVertexLength || 4;
 
   // validators
   if (!singleVertexLength)
@@ -37,7 +47,6 @@ const createVertexBuffer = (
     throw new Error(`createVertexBuffer: incorrect singleVertexLength(${singleVertexLength}), it should be equal ${prefferedSingleVertexLength}`);
 
   // create buffer
-  const data = new Float32Array(R.unnest(vertices));
   const bufferWrapper = createBuffer(
     gl,
     {
@@ -56,7 +65,7 @@ const createVertexBuffer = (
       components: {
         type: gl.FLOAT,
         singleLength: singleVertexLength,
-        count: vertices.length,
+        count: vertices.length / (alreadyBuffer ? singleVertexLength : 1),
       },
     },
   );

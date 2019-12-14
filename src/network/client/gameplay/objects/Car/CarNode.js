@@ -131,7 +131,7 @@ export default class CarNode extends PhysicsMeshNode {
     super.update(interpolate);
 
     const {nickNode, cachedInterpolatedBody} = this;
-    nickNode.update(interpolate, cachedInterpolatedBody);
+    nickNode && nickNode.update(interpolate, cachedInterpolatedBody);
   }
 
   render(interpolate, mpMatrix, f) {

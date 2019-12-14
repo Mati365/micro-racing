@@ -31,6 +31,7 @@ class SimpleBody extends PhysicsBody {
       {
         pos,
         moveable,
+        perspectiveAngleCorrection: 0,
         points: [
           vec2(-size.y / 2, size.x / 2),
           vec2(size.y / 2, size.x / 2),
@@ -49,7 +50,12 @@ class SimpleBody extends PhysicsBody {
 export default class Car {
   constructor(bodyConfig) {
     this.body = new SimpleBody(bodyConfig);
-    this.intersectRays = new CarIntersectRays(this.body);
+    this.intersectRays = new CarIntersectRays(
+      this.body,
+      {
+        viewDistance: 100,
+      },
+    );
   }
 
   update(physicsScene) {

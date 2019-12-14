@@ -25,12 +25,18 @@ import Player from '../Player';
  * Socket API provider for player
  */
 export default class PlayerSocket extends Player {
-  constructor({
-    ws,
-    server,
-    info = new PlayerInfo,
-    onDisconnect,
-  }) {
+  constructor(
+    {
+      ws,
+      server,
+      info = new PlayerInfo(
+        {
+          kind: PLAYER_TYPES.ZOMBIE,
+        },
+      ),
+      onDisconnect,
+    },
+  ) {
     super(
       {
         info,
@@ -44,10 +50,16 @@ export default class PlayerSocket extends Player {
     this.mountMessagesHandler();
   }
 
+  assignRoom(config) {
+    super.assignRoom(config);
+    if (!this.ai && this.info.kind === PLAYER_TYPES.ZOMBIE)
+      this.transformToZombie();
+  }
+
   transformToZombie() {
     const {info} = this;
 
-    if (info.kind !== PLAYER_TYPES.ZOMBIE) {
+    if (!this.ai || info.kind !== PLAYER_TYPES.ZOMBIE) {
       info.kind = PLAYER_TYPES.ZOMBIE;
       info.inputs = [];
 

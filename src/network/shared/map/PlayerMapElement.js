@@ -26,13 +26,17 @@ export const genCarSegmentTransform = ({
   segment,
   align = CAR_ALIGN.LEFT_CORNER,
 } = {}) => {
-  const point = vec3.add(
-    segment.point,
-    vec2.toVec3(
-      vec2.fromScalar(align * segment.width / 2, segment.angle),
-      0.0,
-    ),
-  );
+  let {point} = segment;
+
+  if (align !== CAR_ALIGN.CENTER) {
+    point = vec3.add(
+      segment.point,
+      vec2.toVec3(
+        vec2.fromScalar(align * segment.width / 2, segment.angle),
+        0.0,
+      ),
+    );
+  }
 
   return {
     angle: segment.angle,

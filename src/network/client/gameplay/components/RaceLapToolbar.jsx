@@ -43,6 +43,7 @@ const CurrentLapLabel = styled.span(
 const CornerWrapper = styled.span(
   {
     marginLeft: 'auto',
+    paddingLeft: 20,
     flexShrink: 0,
   },
 );

@@ -8,7 +8,7 @@ import {
 
 import * as T from '..';
 
-const pickFitness = ({score}) => score.value;
+const pickFitness = R.prop('score');
 
 const pluckNeural = R.pluck('neural');
 
@@ -84,7 +84,10 @@ const createNeuralMutator = (mutateRate, winnersNeurals) => {
 
     return R.compose(
       T.restoreFrom1D(winnersNeurals[0]),
-      mutate1DNeural(mutateRate),
+      // remember winner
+      !itemIndex
+        ? R.identity
+        : mutate1DNeural(mutateRate),
     )(new1D);
   };
 };

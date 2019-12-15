@@ -157,11 +157,13 @@ export default class RoomMapNode {
   constructor(
     {
       f,
+      board,
       initialRoomState, // response from loadInitialRoomState
       currentPlayer,
     },
   ) {
     this.f = f;
+    this.board = board;
     this.currentPlayer = currentPlayer;
     this.physics = new PhysicsScene;
 
@@ -173,7 +175,7 @@ export default class RoomMapNode {
       this.loadInitialRoomState(initialRoomState);
   }
 
-  async loadInitialRoomState({players, objects, ...roomInfo}) {
+  async loadInitialRoomState({players, objects}) {
     players = R.map(
       PlayerInfo.fromBSON,
       players,
@@ -200,7 +202,6 @@ export default class RoomMapNode {
       },
     )(f.createSceneBuffer());
 
-    this.roomInfo = roomInfo;
     this.sceneBuffer = buffer;
     this.refs = refs;
 
@@ -218,7 +219,7 @@ export default class RoomMapNode {
   }
 
   update(interpolate) {
-    const {physics} = this;
+    const {physics, board} = this;
     const {list} = this.sceneBuffer;
 
     // fixme: Maybe integrate sceneBuffer with phyics in different way?
@@ -229,7 +230,7 @@ export default class RoomMapNode {
 
       item.update && item.update(interpolate);
       if (item.body && interpolate.fixedStepUpdate)
-        physics.updateObjectPhysics(item.body);
+        physics.updateObjectPhysics(item.body, board.roomInfo.config.aiTraining);
     }
   }
 

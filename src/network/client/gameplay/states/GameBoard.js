@@ -28,7 +28,12 @@ export default class GameBoard {
       players: createLowLatencyObservable(),
     };
 
-    this.roomConfig = null;
+    this.roomInfo = {
+      config: null,
+      state: null,
+      ownerID: null,
+    };
+
     this.roomMapNode = null;
     this.roomRemoteListener = null;
   }
@@ -66,9 +71,15 @@ export default class GameBoard {
     const {f} = this.scene;
     const {client, observers} = this;
 
-    this.roomConfig = initialRoomState.config;
+    this.roomInfo = {
+      ownerID: initialRoomState.ownerID,
+      state: initialRoomState.state,
+      config: initialRoomState.config,
+    };
+
     this.roomMapNode = new RoomMapNode(
       {
+        board: this,
         currentPlayer: client.info,
         f,
       },
@@ -90,7 +101,10 @@ export default class GameBoard {
           this.notifyPlayersChange();
         },
 
-        onUpdateRaceState: observers.raceState.notify,
+        onUpdateRaceState: (state) => {
+          this.roomInfo.state = state;
+          observers.raceState.notify(state);
+        },
 
         onJoinPlayer: async (player, carObject) => {
           await this.roomMapNode.appendObjects(
@@ -156,6 +170,7 @@ export default class GameBoard {
     const node = this.roomMapNode.refs.objects[playerSyncInfo.id];
     const {lastProcessedInput} = playerSyncInfo;
 
+    const {aiTraining} = this.roomInfo.config;
     const {physics, currentPlayerCar} = this.roomMapNode;
     const currentPlayerSync = (
       currentPlayerCar.id === playerSyncInfo.id
@@ -216,7 +231,7 @@ export default class GameBoard {
                   || i + 1 >= predictedInputs.length
                   || predictedInputs[i + 1].tempOnly)) {
               body.update();
-              physics.updateObjectPhysics(body);
+              physics.updateObjectPhysics(body, aiTraining);
             }
 
             prevFrameId = frameId;
@@ -245,7 +260,7 @@ export default class GameBoard {
     }
 
     node.body.updateVerticesShapeCache();
-    physics.updateObjectPhysics(body);
+    physics.updateObjectPhysics(body, aiTraining);
 
     this.waitForSync = false;
   };

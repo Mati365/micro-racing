@@ -24,6 +24,10 @@ export default class Player {
     return this.info.toBSON();
   }
 
+  get car() {
+    return this.info.car;
+  }
+
   get id() {
     return this.info.id;
   }

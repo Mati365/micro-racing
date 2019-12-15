@@ -22,7 +22,6 @@ export default class RoomRacing {
   constructor(
     {
       room,
-      aiTraining = true,
     },
   ) {
     this.room = room;
@@ -30,7 +29,7 @@ export default class RoomRacing {
 
     this.map = new RoadMapObjectsManager(room.map);
     this.state = new RaceState(RACE_STATES.WAIT_FOR_SERVER);
-    this.aiTrainer = aiTraining && new CarNeuralTrainer(
+    this.aiTrainer = room.config.aiTraining && new CarNeuralTrainer(
       {
         map: this.map,
         room: this.room,
@@ -187,10 +186,6 @@ export default class RoomRacing {
 
       this.updatePlayerLaps(now, player);
       this.updateIdlePlayers(now, player);
-
-      // kill AI if score is not enough good
-      if (aiTrainer && ai && ai.score.value < 0)
-        info.car.freeze();
     }
 
     // AI training
@@ -247,8 +242,8 @@ export default class RoomRacing {
 
       body.update && body.update();
 
-      const collision = physics.updateObjectPhysics(body, !!aiTrainer, true);
-      if (aiTrainer && collision && player)
+      const collision = physics.updateObjectPhysics(body, aiTrainer, true);
+      if (aiTrainer && collision && player.ai)
         item.freeze();
     }
   }
@@ -262,15 +257,16 @@ export default class RoomRacing {
    */
   updatePlayerLaps(time, player) {
     const {
+      aiTrainer,
       startTime,
       map: {
         segmentsInfo: {checkpoints},
       },
     } = this;
 
-    const {ai, info} = player;
-    const {racingState} = info;
-    const {body: carBody} = info.car;
+    const {info, ai} = player;
+    const {car, racingState} = info;
+    const {body: carBody} = car;
 
     // update racing state
     racingState.currentLapTime = time - startTime - racingState.time;
@@ -290,19 +286,14 @@ export default class RoomRacing {
         racingState.time += racingState.currentLapTime;
         racingState.currentLapTime = 0;
       }
-
-      // make bot happy
-      if (ai)
-        ai.score.value += 40;
     } else if (racingState.lastCheckpointTime !== null
         && isDiagonalCollisionWithEdge(carBody, checkpoints[prevCheckpoint])) {
       racingState.currentCheckpoint = Math.max(0, racingState.currentCheckpoint - 1);
       if (prevCheckpoint < 0)
         racingState.lap = Math.max(0, racingState.lap - 1);
 
-      // punish bot
-      if (ai)
-        ai.score.value -= 30;
+      if (aiTrainer && ai)
+        car.freeze();
     }
   }
 
@@ -314,17 +305,18 @@ export default class RoomRacing {
    * @memberof RoomRacing
    */
   updateIdlePlayers(time, player) {
+    const {aiTrainer} = this;
     const {playerIdleTime} = this.room.config;
 
     const {ai, info} = player;
-    const {racingState} = info;
+    const {car, racingState} = info;
 
     // detect non progress players
     const nonProgressTime = racingState.currentLapTime - (racingState.lastCheckpointTime || 0);
     if (nonProgressTime > playerIdleTime) {
       // punish bot
-      if (ai)
-        ai.score.value -= 60;
+      if (aiTrainer && ai)
+        car.freeze();
 
       return true;
     }

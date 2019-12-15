@@ -6,6 +6,7 @@ export default class RoomConfig {
       playersLimit = 8,
       playerIdleTime = 6000,
       spawnBotsBeforeStart = true,
+      aiTraining = true,
     } = {},
   ) {
     this.laps = laps;
@@ -13,11 +14,13 @@ export default class RoomConfig {
     this.playersLimit = playersLimit;
     this.spawnBotsBeforeStart = spawnBotsBeforeStart;
     this.playerIdleTime = playerIdleTime;
+    this.aiTraining = aiTraining;
   }
 
   toBSON() {
     return {
       laps: this.laps,
+      aiTraining: this.aiTraining,
     };
   }
 }

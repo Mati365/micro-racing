@@ -116,16 +116,17 @@ export default class RoadMapObjectsManager {
    */
   resetPlayerPositionToSegment(
     {
-      alignFn = genCarSegmentTransform,
-      position,
       playerElement,
+      position = 0,
+      align = CAR_ALIGN[position % 2 ? 'LEFT_CORNER' : 'RIGHT_CORNER'],
+      alignFn = genCarSegmentTransform,
     },
   ) {
     const {segments} = this.segmentsInfo;
     const bodyParams = alignFn(
       {
         segment: segments[segments.length - position - 1],
-        align: CAR_ALIGN[position % 2 ? 'LEFT_CORNER' : 'RIGHT_CORNER'],
+        align,
       },
     );
 

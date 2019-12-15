@@ -57,14 +57,17 @@ export default class CarNeuralAI {
         raysCount,
       },
     );
-
-    this.resetScore();
   }
 
-  resetScore() {
-    this.score = {
-      value: 0,
-    };
+  get score() {
+    const {
+      racingState: {
+        laps,
+        currentCheckpoint,
+      },
+    } = this.car.player.info;
+
+    return (laps || 0) * 100 + (currentCheckpoint || 0) * 10;
   }
 
   getNeuralInputs() {
@@ -106,7 +109,7 @@ export default class CarNeuralAI {
       neuralOutput[NEURAL_CAR_OUTPUTS.THROTTLE_OUTPUT] * 10,
     );
     body.turnSteerWheels(
-      neuralOutput[NEURAL_CAR_OUTPUTS.TURN_OUTPUT] * 10,
+      neuralOutput[NEURAL_CAR_OUTPUTS.TURN_OUTPUT],
     );
   }
 }

@@ -1,4 +1,6 @@
 import * as R from 'ramda';
+
+import {CAR_ALIGN} from '@game/network/constants/serverCodes';
 import forkPopulation from '@pkg/neural-network/src/genetic/forkPopulation';
 
 export default class CarNeuralTrainer {
@@ -26,7 +28,6 @@ export default class CarNeuralTrainer {
       const {car, racingState} = player.info;
 
       if (ai) {
-        ai.resetScore();
         ai.neural = forkedNeurals.pop();
         racingState.reset();
       }
@@ -34,7 +35,7 @@ export default class CarNeuralTrainer {
       map.resetPlayerPositionToSegment(
         {
           playerElement: car,
-          position: i,
+          align: CAR_ALIGN.CENTER,
         },
       );
       car.unfreeze();

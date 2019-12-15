@@ -108,7 +108,7 @@ const GameCanvas = ({dimensions}) => {
           await client.joinRoom('general'),
         );
 
-        if (board.roomMapNode.roomInfo.ownerID === client.info.id)
+        if (board.roomInfo.ownerID === client.info.id)
           client.startRace();
 
         board.start();
@@ -150,7 +150,12 @@ const GameCanvas = ({dimensions}) => {
   return (
     <GameCanvasHolder freeze={gameState.state.type !== RACE_STATES.RACE}>
       <RaceLapToolbar gameBoard={gameState.board} />
-      <div style={{position: 'relative'}}>
+      <div
+        style={{
+          position: 'relative',
+          textAlign: 'center',
+        }}
+      >
         <canvas-html-wrapper>
           <canvas
             tabIndex={1}

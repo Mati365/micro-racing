@@ -264,7 +264,7 @@ export default class RoomRacing {
       },
     } = this;
 
-    const {info, ai} = player;
+    const {ai, info} = player;
     const {car, racingState} = info;
     const {body: carBody} = car;
 
@@ -273,9 +273,11 @@ export default class RoomRacing {
 
     // check checkpoints intersection
     const nextCheckpoint = wrapAroundMod(racingState.currentCheckpoint + 1, checkpoints.length);
-    const prevCheckpoint = wrapAroundMod(racingState.currentCheckpoint - 1, checkpoints.length);
 
-    if (isDiagonalCollisionWithEdge(carBody, checkpoints[nextCheckpoint])) {
+    if (racingState.lastCheckpointTime === null
+        && isDiagonalCollisionWithEdge(carBody, checkpoints[0])) {
+      racingState.lastCheckpointTime = racingState.currentLapTime;
+    } else if (isDiagonalCollisionWithEdge(carBody, checkpoints[nextCheckpoint])) {
       racingState.currentCheckpoint++;
       racingState.lastCheckpointTime = racingState.currentLapTime;
 
@@ -286,14 +288,19 @@ export default class RoomRacing {
         racingState.time += racingState.currentLapTime;
         racingState.currentLapTime = 0;
       }
-    } else if (racingState.lastCheckpointTime !== null
-        && isDiagonalCollisionWithEdge(carBody, checkpoints[prevCheckpoint])) {
-      racingState.currentCheckpoint = Math.max(0, racingState.currentCheckpoint - 1);
-      if (prevCheckpoint < 0)
-        racingState.lap = Math.max(0, racingState.lap - 1);
+    } else {
+      const prevCheckpoint = wrapAroundMod(racingState.currentCheckpoint - 4, checkpoints.length);
 
-      if (aiTrainer && ai)
-        car.freeze();
+      if (isDiagonalCollisionWithEdge(carBody, checkpoints[prevCheckpoint])) {
+        racingState.currentCheckpoint = Math.max(0, racingState.currentCheckpoint - 4);
+        racingState.lastCheckpointTime = racingState.currentLapTime;
+
+        if (prevCheckpoint < 0)
+          racingState.lap = Math.max(0, racingState.lap - 1);
+
+        if (aiTrainer && ai)
+          car.freeze();
+      }
     }
   }
 

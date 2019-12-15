@@ -25,7 +25,7 @@ const createTanH = T.createLayer(T.NEURAL_ACTIVATION_TYPES.TAN_H);
  *
  * @returns {NeuralNetwork}
  */
-const createCarNeuralNetwork = (raysCount) => {
+export const createCarNeuralNetwork = (raysCount) => {
   const inputCount = raysCount + R.keys(NEURAL_CAR_INPUTS).length;
   const outputsCount = R.keys(NEURAL_CAR_OUTPUTS).length;
 
@@ -49,7 +49,7 @@ export default class CarNeuralAI {
     } = {},
   ) {
     this.car = car;
-    this.neural = neural || createCarNeuralNetwork(raysCount);
+    this.raysCount = raysCount;
     this.intersections = new CarIntersectRays(
       car.body,
       {
@@ -57,9 +57,11 @@ export default class CarNeuralAI {
         raysCount,
       },
     );
+
+    this.setNeural(neural);
   }
 
-  get score() {
+  updateScore() {
     const {
       racingState: {
         laps,
@@ -67,7 +69,13 @@ export default class CarNeuralAI {
       },
     } = this.car.player.info;
 
-    return (laps || 0) * 100 + (currentCheckpoint || 0) * 10;
+    this.score = (laps || 0) * 100 + (currentCheckpoint || 0) * 10;
+    return this;
+  }
+
+  setNeural(neural) {
+    this.neural = neural || createCarNeuralNetwork(this.raysCount);
+    return this;
   }
 
   getNeuralInputs() {

@@ -10,10 +10,9 @@ import * as T from '..';
 
 const pickFitness = R.prop('score');
 
-const pluckNeural = R.pluck('neural');
+const pluckNeurals = R.pluck('neural');
 
 export const getWinnersByFitness = count => R.compose(
-  pluckNeural,
   R.reverse,
   R.takeLast(count),
   R.sortBy(pickFitness),
@@ -65,13 +64,13 @@ const createNeuralMutator = (mutateRate, winnersNeurals) => {
   const winners1D = R.map(T.dumpTo1D, winnersNeurals);
 
   return (itemIndex, total) => {
-    let new1D = null;
-
     // first is made from the best items
     if (!itemIndex)
-      [new1D] = winners1D;
+      return winnersNeurals[0];
 
-    else if (itemIndex <= 3)
+    let new1D = null;
+
+    if (itemIndex <= 3)
       new1D = crossoverGenes(winners1D[0], winners1D[1]);
 
     else if (itemIndex < total - 3) {
@@ -84,10 +83,7 @@ const createNeuralMutator = (mutateRate, winnersNeurals) => {
 
     return R.compose(
       T.restoreFrom1D(winnersNeurals[0]),
-      // remember winner
-      !itemIndex
-        ? R.identity
-        : mutate1DNeural(mutateRate),
+      mutate1DNeural(mutateRate),
     )(new1D);
   };
 };
@@ -105,16 +101,34 @@ const createNeuralMutator = (mutateRate, winnersNeurals) => {
  * Algorithm:
  * http://www.cleveralgorithms.com/nature-inspired/evolution/genetic_algorithm.html
  */
-const forkPopulation = (neuralItems) => {
+const forkPopulation = prevFork => (neuralItems) => {
   const winners = getWinnersByFitness(4)(neuralItems);
-  const mutateNeural = createNeuralMutator(0.94, winners); // it is just schema
+  const mutateNeural = createNeuralMutator(0.94, pluckNeurals(winners)); // it is just schema
 
-  return R.compose(
-    R.addIndex(R.map)(
-      (item, index) => mutateNeural(index, neuralItems.length, item),
-    ),
-    pluckNeural,
-  )(neuralItems);
+  // check if regression
+  if (prevFork && prevFork.prevWinnerScore > winners[0].score) {
+    console.log(`Regression! Prev score: ${prevFork.prevWinnerScore}!`);
+    return prevFork;
+  }
+
+  // check if all are losers
+  const abortion = !R.any(
+    R.propSatisfies(R.lt(0), 'score'),
+    winners,
+  );
+
+  if (abortion)
+    return null;
+
+  return {
+    prevWinnerScore: winners[0].score,
+    list: R.compose(
+      R.addIndex(R.map)(
+        (item, index) => mutateNeural(index, neuralItems.length, item),
+      ),
+      pluckNeurals,
+    )(neuralItems),
+  };
 };
 
 export default forkPopulation;

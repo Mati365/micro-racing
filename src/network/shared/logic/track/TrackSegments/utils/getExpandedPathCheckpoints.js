@@ -2,7 +2,7 @@ import {Edge, vec2} from '@pkg/gl-math';
 
 const getExpandedPathCheckpoints = (
   {
-    every = 4,
+    every = 1,
     scale = [1.0, 1.0],
   } = {},
 ) => ([leftTrack, rightTrack]) => {

@@ -17,9 +17,12 @@ export default class CarNeuralTrainer {
   /* eslint-disable class-methods-use-this */
   trainPopulation(players) {
     const {map} = this;
-    const forkedNeurals = R.compose(
-      forkPopulation,
-      R.pluck('ai'),
+    this.forkedNeurals = R.compose(
+      forkPopulation(this.forkedNeurals),
+      R.reject(R.isNil),
+      R.map(
+        ({ai}) => ai?.updateScore(),
+      ),
     )(players);
 
     for (let i = 0; i < players.length; ++i) {
@@ -28,7 +31,9 @@ export default class CarNeuralTrainer {
       const {car, racingState} = player.info;
 
       if (ai) {
-        ai.neural = forkedNeurals.pop();
+        ai.setNeural(
+          this.forkedNeurals?.list.pop(),
+        );
         racingState.reset();
       }
 

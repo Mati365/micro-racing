@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import consola from 'consola';
 
 import {
   getRandomFloatNumber,
@@ -21,7 +22,7 @@ export const getWinnersByFitness = count => R.compose(
 const mutateValues = mutateRate => R.map(
   (gene) => {
     if (Math.random() > mutateRate)
-      return getRandomFloatNumber(-0.15, 0.15) + gene * (1 + getRandomFloatNumber(-0.15, 0.15));
+      return getRandomFloatNumber(-0.05, 0.05) + gene * (1 + getRandomFloatNumber(-0.05, 0.05));
 
     return gene;
   },
@@ -64,11 +65,11 @@ const createNeuralMutator = (mutateRate, winnersNeurals) => {
   const winners1D = R.map(T.dumpTo1D, winnersNeurals);
 
   return (itemIndex, total) => {
+    let new1D = null;
+
     // first is made from the best items
     if (!itemIndex)
       return winnersNeurals[0];
-
-    let new1D = null;
 
     if (itemIndex <= 3)
       new1D = crossoverGenes(winners1D[0], winners1D[1]);
@@ -101,15 +102,9 @@ const createNeuralMutator = (mutateRate, winnersNeurals) => {
  * Algorithm:
  * http://www.cleveralgorithms.com/nature-inspired/evolution/genetic_algorithm.html
  */
-const forkPopulation = prevFork => (neuralItems) => {
+const forkPopulation = (neuralItems) => {
   const winners = getWinnersByFitness(4)(neuralItems);
   const mutateNeural = createNeuralMutator(0.94, pluckNeurals(winners)); // it is just schema
-
-  // check if regression
-  if (prevFork && prevFork.prevWinnerScore > winners[0].score) {
-    console.log(`Regression! Prev score: ${prevFork.prevWinnerScore}!`);
-    return prevFork;
-  }
 
   // check if all are losers
   const abortion = !R.any(
@@ -117,11 +112,14 @@ const forkPopulation = prevFork => (neuralItems) => {
     winners,
   );
 
-  if (abortion)
+  if (abortion) {
+    consola.warn('Population: abortion!');
     return null;
+  }
 
   return {
     prevWinnerScore: winners[0].score,
+    neuralItems,
     list: R.compose(
       R.addIndex(R.map)(
         (item, index) => mutateNeural(index, neuralItems.length, item),

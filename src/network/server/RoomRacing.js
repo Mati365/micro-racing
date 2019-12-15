@@ -122,6 +122,7 @@ export default class RoomRacing {
 
     const {players} = room;
     const aiWorldParams = {
+      checkOnlyWithStatic: !!aiTrainer,
       physics,
       players,
     };
@@ -134,6 +135,9 @@ export default class RoomRacing {
       const {info, ai} = player;
       const {body: carBody} = info.car;
 
+      if (info.inputs.length > 15)
+        info.inputs = info.inputs.slice(0, 2);
+
       if (info.racingState.isFreezed())
         continue;
 
@@ -141,9 +145,6 @@ export default class RoomRacing {
         /**
          * HUMAN
          */
-        if (info.inputs.length > 15)
-          info.inputs = info.inputs.slice(0, 2);
-
         const {inputs} = info;
 
         let prevFrameId = null;
@@ -257,14 +258,13 @@ export default class RoomRacing {
    */
   updatePlayerLaps(time, player) {
     const {
-      aiTrainer,
       startTime,
       map: {
         segmentsInfo: {checkpoints},
       },
     } = this;
 
-    const {ai, info} = player;
+    const {info} = player;
     const {car, racingState} = info;
     const {body: carBody} = car;
 
@@ -287,19 +287,6 @@ export default class RoomRacing {
         racingState.lapsTimes.push(racingState.currentLapTime);
         racingState.time += racingState.currentLapTime;
         racingState.currentLapTime = 0;
-      }
-    } else {
-      const prevCheckpoint = wrapAroundMod(racingState.currentCheckpoint - 4, checkpoints.length);
-
-      if (isDiagonalCollisionWithEdge(carBody, checkpoints[prevCheckpoint])) {
-        racingState.currentCheckpoint = Math.max(0, racingState.currentCheckpoint - 4);
-        racingState.lastCheckpointTime = racingState.currentLapTime;
-
-        if (prevCheckpoint < 0)
-          racingState.lap = Math.max(0, racingState.lap - 1);
-
-        if (aiTrainer && ai)
-          car.freeze();
       }
     }
   }

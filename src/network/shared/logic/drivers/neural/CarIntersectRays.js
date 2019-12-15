@@ -38,11 +38,11 @@ export default class CarIntersectRays {
     this.rays = this.createRays();
   }
 
-  update(physicsScene) {
+  update(physicsScene, checkOnlyWithStatic) {
     this.updateRaysPositions();
 
     if (physicsScene)
-      this.checkCollisions(physicsScene);
+      this.checkCollisions(physicsScene, checkOnlyWithStatic);
   }
 
   /**
@@ -74,8 +74,9 @@ export default class CarIntersectRays {
    *  Add box rays
    *
    * @param {PhysicsScene} physicsScene
+   * @param {boolean} checkOnlyWithStatic
    */
-  checkCollisions(physicsScene) {
+  checkCollisions(physicsScene, checkOnlyWithStatic) {
     const {body, rays, raysBox} = this;
     const {items} = physicsScene;
 
@@ -90,6 +91,9 @@ export default class CarIntersectRays {
         boardItemBody = boardItemBody.body;
 
       if (!boardItemBody || !boardItemBody.vertices || boardItemBody === body)
+        continue;
+
+      if (checkOnlyWithStatic && boardItemBody.moveable)
         continue;
 
       // skip if body not match rays aabb

@@ -99,7 +99,7 @@ export default class CarNeuralAI {
     ];
   }
 
-  drive({physics}) {
+  drive({physics, checkOnlyWithStatic}) {
     const {
       car: {body},
       intersections,
@@ -107,7 +107,7 @@ export default class CarNeuralAI {
     } = this;
 
     // neural control
-    intersections.update(physics);
+    intersections.update(physics, checkOnlyWithStatic);
     const neuralOutput = T.exec(
       this.getNeuralInputs(),
       neural,

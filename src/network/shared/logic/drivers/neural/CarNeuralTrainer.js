@@ -2,7 +2,15 @@ import * as R from 'ramda';
 import consola from 'consola';
 
 import {CAR_ALIGN} from '@game/network/constants/serverCodes';
+
 import forkPopulation from '@pkg/neural-network/src/genetic/forkPopulation';
+import {createLowLatencyObservable} from '@pkg/basic-helpers';
+
+const sortByScore = R.sortWith(
+  [
+    R.descend(R.prop('score')),
+  ],
+);
 
 export default class CarNeuralTrainer {
   constructor(
@@ -13,16 +21,29 @@ export default class CarNeuralTrainer {
   ) {
     this.map = map;
     this.room = room;
+    this.observers = {
+      bestNeuralItems: createLowLatencyObservable(null),
+    };
   }
 
+  /**
+   * Iterates over all players, picks winners and mutate them
+   *
+   * @param {Player[]} players
+   * @returns
+   * @memberof CarNeuralTrainer
+   */
   trainPopulation(players) {
-    const {bestNeuralItems, map} = this;
-    let neuralItems = R.compose(
-      R.sortWith(
-        [
-          R.descend(R.prop('score')),
-        ],
-      ),
+    const {map, observers} = this;
+    const bestNeuralItems = observers.bestNeuralItems.getLastValue();
+
+    const neuralItems = R.compose(
+      R.slice(0, players.length),
+      sortByScore,
+      list => [
+        ...list,
+        ...bestNeuralItems || [],
+      ],
       R.map(
         R.pick(['score', 'neural']),
       ),
@@ -33,11 +54,10 @@ export default class CarNeuralTrainer {
     )(players);
 
     // check if regression
-    if (bestNeuralItems && bestNeuralItems[0].score > neuralItems[0].score) {
-      consola.warn(`Population: Regression! Prev score: ${bestNeuralItems[0].score}!`);
-      neuralItems = bestNeuralItems;
-    } else
-      this.bestNeuralItems = neuralItems;
+    if (!bestNeuralItems || bestNeuralItems[0].score < neuralItems[0].score) {
+      consola.warn(`Population: good! ${neuralItems[0].score}!`);
+      observers.bestNeuralItems.notify(neuralItems);
+    }
 
     const forkedNeurals = forkPopulation(neuralItems);
     for (let i = 0, neuralIndex = 0; i < players.length; ++i) {
@@ -60,5 +80,7 @@ export default class CarNeuralTrainer {
       );
       car.unfreeze();
     }
+
+    return neuralItems;
   }
 }

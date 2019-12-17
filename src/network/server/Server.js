@@ -23,6 +23,7 @@ export default class GameServer {
       port: 8080,
       perMessageDeflate: false,
     },
+    onDumpTrainingPopulation,
   } = {}) {
     this.maps = maps || {};
     this.socketOptions = socketOptions;
@@ -38,6 +39,8 @@ export default class GameServer {
         abstract: true,
       },
     );
+
+    this.onDumpTrainingPopulation = onDumpTrainingPopulation;
   }
 
   /**
@@ -114,6 +117,9 @@ export default class GameServer {
         onDestroy: () => this.removeRoom(name),
       },
     );
+
+    if (room.config.aiTraining)
+      room.racing.aiTrainer.observers.bestNeuralItems.subscribe(this.onDumpTrainingPopulation);
 
     this.rooms.push(room);
     return room;

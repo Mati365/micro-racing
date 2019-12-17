@@ -1,6 +1,8 @@
 import * as R from 'ramda';
 import * as T from '@pkg/neural-network';
 
+import BASIC_NEURAL_AI from '@game/server-res/ai/basic-ai.json';
+
 import {MAX_CAR_SPEED} from '../../physics/CarPhysicsBody';
 import CarIntersectRays from './CarIntersectRays';
 
@@ -43,8 +45,8 @@ export const createCarNeuralNetwork = (raysCount) => {
 export default class CarNeuralAI {
   constructor(
     {
-      raysCount = 7,
-      neural,
+      raysCount = 6,
+      neural = BASIC_NEURAL_AI,
       car,
     } = {},
   ) {

@@ -14,7 +14,7 @@ export default class CarIntersectRays {
   constructor(
     body,
     {
-      viewDistance = 6,
+      viewDistance = 8,
       raysCount = 6,
       raysViewportAngle = toRadians(80),
       renderInterpolation = false,

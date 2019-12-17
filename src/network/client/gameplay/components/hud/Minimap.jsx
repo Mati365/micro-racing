@@ -78,7 +78,7 @@ const renderPlayersOnMinimap = (
 
   for (const playerID in players) {
     const {body, player} = players[playerID];
-    if (!body.pos)
+    if (!body?.pos)
       continue;
 
     drawPoint(

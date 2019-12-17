@@ -66,6 +66,7 @@ export default class RoadMapObjectsManager {
     player,
     {
       alignFn = genCarSegmentTransform,
+      position,
       carType,
     } = {},
   ) {
@@ -87,7 +88,7 @@ export default class RoadMapObjectsManager {
 
     this.resetPlayerPositionToSegment(
       {
-        position: this.totalPlayers,
+        position: R.defaultTo(this.totalPlayers, position),
         playerElement,
         alignFn,
       },
@@ -125,7 +126,7 @@ export default class RoadMapObjectsManager {
     const {segments} = this.segmentsInfo;
     const bodyParams = alignFn(
       {
-        segment: segments[segments.length - position - 1],
+        segment: segments[(segments.length - position - 1) % segments.length],
         align,
       },
     );

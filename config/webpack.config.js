@@ -29,6 +29,7 @@ const SHARED_ALIASES = R.mapObjIndexed(
     '@ui/i18n': 'packages/ui/i18n/src/',
 
     '@game/res': 'public/res/',
+    '@game/server-res': 'server/res/',
     '@game/public': 'public/',
     '@game/network': 'network/',
     '@game/server': 'network/server/',
@@ -72,6 +73,7 @@ module.exports = [
             ? [
               new NodemonPlugin(
                 {
+                  ignore: ['*.json'],
                   watch: [
                     resolve(OUTPUT_FOLDER),
                   ],

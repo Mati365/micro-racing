@@ -234,7 +234,14 @@ export default class Room {
 
     // broadcast it to all players, exclude added
     if (!abstract) {
-      const playerCar = this.racing.map.appendPlayerCar(player);
+      const playerCar = this.racing.map.appendPlayerCar(
+        player,
+        {
+          ...racing.aiTrainer && {
+            position: 0,
+          },
+        },
+      );
 
       player.assignRoom(
         {

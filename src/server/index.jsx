@@ -17,11 +17,13 @@ import {
 
 import GameServer from '@game/network/server/Server';
 import RootContainer from '../public/src/RootContainer';
+import ProvideGlobalJSON from './components/ProvideGlobalJSON';
 
 import staticManifest from './constants/staticManifest';
-import loadMapsDirectory from './utils/loadMapsDirectory';
-
-import ProvideGlobalJSON from './components/ProvideGlobalJSON';
+import {
+  loadMapsDirectory,
+  writeAiPopulation,
+} from './utils';
 
 const APP_PORT = 3000;
 
@@ -39,6 +41,11 @@ const app = express();
   new GameServer(
     {
       maps,
+      onDumpTrainingPopulation: writeAiPopulation(
+        {
+          filename: resolve(__dirname, 'res/ai/cars-ai.json'),
+        },
+      ),
     },
   ).start();
 })();

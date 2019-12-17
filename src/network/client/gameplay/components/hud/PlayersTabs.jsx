@@ -23,11 +23,12 @@ const PlayersTabsWrapper = styled(
   {
     display: 'flex',
     alignItems: 'center',
-
+    flexShrink: 1,
     width: '100%',
     height: 48,
     lineHeight: '48px',
     maxHeight: '100%',
+    overflow: 'hidden',
     color: WHITE,
   },
   {
@@ -42,6 +43,7 @@ const PlayerTab = injectClassesStylesheet(
     base: {
       position: 'relative',
       flexDirection: 'row',
+      flexShrink: 0,
       textAlign: 'left',
     },
 
@@ -172,9 +174,10 @@ const PlayersTabs = ({gameBoard}) => {
     [gameBoard],
   );
 
+  const slicedList = R.slice(0, 4, playersNodes.list);
   return (
     <PlayersTabsWrapper>
-      {playersNodes.list.map(
+      {slicedList.map(
         ({player}, index) => (
           <PlayerTab
             key={player.id}
@@ -184,7 +187,7 @@ const PlayersTabs = ({gameBoard}) => {
               player.id === playersNodes.current.player.id
             }
             last={
-              (player.racingState.position || index + 1) === playersNodes.list.length
+              (player.racingState.position || index + 1) === slicedList.length
             }
           />
         ),

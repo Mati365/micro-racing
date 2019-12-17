@@ -19,10 +19,14 @@ export const getWinnersByFitness = count => R.compose(
   R.sortBy(pickFitness),
 );
 
-const mutateValues = mutateRate => R.map(
+// 0.5, without gene it worked
+const mutateValues = (mutateRate, mutateMaxValue = 0.05) => R.map(
   (gene) => {
-    if (Math.random() > mutateRate)
-      return getRandomFloatNumber(-0.05, 0.05) + gene * (1 + getRandomFloatNumber(-0.05, 0.05));
+    if (Math.random() > mutateRate) {
+      return (
+        getRandomFloatNumber(-mutateMaxValue, mutateMaxValue) + gene
+      );
+    }
 
     return gene;
   },
@@ -37,7 +41,7 @@ const crossoverValues = (geneA, geneB) => {
   ];
 };
 
-const crossoverGenes = (neuralA, neuralB) => {
+export const crossoverGenes = (neuralA, neuralB) => {
   const [_a, _b] = (
     Math.random() > 0.25
       ? [neuralA, neuralB]
@@ -71,16 +75,21 @@ const createNeuralMutator = (mutateRate, winnersNeurals) => {
     if (!itemIndex)
       return winnersNeurals[0];
 
-    if (itemIndex <= 3)
-      new1D = crossoverGenes(winners1D[0], winners1D[1]);
-
-    else if (itemIndex < total - 3) {
-      new1D = crossoverGenes(
-        getRandomArrayItem(winners1D),
-        getRandomArrayItem(winners1D),
-      );
-    } else
+    if (itemIndex < total / 2)
+      [new1D] = winners1D;
+    else
       new1D = getRandomArrayItem(winners1D);
+
+    // else if (itemIndex <= total * 3 / 4)
+    //   new1D = crossoverGenes(winners1D[0], winners1D[1]);
+
+    // else if (itemIndex < total - 3) {
+    //   new1D = crossoverGenes(
+    //     getRandomArrayItem(winners1D),
+    //     getRandomArrayItem(winners1D),
+    //   );
+    // } else
+    // new1D = getRandomArrayItem(winners1D);
 
     return R.compose(
       T.restoreFrom1D(winnersNeurals[0]),
@@ -104,7 +113,7 @@ const createNeuralMutator = (mutateRate, winnersNeurals) => {
  */
 const forkPopulation = (neuralItems) => {
   const winners = getWinnersByFitness(4)(neuralItems);
-  const mutateNeural = createNeuralMutator(0.94, pluckNeurals(winners)); // it is just schema
+  const mutateNeural = createNeuralMutator(0.9, pluckNeurals(winners)); // it is just schema
 
   // check if all are losers
   const abortion = !R.any(

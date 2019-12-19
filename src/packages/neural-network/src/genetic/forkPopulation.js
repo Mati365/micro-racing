@@ -76,25 +76,18 @@ const createNeuralMutator = (mutateRate, winnersNeurals) => {
       return winnersNeurals[0];
 
     if (itemIndex < total / 2)
-      [new1D] = winners1D;
-    else
-      new1D = getRandomArrayItem(winners1D);
+      new1D = mutate1DNeural(mutateRate)(winners1D[0]);
+    else if (itemIndex <= total * 3 / 4)
+      new1D = crossoverGenes(winners1D[0], winners1D[1]);
+    else if (itemIndex < total - 3) {
+      new1D = crossoverGenes(
+        getRandomArrayItem(winners1D),
+        getRandomArrayItem(winners1D),
+      );
+    } else
+      new1D = mutate1DNeural(mutateRate)(getRandomArrayItem(winners1D));
 
-    // else if (itemIndex <= total * 3 / 4)
-    //   new1D = crossoverGenes(winners1D[0], winners1D[1]);
-
-    // else if (itemIndex < total - 3) {
-    //   new1D = crossoverGenes(
-    //     getRandomArrayItem(winners1D),
-    //     getRandomArrayItem(winners1D),
-    //   );
-    // } else
-    // new1D = getRandomArrayItem(winners1D);
-
-    return R.compose(
-      T.restoreFrom1D(winnersNeurals[0]),
-      mutate1DNeural(mutateRate),
-    )(new1D);
+    return T.restoreFrom1D(winnersNeurals[0])(new1D);
   };
 };
 

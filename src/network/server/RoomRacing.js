@@ -1,3 +1,6 @@
+import chalk from 'chalk';
+import consola from 'consola';
+
 import {intervalCountdown} from '@pkg/basic-helpers';
 import {createAnimationFrameRenderer} from '@pkg/isometric-renderer/FGL/core/viewport/createDtRenderLoop';
 import {isDiagonalCollisionWithEdge} from '@pkg/physics-scene/src/engines/diagonal';
@@ -244,8 +247,10 @@ export default class RoomRacing {
       body.update && body.update();
 
       const collision = physics.updateObjectPhysics(body, aiTrainer, true);
-      if (aiTrainer && collision && player.ai)
+      if (aiTrainer && collision && player.ai) {
+        consola.info(`${chalk.green.bold('AiTrainer:')} Player ${chalk.bold.white(player.info.nick)} killed, it ${chalk.bold.red('collided')}!`);
         item.freeze();
+      }
     }
   }
 
@@ -258,7 +263,11 @@ export default class RoomRacing {
    */
   updatePlayerLaps(time, player) {
     const {
+      aiTrainer,
       startTime,
+      room: {
+        config: roomConfig,
+      },
       map: {
         segmentsInfo: {checkpoints},
       },
@@ -282,7 +291,14 @@ export default class RoomRacing {
       racingState.lastCheckpointTime = racingState.currentLapTime;
 
       if (!nextCheckpoint) {
-        racingState.lap++;
+        // WIN!
+        if (racingState.lap + 1 > roomConfig.laps) {
+          if (aiTrainer && player.ai) {
+            consola.info(`${chalk.green.bold('AiTrainer:')} Player ${chalk.bold.white(player.info.nick)} killed, it ${chalk.bold.green('win')}!`);
+            car.freeze();
+          }
+        } else
+          racingState.lap++;
 
         racingState.lapsTimes.push(racingState.currentLapTime);
         racingState.time += racingState.currentLapTime;
@@ -309,8 +325,10 @@ export default class RoomRacing {
     const nonProgressTime = racingState.currentLapTime - (racingState.lastCheckpointTime || 0);
     if (nonProgressTime > playerIdleTime) {
       // punish bot
-      if (aiTrainer && ai)
+      if (aiTrainer && ai) {
+        consola.info(`${chalk.green.bold('AiTrainer:')} Player ${chalk.bold.white(info.nick)} killed, it was ${chalk.bold.bold('idle')}!`);
         car.freeze();
+      }
 
       return true;
     }

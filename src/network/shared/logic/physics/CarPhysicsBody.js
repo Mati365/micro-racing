@@ -152,11 +152,13 @@ export default class CarPhysicsBody extends PhysicsBody {
     );
   }
 
-  speedUp(delta) {
+  speedUp(delta, allowReverse = true) {
     const {maxThrottle} = this;
 
     this.throttle = clamp(
-      -maxThrottle,
+      allowReverse
+        ? -maxThrottle
+        : 0,
       maxThrottle,
       this.throttle + delta,
     );

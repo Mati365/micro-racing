@@ -31,18 +31,18 @@ export default class PhysicsScene {
 
       let newVelocity = null;
 
-      if (cornerCollision)
-        newVelocity = vec2.mul(-0.5, a.velocityVector);
-      else {
+      if (!cornerCollision) {
         const edgeNormal = intersection.edgeB.normal(true);
         newVelocity = vec2.mul(
-          0.5,
+          0.15,
           vec2.reflectByNormal(edgeNormal, a.velocityVector, true),
         );
       }
 
-      a.velocityVector = newVelocity;
-      a.pos = vec2.add(a.pos, newVelocity);
+      if (newVelocity) {
+        a.velocityVector = newVelocity;
+        a.pos = vec2.add(a.pos, newVelocity);
+      }
     }
 
     a.updateVerticesShapeCache();
@@ -97,7 +97,7 @@ export default class PhysicsScene {
       }
 
       if (!collided && (!toggleFlagOnStatic || !b.moveable))
-        collided = !mtv || !mtv2;
+        collided = !mtv || !mtv2 ? b : null;
     }
 
     return collided;

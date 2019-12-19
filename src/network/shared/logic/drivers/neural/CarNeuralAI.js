@@ -101,7 +101,7 @@ export default class CarNeuralAI {
     ];
   }
 
-  drive({physics, checkOnlyWithStatic}) {
+  drive({physics}) {
     const {
       car: {body},
       intersections,
@@ -109,15 +109,19 @@ export default class CarNeuralAI {
     } = this;
 
     // neural control
-    intersections.update(physics, checkOnlyWithStatic);
+    intersections.update(physics, true);
     const neuralOutput = T.exec(
       this.getNeuralInputs(),
       neural,
     );
 
-    body.speedUp(
-      neuralOutput[NEURAL_CAR_OUTPUTS.THROTTLE_OUTPUT] * 10,
-    );
+    let speedUp = neuralOutput[NEURAL_CAR_OUTPUTS.THROTTLE_OUTPUT] * 10;
+
+    // fix for sleeping and lazy bots
+    if (Math.abs(body.speed) < 1)
+      speedUp += 14;
+
+    body.speedUp(speedUp, false);
     body.turnSteerWheels(
       neuralOutput[NEURAL_CAR_OUTPUTS.TURN_OUTPUT],
     );

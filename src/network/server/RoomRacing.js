@@ -8,6 +8,7 @@ import {isDiagonalCollisionWithEdge} from '@pkg/physics-scene/src/engines/diagon
 import carKeyboardDriver from '../shared/logic/drivers/carKeyboardDriver';
 
 import {
+  CAR_ALIGN,
   PLAYER_ACTIONS,
   PLAYER_TYPES,
   RACE_STATES,
@@ -227,13 +228,9 @@ export default class RoomRacing {
    * @memberof RoomRacing
    */
   updatePhysics() {
-    const {
-      aiTrainer,
-      map: {
-        physics,
-      },
-    } = this;
+    const {aiTrainer, map} = this;
 
+    const {physics} = map;
     const {items} = physics;
 
     for (let i = 0; i < items.length; ++i) {
@@ -247,9 +244,25 @@ export default class RoomRacing {
       body.update && body.update();
 
       const collision = physics.updateObjectPhysics(body, aiTrainer, true);
-      if (aiTrainer && collision && player.ai) {
-        consola.info(`${chalk.green.bold('AiTrainer:')} Player ${chalk.bold.white(player.info.nick)} killed, it ${chalk.bold.red('collided')}!`);
-        item.freeze();
+      if (collision && player.ai) {
+        if (aiTrainer) {
+          consola.info(`${chalk.green.bold('AiTrainer:')} Player ${chalk.bold.white(player.info.nick)} killed, it ${chalk.bold.red('collided')}!`);
+          item.freeze();
+        }
+
+        // try to reset if bot stuck
+        if (body.speed < 3 && !collision.moveable) {
+          const {info} = player;
+
+          map.resetPlayerPositionToSegment(
+            {
+              position: info.racingState.currentCheckpoint,
+              absolutePosition: true,
+              playerElement: info.car,
+              align: CAR_ALIGN.CENTER,
+            },
+          );
+        }
       }
     }
   }
@@ -292,7 +305,7 @@ export default class RoomRacing {
 
       if (!nextCheckpoint) {
         // WIN!
-        if (racingState.lap + 1 > roomConfig.laps) {
+        if (racingState.lap + 1 >= roomConfig.laps) {
           if (aiTrainer && player.ai) {
             consola.info(`${chalk.green.bold('AiTrainer:')} Player ${chalk.bold.white(player.info.nick)} killed, it ${chalk.bold.green('win')}!`);
             car.freeze();

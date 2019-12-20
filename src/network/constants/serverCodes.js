@@ -47,6 +47,10 @@ export const PLAYER_ACTIONS = {
 
   // PING CHECK
   PING: 11,
+
+  // SEND DURING CONNECTING
+  CONNECTION_SUCCESS: 13,
+  CONNECTION_ERROR: 12,
 };
 
 export const CAR_TYPES = {

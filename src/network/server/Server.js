@@ -10,21 +10,33 @@ import {logMethod} from '@pkg/basic-helpers';
 import PlayerSocket from './Player/types/PlayerSocket';
 import Room from './Room';
 import ServerError from '../shared/ServerError';
+import {RoomConfig} from '../shared/room';
 
-import {ERROR_CODES} from '../constants/serverCodes';
+import {
+  PLAYER_ACTIONS,
+  ERROR_CODES,
+} from '../constants/serverCodes';
+
+import {
+  serializeServerError,
+  createActionMessage,
+} from '../shared/utils';
 
 /**
  * Main networking class
  */
 export default class GameServer {
-  constructor({
-    maps,
-    socketOptions = {
-      port: 8080,
-      perMessageDeflate: false,
-    },
-    onDumpTrainingPopulation,
-  } = {}) {
+  constructor(
+    {
+      maps,
+      playersLimit = 64,
+      socketOptions = {
+        port: 8080,
+        perMessageDeflate: false,
+      },
+      onDumpTrainingPopulation,
+    } = {},
+  ) {
     this.maps = maps || {};
     this.socketOptions = socketOptions;
 
@@ -37,6 +49,11 @@ export default class GameServer {
       {
         owner: null,
         abstract: true,
+        config: new RoomConfig(
+          {
+            playersLimit,
+          },
+        ),
       },
     );
 
@@ -58,12 +75,32 @@ export default class GameServer {
     this.wss.binaryType = 'arraybuffer';
 
     this.wss.on('connection', (ws) => {
-      new PlayerSocket(
-        {
-          server: this,
-          ws,
-        },
-      );
+      try {
+        new PlayerSocket(
+          {
+            server: this,
+            ws,
+          },
+        );
+        ws.send(
+          createActionMessage(
+            null,
+            PLAYER_ACTIONS.CONNECTION_SUCCESS,
+            null,
+            {},
+          ),
+        );
+      } catch (e) {
+        ws.send(
+          createActionMessage(
+            null,
+            PLAYER_ACTIONS.CONNECTION_ERROR,
+            null,
+            serializeServerError(e),
+          ),
+        );
+        ws.close();
+      }
     });
   }
 

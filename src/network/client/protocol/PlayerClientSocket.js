@@ -60,16 +60,19 @@ export default class PlayerClientSocket {
   static connect = (uri, clientParams) => new Promise((resolve, reject) => {
     const ws = new WebSocket(uri);
     ws.binaryType = 'arraybuffer';
-    ws.onopen = async () => {
+    ws.onopen = () => {
       const clientSocket = new PlayerClientSocket;
-      await clientSocket.init(
+      clientSocket.listeners = {
+        [PLAYER_ACTIONS.CONNECTION_SUCCESS]: () => resolve(clientSocket),
+        [PLAYER_ACTIONS.CONNECTION_ERROR]: reject,
+      };
+
+      clientSocket.init(
         {
           ws,
           ...clientParams,
         },
       );
-
-      resolve(clientSocket);
     };
 
     ws.onerror = reject;
@@ -84,6 +87,7 @@ export default class PlayerClientSocket {
     {
       ws,
       pingInterval = 500,
+      playerInfo,
     } = {},
   ) {
     R.forEachObjIndexed(
@@ -97,9 +101,15 @@ export default class PlayerClientSocket {
       PlayerClientSocket.defaultApiMethods,
     );
 
-    this.listeners = {};
+    this.ws = ws;
+    this.listeners = this.listeners || {};
     this.rpc = new BinarySocketRPCWrapper(ws, this.listeners);
-    this.info = await this.fetchPlayerInfo();
+    this.info = await (
+      playerInfo
+        ? this.setPlayerInfo(playerInfo)
+        : this.fetchPlayerInfo()
+    );
+
     this.observers = {
       ping: interval(pingInterval)
         .pipe(

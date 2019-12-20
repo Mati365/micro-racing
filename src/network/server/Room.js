@@ -151,7 +151,7 @@ export default class Room {
   }
 
   get isFull() {
-    return this.config.playersLimit === this.playersCount - 1;
+    return Math.max(0, this.playersCount - 1) === this.config.playersLimit;
   }
 
   get isEmpty() {
@@ -219,7 +219,7 @@ export default class Room {
     if (racing?.allowPlayerJoin === false)
       throw new ServerError(ERROR_CODES.RACING_ALREADY_ACTIVE);
 
-    const {id} = player.info;
+    const {carType, id} = player.info;
     if (findByID(id, players))
       throw new ServerError(ERROR_CODES.ALREADY_JOINED);
 
@@ -237,6 +237,7 @@ export default class Room {
       const playerCar = this.racing.map.appendPlayerCar(
         player,
         {
+          carType,
           ...racing.aiTrainer && {
             position: 0,
           },

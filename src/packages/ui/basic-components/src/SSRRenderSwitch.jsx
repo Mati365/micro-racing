@@ -24,12 +24,12 @@ SSRRenderSwitch.propTypes = {
   allowSSR: PropTypes.bool,
 };
 
-export const withSSRSwitch = switchProps => ({children, ...props}) => (
+export const withSSRSwitch = switchProps => Component => props => (
   <SSRRenderSwitch
     {...switchProps}
     {...props}
   >
-    {() => children}
+    {() => <Component {...props} />}
   </SSRRenderSwitch>
 );
 

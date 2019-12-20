@@ -1,58 +1,48 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {Route, MemoryRouter} from 'react-router-dom';
 
-import {useI18n} from '@ui/i18n';
+import {withSSRSwitch} from '@ui/basic-components/SSRRenderSwitch';
 import useClientSocket from '../hooks/useClientSocket';
 
 import ConfigChooseScreen from './ConfigChoose';
 import {GameCanvasHolder} from '../components';
-import {TitledOverlay} from '../components/parts';
-
-const ConnectingScreen = React.memo(() => {
-  const t = useI18n();
-
-  return (
-    <TitledOverlay>
-      {t('game.screens.loading.header')}
-    </TitledOverlay>
-  );
-});
 
 const ScreensContainer = () => {
   const {
-    connecting,
-    client,
+    connect,
+    // client,
   } = useClientSocket();
 
-  const onConfigSet = async ({nick, carType}) => {
-    await client.setPlayerInfo(
+  const onConfigSet = useCallback(
+    ({nick, carType}) => connect(
       {
-        nick,
-        carType,
+        playerInfo: {
+          nick,
+          carType,
+        },
       },
-    );
-  };
+    ),
+    [connect],
+  );
 
   return (
     <GameCanvasHolder>
-      {(
-        connecting
-          ? <ConnectingScreen />
-          : (
-            <MemoryRouter>
-              <Route
-                path='/'
-                render={
-                  () => <ConfigChooseScreen onConfigSet={onConfigSet} />
-                }
-              />
-            </MemoryRouter>
-          )
-      )}
+      <MemoryRouter>
+        <Route
+          path='/'
+          render={
+            () => <ConfigChooseScreen onConfigSet={onConfigSet} />
+          }
+        />
+      </MemoryRouter>
     </GameCanvasHolder>
   );
 };
 
 ScreensContainer.displayName = 'ScreensContainer';
 
-export default ScreensContainer;
+export default withSSRSwitch(
+  {
+    allowSSR: false,
+  },
+)(ScreensContainer);

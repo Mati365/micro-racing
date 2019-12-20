@@ -1,17 +1,21 @@
 import consola from 'consola';
 import chalk from 'chalk';
+import * as R from 'ramda';
 
 import logMethod, {logFunction} from '@pkg/basic-helpers/decorators/logMethod';
+import {getRandomObjValue} from '@pkg/basic-helpers';
 
 import {
   PLAYER_TYPES,
   ERROR_CODES,
   PLAYER_ACTIONS,
   ACTION_FLAGS,
+  CAR_TYPES,
 } from '@game/network/constants/serverCodes';
 
 import CarNeuralAI from '@game/logic/drivers/neural';
 
+import serializeServerError from '../../../shared/utils/serializeServerError';
 import createActionMessage, {
   getMessageMeta,
   getMessageContent,
@@ -102,29 +106,21 @@ export default class PlayerSocket extends Player {
 
     server.rootRoom.join(this);
 
-    ws.on('message', (message) => {
+    ws.on('message', async (message) => {
       const {cmdID, action} = getMessageMeta(message);
       const listener = listeners[action];
       if (!listener)
         return;
 
       try {
-        listener(
+        await listener(
           cmdID,
           getMessageContent(message),
         );
       } catch (e) {
-        const serializedError = (
-          e?.toJSON
-            ? e
-            : new ServerError(ERROR_CODES.UNEXPECTED_ERROR)
-        );
-
         this.sendActionResponse(
           cmdID,
-          {
-            error: serializedError.toJSON(),
-          },
+          serializeServerError(e),
         );
 
         consola.error(e);
@@ -227,7 +223,18 @@ export default class PlayerSocket extends Player {
     },
 
     [PLAYER_ACTIONS.SET_PLAYER_INFO]: (cmdID, {nick, carType}) => {
-      console.log(nick, carType);
+      Object.assign(
+        this.info,
+        {
+          nick: R.slice(0, 20, nick),
+          carType: (
+            R.contains(CAR_TYPES, R.values(CAR_TYPES))
+              ? carType
+              : getRandomObjValue(CAR_TYPES)
+          ),
+        },
+      );
+
       this.sendActionResponse(
         cmdID,
         this.toBSON(),

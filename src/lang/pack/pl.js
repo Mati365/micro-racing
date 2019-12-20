@@ -1,3 +1,5 @@
+import {ERROR_CODES} from '../../network/constants/serverCodes';
+
 export default {
   editor: {
     titles: {
@@ -6,6 +8,15 @@ export default {
     },
   },
   game: {
+    errors: {
+      [ERROR_CODES.ROOM_FULL]: 'Pokój / serwer jest pełny!',
+      [ERROR_CODES.ROOM_ALREADY_EXISTS]: 'Podany pokój już istnieje!',
+      [ERROR_CODES.ALREADY_KICKED]: 'Dostęp zabroniony, ban!',
+      [ERROR_CODES.ACCESS_DENIED]: 'Dostęp zabroniony!',
+      [ERROR_CODES.UNEXPECTED_ERROR]: 'Nieprzewidziany błąd serwera!',
+      [ERROR_CODES.RACING_ALREADY_ACTIVE]: 'Wyścig już trwa!',
+      undefined: 'Niezdefiniowany błąd!',
+    },
     screens: {
       loading: {
         header: 'Łączenie...',

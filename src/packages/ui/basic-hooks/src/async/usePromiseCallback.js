@@ -43,7 +43,6 @@ const usePromiseCallback = (
         if (!promiseState.loading && !silent) {
           setPromiseState(
             {
-              errors: false,
               loading: true,
             },
           );
@@ -82,15 +81,16 @@ const usePromiseCallback = (
             errors: safeArray(e),
           },
         );
+
         !unmounted.current && !silent && setPromiseState(
           {
             result: null,
-            errors: errorSelectorFn?.(e) || true,
+            errors: errorSelectorFn(e) || true,
           },
         );
 
         if (rethrow)
-          throw e;
+          throw errorSelectorFn(e);
       }
 
       return null;

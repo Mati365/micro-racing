@@ -19,6 +19,7 @@ import {
 } from '@ui/basic-components';
 
 import CarsChooseRow from './CarsChooseRow';
+import {ServerErrorsList} from '../../components/parts';
 import {
   GameDivider,
   GameButton,
@@ -60,7 +61,7 @@ const ConfigChoose = ({onConfigSet}) => {
         }
       }
     >
-      {({l, promiseState: {loading}}) => (
+      {({l, promiseState: {loading, errors}}) => (
         <>
           <GameHeader>
             {t('headers.car')}
@@ -104,6 +105,12 @@ const ConfigChoose = ({onConfigSet}) => {
                 {t(loading ? 'sending' : 'play')}
               </GameButton>
             </Margin>
+
+            {errors && (
+              <Margin top={2}>
+                <ServerErrorsList errors={errors} />
+              </Margin>
+            )}
           </div>
         </>
       )}

@@ -21,11 +21,12 @@ const usePromiseCallback = (
     rethrow = false,
     afterExecFn = R.F,
     initialPromiseState,
-    errorSelectorFn,
-  },
+    errorSelectorFn = R.identity,
+  } = {},
 ) => {
   const [promiseState, setPromiseState] = usePromiseState(initialPromiseState);
   const unmounted = useRef(false);
+  const executorRef = useRef();
 
   useEffect(
     () => () => {
@@ -33,6 +34,8 @@ const usePromiseCallback = (
     },
     [],
   );
+
+  executorRef.current = promiseFn;
 
   const fn = useCallback(
     async (...args) => {
@@ -46,7 +49,7 @@ const usePromiseCallback = (
           );
         }
 
-        const result = await promiseFn(...args);
+        const result = await executorRef.current(...args);
         const resultErrors = result?.error || result?.errors || null;
 
         if (!unmounted.current && !silent) {

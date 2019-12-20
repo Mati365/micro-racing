@@ -37,6 +37,11 @@ const GameButton = styled(
       },
     },
 
+    disabled: {
+      opacity: 0.5,
+      cursor: 'default',
+    },
+
     expanded: {
       width: '100%',
     },
@@ -56,9 +61,10 @@ const GameButton = styled(
   {
     index: 3,
     omitProps: ['type', 'expanded'],
-    classSelector: (classes, {type, expanded}) => [
+    classSelector: (classes, {type, disabled, expanded}) => [
       classes[`type-${type}`],
       expanded && classes.expanded,
+      disabled && classes.disabled,
     ],
   },
 );

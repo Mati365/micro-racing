@@ -2,7 +2,7 @@ import React from 'react';
 import {Route, MemoryRouter} from 'react-router-dom';
 
 import {useI18n} from '@ui/i18n';
-import useClientSocket from './hooks/useClientSocket';
+import useClientSocket from '../hooks/useClientSocket';
 
 import ConfigChooseScreen from './ConfigChoose';
 import {GameCanvasHolder} from '../components';
@@ -21,11 +21,16 @@ const ConnectingScreen = React.memo(() => {
 const ScreensContainer = () => {
   const {
     connecting,
-    // client,
+    client,
   } = useClientSocket();
 
-  const onConfigSet = (config) => {
-    console.log(config);
+  const onConfigSet = async ({nick, carType}) => {
+    await client.setPlayerInfo(
+      {
+        nick,
+        carType,
+      },
+    );
   };
 
   return (

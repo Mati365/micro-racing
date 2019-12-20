@@ -129,6 +129,7 @@ export default class PlayerInfo {
     this.inputs = [];
     this.lastProcessedInput = -1;
     this.lastIdleTime = null;
+    this.carType = null;
     this.racingState = racingState;
   }
 
@@ -146,6 +147,7 @@ export default class PlayerInfo {
       id: this.id,
       kind: this.kind,
       nick: this.nick,
+      carType: this.carType,
       racingState: this.racingState?.toBSON(),
     };
   }

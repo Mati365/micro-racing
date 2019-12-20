@@ -1,7 +1,7 @@
 import {ssr} from '@pkg/basic-helpers';
 import usePromise from '@ui/basic-hooks/async/usePromise';
 
-import PlayerClientSocket from '../../../protocol/PlayerClientSocket';
+import PlayerClientSocket from '../../protocol/PlayerClientSocket';
 
 const useClientSocket = (
   {

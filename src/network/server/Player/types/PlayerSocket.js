@@ -226,7 +226,15 @@ export default class PlayerSocket extends Player {
       );
     },
 
-    [PLAYER_ACTIONS.PLAYER_INFO]: (cmdID) => {
+    [PLAYER_ACTIONS.SET_PLAYER_INFO]: (cmdID, {nick, carType}) => {
+      console.log(nick, carType);
+      this.sendActionResponse(
+        cmdID,
+        this.toBSON(),
+      );
+    },
+
+    [PLAYER_ACTIONS.GET_PLAYER_INFO]: (cmdID) => {
       this.sendActionResponse(
         cmdID,
         this.toBSON(),

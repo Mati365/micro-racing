@@ -23,8 +23,15 @@ export default class PlayerClientSocket {
       },
     },
 
+    setPlayerInfo: {
+      action: PLAYER_ACTIONS.SET_PLAYER_INFO,
+      flags: {
+        waitForResponse: true,
+      },
+    },
+
     fetchPlayerInfo: {
-      action: PLAYER_ACTIONS.PLAYER_INFO,
+      action: PLAYER_ACTIONS.GET_PLAYER_INFO,
       flags: {
         waitForResponse: true,
       },

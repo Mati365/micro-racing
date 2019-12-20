@@ -254,6 +254,7 @@ export default class RoomRacing {
         if (body.speed < 3 && !collision.moveable) {
           const {info} = player;
 
+          info.racingState.flash();
           map.resetPlayerPositionToSegment(
             {
               position: info.racingState.currentCheckpoint,

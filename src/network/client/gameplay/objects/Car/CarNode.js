@@ -79,6 +79,8 @@ class PlayerNickTextNode extends HTMLTextNode {
  *  CarNode receives mesh size both from server and client
  *  for CarPhysicsBody it will be better to use server size
  */
+export const FLASH_INTERVAL = 5; // * 30ms
+
 export default class CarNode extends PhysicsMeshNode {
   constructor(
     {
@@ -97,6 +99,7 @@ export default class CarNode extends PhysicsMeshNode {
 
     this.player = player;
     this.type = type;
+    this.flashCounter = FLASH_INTERVAL;
   }
 
   setRenderer(renderer) {
@@ -131,17 +134,27 @@ export default class CarNode extends PhysicsMeshNode {
     super.update(interpolate);
 
     const {
-      nickNode, player,
-      renderConfig, cachedInterpolatedBody,
+      nickNode,
+      renderConfig,
+      cachedInterpolatedBody,
     } = this;
 
     nickNode && nickNode.update(interpolate, cachedInterpolatedBody);
     if (interpolate.fixedStepUpdate) {
-      renderConfig.uniforms.opacity = (
-        player.racingState.isFreezed()
-          ? 0.5
-          : 1.0
-      );
+      const {racingState} = this.player;
+      let opacity = 1.0;
+
+      if (racingState.isFlashing()) {
+        this.flashCounter--;
+        if (this.flashCounter < -FLASH_INTERVAL)
+          this.flashCounter = FLASH_INTERVAL;
+
+        if (this.flashCounter > 0)
+          opacity = 0.15;
+      } else if (racingState.isFreezed())
+        opacity = 0.5;
+
+      renderConfig.uniforms.opacity = opacity;
     }
   }
 

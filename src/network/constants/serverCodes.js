@@ -79,4 +79,5 @@ export const PLAYER_RACE_STATES = {
   WRONG_DIRECTION: 1 << 1,
   FINISH: 1 << 2,
   FREEZE: 1 << 3,
+  FLASH: 1 << 4,
 };

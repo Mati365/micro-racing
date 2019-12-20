@@ -1,4 +1,5 @@
 import uniqid from 'uniqid';
+import * as R from 'ramda';
 
 import {
   PLAYER_RACE_STATES,
@@ -37,6 +38,17 @@ export class PlayerRacingState {
     // do not leak info to client:
     this.lastCheckpointTime = lastCheckpointTime;
     this.currentCheckpoint = currentCheckpoint;
+
+    // for events such as flash
+    this.timers = [];
+  }
+
+  release() {
+    R.forEach(
+      clearTimeout,
+      this.timers,
+    );
+    this.timers = [];
   }
 
   reset() {
@@ -53,9 +65,9 @@ export class PlayerRacingState {
     );
   }
 
-  isFreezed() {
-    return hasFlag(PLAYER_RACE_STATES.FREEZE, this.state);
-  }
+  isFreezed() { return hasFlag(PLAYER_RACE_STATES.FREEZE, this.state); }
+
+  isFlashing() { return hasFlag(PLAYER_RACE_STATES.FLASH, this.state); }
 
   freeze() {
     this.state |= PLAYER_RACE_STATES.FREEZE;
@@ -64,6 +76,23 @@ export class PlayerRacingState {
 
   unfreeze() {
     this.state = removeFlag(PLAYER_RACE_STATES.FREEZE, this.state);
+    return this;
+  }
+
+  flash(duration = 3000) {
+    if (hasFlag(PLAYER_RACE_STATES.FLASH, this.state))
+      return this;
+
+    this.state |= PLAYER_RACE_STATES.FLASH;
+    this.timers.push(
+      setTimeout(
+        () => {
+          this.state = removeFlag(PLAYER_RACE_STATES.FLASH, this.state);
+        },
+        duration,
+      ),
+    );
+
     return this;
   }
 
@@ -119,5 +148,10 @@ export default class PlayerInfo {
       nick: this.nick,
       racingState: this.racingState?.toBSON(),
     };
+  }
+
+  release() {
+    const {racingState} = this;
+    racingState?.release();
   }
 }

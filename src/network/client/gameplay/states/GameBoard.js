@@ -253,11 +253,9 @@ export default class GameBoard {
       }
     }
 
-    if (currentPlayerSync && human) {
-      body.angle = lerp(prevAngle, body.angle, 0.05);
-      body.pos = vec2.lerp(0.05, prevPos, body.pos);
-      body.velocity = vec2.lerp(0.05, prevVelocity, body.velocity);
-    }
+    body.angle = lerp(prevAngle, body.angle, 0.05);
+    body.pos = vec2.lerp(0.05, prevPos, body.pos);
+    body.velocity = vec2.lerp(0.05, prevVelocity, body.velocity);
 
     node.body.updateVerticesShapeCache();
     physics.updateObjectPhysics(body, aiTraining);

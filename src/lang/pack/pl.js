@@ -6,6 +6,17 @@ export default {
     },
   },
   game: {
+    screens: {
+      loading: {
+        header: 'Łączenie...',
+      },
+
+      choose_nick: {
+        header: 'Wybierz nick',
+        play: 'Graj',
+      },
+    },
+
     keyboard: {
       controls: 'Sterowanie',
       throttle: 'Przyśpiesz',

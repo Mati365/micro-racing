@@ -13,7 +13,7 @@ import {
   SSRRenderSwitch,
 } from '@ui/basic-components';
 
-import GameCanvas from '@game/network/client/gameplay/GameCanvas';
+import ScreensContainer from '@game/network/client/gameplay/screens';
 import EditorCanvas from './ui/EditorCanvas';
 import PhysicsCanvas from './ui/PhysicsCanvas/PhysicsCanvas';
 
@@ -57,15 +57,6 @@ const editorRoute = Component => () => (
   </SSRRenderSwitch>
 );
 
-const GameRoute = () => (
-  <GameCanvas
-    dimensions={{
-      w: 800,
-      h: 600,
-    }}
-  />
-);
-
 const RootContainer = ({i18n, routerProps}) => (
   <ProvideI18n {...i18n}>
     <Container>
@@ -73,7 +64,7 @@ const RootContainer = ({i18n, routerProps}) => (
         <Switch>
           <Route path='/physics' component={editorRoute(PhysicsCanvas)} />
           <Route path='/editor' component={editorRoute(EditorCanvas)} />
-          <Route path='/' component={GameRoute} />
+          <Route path='/' component={ScreensContainer} />
         </Switch>
       </IsomorphicRouter>
     </Container>

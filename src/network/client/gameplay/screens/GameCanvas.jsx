@@ -4,35 +4,14 @@ import * as R from 'ramda';
 import {DIMENSIONS_SCHEMA} from '@ui/schemas';
 import {RACE_STATES} from '@game/network/constants/serverCodes';
 
-import {ssr} from '@pkg/basic-helpers';
-import usePromise from '@ui/basic-hooks/async/usePromise';
-
-import PlayerClientSocket from '../protocol/PlayerClientSocket';
-
-import * as Hud from './components/hud';
+import * as Hud from '../components/hud';
 import {
   RaceLapToolbar,
   GameCanvasHolder,
-} from './components';
+} from '../components';
 
-import * as Overlays from './components/overlays';
-import GameBoard from './states/GameBoard';
-
-const useClientSocket = (
-  {
-    uri = `ws://${ssr ? 'lvh.me' : document.domain}:8080`,
-  } = {},
-) => {
-  const {loading, result} = usePromise(
-    () => PlayerClientSocket.connect(uri),
-    [uri],
-  );
-
-  return {
-    connecting: loading,
-    client: result,
-  };
-};
+import * as Overlays from '../components/overlays';
+import GameBoard from '../states/GameBoard';
 
 const GameCanvas = ({dimensions}) => {
   const canvasRef = useRef();
@@ -180,8 +159,8 @@ GameCanvas.propTypes = {
 
 GameCanvas.defaultProps = {
   dimensions: {
-    w: 640,
-    h: 550,
+    w: 800,
+    h: 600,
   },
 };
 

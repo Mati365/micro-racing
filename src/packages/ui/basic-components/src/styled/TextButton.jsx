@@ -1,7 +1,7 @@
 import {styled} from '@pkg/fast-stylesheet/src/react';
 import Text from './Text';
 
-export const CLEAR_BUTTON_STYLE = {
+export const CLEAR_INPUT_STYLE = {
   background: 'none',
   border: 'none',
   outline: 'none',
@@ -12,7 +12,7 @@ export const CLEAR_BUTTON_STYLE = {
 const TextButton = styled(
   Text,
   {
-    extend: CLEAR_BUTTON_STYLE,
+    extend: CLEAR_INPUT_STYLE,
     cursor: 'pointer',
 
     '&:hover': {

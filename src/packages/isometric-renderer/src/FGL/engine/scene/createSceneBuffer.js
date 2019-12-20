@@ -22,7 +22,7 @@ const chainMethods = (context) => {
 };
 
 export class SceneBuffer {
-  constructor(f) {
+  constructor(f, {cameraConfig} = {}) {
     this.f = f;
 
     // lists
@@ -46,6 +46,7 @@ export class SceneBuffer {
       {
         target: null,
         pos: null,
+        ...cameraConfig,
       },
     );
   }

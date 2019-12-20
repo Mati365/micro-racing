@@ -11,7 +11,7 @@ import CarPhysicsBody from '@game/shared/logic/physics/CarPhysicsBody';
 import CarNodeEffects from './CarNodeEffects';
 import PhysicsMeshNode from '../PhysicsMeshNode';
 
-const createTexturedCarRenderer = f => R.memoizeWith(
+export const createTexturedCarRenderer = f => R.memoizeWith(
   R.identity,
   type => (
     f.loaders.mesh.from.cached(
@@ -107,20 +107,22 @@ export default class CarNode extends PhysicsMeshNode {
 
     super.setRenderer(renderer);
 
-    this.wireframe = new CarNodeEffects(
-      f, this,
-      {
-        renderBorders: player.current,
-        wireframeColor: hexToVec4(player.racingState.color),
-      },
-    );
+    if (player) {
+      this.wireframe = new CarNodeEffects(
+        f, this,
+        {
+          renderBorders: player.current,
+          wireframeColor: hexToVec4(player.racingState.color),
+        },
+      );
 
-    this.nickNode = new PlayerNickTextNode(
-      {
-        f,
-        player,
-      },
-    );
+      this.nickNode = new PlayerNickTextNode(
+        {
+          f,
+          player,
+        },
+      );
+    }
   }
 
   release() {
@@ -134,14 +136,15 @@ export default class CarNode extends PhysicsMeshNode {
     super.update(interpolate);
 
     const {
+      player,
       nickNode,
       renderConfig,
       cachedInterpolatedBody,
     } = this;
 
     nickNode && nickNode.update(interpolate, cachedInterpolatedBody);
-    if (interpolate.fixedStepUpdate) {
-      const {racingState} = this.player;
+    if (player && interpolate.fixedStepUpdate) {
+      const {racingState} = player;
       let opacity = 1.0;
 
       if (racingState.isFlashing()) {

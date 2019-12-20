@@ -2,19 +2,27 @@ import React, {useMemo} from 'react';
 import PropTypes from 'prop-types';
 
 import generateName from '@pkg/name-generator';
+import {styled} from '@pkg/fast-stylesheet/src/react';
 
 import {useI18n} from '@ui/i18n';
 import {useInputs} from '@ui/basic-hooks';
-import {
-  Margin,
-  Text,
-} from '@ui/basic-components/styled';
 
+import {Margin} from '@ui/basic-components/styled';
 import {
   GameDivider,
   GameButton,
   GameInput,
+  GameCard,
+  GameHeader,
 } from '../../components/ui';
+
+import CarPreview from './CarPreview';
+
+const ConfigChooseForm = styled.form(
+  {
+    width: 200,
+  },
+);
 
 const ConfigChoose = ({onConfigSet}) => {
   const t = useI18n('game.screens.choose_config');
@@ -27,36 +35,39 @@ const ConfigChoose = ({onConfigSet}) => {
   );
 
   return (
-    <form
+    <ConfigChooseForm
       onSubmit={(e) => {
         e.preventDefault();
         onConfigSet(value);
       }}
     >
+      <GameHeader>
+        {t('headers.car')}
+      </GameHeader>
+
+      <GameCard
+        square
+        style={{
+          width: '100%',
+        }}
+      >
+        <CarPreview />
+      </GameCard>
+
       <GameDivider
         spacing='medium'
         type='dashed'
       />
 
-      <Text
-        type='white'
-        weight={900}
-        style={{
-          fontSize: '20px',
-        }}
-      >
+      <GameHeader>
         {t('headers.nick')}
-      </Text>
+      </GameHeader>
 
-      <Margin
-        top={4}
-        block
-      >
-        <GameInput
-          {...l.input('nick')}
-          required
-        />
-      </Margin>
+      <GameInput
+        {...l.input('nick')}
+        expanded
+        required
+      />
 
       <Margin
         top={3}
@@ -69,7 +80,7 @@ const ConfigChoose = ({onConfigSet}) => {
           {t('play')}
         </GameButton>
       </Margin>
-    </form>
+    </ConfigChooseForm>
   );
 };
 

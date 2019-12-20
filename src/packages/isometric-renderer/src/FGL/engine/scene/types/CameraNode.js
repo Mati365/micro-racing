@@ -3,12 +3,14 @@ import {lerp, mat4, vec3} from '@pkg/gl-math';
 import SceneNode from './SceneNode';
 
 export default class Camera extends SceneNode {
-  constructor({
-    pos,
-    target,
-    lerpSpeed = 0.45,
-    viewportOffset = [0, 0.9, 0],
-  }) {
+  constructor(
+    {
+      pos,
+      target,
+      lerpSpeed = 0.45,
+      viewportOffset = [0, 0.9, 0],
+    },
+  ) {
     super(
       {
         transform: {

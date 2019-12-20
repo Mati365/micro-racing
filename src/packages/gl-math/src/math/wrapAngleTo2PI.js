@@ -1,6 +1,8 @@
 export const RAD_360 = Math.PI * 2;
 
 /**
+ * It is broken! check createCarPreview
+ *
  * @todo
  *  Optimise
  */

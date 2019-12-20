@@ -83,12 +83,8 @@ export default class Car {
         ctx,
       );
 
-      fillCircle(
-        rays[i].edge.from,
-        2,
-        '#ff0000',
-        ctx,
-      );
+      fillCircle(ray.edge.from, 2, '#ff0000', ctx);
+      drawRect(ray.box, 1, '#d11141', ctx);
 
       // draw collision points
       if (intersection) {

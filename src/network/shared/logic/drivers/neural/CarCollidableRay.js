@@ -1,10 +1,30 @@
-import {Edge} from '@pkg/gl-math';
+import {Edge, CornersBox, vec2} from '@pkg/gl-math';
 
 export default class CarCollidableRay {
   constructor(edge = new Edge) {
     this.edge = edge;
+    this.box = new CornersBox(
+      vec2.zero(),
+      vec2.zero(),
+    );
+
     this.bodyAttachPoint = null; // absolute point,
     this.collisionPoints = []; // RaysIntersection
+  }
+
+  setEdgePoints(from, to) {
+    const {box, edge} = this;
+
+    edge.from = from;
+    edge.to = to;
+
+    box.topLeft[0] = Math.min(from[0], to[0]);
+    box.topLeft[1] = Math.min(from[1], to[1]);
+
+    box.bottomRight[0] = Math.max(from[0], to[0]);
+    box.bottomRight[1] = Math.max(from[1], to[1]);
+
+    return this;
   }
 
   /**

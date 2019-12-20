@@ -103,6 +103,9 @@ export default class CarIntersectRays {
       // check all rays collisions with body
       for (let i = rays.length - 1; i >= 0; --i) {
         const ray = rays[i];
+        if (!aabb(ray.box, boardItemBody.box))
+          continue;
+
         const intersectPoints = isCornerCollisionWithEdge(boardItemBody, ray.edge, true);
 
         if (intersectPoints.length)
@@ -198,8 +201,7 @@ export default class CarIntersectRays {
         renderInterpolation,
       );
 
-      ray.edge.from = from;
-      ray.edge.to = to;
+      ray.setEdgePoints(from, to);
 
       raysBox.topLeft[0] = Math.min(raysBox.topLeft[0], from[0], to[0]);
       raysBox.topLeft[1] = Math.min(raysBox.topLeft[1], from[1], to[1]);

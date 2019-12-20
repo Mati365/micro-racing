@@ -22,6 +22,7 @@ const vec2 = createVectorOptimizedOperations(
     angleBetweenPoints,
     vectorAngle,
 
+    zero: () => vec2(0, 0),
     toVec3(vec, z = 0.0) { return vec3(vec[0], vec[1], z); },
     toVec4(vec, z = 0.0, w = 1.0) { return vec4(vec[0], vec[1], z, w); },
   },

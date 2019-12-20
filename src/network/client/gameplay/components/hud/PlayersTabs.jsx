@@ -174,7 +174,12 @@ const PlayersTabs = ({gameBoard}) => {
     [gameBoard],
   );
 
-  const slicedList = R.slice(0, 4, playersNodes.list);
+  const slicedList = (
+    playersNodes.list.length > 4
+      ? R.slice(0, 4, playersNodes.list)
+      : playersNodes.list
+  );
+
   return (
     <PlayersTabsWrapper>
       {slicedList.map(

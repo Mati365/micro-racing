@@ -49,6 +49,7 @@ export default class CarPhysicsBody extends PhysicsBody {
       angle = toRadians(45),
       steerAngle = toRadians(0), // relative to root angle
       maxSteerAngle = toRadians(45),
+      maxGrip = 120,
 
       // left top corner
       velocity = vec2(0, 0),
@@ -118,7 +119,7 @@ export default class CarPhysicsBody extends PhysicsBody {
       rear: -80.2,
     };
 
-    this.maxGrip = 40.0;
+    this.maxGrip = maxGrip;
     this.resistance = 5.0;
     this.drag = 3.5;
   }
@@ -290,6 +291,7 @@ export default class CarPhysicsBody extends PhysicsBody {
       [
         'mass', 'velocity', 'angle', 'steerAngle', 'maxSteerAngle', 'throttle',
         'pos', 'size', 'massCenter', 'wheelSize', 'axles', 'angularVelocity',
+        'maxGrip',
       ],
     );
 
@@ -308,7 +310,10 @@ export default class CarPhysicsBody extends PhysicsBody {
       R.converge(
         R.merge,
         [
-          R.pick(['mass', 'size', 'angle', 'steerAngle', 'maxSteerAngle', 'axles', 'angularVelocity']),
+          R.pick([
+            'mass', 'size', 'angle', 'steerAngle', 'maxSteerAngle',
+            'axles', 'angularVelocity', 'maxGrip',
+          ]),
           R.compose(
             R.mapObjIndexed(obj => obj && vec2(...obj)),
             R.pick(['velocity', 'pos', 'massCenter', 'wheelSize']),

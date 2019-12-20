@@ -1,6 +1,7 @@
 import {vec2, vec3} from '@pkg/gl-math';
 
 import {
+  PLAYER_TYPES,
   CAR_TYPES,
   CAR_ALIGN,
   OBJECT_TYPES,
@@ -12,6 +13,12 @@ import CarPhysicsBody from '../logic/physics/CarPhysicsBody';
 import MapElement from './MapElement';
 
 import {CARS_RESOURCES} from '../sceneResources/cars';
+
+export const PLAYER_TYPES_BODY_CONFIG = {
+  [PLAYER_TYPES.BOT]: {
+    maxGrip: 40,
+  },
+};
 
 /**
  * Calculates angle and position car on map segment
@@ -68,6 +75,7 @@ export default class PlayerMapElement extends MapElement {
     this.body = new CarPhysicsBody(
       {
         ...body,
+        ...PLAYER_TYPES_BODY_CONFIG[player.info.kind],
         size: normalizedSize.scale(scale),
       },
     );

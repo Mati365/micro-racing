@@ -31,7 +31,7 @@ export default class PlayerSocket extends Player {
       server,
       info = new PlayerInfo(
         {
-          kind: PLAYER_TYPES.ZOMBIE,
+          kind: PLAYER_TYPES.HUMAN,
         },
       ),
       onDisconnect,

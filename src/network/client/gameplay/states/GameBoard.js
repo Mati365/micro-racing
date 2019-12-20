@@ -182,7 +182,7 @@ export default class GameBoard {
     }
 
     /** @see PlayerMapElement.binarySnapshotSerializer */
-    const {body, player: {kind}} = node;
+    const {body, player: {kind, racingState}} = node;
     if (!body)
       return;
 
@@ -253,9 +253,11 @@ export default class GameBoard {
       }
     }
 
-    body.angle = lerp(prevAngle, body.angle, 0.05);
-    body.pos = vec2.lerp(0.05, prevPos, body.pos);
-    body.velocity = vec2.lerp(0.05, prevVelocity, body.velocity);
+    if (!racingState.isFlashing()) {
+      body.angle = lerp(prevAngle, body.angle, 0.05);
+      body.pos = vec2.lerp(0.05, prevPos, body.pos);
+      body.velocity = vec2.lerp(0.05, prevVelocity, body.velocity);
+    }
 
     node.body.updateVerticesShapeCache();
     physics.updateObjectPhysics(body, aiTraining);

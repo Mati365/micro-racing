@@ -11,8 +11,11 @@ export default {
         header: 'Łączenie...',
       },
 
-      choose_nick: {
-        header: 'Wybierz nick',
+      choose_config: {
+        headers: {
+          car: 'Wybierz auto',
+          nick: 'Wybierz nick',
+        },
         play: 'Graj',
       },
     },

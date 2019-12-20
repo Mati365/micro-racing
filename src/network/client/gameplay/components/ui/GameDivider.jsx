@@ -16,6 +16,8 @@ export const dividerStyles = {
   big: {margin: 40},
   huge: {margin: 50},
 
+  'type-dashed': {borderStyle: 'dashed !important'},
+
   horizontal: {
     width: '100%',
     marginLeft: 0,
@@ -36,10 +38,11 @@ const GameDivider = styled(
   'hr',
   dividerStyles,
   {
-    omitProps: ['vertical', 'spacing'],
-    classSelector: (classes, {vertical, spacing}) => [
+    omitProps: ['vertical', 'spacing', 'type'],
+    classSelector: (classes, {vertical, spacing, type}) => [
       classes[spacing],
       classes[vertical ? 'vertical' : 'horizontal'],
+      type && classes[`type-${type}`],
     ],
   },
 );
@@ -48,6 +51,7 @@ GameDivider.displayName = 'GameDivider';
 
 GameDivider.propTypes = {
   vertical: PropTypes.bool,
+  type: PropTypes.string,
   spacing: PropTypes.oneOf([
     'none',
     'medium',

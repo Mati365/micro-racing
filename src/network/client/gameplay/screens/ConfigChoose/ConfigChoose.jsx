@@ -11,12 +11,13 @@ import {
 } from '@ui/basic-components/styled';
 
 import {
+  GameDivider,
   GameButton,
   GameInput,
-} from '../components/ui';
+} from '../../components/ui';
 
-const NickChoose = ({onNickSet}) => {
-  const t = useI18n('game.screens.choose_nick');
+const ConfigChoose = ({onConfigSet}) => {
+  const t = useI18n('game.screens.choose_config');
   const {l, value} = useInputs(
     {
       initialData: {
@@ -29,9 +30,14 @@ const NickChoose = ({onNickSet}) => {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        onNickSet(value.nick);
+        onConfigSet(value);
       }}
     >
+      <GameDivider
+        spacing='medium'
+        type='dashed'
+      />
+
       <Text
         type='white'
         weight={900}
@@ -39,7 +45,7 @@ const NickChoose = ({onNickSet}) => {
           fontSize: '20px',
         }}
       >
-        {t('header')}
+        {t('headers.nick')}
       </Text>
 
       <Margin
@@ -67,12 +73,12 @@ const NickChoose = ({onNickSet}) => {
   );
 };
 
-NickChoose.displayName = 'NickChoose';
+ConfigChoose.displayName = 'ConfigChoose';
 
-NickChoose.propTypes = {
+ConfigChoose.propTypes = {
   // eslint-disable-next-line react/require-default-props,react/no-unused-prop-types
   client: PropTypes.object,
-  onNickSet: PropTypes.func.isRequired,
+  onConfigSet: PropTypes.func.isRequired,
 };
 
-export default NickChoose;
+export default ConfigChoose;

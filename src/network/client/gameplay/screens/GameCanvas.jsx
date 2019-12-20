@@ -1,4 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
+import PropTypes from 'prop-types';
 import * as R from 'ramda';
 
 import {DIMENSIONS_SCHEMA} from '@ui/schemas';
@@ -13,14 +14,8 @@ import {
 import * as Overlays from '../components/overlays';
 import GameBoard from '../states/GameBoard';
 
-const GameCanvas = ({dimensions}) => {
+const GameCanvas = ({dimensions, client}) => {
   const canvasRef = useRef();
-
-  const {
-    connecting,
-    client,
-  } = useClientSocket();
-
   const [gameState, setGameState] = useState(
     {
       board: null,
@@ -42,9 +37,6 @@ const GameCanvas = ({dimensions}) => {
 
   useEffect(
     () => {
-      if (connecting)
-        return;
-
       (async () => {
         const board = new GameBoard(
           {
@@ -93,7 +85,7 @@ const GameCanvas = ({dimensions}) => {
         board.start();
       })();
     },
-    [connecting],
+    [],
   );
 
   let overlayModal = null;
@@ -155,6 +147,7 @@ GameCanvas.displayName = 'GameCanvas';
 
 GameCanvas.propTypes = {
   dimensions: DIMENSIONS_SCHEMA,
+  client: PropTypes.object.isRequired,
 };
 
 GameCanvas.defaultProps = {

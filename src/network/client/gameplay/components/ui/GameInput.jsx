@@ -8,7 +8,7 @@ const GameInput = styled(
   {
     base: {
       borderRadius: 7,
-      border: `1px solid ${DARKEST_GRAY}`,
+      border: `2px solid ${DARKEST_GRAY}`,
       color: '#929292',
       padding: 7,
       textTransform: 'uppercase',

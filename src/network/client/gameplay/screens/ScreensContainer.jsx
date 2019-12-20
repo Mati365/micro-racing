@@ -4,7 +4,7 @@ import {Route, MemoryRouter} from 'react-router-dom';
 import {useI18n} from '@ui/i18n';
 import useClientSocket from './hooks/useClientSocket';
 
-import NickChooseScreen from './NickChoose';
+import ConfigChooseScreen from './ConfigChoose';
 import {GameCanvasHolder} from '../components';
 import {TitledOverlay} from '../components/parts';
 
@@ -21,11 +21,11 @@ const ConnectingScreen = React.memo(() => {
 const ScreensContainer = () => {
   const {
     connecting,
-    client,
+    // client,
   } = useClientSocket();
 
-  const onNickSet = (nick) => {
-    console.log(nick);
+  const onConfigSet = (config) => {
+    console.log(config);
   };
 
   return (
@@ -38,7 +38,7 @@ const ScreensContainer = () => {
               <Route
                 path='/'
                 render={
-                  () => <NickChooseScreen onNickSet={onNickSet} />
+                  () => <ConfigChooseScreen onConfigSet={onConfigSet} />
                 }
               />
             </MemoryRouter>

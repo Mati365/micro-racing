@@ -1,25 +1,29 @@
 import React, {useMemo} from 'react';
 import PropTypes from 'prop-types';
 
+import {CAR_TYPES} from '@game/network/constants/serverCodes';
+
 import generateName from '@pkg/name-generator';
 import {styled} from '@pkg/fast-stylesheet/src/react';
+import {getRandomObjValue} from '@pkg/basic-helpers';
 
 import {useI18n} from '@ui/i18n';
 import {useInputs} from '@ui/basic-hooks';
 
 import {Margin} from '@ui/basic-components/styled';
+import {AutofocusInput} from '@ui/basic-components';
+
+import CarsChooseRow from './CarsChooseRow';
 import {
   GameDivider,
   GameButton,
   GameInput,
-  GameCard,
   GameHeader,
 } from '../../components/ui';
 
-import CarPreview from './CarPreview';
-
 const ConfigChooseForm = styled.form(
   {
+    textAlign: 'center',
     width: 200,
   },
 );
@@ -29,10 +33,20 @@ const ConfigChoose = ({onConfigSet}) => {
   const {l, value} = useInputs(
     {
       initialData: {
+        carType: getRandomObjValue(CAR_TYPES),
         nick: useMemo(generateName, []),
       },
     },
   );
+
+  const carsInfo = [
+    {
+      type: CAR_TYPES.BLUE,
+    },
+    {
+      type: CAR_TYPES.RED,
+    },
+  ];
 
   return (
     <ConfigChooseForm
@@ -45,14 +59,13 @@ const ConfigChoose = ({onConfigSet}) => {
         {t('headers.car')}
       </GameHeader>
 
-      <GameCard
-        square
+      <CarsChooseRow
+        carsInfo={carsInfo}
         style={{
-          width: '100%',
+          transform: 'translateX(-50%)',
         }}
-      >
-        <CarPreview />
-      </GameCard>
+        {...l.input('carType')}
+      />
 
       <GameDivider
         spacing='medium'
@@ -63,11 +76,16 @@ const ConfigChoose = ({onConfigSet}) => {
         {t('headers.nick')}
       </GameHeader>
 
-      <GameInput
-        {...l.input('nick')}
-        expanded
-        required
-      />
+      <AutofocusInput>
+        <GameInput
+          {...l.input('nick')}
+          style={{
+            textAlign: 'center',
+          }}
+          expanded
+          required
+        />
+      </AutofocusInput>
 
       <Margin
         top={3}
@@ -92,4 +110,4 @@ ConfigChoose.propTypes = {
   onConfigSet: PropTypes.func.isRequired,
 };
 
-export default ConfigChoose;
+export default React.memo(ConfigChoose);

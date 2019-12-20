@@ -9,6 +9,9 @@ const UnorderedList = styled.ul(
     },
 
     row: {
+      display: 'flex',
+      flexDirection: 'row',
+
       '& > li': {
         display: 'inline-flex',
       },

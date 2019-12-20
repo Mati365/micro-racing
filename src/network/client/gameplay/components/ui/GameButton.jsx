@@ -24,6 +24,7 @@ const GameButton = styled(
       textAlign: 'center',
       textTransform: 'uppercase',
       fontWeight: 900,
+      userSelect: 'none',
 
       '&:hover': {
         textDecoration: 'none',

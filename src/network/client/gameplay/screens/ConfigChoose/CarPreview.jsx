@@ -44,7 +44,7 @@ const createCarPreview = (
   let rotation = 0.0;
 
   buffer.createNode(carNode);
-  frame(
+  const releaseFrameRenderer = frame(
     {
       update: (interpolation) => {
         const {fixedStepUpdate} = interpolation;
@@ -63,6 +63,11 @@ const createCarPreview = (
       },
     },
   );
+
+  return () => {
+    buffer.release();
+    releaseFrameRenderer();
+  };
 };
 
 const CarPreview = ({carType}) => {
@@ -105,4 +110,4 @@ CarPreview.defaultProps = {
   carType: CAR_TYPES.BLUE,
 };
 
-export default CarPreview;
+export default React.memo(CarPreview);

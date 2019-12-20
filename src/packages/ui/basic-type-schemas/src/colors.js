@@ -10,6 +10,7 @@ export const DARK_GRAY = '#666666';
 export const LIGHT_GRAY = '#F5F5F5';
 export const DARKEST_GRAY = '#292929';
 
+export const GRAY_DARKEN_3 = Color(LIGHT_GRAY).darken(0.3).hex();
 export const GRAY_DARKEN_5 = Color(LIGHT_GRAY).darken(0.5).hex();
 
 export const CRIMSON_RED = '#ff1a48';

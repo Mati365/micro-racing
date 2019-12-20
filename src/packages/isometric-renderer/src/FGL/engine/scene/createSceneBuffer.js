@@ -115,6 +115,15 @@ export class SceneBuffer {
     return node;
   }
 
+  release() {
+    const {list} = this;
+
+    for (let i = 0, len = list.length; i < len; ++i)
+      list[i]?.release();
+
+    this.list = [];
+  }
+
   /**
    * SceneNode methods
    */

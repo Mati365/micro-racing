@@ -4,14 +4,17 @@ import PropTypes from 'prop-types';
 import {useI18n} from '@ui/i18n';
 
 import {
-  Text,
+  Flex,
   Margin,
 } from '@ui/basic-components/styled';
 
 import PlayerClientSocket from '../../../protocol/PlayerClientSocket';
 import TitledScreen from '../TitledScreen';
 import TrackEditorCanvas from './TrackEditorCanvas';
-import {GameCard} from '../../components/ui';
+import {
+  GameInput,
+  GameCard,
+} from '../../components/ui';
 
 const RoomEdit = ({client, room}) => { // eslint-disable-line no-unused-vars
   const t = useI18n('game.screens.room_edit');
@@ -19,14 +22,17 @@ const RoomEdit = ({client, room}) => { // eslint-disable-line no-unused-vars
   return (
     <TitledScreen
       header={(
-        <>
+        <Flex direction='row'>
           {t('header')}
-          <Margin left={2}>
-            <Text type='crimson_red'>
-              {room.name}
-            </Text>
+          <Margin left={3}>
+            <GameInput
+              value={room.name}
+              style={{
+                width: 400,
+              }}
+            />
           </Margin>
-        </>
+        </Flex>
       )}
     >
       <GameCard

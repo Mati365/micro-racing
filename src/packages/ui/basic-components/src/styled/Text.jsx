@@ -22,11 +22,7 @@ const Text = styled(
       R.toPairs,
     )(TEXT_COLORS),
 
-    base: {
-      composes: [
-        '$type-default',
-      ],
-    },
+    base: {},
 
     'size-tiny': {fontSize: '9px'},
     'size-small': {fontSize: '11px'},

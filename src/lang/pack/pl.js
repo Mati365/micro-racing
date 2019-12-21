@@ -39,7 +39,7 @@ export default {
       },
 
       room_edit: {
-        header: 'Pokój: %{}',
+        header: 'Pokój:',
       },
     },
 

@@ -25,6 +25,8 @@ export const DODGER_BLUE_DARKEN_5 = Color(DODGER_BLUE).darken(0.5).hex();
 export const DIM_GRAY = '#696969';
 
 export const TEXT_COLORS = {
+  CRIMSON_RED,
+
   DEFAULT: BLACK,
 
   PRIMARY: DODGER_BLUE,

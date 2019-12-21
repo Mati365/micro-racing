@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {styled} from '@pkg/fast-stylesheet/src/react';
 import {
@@ -6,14 +7,31 @@ import {
   GameDivider,
 } from '../components/ui';
 
-const ScreenHolder = styled.div(
+export const ScreenHolder = styled.div(
   {
-    width: 800,
-    height: '90vh',
-    maxWidth: '90vw',
-    overflowY: 'auto',
+    base: {
+      height: '90vh',
+      overflowY: 'auto',
+    },
+
+    expanded: {
+      width: 800,
+      maxWidth: '90vw',
+    },
+  },
+  {
+    omitProps: ['expanded'],
+    classSelector: (classes, {expanded}) => expanded && classes.expanded,
   },
 );
+
+ScreenHolder.propTypes = {
+  expanded: PropTypes.bool,
+};
+
+ScreenHolder.defaultProps = {
+  expanded: true,
+};
 
 const TitledScreen = ({header, children}) => (
   <ScreenHolder>

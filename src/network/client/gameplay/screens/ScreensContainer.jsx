@@ -1,6 +1,8 @@
 import React, {useCallback} from 'react';
 import {Route, MemoryRouter} from 'react-router-dom';
 
+import {styled} from '@pkg/fast-stylesheet/src/react';
+
 import {withSSRSwitch} from '@ui/basic-components/SSRRenderSwitch';
 import useClientSocket from '../hooks/useClientSocket';
 
@@ -8,6 +10,21 @@ import ConfigChooseScreen from './ConfigChoose';
 import {GameCanvasHolder} from '../components';
 import ServersList from './ServersList';
 import RoomEdit from './RoomEdit';
+
+const ScreensHolder = styled(
+  GameCanvasHolder,
+  {
+    flexDirection: 'row',
+  },
+);
+
+const BoardContainer = styled.div(
+  {
+    '&:not(:empty)': {
+      marginLeft: 40,
+    },
+  },
+);
 
 const ScreensContainer = () => {
   const {
@@ -33,36 +50,41 @@ const ScreensContainer = () => {
   );
 
   return (
-    <GameCanvasHolder>
+    <ScreensHolder>
       <MemoryRouter>
         <Route
-          path='/room-edit'
           render={
-            ({location: {state}}) => (
-              <RoomEdit
-                client={client}
-                room={state.room}
+            ({history}) => (
+              <ConfigChooseScreen
+                created={!!client}
+                onConfigSet={onConfigSet(history)}
               />
             )
           }
         />
 
-        <Route
-          path='/servers-list'
-          render={
-            () => <ServersList client={client} />
-          }
-        />
+        <BoardContainer>
+          <Route
+            path='/room-edit'
+            render={
+              ({location: {state}}) => (
+                <RoomEdit
+                  client={client}
+                  room={state.room}
+                />
+              )
+            }
+          />
 
-        <Route
-          exact
-          path='/'
-          render={
-            ({history}) => <ConfigChooseScreen onConfigSet={onConfigSet(history)} />
-          }
-        />
+          <Route
+            path='/servers-list'
+            render={
+              () => <ServersList client={client} />
+            }
+          />
+        </BoardContainer>
       </MemoryRouter>
-    </GameCanvasHolder>
+    </ScreensHolder>
   );
 };
 

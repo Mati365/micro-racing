@@ -19,6 +19,7 @@ import {
 } from '@ui/basic-components';
 
 import CarsChooseRow from './CarsChooseRow';
+import {ScreenHolder} from '../TitledScreen';
 import {ServerErrorsList} from '../../components/parts';
 import {
   GameDivider,
@@ -37,7 +38,7 @@ const ConfigChooseForm = styled(
   },
 );
 
-const ConfigChoose = ({onConfigSet}) => {
+const ConfigChoose = ({created, onConfigSet}) => {
   const t = useI18n('game.screens.choose_config');
   const carsInfo = [
     {
@@ -49,81 +50,90 @@ const ConfigChoose = ({onConfigSet}) => {
   ];
 
   return (
-    <ConfigChooseForm
-      initialData={{
-        carType: getRandomObjValue(CAR_TYPES),
-        nick: useMemo(generateName, []),
-      }}
-      onSubmit={
-        async (...args) => {
-          await asyncTimeout(500);
-          return onConfigSet(...args);
+    <ScreenHolder expanded={false}>
+      <ConfigChooseForm
+        initialData={{
+          carType: getRandomObjValue(CAR_TYPES),
+          nick: useMemo(generateName, []),
+        }}
+        onSubmit={
+          async (...args) => {
+            await asyncTimeout(500);
+            return onConfigSet(...args);
+          }
         }
-      }
-    >
-      {({l, promiseState: {loading, errors}}) => (
-        <>
-          <GameHeader>
-            {t('headers.car')}
-          </GameHeader>
-
-          <CarsChooseRow
-            carsInfo={carsInfo}
-            {...l.input('carType')}
-          />
-
-          <div style={{width: 200}}>
-            <GameDivider
-              spacing='medium'
-              type='dashed'
-            />
-
+      >
+        {({l, promiseState: {loading, errors}}) => (
+          <>
             <GameHeader>
-              {t('headers.nick')}
+              {t('headers.car')}
             </GameHeader>
 
-            <AutofocusInput>
-              <GameInput
-                {...l.input('nick')}
-                style={{
-                  textAlign: 'center',
-                }}
-                expanded
-                required
+            <CarsChooseRow
+              carsInfo={carsInfo}
+              {...l.input('carType')}
+            />
+
+            <div style={{width: 200}}>
+              <GameDivider
+                spacing='medium'
+                type='dashed'
               />
-            </AutofocusInput>
 
-            <Margin
-              top={3}
-              block
-            >
-              <GameButton
-                type='red'
-                disabled={loading}
-                expanded
+              <GameHeader>
+                {t('headers.nick')}
+              </GameHeader>
+
+              <AutofocusInput>
+                <GameInput
+                  {...l.input('nick')}
+                  style={{
+                    textAlign: 'center',
+                  }}
+                  expanded
+                  required
+                />
+              </AutofocusInput>
+
+              <Margin
+                top={3}
+                block
               >
-                {t(loading ? 'sending' : 'play')}
-              </GameButton>
-            </Margin>
-
-            {errors && (
-              <Margin top={2}>
-                <ServerErrorsList errors={errors} />
+                <GameButton
+                  type='red'
+                  disabled={loading}
+                  expanded
+                >
+                  {t((() => {
+                    if (loading) return 'sending';
+                    if (created) return 'update';
+                    return 'play';
+                  })())}
+                </GameButton>
               </Margin>
-            )}
-          </div>
-        </>
-      )}
-    </ConfigChooseForm>
+
+              {errors && (
+                <Margin top={2}>
+                  <ServerErrorsList errors={errors} />
+                </Margin>
+              )}
+            </div>
+          </>
+        )}
+      </ConfigChooseForm>
+    </ScreenHolder>
   );
 };
 
 ConfigChoose.displayName = 'ConfigChoose';
 
 ConfigChoose.propTypes = {
-  // eslint-disable-next-line react/require-default-props,react/no-unused-prop-types
-  client: PropTypes.object,
+  created: PropTypes.bool,
   onConfigSet: PropTypes.func.isRequired,
+};
+
+ConfigChoose.defaultProps = {
+  created: false,
 };
 
 export default React.memo(ConfigChoose);

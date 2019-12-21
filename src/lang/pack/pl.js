@@ -28,6 +28,7 @@ export default {
           nick: 'Wybierz nick',
         },
         play: 'Graj',
+        update: 'Zaktualizuj',
         sending: 'Wysyłanie...',
       },
 

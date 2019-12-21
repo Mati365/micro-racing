@@ -223,10 +223,16 @@ export default class PlayerSocket extends Player {
     },
 
     [PLAYER_ACTIONS.SET_PLAYER_INFO]: (cmdID, {nick, carType}) => {
+      const {nick: prevNick} = this.info;
+      const newNick = R.slice(0, 20, nick) || prevNick;
+
+      if (newNick !== prevNick)
+        consola.info(`Player ${chalk.white.bold(prevNick)} renamed to ${chalk.green.bold(newNick)}!`);
+
       Object.assign(
         this.info,
         {
-          nick: R.slice(0, 20, nick),
+          nick: newNick,
           carType: (
             R.contains(CAR_TYPES, R.values(CAR_TYPES))
               ? carType

@@ -48,11 +48,12 @@ const createCarPreview = (
     {
       update: (interpolation) => {
         const {fixedStepUpdate} = interpolation;
-        if (fixedStepUpdate)
-          rotation += toRadians(4);
+        if (carNode.body) {
+          if (fixedStepUpdate)
+            rotation += toRadians(4);
 
-        if (carNode.body)
           carNode.body.angle = rotation;
+        }
 
         carNode.update(interpolation);
       },

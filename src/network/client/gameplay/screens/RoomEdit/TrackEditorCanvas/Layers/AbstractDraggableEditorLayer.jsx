@@ -9,9 +9,15 @@ export default class AbstractDraggableEditorLayer {
     this.layerDisplayName = layerDisplayName;
   }
 
+  getRelativeEventPos(e) {
+    return relativeEventPos(e, 1 / this.scale);
+  }
+
   onDragStart = (e) => {
     const {handlers} = this;
-    const draggableElement = handlers.findElementByCoords?.(relativeEventPos(e)) || null;
+    const draggableElement = handlers.findElementByCoords?.(
+      this.getRelativeEventPos(e)
+    ) || null;
 
     this.draggingElement = draggableElement;
     if (draggableElement) {
@@ -34,7 +40,7 @@ export default class AbstractDraggableEditorLayer {
 
     handlers.updateElementPos?.(
       this.draggingElement,
-      relativeEventPos(e),
+      this.getRelativeEventPos(e),
     );
 
     this.render();
@@ -71,7 +77,7 @@ export default class AbstractDraggableEditorLayer {
     const {handlers} = this;
 
     handlers.handleClick?.(
-      relativeEventPos(e),
+      this.getRelativeEventPos(e),
     );
   }
 
@@ -89,13 +95,27 @@ export default class AbstractDraggableEditorLayer {
     element.item.focused = true;
   }
 
-  setCanvas({
-    canvas,
-    dimensions,
-  }) {
+  setCanvas(
+    {
+      scale = 0.85,
+      canvas,
+      dimensions,
+    },
+  ) {
+    this.scale = scale;
     this.canvas = canvas;
     this.dimensions = dimensions || getElementDimensions(canvas);
     this.ctx = canvas.getContext('2d');
+
+    const {w, h} = this.dimensions;
+    Object.assign(
+      canvas,
+      {
+        imageSmoothingEnabled: false,
+        width: w,
+        height: h,
+      },
+    );
 
     this.listeners?.();
     this.listeners = assignElementListeners(
@@ -113,8 +133,9 @@ export default class AbstractDraggableEditorLayer {
     return this;
   }
 
-  render() {
+  render(fn) {
     const {
+      scale,
       ctx,
       dimensions,
     } = this;
@@ -122,5 +143,12 @@ export default class AbstractDraggableEditorLayer {
     // cleanup
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, dimensions.w, dimensions.h);
+
+    ctx.save();
+    ctx.scale(scale, scale);
+
+    fn && fn();
+
+    ctx.restore();
   }
 }

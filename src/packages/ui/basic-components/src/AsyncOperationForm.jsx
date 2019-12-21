@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 
 import {
   usePromiseCallback,
@@ -7,9 +7,14 @@ import {
 
 const AsyncOperationForm = ({onSubmit, initialData, children, ...props}) => {
   const [_onSubmit, promiseState] = usePromiseCallback(onSubmit);
+  const modifiedFlagRef = useRef(false);
+
   const {l, value} = useInputs(
     {
       initialData,
+      onChange: () => {
+        modifiedFlagRef.current = true;
+      },
     },
   );
 
@@ -26,6 +31,7 @@ const AsyncOperationForm = ({onSubmit, initialData, children, ...props}) => {
           l,
           value,
           promiseState,
+          modified: modifiedFlagRef.current,
         },
       )}
     </form>

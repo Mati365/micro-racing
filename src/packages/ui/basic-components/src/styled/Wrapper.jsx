@@ -16,13 +16,19 @@ const Wrapper = styled.span(
         '$display-inline-block',
       ],
     },
+
+    expanded: {
+      width: '100%',
+      height: '100%',
+    },
   },
   {
     index: 0,
-    omitProps: ['display', 'position'],
-    classSelector: (classes, {display, position}) => [
+    omitProps: ['display', 'position', 'expanded'],
+    classSelector: (classes, {display, position, expanded}) => [
       display && classes[`display-${display}`],
       position && classes[`position-${position}`],
+      expanded && classes.expanded,
     ],
   },
 );
@@ -32,6 +38,7 @@ Wrapper.displayName = 'Wrapper';
 Wrapper.propTypes = {
   display: PropTypes.string,
   position: PropTypes.string,
+  expanded: PropTypes.bool,
 };
 
 export default Wrapper;

@@ -2,7 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import pako from 'pako';
 
-import {WHITE} from '@ui/colors';
+import {
+  WHITE,
+  DARKEST_GRAY,
+} from '@ui/colors';
 
 import {styled} from '@pkg/fast-stylesheet/src/react';
 
@@ -21,14 +24,13 @@ import {
 } from '@ui/basic-components/styled';
 
 import TrackEditor from '../TrackEditor';
+import {GameInput} from '../../../../components/ui';
 
 const ToolbarHolder = styled(
   UnorderedList,
   {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    padding: 5,
+    margin: 5,
+    float: 'right',
 
     '& button': {
       color: WHITE,
@@ -36,9 +38,11 @@ const ToolbarHolder = styled(
 
     '& > li:not(:last-child)': {
       '&::after': {
+        position: 'relative',
+        top: 2,
         content: '"|"',
         margin: [0, 5],
-        color: WHITE,
+        color: DARKEST_GRAY,
       },
     },
   },
@@ -101,8 +105,9 @@ const Toolbar = ({editor}) => {
       </li>
 
       <li>
-        <input
+        <GameInput
           type='text'
+          size='small'
           {...l.input('meta.title', {defaultInputValue: ''})}
         />
       </li>

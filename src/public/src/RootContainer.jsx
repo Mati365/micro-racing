@@ -14,7 +14,7 @@ import {
 } from '@ui/basic-components';
 
 import ScreensContainer from '@game/network/client/gameplay/screens';
-import EditorCanvas from './ui/EditorCanvas';
+import TrackEditorCanvas from '@game/network/client/gameplay/screens/RoomEdit/TrackEditorCanvas';
 import PhysicsCanvas from './ui/PhysicsCanvas/PhysicsCanvas';
 
 const Container = styled.div(
@@ -63,7 +63,7 @@ const RootContainer = ({i18n, routerProps}) => (
       <IsomorphicRouter {...routerProps}>
         <Switch>
           <Route path='/physics' component={editorRoute(PhysicsCanvas)} />
-          <Route path='/editor' component={editorRoute(EditorCanvas)} />
+          <Route path='/editor' component={editorRoute(TrackEditorCanvas)} />
           <Route path='/' component={ScreensContainer} />
         </Switch>
       </IsomorphicRouter>

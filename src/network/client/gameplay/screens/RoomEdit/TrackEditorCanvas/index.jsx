@@ -3,6 +3,7 @@ import React, {
   useEffect,
   useMemo,
 } from 'react';
+import PropTypes from 'prop-types';
 
 import {DIMENSIONS_SCHEMA} from '@ui/schemas';
 
@@ -20,7 +21,7 @@ const useTrackEditor = initialConfig => useMemo(
  *
  * @export
  */
-const EditorCanvas = ({dimensions}) => {
+const TrackEditorCanvas = ({dimensions, canvasConfig}) => {
   const roadRef = useRef();
   const editor = useTrackEditor();
 
@@ -29,6 +30,7 @@ const EditorCanvas = ({dimensions}) => {
       editor.setCanvas(
         {
           canvas: roadRef.current,
+          ...canvasConfig,
         },
       );
     },
@@ -36,14 +38,14 @@ const EditorCanvas = ({dimensions}) => {
   );
 
   return (
-    <Wrapper position='relative'>
+    <Wrapper expanded>
       <canvas
         ref={roadRef}
         tabIndex={-1}
-        width={dimensions.w}
-        height={dimensions.h}
         style={{
           outline: 0,
+          width: dimensions?.w || '100%',
+          height: dimensions?.h || '100%',
         }}
       />
 
@@ -52,10 +54,16 @@ const EditorCanvas = ({dimensions}) => {
   );
 };
 
-EditorCanvas.displayName = 'EditorCanvas';
+TrackEditorCanvas.displayName = 'TrackEditorCanvas';
 
-EditorCanvas.propTypes = {
-  dimensions: DIMENSIONS_SCHEMA.isRequired,
+TrackEditorCanvas.propTypes = {
+  dimensions: DIMENSIONS_SCHEMA,
+  canvasConfig: PropTypes.any,
 };
 
-export default EditorCanvas;
+TrackEditorCanvas.defaultProps = {
+  dimensions: null,
+  canvasConfig: null,
+};
+
+export default TrackEditorCanvas;

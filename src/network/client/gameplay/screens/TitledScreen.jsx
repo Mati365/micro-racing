@@ -11,7 +11,6 @@ export const ScreenHolder = styled.div(
   {
     base: {
       height: '90vh',
-      overflowY: 'auto',
     },
 
     expanded: {

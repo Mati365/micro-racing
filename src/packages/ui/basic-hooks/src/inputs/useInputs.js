@@ -94,16 +94,19 @@ const useInputs = (config = {}) => {
     setValue: (e, name, flags) => {
       const newValue = processInputValue(state.value, name, e);
 
-      if (controlled)
+      if (onChange)
         onChange(newValue);
-      else if (flags?.noRerenderAfterUpdate)
-        state.value = newValue;
-      else {
-        setState(
-          {
-            value: newValue,
-          },
-        );
+
+      if (!controlled) {
+        if (flags?.noRerenderAfterUpdate)
+          state.value = newValue;
+        else {
+          setState(
+            {
+              value: newValue,
+            },
+          );
+        }
       }
     },
   };

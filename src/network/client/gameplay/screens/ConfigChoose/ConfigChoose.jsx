@@ -63,7 +63,7 @@ const ConfigChoose = ({created, onConfigSet}) => {
           }
         }
       >
-        {({l, promiseState: {loading, errors}}) => (
+        {({l, modified, promiseState: {loading, errors}}) => (
           <>
             <GameHeader>
               {t('headers.car')}
@@ -101,7 +101,9 @@ const ConfigChoose = ({created, onConfigSet}) => {
               >
                 <GameButton
                   type='red'
-                  disabled={loading}
+                  disabled={
+                    loading || (created && !modified)
+                  }
                   expanded
                 >
                   {t((() => {

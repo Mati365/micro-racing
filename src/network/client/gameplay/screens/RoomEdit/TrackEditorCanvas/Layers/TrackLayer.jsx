@@ -1,6 +1,13 @@
 import * as R from 'ramda';
 
 import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
+import {
+  CRIMSON_RED,
+  DODGER_BLUE,
+  DARKEST_GRAY,
+  GRASS_GREEN,
+} from '@ui/colors';
+
 import PALETTE from '@pkg/isometric-renderer/FGL/core/constants/colors';
 
 import {
@@ -107,8 +114,8 @@ const getTrackBarriers = (
 const renderTrack = ({
   segmentize = true,
   colors = {
-    points: '#0000ff',
-    segments: '#666',
+    points: DODGER_BLUE,
+    segments: DARKEST_GRAY,
   },
   barrierSize = vec2(15, 8),
 } = {}) => (ctx, track) => {
@@ -142,7 +149,7 @@ const renderTrack = ({
 
       barriers.forEach((barrier) => {
         drawPoint(
-          '#ff0000',
+          CRIMSON_RED,
           2,
           barrier.point,
           ctx,
@@ -164,7 +171,7 @@ const renderTrack = ({
             h: barrierSize.y,
           },
           2,
-          '#00ff00',
+          GRASS_GREEN,
           ctx,
         );
         ctx.restore();
@@ -175,7 +182,7 @@ const renderTrack = ({
         drawLine(
           edge.from,
           edge.to,
-          '#ff0000',
+          CRIMSON_RED,
           1,
           ctx,
         );
@@ -222,7 +229,7 @@ const renderTrack = ({
       else if (focused)
         color = '#ffff00';
       else
-        color = '#ff0000';
+        color = CRIMSON_RED;
 
       // normal circle of path
       ctx.fillStyle = color;
@@ -267,25 +274,34 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
     if (!this.track) {
       this.track = TrackPath.fromRandomPath(
         R.mapObjIndexed(
-          R.multiply(0.5),
+          R.multiply(0.8),
           this.dimensions,
         ),
-        false,
+        vec2(100, 100),
       );
       this.render();
     }
   }
 
-  fromBSON([roadMapElement]) {
+  fromBSON([roadMapElement], toLeftCorner = true) {
     const {points, sceneMeta} = roadMapElement.params;
+    const parsedPoints = R.map(Vector.fromArray, points);
+
+    if (toLeftCorner) {
+      const {transform, box} = sceneMeta;
+      const {topLeft} = box;
+
+      R.forEach(
+        (point) => {
+          point[0] -= topLeft[0] / transform.scale[0] - 30; // x
+          point[1] -= topLeft[1] / transform.scale[1] - 30; // y
+        },
+        parsedPoints,
+      );
+    }
 
     this.sceneMeta = sceneMeta;
-    this.track = new TrackPath(
-      R.map(
-        Vector.fromArray,
-        points,
-      ),
-    );
+    this.track = new TrackPath(parsedPoints);
 
     this.render();
   }
@@ -436,9 +452,9 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
       ctx,
     } = this;
 
-    super.render();
-
-    if (track)
-      renderTrack()(ctx, track);
+    super.render(() => {
+      if (track)
+        renderTrack()(ctx, track);
+    });
   }
 }

@@ -10,6 +10,8 @@ import {
 
 import PlayerClientSocket from '../../../protocol/PlayerClientSocket';
 import TitledScreen from '../TitledScreen';
+import TrackEditorCanvas from './TrackEditorCanvas';
+import {GameCard} from '../../components/ui';
 
 const RoomEdit = ({client, room}) => { // eslint-disable-line no-unused-vars
   const t = useI18n('game.screens.room_edit');
@@ -27,7 +29,13 @@ const RoomEdit = ({client, room}) => { // eslint-disable-line no-unused-vars
         </>
       )}
     >
-      abc
+      <GameCard
+        style={{
+          paddingBottom: '75%',
+        }}
+      >
+        <TrackEditorCanvas />
+      </GameCard>
     </TitledScreen>
   );
 };

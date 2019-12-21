@@ -7,6 +7,7 @@ import useClientSocket from '../hooks/useClientSocket';
 import ConfigChooseScreen from './ConfigChoose';
 import {GameCanvasHolder} from '../components';
 import ServersList from './ServersList';
+import RoomEdit from './RoomEdit';
 
 const ScreensContainer = () => {
   const {
@@ -35,11 +36,24 @@ const ScreensContainer = () => {
     <GameCanvasHolder>
       <MemoryRouter>
         <Route
+          path='/room-edit'
+          render={
+            ({location: {state}}) => (
+              <RoomEdit
+                client={client}
+                room={state.room}
+              />
+            )
+          }
+        />
+
+        <Route
           path='/servers-list'
           render={
             () => <ServersList client={client} />
           }
         />
+
         <Route
           exact
           path='/'

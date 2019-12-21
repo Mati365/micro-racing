@@ -36,6 +36,10 @@ export default {
         create_room: 'Stwórz pokój',
         creating_room: 'Tworzenie pokoju',
       },
+
+      room_edit: {
+        header: 'Pokój: %{}',
+      },
     },
 
     keyboard: {

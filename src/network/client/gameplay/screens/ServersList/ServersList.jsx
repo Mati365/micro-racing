@@ -1,26 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {styled} from '@pkg/fast-stylesheet/src/react';
-
 import {useIntervalResourceFetch} from '@pkg/basic-hooks';
 import {useI18n} from '@ui/i18n';
 
 import PlayerClientSocket from '../../../protocol/PlayerClientSocket';
 import CreateRoomCard from './CreateRoomCard';
-import {
-  GameHeader,
-  GameDivider,
-} from '../../components/ui';
-
-const ListWrapper = styled.div(
-  {
-    width: 800,
-    height: '90vh',
-    maxWidth: '90vw',
-    overflowY: 'auto',
-  },
-);
+import TitledScreen from '../TitledScreen';
 
 const ServersList = ({client}) => {
   const t = useI18n('game.screens.rooms_list');
@@ -33,15 +19,9 @@ const ServersList = ({client}) => {
   console.log(loading, result);
 
   return (
-    <ListWrapper>
-      <GameHeader spaced={false}>
-        {t('header')}
-      </GameHeader>
-
-      <GameDivider spacing='medium-small' />
-
+    <TitledScreen header={t('header')}>
       <CreateRoomCard client={client} />
-    </ListWrapper>
+    </TitledScreen>
   );
 };
 

@@ -17,7 +17,7 @@ const CreateRoomCard = ({client}) => {
     async () => {
       const room = await client.joinRoom();
       history.push(
-        '/edit-room',
+        '/room-edit',
         {
           room,
         },

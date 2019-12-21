@@ -164,7 +164,10 @@ export default class PlayerSocket extends Player {
     },
   )
   joinRoom(name) {
-    const {server} = this;
+    const {server, info} = this;
+
+    if (!name)
+      name = `${info.nick}'s room`;
 
     let room = server.findRoom(name);
     if (room)

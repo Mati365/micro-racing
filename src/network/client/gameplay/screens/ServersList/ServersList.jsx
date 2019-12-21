@@ -16,7 +16,9 @@ import {
 const ListWrapper = styled.div(
   {
     width: 800,
+    height: '90vh',
     maxWidth: '90vw',
+    overflowY: 'auto',
   },
 );
 
@@ -38,7 +40,7 @@ const ServersList = ({client}) => {
 
       <GameDivider spacing='medium-small' />
 
-      <CreateRoomCard />
+      <CreateRoomCard client={client} />
     </ListWrapper>
   );
 };

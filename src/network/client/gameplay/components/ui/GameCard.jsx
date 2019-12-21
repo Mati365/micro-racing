@@ -13,6 +13,12 @@ const GameCardHolder = styled.div(
       border: `1px dashed ${DARKEST_GRAY}`,
     },
 
+    disabled: {
+      opacity: 0.7,
+      pointerEvents: 'none',
+      cursor: 'initial !important',
+    },
+
     square: {
       position: 'relative',
       height: 0,
@@ -21,10 +27,11 @@ const GameCardHolder = styled.div(
   },
   {
     index: 3,
-    omitProps: ['type', 'square'],
-    classSelector: (classes, {type, square}) => [
+    omitProps: ['type', 'square', 'disabled'],
+    classSelector: (classes, {type, disabled, square}) => [
       classes[`type-${type}`],
       square && classes.square,
+      disabled && classes.disabled,
     ],
   },
 );

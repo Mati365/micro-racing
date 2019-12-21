@@ -9,7 +9,7 @@ import {flexCenteredStyle} from '@ui/basic-components/styled/Flex';
 import {Margin} from '@ui/basic-components/styled';
 import GameClickableCard from './GameClickableCard';
 
-const GameClickableIconCard = ({icon, title, classes, className, ...props}) => (
+const GameClickableIconCard = ({icon, title, classes, className, children, ...props}) => (
   <GameClickableCard
     square={false}
     className={c(
@@ -23,6 +23,8 @@ const GameClickableIconCard = ({icon, title, classes, className, ...props}) => (
         {icon}
       </span>
     )}
+
+    {children}
 
     {title && (
       <Margin

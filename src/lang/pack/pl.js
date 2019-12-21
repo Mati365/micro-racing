@@ -34,6 +34,7 @@ export default {
       rooms_list: {
         header: 'Lista pokojów',
         create_room: 'Stwórz pokój',
+        creating_room: 'Tworzenie pokoju',
       },
     },
 

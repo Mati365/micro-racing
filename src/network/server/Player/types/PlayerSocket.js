@@ -254,6 +254,18 @@ export default class PlayerSocket extends Player {
       );
     },
 
+    [PLAYER_ACTIONS.GET_ROOMS_LIST]: (cmdID) => {
+      this.sendActionResponse(
+        cmdID,
+        {
+          list: R.map(
+            room => room.toListBSON(),
+            this.server.rooms,
+          ),
+        },
+      );
+    },
+
     [PLAYER_ACTIONS.JOIN_ROOM]: logFunction(
       (_, room) => {
         consola.info(`Player ${chalk.white.bold(this.info.nick)} joined to ${chalk.green.bold(room.name)}!`);

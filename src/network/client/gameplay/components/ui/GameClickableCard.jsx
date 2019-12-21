@@ -1,7 +1,9 @@
+import Color from 'color';
+
 import {
   CRIMSON_RED,
   CRIMSON_RED_DARKEN_5,
-  GRAY_DARKEN_3,
+  DARKEST_GRAY,
 } from '@ui/colors';
 
 import {styled} from '@pkg/fast-stylesheet/src/react';
@@ -13,14 +15,32 @@ const GameClickableCard = styled(
     base: {
       cursor: 'pointer',
       flexShrink: 0,
-      width: 200,
-      paddingBottom: 200,
       transition: 'border-color 100ms ease-in-out',
       boxShadow: '0 0.2rem transparent',
 
       '&:hover': {
-        borderColor: GRAY_DARKEN_3,
+        borderColor: Color(DARKEST_GRAY).lighten(0.5).hex(),
       },
+    },
+
+    'size-auto': {
+      width: '100%',
+      paddingBottom: '100%',
+    },
+
+    'size-small': {
+      width: 100,
+      paddingBottom: 100,
+    },
+
+    'size-medium': {
+      width: 150,
+      paddingBottom: 150,
+    },
+
+    'size-big': {
+      width: 200,
+      paddingBottom: 200,
     },
 
     active: {
@@ -35,8 +55,11 @@ const GameClickableCard = styled(
     props: {
       square: true,
     },
-    omitProps: ['active'],
-    classSelector: (classes, {active}) => active && classes.active,
+    omitProps: ['active', 'size'],
+    classSelector: (classes, {active, size}) => [
+      active && classes.active,
+      classes[`size-${size || 'medium'}`],
+    ],
   },
 );
 

@@ -12,6 +12,7 @@ export const dividerStyles = {
 
   none: {margin: 0},
   small: {margin: 10},
+  'medium-small': {margin: 20},
   medium: {margin: 30},
   big: {margin: 40},
   huge: {margin: 50},
@@ -54,6 +55,7 @@ GameDivider.propTypes = {
   type: PropTypes.string,
   spacing: PropTypes.oneOf([
     'none',
+    'medium-small',
     'medium',
     'smalll',
     'big',
@@ -64,6 +66,7 @@ GameDivider.propTypes = {
 GameDivider.defaultProps = {
   vertical: false,
   spacing: 'small',
+  type: 'dashed',
 };
 
 export default GameDivider;

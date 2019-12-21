@@ -30,6 +30,11 @@ export default {
         play: 'Graj',
         sending: 'Wysyłanie...',
       },
+
+      rooms_list: {
+        header: 'Lista pokojów',
+        create_room: 'Stwórz pokój',
+      },
     },
 
     keyboard: {

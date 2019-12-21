@@ -6,22 +6,28 @@ import useClientSocket from '../hooks/useClientSocket';
 
 import ConfigChooseScreen from './ConfigChoose';
 import {GameCanvasHolder} from '../components';
+import ServersList from './ServersList';
 
 const ScreensContainer = () => {
   const {
     connect,
-    // client,
+    client,
   } = useClientSocket();
 
   const onConfigSet = useCallback(
-    ({nick, carType}) => connect(
-      {
-        playerInfo: {
-          nick,
-          carType,
+    history => async ({nick, carType}) => {
+      const _client = await connect(
+        {
+          playerInfo: {
+            nick,
+            carType,
+          },
         },
-      },
-    ),
+      );
+
+      history.push('/servers-list');
+      return _client;
+    },
     [connect],
   );
 
@@ -29,9 +35,16 @@ const ScreensContainer = () => {
     <GameCanvasHolder>
       <MemoryRouter>
         <Route
+          path='/servers-list'
+          render={
+            () => <ServersList client={client} />
+          }
+        />
+        <Route
+          exact
           path='/'
           render={
-            () => <ConfigChooseScreen onConfigSet={onConfigSet} />
+            ({history}) => <ConfigChooseScreen onConfigSet={onConfigSet(history)} />
           }
         />
       </MemoryRouter>

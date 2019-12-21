@@ -8,6 +8,7 @@ import {Layer} from '@ui/basic-components/styled';
 const GameCardHolder = styled.div(
   {
     base: {
+      position: 'relative',
       borderRadius: 4,
       border: `1px dashed ${DARKEST_GRAY}`,
     },

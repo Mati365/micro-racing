@@ -22,16 +22,12 @@ const List = styled(
   },
 );
 
-const CarsChooseRow = ({cardSize = 150, carsInfo, value, onChange, ...props}) => (
+const CarsChooseRow = ({carsInfo, value, onChange, ...props}) => (
   <List {...props}>
     {carsInfo.map(
       ({type}) => (
         <li key={type}>
           <GameClickableCard
-            style={{
-              width: cardSize,
-              paddingBottom: cardSize,
-            }}
             active={value === type}
             onClick={() => onChange(type)}
           >

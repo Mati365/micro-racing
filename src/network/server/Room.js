@@ -115,7 +115,32 @@ export default class Room {
   }
 
   /**
-   * Returns info about map
+   * Returns info about room used in some
+   * for example rooms list, it must be compressed
+   *
+   * @returns
+   * @memberof Room
+   */
+  toListBSON() {
+    const {
+      name, owner, config,
+      racing, players,
+    } = this;
+
+    return {
+      name,
+      owner: R.pick(['id', 'name'], owner.info),
+      playersCount: players.config,
+      config: config.toBSON(),
+      state: racing.getRaceState().toBSON(),
+    };
+  }
+
+  /**
+   * Returns info about room with MAP
+   *
+   * @returns
+   * @memberof Room
    */
   toBSON() {
     const {

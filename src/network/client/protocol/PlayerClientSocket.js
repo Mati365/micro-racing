@@ -15,6 +15,13 @@ export default class PlayerClientSocket {
       },
     },
 
+    fetchRoomsList: {
+      action: PLAYER_ACTIONS.GET_ROOMS_LIST,
+      flags: {
+        waitForResponse: true,
+      },
+    },
+
     joinRoom: {
       action: PLAYER_ACTIONS.JOIN_ROOM,
       serialize: R.objOf('name'),

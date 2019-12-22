@@ -1,28 +1,35 @@
 import React from 'react';
 
 import {useI18n} from '@ui/i18n';
-import {GameTabs} from '../../components/ui';
 
-const RacingConfigColumn = () => {
+import PlayersListConfig from './PlayersListConfig';
+import {
+  GameDivider,
+  GameTabs,
+} from '../../components/ui';
+
+const RacingConfigColumn = ({gameBoard}) => {
   const t = useI18n('game.screens.room_edit');
 
   return (
     <>
       <GameTabs>
         <GameTabs.Tab
-          id='settings'
-          title={t('tabs.settings')}
-        >
-          {() => (
-            <div>
-              COŚ
-            </div>
-          )}
-        </GameTabs.Tab>
-
-        <GameTabs.Tab
           id='players'
           title={t('tabs.players')}
+        >
+          {() => (
+            <PlayersListConfig gameBoard={gameBoard} />
+          )}
+        </GameTabs.Tab>
+      </GameTabs>
+
+      <GameDivider />
+
+      <GameTabs>
+        <GameTabs.Tab
+          id='settings'
+          title={t('tabs.settings')}
         >
           {() => (
             <div>

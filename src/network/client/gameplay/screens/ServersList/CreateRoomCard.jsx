@@ -1,29 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {useHistory} from 'react-router-dom';
 
 import plusIconUrl from '@game/res/img/icons/plus.png';
 
-import usePromiseCallback from '@ui/basic-hooks/async/usePromiseCallback';
 import {useI18n} from '@ui/i18n';
+import {usePromiseCallback} from '@pkg/basic-hooks';
 
 import {GameClickableIconCard} from '../../components/ui';
-import PlayerClientSocket from '../../../protocol/PlayerClientSocket';
 
-const CreateRoomCard = ({client}) => {
+const CreateRoomCard = ({createRoom}) => {
   const t = useI18n('game.screens.rooms_list');
-  const history = useHistory();
-  const [createRoom, {loading}] = usePromiseCallback(
-    async () => {
-      const room = await client.joinRoom();
-      history.push(
-        '/room-edit',
-        {
-          room,
-        },
-      );
-    },
-  );
+  const [_createRoom, {loading}] = usePromiseCallback(createRoom);
 
   return (
     <GameClickableIconCard
@@ -37,7 +24,7 @@ const CreateRoomCard = ({client}) => {
       title={
         t(loading ? 'creating_room' : 'create_room')
       }
-      onClick={createRoom}
+      onClick={_createRoom}
     />
   );
 };
@@ -45,7 +32,7 @@ const CreateRoomCard = ({client}) => {
 CreateRoomCard.displayName = 'CreateRoomCard';
 
 CreateRoomCard.propTypes = {
-  client: PropTypes.instanceOf(PlayerClientSocket).isRequired,
+  createRoom: PropTypes.func.isRequired,
 };
 
 export default React.memo(CreateRoomCard);

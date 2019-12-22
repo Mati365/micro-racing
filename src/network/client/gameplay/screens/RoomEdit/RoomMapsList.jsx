@@ -1,31 +1,17 @@
 import React from 'react';
 
-import {styled} from '@pkg/fast-stylesheet/src/react';
 import {usePromise} from '@pkg/basic-hooks';
 
-import {UnorderedList} from '@ui/basic-components/styled';
-import {GameRoadCard} from '../../components/ui';
-
-const MapsListUnorderedList = styled(
-  UnorderedList,
-  {
-    '& li': {
-      marginRight: 10,
-      marginBottom: 10,
-    },
-  },
-  {
-    props: {
-      row: true,
-    },
-  },
-);
+import {
+  GameCardsList,
+  GameRoadCard,
+} from '../../components/ui';
 
 const RoomMapsList = ({client}) => {
   const {result: maps} = usePromise(::client.fetchMapsList);
 
   return (
-    <MapsListUnorderedList>
+    <GameCardsList>
       {(maps?.list || []).map(
         ({id, title, thumbnail}) => (
           <li key={id}>
@@ -38,7 +24,7 @@ const RoomMapsList = ({client}) => {
           </li>
         ),
       )}
-    </MapsListUnorderedList>
+    </GameCardsList>
   );
 };
 

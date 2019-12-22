@@ -12,6 +12,10 @@ export default class RaceState {
     this.payload = payload;
   }
 
+  static fromBSON({type, payload}) {
+    return new RaceState(type, payload);
+  }
+
   toBSON() {
     return {
       type: this.type,

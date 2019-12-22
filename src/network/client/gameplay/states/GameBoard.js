@@ -12,6 +12,7 @@ import carKeyboardDriver, {GameKeyboardController} from '@game/logic/drivers/car
 
 import RoomMapNode from '../objects/RoomMapNode';
 import RemoteRoomStateListener from '../RemoteRoomStateListener';
+import RaceState from '../../../shared/room/RoomRaceState';
 
 export default class GameBoard {
   constructor(
@@ -24,11 +25,13 @@ export default class GameBoard {
 
     this.observers = {
       roomMap: createLowLatencyObservable(),
+      roomInfo: createLowLatencyObservable(),
       raceState: createLowLatencyObservable(),
       players: createLowLatencyObservable(),
     };
 
     this.roomInfo = {
+      name: null,
       config: null,
       state: null,
       ownerID: null,
@@ -57,26 +60,23 @@ export default class GameBoard {
   }
 
   notifyPlayersChange(left, join) {
+    const {players, currentPlayerCar} = this.roomMapNode || {};
+
     this.observers.players.notify(
       {
-        nodes: this.roomMapNode.players,
-        currentPlayerNode: this.roomMapNode.currentPlayerCar,
+        nodes: players,
+        currentPlayerNode: currentPlayerCar,
         left,
         join,
       },
     );
   }
 
-  async loadInitialRoomState(initialRoomState) {
-    const {f} = this.scene;
-    const {client, observers} = this;
+  async loadRoomMapNode(roomState) {
+    const {f} = this.scene || {};
+    const {client} = this;
 
-    this.roomInfo = {
-      ownerID: initialRoomState.ownerID,
-      state: initialRoomState.state,
-      config: initialRoomState.config,
-    };
-
+    this.roomMapNode?.release();
     this.roomMapNode = new RoomMapNode(
       {
         board: this,
@@ -85,15 +85,50 @@ export default class GameBoard {
       },
     );
 
-    await this.roomMapNode.loadInitialRoomState(initialRoomState);
+    await this.roomMapNode.loadInitialRoomState(roomState);
+  }
+
+  async loadInitialRoomState(initialRoomState, createRoomMapNode = true) {
+    const {client, observers} = this;
+
+    this.roomInfo = {
+      name: initialRoomState.name,
+      ownerID: initialRoomState.ownerID,
+      state: initialRoomState.state,
+      config: initialRoomState.config,
+    };
+
+    if (createRoomMapNode)
+      await this.loadRoomMapNode(initialRoomState);
 
     this.notifyPlayersChange();
+    observers.roomInfo.notify(this.roomInfo);
+
     this.roomRemoteListener = new RemoteRoomStateListener(
       {
         client,
 
+        onUpdateRoomInfo: (roomInfo) => {
+          Object.assign(
+            this.roomInfo,
+            {
+              name: roomInfo.name,
+              ownerID: roomInfo.owner.id,
+              state: RaceState.fromBSON(roomInfo.state),
+            },
+          );
+
+          observers.roomInfo.notify(this.roomInfo);
+          observers.raceState.notify(this.roomInfo.state);
+        },
+
         onUpdateBoardObjects: (players) => {
           players.forEach(this.onSyncObject);
+        },
+
+        onUpdatePlayersRoomState: ({players: playersInfos}) => {
+          playersInfos.forEach(this.onSyncPlayerRoomInfo);
+          this.notifyPlayersChange();
         },
 
         onUpdatePlayersRaceState: (playersStates) => {
@@ -101,13 +136,8 @@ export default class GameBoard {
           this.notifyPlayersChange();
         },
 
-        onUpdateRaceState: (state) => {
-          this.roomInfo.state = state;
-          observers.raceState.notify(state);
-        },
-
         onJoinPlayer: async (player, carObject) => {
-          await this.roomMapNode.appendObjects(
+          await this.roomMapNode?.appendObjects(
             {
               players: [player],
               objects: [carObject],
@@ -125,7 +155,7 @@ export default class GameBoard {
         },
 
         onLeavePlayer: (player) => {
-          this.roomMapNode.removePlayerCar(player);
+          this.roomMapNode?.removePlayerCar(player);
           this.notifyPlayersChange(
             {
               map: this.roomMapNode,
@@ -146,6 +176,21 @@ export default class GameBoard {
 
     return this;
   }
+
+  onSyncPlayerRoomInfo = (playerInfo) => {
+    const playerNode = this.roomMapNode.refs.players[playerInfo.id];
+    if (!playerNode) {
+      console.warn(`Unknown sync player room state(id: ${playerInfo.id})!`);
+      return;
+    }
+
+    Object.assign(
+      playerNode.player,
+      {
+        nick: playerInfo.nick,
+      },
+    );
+  };
 
   onSyncPlayerRaceState = (playerRaceState) => {
     const playerNode = this.roomMapNode.refs.objects[playerRaceState.id];
@@ -319,5 +364,9 @@ export default class GameBoard {
     const {roomMapNode} = this;
 
     roomMapNode.render(interpolate, mpMatrix);
+  }
+
+  release() {
+    this.roomMapNode?.release();
   }
 }

@@ -6,6 +6,10 @@ const UnorderedList = styled.ul(
     base: {
       margin: 0,
       padding: 0,
+
+      '& > li': {
+        listStyleType: 'none',
+      },
     },
 
     row: {

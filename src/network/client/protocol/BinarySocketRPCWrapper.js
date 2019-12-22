@@ -1,4 +1,6 @@
-import {Deferred} from '@pkg/basic-helpers';
+import * as R from 'ramda';
+
+import {Deferred, safeArray} from '@pkg/basic-helpers';
 
 import {ACTION_FLAGS} from '../../constants/serverCodes';
 
@@ -33,6 +35,26 @@ export default class BinarySocketRPCWrapper {
     ws.addEventListener('message', this.onMessage);
   }
 
+  chainListener(type, fn) {
+    let prevListeners = this.listeners[type];
+    if (prevListeners)
+      prevListeners = safeArray(prevListeners);
+
+    this.listeners[type] = [
+      ...(prevListeners || []),
+      fn,
+    ];
+
+    return () => {
+      this.listeners[type] = R.without([fn], this.listeners[type]);
+    };
+  }
+
+  /**
+   * Watches messages from server
+   *
+   * @memberof BinarySocketRPCWrapper
+   */
   onMessage = ({data}) => {
     const {listeners} = this;
     const msg = new Uint8Array(data);
@@ -57,9 +79,13 @@ export default class BinarySocketRPCWrapper {
       const handler = listeners[action];
 
       if (handler) {
-        handler(
-          getMessageContent(msg),
-        );
+        const content = getMessageContent(msg);
+
+        if (handler.constructor === Array) {
+          for (let i = 0; i < handler.length; ++i)
+            handler[i](content);
+        } else
+          handler(content);
       }
     }
   };

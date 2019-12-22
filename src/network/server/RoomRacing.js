@@ -61,7 +61,7 @@ export default class RoomRacing {
   setRaceState(state, broadcast = true) {
     this.state = state;
     if (broadcast)
-      this.broadcastRoomState(state);
+      this.room.broadcastRoomInfo();
 
     return this;
   }
@@ -356,18 +356,6 @@ export default class RoomRacing {
     }
 
     return false;
-  }
-
-  /**
-   * High latency, send race state (total laps and other stuff)
-   */
-  broadcastRoomState(state = this.state) {
-    this.room.sendBroadcastAction(
-      null,
-      PLAYER_ACTIONS.UPDATE_RACE_STATE,
-      null,
-      state,
-    );
   }
 
   /**

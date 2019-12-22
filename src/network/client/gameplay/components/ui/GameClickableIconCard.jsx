@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import c from 'classnames';
 
 import {WHITE} from '@ui/colors';
@@ -10,7 +11,9 @@ import {Margin} from '@ui/basic-components/styled';
 import GameClickableCard from './GameClickableCard';
 
 const GameClickableIconCard = ({
-  icon, iconSize, title, classes, className, children,
+  icon, iconSize, iconWrapperProps,
+  mutedTitle, title,
+  classes, className, children,
   ...props
 }) => (
   <GameClickableCard
@@ -27,6 +30,7 @@ const GameClickableIconCard = ({
           classes.icon,
           iconSize && classes[`icon-size-${iconSize}`],
         )}
+        {...iconWrapperProps}
       >
         {icon}
       </span>
@@ -36,7 +40,10 @@ const GameClickableIconCard = ({
 
     {title && (
       <Margin
-        className={classes.title}
+        className={c(
+          classes.title,
+          mutedTitle && classes.mutedTitle,
+        )}
         top={2}
         block
       >
@@ -47,6 +54,14 @@ const GameClickableIconCard = ({
 );
 
 GameClickableIconCard.displayName = 'GameClickableIconCard';
+
+GameClickableIconCard.propTypes = {
+  mutedTitle: PropTypes.bool,
+};
+
+GameClickableIconCard.defaultProps = {
+  mutedTitle: true,
+};
 
 export default injectClassesStylesheet(
   {
@@ -77,11 +92,14 @@ export default injectClassesStylesheet(
       textTransform: 'uppercase',
       fontSize: '11px',
       fontWeight: 900,
-      opacity: 0.5,
       textOverflow: 'ellipsis',
       overflow: 'hidden',
       whiteSpace: 'nowrap',
       padding: '0 4px',
+    },
+
+    mutedTitle: {
+      opacity: 0.5,
     },
   },
 )(GameClickableIconCard);

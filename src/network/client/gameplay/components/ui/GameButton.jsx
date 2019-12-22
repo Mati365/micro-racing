@@ -48,6 +48,12 @@ const GameButton = styled(
       width: '100%',
     },
 
+    'size-tiny': {
+      padding: 5,
+      fontSize: '10px',
+      letterSpacing: '1px',
+    },
+
     'type-blue': {
       color: WHITE,
       background: DODGER_BLUE,
@@ -68,11 +74,12 @@ const GameButton = styled(
   },
   {
     index: 3,
-    omitProps: ['type', 'expanded'],
-    classSelector: (classes, {type, disabled, expanded}) => [
+    omitProps: ['type', 'expanded', 'size'],
+    classSelector: (classes, {type, disabled, expanded, size}) => [
       classes[`type-${type}`],
       expanded && classes.expanded,
       disabled && classes.disabled,
+      size && classes[`size-${size}`],
     ],
   },
 );

@@ -57,7 +57,7 @@ GameDivider.propTypes = {
     'none',
     'medium-small',
     'medium',
-    'smalll',
+    'small',
     'big',
     'huge',
   ]),

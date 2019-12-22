@@ -163,20 +163,17 @@ export default class PlayerSocket extends Player {
       afterExec: true,
     },
   )
-  joinRoom(name) {
+  joinRoom(id) {
     const {server, info} = this;
 
-    if (!name)
-      name = `${info.nick}'s room`;
-
-    let room = server.findRoom(name);
+    let room = server.findRoom(id);
     if (room)
       room.join(this);
     else {
       room = server.createRoom(
         {
           owner: this,
-          name,
+          name: `${info.nick}'s room`,
         },
       );
     }
@@ -235,10 +232,22 @@ export default class PlayerSocket extends Player {
       );
     },
 
-    [PLAYER_ACTIONS.SET_PLAYER_INFO]: (cmdID, {nick, carType}) => {
-      const {nick: prevNick} = this.info;
-      const newNick = R.slice(0, 20, nick) || prevNick;
+    [PLAYER_ACTIONS.KICK_PLAYER]: (cmdID, {id}) => {
+      this.sendActionResponse(
+        cmdID,
+        {
+          result: this.info.room?.kick(id),
+        },
+      );
+    },
 
+    [PLAYER_ACTIONS.SET_PLAYER_INFO]: (cmdID, {nick, carType}) => {
+      const {
+        room,
+        nick: prevNick,
+      } = this.info;
+
+      const newNick = R.slice(0, 20, nick) || prevNick;
       if (newNick !== prevNick)
         consola.info(`Player ${chalk.white.bold(prevNick)} renamed to ${chalk.green.bold(newNick)}!`);
 
@@ -254,6 +263,7 @@ export default class PlayerSocket extends Player {
         },
       );
 
+      room?.broadcastPlayersRoomState();
       this.sendActionResponse(
         cmdID,
         this.toBSON(),

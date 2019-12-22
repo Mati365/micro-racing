@@ -38,8 +38,8 @@ export default class RemoteRoomStateListener {
       this.onUpdatePlayersRoomState(players);
     },
 
-    [PLAYER_ACTIONS.UPDATE_RACE_STATE]: (data) => {
-      this.onUpdateRaceState(data);
+    [PLAYER_ACTIONS.UPDATE_ROOM_INFO]: (data) => {
+      this.onUpdateRoomInfo(data);
     },
   };
 
@@ -49,7 +49,7 @@ export default class RemoteRoomStateListener {
       onLeavePlayer = R.F,
       onJoinPlayer = R.F,
       onUpdateBoardObjects = R.F,
-      onUpdateRaceState = R.F,
+      onUpdateRoomInfo = R.F,
       onUpdatePlayersRoomState = R.F,
       onUpdatePlayersRaceState = R.F,
     } = {},
@@ -58,7 +58,7 @@ export default class RemoteRoomStateListener {
     this.onLeavePlayer = onLeavePlayer;
     this.onJoinPlayer = onJoinPlayer;
 
-    this.onUpdateRaceState = onUpdateRaceState;
+    this.onUpdateRoomInfo = onUpdateRoomInfo;
     this.onUpdatePlayersRaceState = onUpdatePlayersRaceState;
     this.onUpdatePlayersRoomState = onUpdatePlayersRoomState;
 

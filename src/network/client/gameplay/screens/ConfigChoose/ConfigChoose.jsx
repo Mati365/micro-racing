@@ -4,8 +4,6 @@ import PropTypes from 'prop-types';
 import {CAR_TYPES} from '@game/network/constants/serverCodes';
 
 import {styled} from '@pkg/fast-stylesheet/src/react';
-import {asyncTimeout} from '@pkg/basic-helpers';
-
 import {useI18n} from '@ui/i18n';
 
 import {Margin} from '@ui/basic-components/styled';
@@ -49,12 +47,7 @@ const ConfigChoose = ({initialData, created, onConfigSet}) => {
     <ScreenHolder expanded={false}>
       <ConfigChooseForm
         initialData={initialData}
-        onSubmit={
-          async (...args) => {
-            await asyncTimeout(500);
-            return onConfigSet(...args);
-          }
-        }
+        onSubmit={onConfigSet}
       >
         {({l, modified, promiseState: {loading, errors}}) => (
           <>

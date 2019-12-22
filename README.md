@@ -65,6 +65,7 @@ https://png.is/f/chatbot-robot-internet-bot-artificial-intelligence-icon-vector-
 https://icons8.com/icon/38824/meat
 https://www.kisscc0.com/clipart/u-turn-traffic-sign-turnaround-computer-icons-caut-y4h8ur/
 https://dryicons.com/icon/zombie-brains-icon-11516
+https://fontawesome.com/icons/car
 
 Cars:
 https://opengameart.org/content/low-poly-cars

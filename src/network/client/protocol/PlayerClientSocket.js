@@ -41,6 +41,14 @@ export default class PlayerClientSocket {
       },
     },
 
+    kickPlayer: {
+      action: PLAYER_ACTIONS.KICK_PLAYER,
+      serialize: R.objOf('id'),
+      flags: {
+        waitForResponse: true,
+      },
+    },
+
     setPlayerInfo: {
       action: PLAYER_ACTIONS.SET_PLAYER_INFO,
       flags: {

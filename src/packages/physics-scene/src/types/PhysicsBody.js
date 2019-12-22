@@ -2,10 +2,10 @@ import * as R from 'ramda';
 
 import {
   toRadians,
-  lerp,
   wrapAngleTo2PI,
   vec2,
   getPathCornersBox,
+  angleLerp,
 } from '@pkg/gl-math';
 
 export default class PhysicsBody {
@@ -201,7 +201,7 @@ export default class PhysicsBody {
         return this;
 
       if (interpolate.lerpUpdate) {
-        interpolationCache.angle = lerp(
+        interpolationCache.angle = angleLerp(
           interpolateState.prevState.angle,
           interpolateState.state.angle,
           alpha,

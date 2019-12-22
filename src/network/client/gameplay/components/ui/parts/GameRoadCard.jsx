@@ -4,6 +4,14 @@ import PropTypes from 'prop-types';
 import {ID_SCHEMA} from '@ui/schemas';
 import GameClickableIconCard from '../GameClickableIconCard';
 
+export const ROAD_CARD_INFO_SCHEMA = PropTypes.shape(
+  {
+    id: ID_SCHEMA,
+    title: PropTypes.string.isRequired,
+    thumbnail: PropTypes.string.isRequired,
+  },
+);
+
 const GameRoadCard = ({road, ...props}) => (
   <GameClickableIconCard
     size='small'
@@ -22,13 +30,7 @@ const GameRoadCard = ({road, ...props}) => (
 GameRoadCard.displayName = 'GameRoadCard';
 
 GameRoadCard.propTypes = {
-  road: PropTypes.shape(
-    {
-      id: ID_SCHEMA,
-      title: PropTypes.string.isRequired,
-      thumbnail: PropTypes.string.isRequired,
-    },
-  ).isRequired,
+  road: ROAD_CARD_INFO_SCHEMA.isRequired,
 };
 
 export default GameRoadCard;

@@ -22,11 +22,13 @@ const createLowLatencyObservable = (initialValue = null) => {
         list[i](value);
     },
 
-    subscribe(fn) {
+    subscribe(fn, emitOnMount = false) {
       if (!fn)
         return R.F;
 
       observers.current.push(fn);
+      if (emitOnMount)
+        fn(lastValue);
 
       return () => {
         observers.current = R.without([fn], observers.current);

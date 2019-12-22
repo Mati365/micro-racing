@@ -1,3 +1,4 @@
+import uniqid from 'uniqid';
 import * as R from 'ramda';
 
 import {
@@ -25,6 +26,7 @@ import {PlayerRacingState} from './Player/PlayerInfo';
 export default class Room {
   constructor(
     {
+      id = uniqid(),
       owner,
       name,
       map,
@@ -35,6 +37,7 @@ export default class Room {
       onDestroy,
     },
   ) {
+    this.id = id;
     this.config = config;
     this.map = map;
     this.name = name;
@@ -123,16 +126,18 @@ export default class Room {
    */
   toListBSON() {
     const {
-      name, owner, config,
-      racing, players,
+      id, name, map, owner, config,
+      racing, playersCount,
     } = this;
 
     return {
+      id,
       name,
+      playersCount,
+      map: map?.toListBSON(),
       owner: R.pick(['id', 'nick'], owner.info),
-      playersCount: players.config,
       config: config.toBSON(),
-      state: racing.getRaceState().toBSON(),
+      state: racing?.getRaceState().toBSON(),
     };
   }
 
@@ -144,11 +149,12 @@ export default class Room {
    */
   toBSON() {
     const {
-      name, owner, config,
+      id, name, owner, config,
       racing, players,
     } = this;
 
     return {
+      id,
       name,
       config: config.toBSON(),
       state: racing.getRaceState().toBSON(),
@@ -176,7 +182,7 @@ export default class Room {
   }
 
   get isFull() {
-    return Math.max(0, this.playersCount - 1) === this.config.playersLimit;
+    return this.playersCount >= this.config.playersLimit;
   }
 
   get isEmpty() {
@@ -224,6 +230,18 @@ export default class Room {
   }
 
   /**
+   * Sends basic info about room
+   */
+  broadcastRoomInfo() {
+    this.sendBroadcastAction(
+      null,
+      PLAYER_ACTIONS.UPDATE_ROOM_INFO,
+      null,
+      this.toListBSON(),
+    );
+  }
+
+  /**
    * Appends player to room players,
    * if owner is null(which should never happen) set it as owner
    *
@@ -248,7 +266,7 @@ export default class Room {
     if (findByID(id, players))
       throw new ServerError(ERROR_CODES.ALREADY_JOINED);
 
-    if (findByID(id, kickedPlayers))
+    if (R.contains(id, kickedPlayers))
       throw new ServerError(ERROR_CODES.ALREADY_KICKED);
 
     if (R.isNil(this.owner))
@@ -300,13 +318,15 @@ export default class Room {
    * @param {Boolean} broadcast
    */
   leave(player, broadcast = true) {
-    const {abstract} = this;
+    const {abstract, owner} = this;
 
     this.players = removeByID(player.id, this.players);
-
-    if (!abstract) {
+    if (!abstract)
       this.racing.map.removePlayerCar(player);
 
+    if (this.isEmpty || this.bots.length === this.players.length)
+      this.destroy();
+    else if (!abstract) {
       player.assignRoom(
         {
           room: null,
@@ -314,17 +334,49 @@ export default class Room {
         },
       );
 
-      broadcast && this.sendBroadcastAction(
+      if (broadcast) {
+        if (player.id === owner?.id) {
+          [this.owner] = this.players;
+          this.broadcastRoomInfo();
+        }
+
+        this.sendBroadcastAction(
+          null,
+          PLAYER_ACTIONS.PLAYER_LEFT_ROOM,
+          null,
+          {
+            player: player.toBSON(),
+          },
+        );
+      }
+    }
+  }
+
+  /**
+   * Removes player from room
+   *
+   * @param {ID} playerId
+   * @memberof Room
+   */
+  kick(playerId) {
+    const player = findByID(playerId, this.players);
+    if (!player)
+      return false;
+
+    this.kickedPlayers.push(playerId);
+    this.leave(player);
+
+    player.ws.send(
+      createActionMessage(
         null,
-        PLAYER_ACTIONS.PLAYER_LEFT_ROOM,
+        PLAYER_ACTIONS.YOU_ARE_KICKED,
         null,
         {
-          player: player.toBSON(),
+          message: null,
         },
-      );
-    }
+      ),
+    );
 
-    if (this.isEmpty || this.bots.length === this.players.length)
-      this.destroy();
+    return true;
   }
 }

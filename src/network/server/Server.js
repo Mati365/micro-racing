@@ -3,9 +3,11 @@ import consola from 'consola';
 import chalk from 'chalk';
 
 import {removeByProp} from '@pkg/basic-helpers/list/removeByID';
-import {findByProp} from '@pkg/basic-helpers/list/findByID';
 import {getRandomObjValue} from '@pkg/basic-helpers/base/random';
-import {logMethod} from '@pkg/basic-helpers';
+import {
+  logMethod,
+  findByID,
+} from '@pkg/basic-helpers';
 
 import PlayerSocket from './Player/types/PlayerSocket';
 import Room from './Room';
@@ -114,8 +116,8 @@ export default class GameServer {
   /**
    * ROOM API
    */
-  findRoom(name) {
-    return findByProp('name')(name, this.rooms);
+  findRoom(id) {
+    return findByID(id, this.rooms);
   }
 
   /**

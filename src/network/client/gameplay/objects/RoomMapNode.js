@@ -153,6 +153,31 @@ export const appendToSceneBuffer = f => ({
   };
 };
 
+export const createOffscreenRefs = ({players, objects}) => ({
+  objects,
+  players: R.reduce(
+    (acc, player) => {
+      if (player) {
+        acc[player.id] = {
+          player,
+        };
+      }
+
+      return acc;
+    },
+    {},
+    players,
+  ),
+});
+
+/**
+ * @see
+ *  It works in two modes! Offscreen is used in game board!
+ *  In offscreen mode FGL is not provided and scene is not created
+ *
+ * @export
+ * @class RoomMapNode
+ */
 export default class RoomMapNode {
   constructor(
     {
@@ -192,30 +217,49 @@ export default class RoomMapNode {
     }
 
     const {f, currentPlayer} = this;
-    const {
-      buffer,
-      refs,
-    } = await appendToSceneBuffer(f)(
-      {
-        players,
-        objects,
-      },
-    )(f.createSceneBuffer());
+    if (f) {
+      const {
+        buffer,
+        refs,
+      } = await appendToSceneBuffer(f)(
+        {
+          players,
+          objects,
+        },
+      )(f.createSceneBuffer());
 
-    this.sceneBuffer = buffer;
-    this.refs = refs;
+      this.sceneBuffer = buffer;
+      this.refs = refs;
+      this.roadNodes = R.filter(
+        R.is(RoadNode),
+        buffer.list || [],
+      );
 
-    this.currentPlayerCar = refs.players[currentPlayer.id];
-    this.roadNodes = R.filter(
-      R.is(RoadNode),
-      this.sceneBuffer.list || [],
-    );
+      this.render = ::this.sceneBuffer.render;
+    } else {
+      this.refs = createOffscreenRefs(
+        {
+          players,
+          objects,
+        },
+      );
+    }
 
-    this.render = ::this.sceneBuffer.render;
+    this.currentPlayerCar = this.refs.players[currentPlayer.id];
   }
 
   get players() {
     return this.refs.players;
+  }
+
+  release() {
+    const {buffer} = this;
+
+    buffer?.release();
+    this.refs = {
+      players: {},
+      objects: {},
+    };
   }
 
   update(interpolate) {
@@ -238,7 +282,7 @@ export default class RoomMapNode {
     const {sceneBuffer, refs} = this;
     const carNode = refs.players[player.id];
 
-    sceneBuffer.removeNode(carNode);
+    sceneBuffer?.removeNode(carNode);
 
     delete refs.players[player.id];
     delete refs.objects[carNode.id];
@@ -250,12 +294,24 @@ export default class RoomMapNode {
       objects,
     },
   ) {
-    const {refs} = await appendToSceneBuffer(this.f)(
-      {
-        players,
-        objects,
-      },
-    )(this.sceneBuffer);
+    const {f} = this;
+    let refs = null;
+
+    if (!f) {
+      refs = createOffscreenRefs(
+        {
+          players,
+          objects,
+        },
+      );
+    } else {
+      refs = await appendToSceneBuffer(f)(
+        {
+          players,
+          objects,
+        },
+      )(this.sceneBuffer);
+    }
 
     this.refs = {
       players: {

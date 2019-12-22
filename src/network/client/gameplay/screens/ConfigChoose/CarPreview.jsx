@@ -4,7 +4,7 @@ import * as R from 'ramda';
 
 import {CAR_TYPES} from '@game/network/constants/serverCodes';
 
-import {vec3, toRadians} from '@pkg/gl-math';
+import {vec3} from '@pkg/gl-math';
 import {createIsometricScene} from '@pkg/isometric-renderer';
 
 import CarNode from '../../objects/Car';
@@ -13,6 +13,7 @@ const createCarPreview = (
   {
     canvas,
     carType,
+    rotateDuration = 5000,
   },
 ) => {
   const {f, frame} = createIsometricScene(
@@ -41,19 +42,12 @@ const createCarPreview = (
     },
   );
 
-  let rotation = 0.0;
-
   buffer.createNode(carNode);
   const releaseFrameRenderer = frame(
     {
       update: (interpolation) => {
-        const {fixedStepUpdate} = interpolation;
-        if (carNode.body) {
-          if (fixedStepUpdate)
-            rotation += toRadians(4);
-
-          carNode.body.angle = rotation;
-        }
+        if (carNode.body)
+          carNode.body.angle = (Date.now() % rotateDuration) / rotateDuration * Math.PI * 2;
 
         carNode.update(interpolation);
       },

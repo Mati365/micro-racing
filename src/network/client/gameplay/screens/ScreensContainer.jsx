@@ -73,7 +73,7 @@ const ScreensContainer = () => {
                 ({location: {state}}) => (
                   <RoomEdit
                     client={client}
-                    room={state.room}
+                    gameBoard={state.gameBoard}
                   />
                 )
               }

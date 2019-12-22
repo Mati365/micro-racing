@@ -6,5 +6,7 @@ export {default as GameHeader} from './GameHeader';
 export {default as GameClickableCard} from './GameClickableCard';
 export {default as GameClickableIconCard} from './GameClickableIconCard';
 export {default as GameTabs} from './GameTabs';
+export {default as GameCardsList} from './GameCardsList';
 
 export {default as GameRoadCard} from './parts/GameRoadCard';
+export {default as GameRoomCard} from './parts/GameRoomCard';

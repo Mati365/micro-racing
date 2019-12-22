@@ -49,6 +49,12 @@ export default {
           players: 'Obecni',
           settings: 'Opcje',
         },
+
+        players_list: {
+          ops: 'Administrator:',
+          in_race: 'Zawodnicy:',
+          observers: 'Obserwatorzy:',
+        },
       },
     },
 

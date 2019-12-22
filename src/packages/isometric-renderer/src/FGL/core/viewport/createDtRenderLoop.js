@@ -3,14 +3,16 @@
  *
  * @param {Function} fn
  */
-export const createAnimationFrameRenderer = ({
-  render,
-  update,
-  allowLerpUpdate = true,
-  updateDelay = 1000 / 30,
-  limitFrameTime = 1000 / 60, // 60fps
-  raf = window?.requestAnimationFrame,
-}) => {
+export const createAnimationFrameRenderer = (
+  {
+    render,
+    update,
+    allowLerpUpdate = true,
+    updateDelay = 1000 / 30,
+    limitFrameTime = 1000 / 60, // 60fps
+    raf = window?.requestAnimationFrame,
+  },
+) => {
   let stop = false;
   let lastFrame = Date.now();
   let updateAcc = 0;

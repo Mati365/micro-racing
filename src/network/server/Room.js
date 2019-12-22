@@ -129,7 +129,7 @@ export default class Room {
 
     return {
       name,
-      owner: R.pick(['id', 'name'], owner.info),
+      owner: R.pick(['id', 'nick'], owner.info),
       playersCount: players.config,
       config: config.toBSON(),
       state: racing.getRaceState().toBSON(),

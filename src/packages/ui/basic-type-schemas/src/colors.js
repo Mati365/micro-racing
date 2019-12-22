@@ -17,7 +17,9 @@ export const CRIMSON_RED_DARKEN_5 = Color(CRIMSON_RED).darken(0.5).hex();
 export const CRIMSON_RED_DARKEN_1 = Color(CRIMSON_RED).darken(0.1).hex();
 
 export const SPRING_ORANGE = '#F7A758';
+
 export const GRASS_GREEN = '#59C56D';
+export const GRASS_GREEN_DARKEN_5 = Color(GRASS_GREEN).darken(0.5).hex();
 
 export const SPRING_GREEN = '#94C751';
 export const SPRING_GREEN_DARKEN_5 = Color(SPRING_GREEN).darken(0.5).hex();

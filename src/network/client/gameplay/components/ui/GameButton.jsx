@@ -4,8 +4,8 @@ import {
   CRIMSON_RED_DARKEN_5,
   DODGER_BLUE,
   DODGER_BLUE_DARKEN_5,
-  SPRING_GREEN,
-  SPRING_GREEN_DARKEN_5,
+  GRASS_GREEN,
+  GRASS_GREEN_DARKEN_5,
 } from '@ui/colors';
 
 import {styled} from '@pkg/fast-stylesheet/src/react';
@@ -56,8 +56,8 @@ const GameButton = styled(
 
     'type-green': {
       color: WHITE,
-      background: SPRING_GREEN,
-      boxShadow: `0 0.2em ${SPRING_GREEN_DARKEN_5}`,
+      background: GRASS_GREEN,
+      boxShadow: `0 0.2em ${GRASS_GREEN_DARKEN_5}`,
     },
 
     'type-red': {

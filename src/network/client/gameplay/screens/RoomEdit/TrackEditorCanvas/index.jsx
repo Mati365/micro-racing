@@ -21,7 +21,7 @@ const useTrackEditor = initialConfig => useMemo(
  *
  * @export
  */
-const TrackEditorCanvas = ({dimensions, canvasConfig}) => {
+const TrackEditorCanvas = ({disabled, dimensions, canvasConfig}) => {
   const roadRef = useRef();
   const editor = useTrackEditor();
 
@@ -38,7 +38,17 @@ const TrackEditorCanvas = ({dimensions, canvasConfig}) => {
   );
 
   return (
-    <Wrapper expanded>
+    <Wrapper
+      style={(
+        disabled
+          ? {
+            filter: 'grayscale(1.0)',
+            pointerEvents: 'none',
+          }
+          : null
+      )}
+      expanded
+    >
       <canvas
         ref={roadRef}
         tabIndex={-1}
@@ -49,7 +59,10 @@ const TrackEditorCanvas = ({dimensions, canvasConfig}) => {
         }}
       />
 
-      <Toolbar editor={editor} />
+      <Toolbar
+        disabled={disabled}
+        editor={editor}
+      />
     </Wrapper>
   );
 };
@@ -59,11 +72,13 @@ TrackEditorCanvas.displayName = 'TrackEditorCanvas';
 TrackEditorCanvas.propTypes = {
   dimensions: DIMENSIONS_SCHEMA,
   canvasConfig: PropTypes.any,
+  disabled: PropTypes.bool,
 };
 
 TrackEditorCanvas.defaultProps = {
   dimensions: null,
   canvasConfig: null,
+  disabled: false,
 };
 
 export default React.memo(TrackEditorCanvas);

@@ -43,6 +43,7 @@ export default {
         predefined_maps: 'Wybierz inne mapy:',
         racing_config: 'Konfiguracja wyścigu:',
         leave: 'Opuść pokój',
+        edit_road: 'Edytuj tor',
       },
     },
 

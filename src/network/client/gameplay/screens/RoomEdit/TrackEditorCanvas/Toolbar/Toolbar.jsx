@@ -29,31 +29,40 @@ import {GameInput} from '../../../../components/ui';
 const ToolbarHolder = styled(
   UnorderedList,
   {
-    margin: 5,
-    float: 'right',
+    base: {
+      margin: 5,
+      float: 'right',
 
-    '& button': {
-      color: WHITE,
+      '& button': {
+        color: WHITE,
+      },
+
+      '& > li:not(:last-child)': {
+        '&::after': {
+          position: 'relative',
+          top: 2,
+          content: '"|"',
+          margin: [0, 5],
+          color: DARKEST_GRAY,
+        },
+      },
     },
 
-    '& > li:not(:last-child)': {
-      '&::after': {
-        position: 'relative',
-        top: 2,
-        content: '"|"',
-        margin: [0, 5],
-        color: DARKEST_GRAY,
-      },
+    disabled: {
+      opacity: 0.5,
+      pointerEvents: 'none',
     },
   },
   {
+    omitProps: ['disabled'],
+    classSelector: (classes, {disabled}) => disabled && classes.disabled,
     props: {
       row: true,
     },
   },
 );
 
-const Toolbar = ({editor}) => {
+const Toolbar = ({disabled, editor}) => {
   const t = useI18n();
   const {l, value, setValue} = useInputs(
     {
@@ -91,7 +100,7 @@ const Toolbar = ({editor}) => {
   };
 
   return (
-    <ToolbarHolder>
+    <ToolbarHolder disabled={disabled}>
       <li>
         <TextButton onClick={onSave}>
           {t('editor.titles.save')}
@@ -118,7 +127,12 @@ const Toolbar = ({editor}) => {
 Toolbar.displayName = 'Toolbar';
 
 Toolbar.propTypes = {
+  disabled: PropTypes.bool,
   editor: PropTypes.instanceOf(TrackEditor).isRequired,
+};
+
+Toolbar.defaultProps = {
+  disabled: false,
 };
 
 export default Toolbar;

@@ -232,11 +232,11 @@ export default class PlayerSocket extends Player {
       );
     },
 
-    [PLAYER_ACTIONS.KICK_PLAYER]: (cmdID, {id}) => {
+    [PLAYER_ACTIONS.KICK_PLAYER]: (cmdID, {id, ban}) => {
       this.sendActionResponse(
         cmdID,
         {
-          result: this.info.room?.kick(id),
+          result: this.info.room?.kick(id, ban),
         },
       );
     },

@@ -18,7 +18,10 @@ const pluckPlayersArray = R.compose(
   R.prop('nodes'),
 );
 
-const PlayersUnorderedList = ({title, players, spaced, gameBoard, onKick}) => {
+const PlayersUnorderedList = ({
+  title, players, spaced, gameBoard,
+  onKick, onBan,
+}) => {
   if (!players || !players.length)
     return null;
 
@@ -50,6 +53,7 @@ const PlayersUnorderedList = ({title, players, spaced, gameBoard, onKick}) => {
                 }
                 player={player}
                 onKick={() => onKick(player)}
+                onBan={() => onBan(player)}
               />
             );
           },
@@ -84,7 +88,10 @@ const PlayersListConfig = ({gameBoard}) => {
     players,
   );
 
-  const onKick = player => gameBoard.client.kickPlayer(player.id);
+  const sharedProps = {
+    onKick: player => gameBoard.client.kickPlayer({id: player.id}),
+    onBan: player => gameBoard.client.kickPlayer({id: player.id, ban: true}),
+  };
 
   return (
     <>
@@ -92,15 +99,15 @@ const PlayersListConfig = ({gameBoard}) => {
         title={t('ops')}
         players={groupedPlayers.op || []}
         gameBoard={gameBoard}
-        onKick={onKick}
+        {...sharedProps}
       />
 
       <PlayersUnorderedList
         title={t('in_race')}
         players={groupedPlayers.inRace || []}
         gameBoard={gameBoard}
-        onKick={onKick}
         spaced
+        {...sharedProps}
       />
     </>
   );

@@ -5,11 +5,12 @@ import {WHITE} from '@ui/colors';
 
 import carIconUrl from '@game/res/img/icons/car.png';
 import {injectClassesStylesheet} from '@pkg/fast-stylesheet/src/react';
+import textTruncateStyle from '@ui/basic-components/styled/styles/textTruncate';
 
 import {AsyncLockButton} from '@ui/basic-components';
 import {GameButton} from '../../../components/ui';
 
-const PlayerListItem = ({player, current, classes, op, onKick, ...props}) => (
+const PlayerListItem = ({player, current, classes, op, onKick, onBan, ...props}) => (
   <li
     {...props}
     className={c(
@@ -23,6 +24,7 @@ const PlayerListItem = ({player, current, classes, op, onKick, ...props}) => (
       className={classes.icon}
     />
     <span
+      title={player.nick}
       className={c(
         classes.nick,
         !current && classes.mutedNick,
@@ -32,15 +34,26 @@ const PlayerListItem = ({player, current, classes, op, onKick, ...props}) => (
     </span>
 
     {!current && (
-      <AsyncLockButton
-        component={GameButton}
-        type='red'
-        size='tiny'
-        className={classes.toolbarButton}
-        onClick={onKick}
-      >
-        Kick
-      </AsyncLockButton>
+      <>
+        <AsyncLockButton
+          component={GameButton}
+          type='green'
+          size='tiny'
+          className={classes.toolbarButton}
+          onClick={onKick}
+        >
+          Kick
+        </AsyncLockButton>
+
+        <AsyncLockButton
+          component={GameButton}
+          type='red'
+          size='tiny'
+          onClick={onBan}
+        >
+          Ban
+        </AsyncLockButton>
+      </>
     )}
   </li>
 );
@@ -71,6 +84,8 @@ export default injectClassesStylesheet(
     },
 
     nick: {
+      extend: textTruncateStyle,
+
       position: 'relative',
       top: 1,
       paddingRight: 10,
@@ -78,6 +93,10 @@ export default injectClassesStylesheet(
 
     toolbarButton: {
       marginLeft: 'auto',
+
+      '&:not(:last-of-type)': {
+        marginRight: 5,
+      },
     },
 
     mutedNick: {

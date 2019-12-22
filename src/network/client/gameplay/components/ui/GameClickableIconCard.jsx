@@ -6,6 +6,7 @@ import {WHITE} from '@ui/colors';
 
 import {injectClassesStylesheet} from '@pkg/fast-stylesheet/src/react';
 import {flexCenteredStyle} from '@ui/basic-components/styled/Flex';
+import textTruncateStyle from '@ui/basic-components/styled/styles/textTruncate';
 
 import {Margin} from '@ui/basic-components/styled';
 import GameClickableCard from './GameClickableCard';
@@ -83,6 +84,8 @@ export default injectClassesStylesheet(
     'icon-size-big': {width: '70%'},
 
     title: {
+      extend: textTruncateStyle,
+
       position: 'absolute',
       left: 0,
       bottom: 8,
@@ -92,9 +95,6 @@ export default injectClassesStylesheet(
       textTransform: 'uppercase',
       fontSize: '11px',
       fontWeight: 900,
-      textOverflow: 'ellipsis',
-      overflow: 'hidden',
-      whiteSpace: 'nowrap',
       padding: '0 4px',
     },
 

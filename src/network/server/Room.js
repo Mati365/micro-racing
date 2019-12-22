@@ -358,14 +358,15 @@ export default class Room {
    * @param {ID} playerId
    * @memberof Room
    */
-  kick(playerId) {
+  kick(playerId, ban = false) {
     const player = findByID(playerId, this.players);
     if (!player)
       return false;
 
-    this.kickedPlayers.push(playerId);
-    this.leave(player);
+    if (ban)
+      this.kickedPlayers.push(playerId);
 
+    this.leave(player);
     player.ws.send(
       createActionMessage(
         null,

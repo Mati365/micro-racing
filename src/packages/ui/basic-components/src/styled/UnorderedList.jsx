@@ -11,6 +11,7 @@ const UnorderedList = styled.ul(
     row: {
       display: 'flex',
       flexDirection: 'row',
+      flexWrap: 'wrap',
 
       '& > li': {
         display: 'inline-flex',

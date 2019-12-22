@@ -257,6 +257,18 @@ export default class PlayerSocket extends Player {
       );
     },
 
+    [PLAYER_ACTIONS.GET_PREDEFINED_MAPS_LIST]: (cmdID) => {
+      this.sendActionResponse(
+        cmdID,
+        {
+          list: R.map(
+            map => map.toListBSON(),
+            this.server.maps,
+          ),
+        },
+      );
+    },
+
     [PLAYER_ACTIONS.GET_ROOMS_LIST]: (cmdID) => {
       this.sendActionResponse(
         cmdID,

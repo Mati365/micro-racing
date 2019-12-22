@@ -2,7 +2,7 @@ import {useEffect} from 'react';
 
 import usePromiseCallback from './usePromiseCallback';
 
-const usePromise = (fn, {keys, ...promiseFlags} = {keys: []}) => {
+const usePromise = (fn, {keys = [], ...promiseFlags} = {}) => {
   const [promiseExecutor, promiseState] = usePromiseCallback(
     fn,
     {

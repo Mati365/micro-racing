@@ -10,11 +10,10 @@ import {
 
 import PlayerClientSocket from '../../../protocol/PlayerClientSocket';
 import TitledScreen from '../TitledScreen';
-import TrackEditorCanvas from './TrackEditorCanvas';
-import {
-  GameInput,
-  GameCard,
-} from '../../components/ui';
+import {GameInput} from '../../components/ui';
+
+import MapChooseColumn from './MapChooseColumn';
+import RacingConfigColumn from './RacingConfigColumn';
 
 const RoomEdit = ({client, room}) => { // eslint-disable-line no-unused-vars
   const t = useI18n('game.screens.room_edit');
@@ -35,13 +34,20 @@ const RoomEdit = ({client, room}) => { // eslint-disable-line no-unused-vars
         </Flex>
       )}
     >
-      <GameCard
-        style={{
-          paddingBottom: '75%',
-        }}
-      >
-        <TrackEditorCanvas />
-      </GameCard>
+      <Flex direction='row'>
+        <div style={{width: '70%'}}>
+          <MapChooseColumn client={client} />
+        </div>
+
+        <div
+          style={{
+            width: '30%',
+            paddingLeft: 20,
+          }}
+        >
+          <RacingConfigColumn />
+        </div>
+      </Flex>
     </TitledScreen>
   );
 };

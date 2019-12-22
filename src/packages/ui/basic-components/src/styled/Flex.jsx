@@ -27,6 +27,8 @@ const Flex = styled.div(
     'align-flex-end': {alignItems: 'flex-end'},
     'align-flex-start': {alignItems: 'flex-start'},
 
+    'wrap-wrap': {flexWrap: 'wrap'},
+
     base: {
       display: 'flex',
       composes: ['$row'],
@@ -34,11 +36,12 @@ const Flex = styled.div(
   },
   {
     index: 0,
-    omitProps: ['justify', 'direction', 'align'],
-    classSelector: (classes, {justify, direction, align}) => [
+    omitProps: ['justify', 'direction', 'align', 'wrap'],
+    classSelector: (classes, {justify, direction, align, wrap}) => [
       justify && classes[`justify-${justify}`],
       direction && classes[`direction-${direction}`],
       align && classes[`align-${align}`],
+      wrap && classes[`wrap-${wrap}`],
     ],
   },
 );
@@ -49,6 +52,7 @@ Flex.propTypes = {
   justify: PropTypes.string,
   direction: PropTypes.string,
   align: PropTypes.string,
+  wrap: PropTypes.string,
 };
 
 export default Flex;

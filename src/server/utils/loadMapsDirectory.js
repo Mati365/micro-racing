@@ -9,14 +9,14 @@ import * as R from 'ramda';
 import {logFunction} from '@pkg/basic-helpers/decorators/logMethod';
 import asyncSequentionalMap from '@pkg/basic-helpers/async/asyncSequentionalMap';
 
-import {LayerMap} from '@game/network/shared/map';
+import PrerenderedLayerMap from '@game/network/server/PrerenderedLayerMap';
 
 const loadMapsDirectory = async ({dir}) => {
   const paths = await fg([path.join(dir, '*.gzip')]);
 
   return asyncSequentionalMap(
     async mapPath => R.compose(
-      LayerMap.fromBSON,
+      PrerenderedLayerMap.fromBSON,
       pako.inflate,
     )(
       await fs.promises.readFile(mapPath),

@@ -15,6 +15,7 @@ export {default as filterMap} from './list/filterMap';
 
 export {default as wrapMethod} from './decorators/wrapMethod';
 export {default as logMethod} from './decorators/logMethod';
+export {default as memoizeMethod} from './decorators/memoizeMethod';
 export {default as ssr} from './base/ssr';
 
 export {default as mapObjValuesToPromise} from './base/mapObjValuesToPromise';

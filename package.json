@@ -60,7 +60,8 @@
     "chalk": "^2.4.2",
     "source-map-support": "^0.5.13",
     "pako": "^1.0.10",
-    "react-router-dom": "^5.1.2"
+    "react-router-dom": "^5.1.2",
+    "canvas": "^2.6.1"
   },
   "scripts": {
     "develop": "(rm -rf ./dist/*; env NODE_ENV=development npx webpack --config=config/webpack.config.js --mode=development --watch)",

@@ -15,6 +15,13 @@ export default class PlayerClientSocket {
       },
     },
 
+    fetchMapsList: {
+      action: PLAYER_ACTIONS.GET_PREDEFINED_MAPS_LIST,
+      flags: {
+        waitForResponse: true,
+      },
+    },
+
     fetchRoomsList: {
       action: PLAYER_ACTIONS.GET_ROOMS_LIST,
       flags: {

@@ -54,6 +54,7 @@ export const PLAYER_ACTIONS = {
 
   // OTHER SCREENS
   GET_ROOMS_LIST: 14,
+  GET_PREDEFINED_MAPS_LIST: 15,
 };
 
 export const CAR_TYPES = {

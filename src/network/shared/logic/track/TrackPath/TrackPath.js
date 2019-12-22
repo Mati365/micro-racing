@@ -2,6 +2,7 @@ import * as R from 'ramda';
 import {vec2} from '@pkg/gl-math/matrix';
 
 import {filterMap} from '@pkg/basic-helpers';
+
 import {
   interpolateEditorPath,
   generateRandomPath,

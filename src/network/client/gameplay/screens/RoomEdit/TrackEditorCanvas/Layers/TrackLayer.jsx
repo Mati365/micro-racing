@@ -274,7 +274,7 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
     if (!this.track) {
       this.track = TrackPath.fromRandomPath(
         R.mapObjIndexed(
-          R.multiply(0.8),
+          R.multiply(0.8 / this.scale),
           this.dimensions,
         ),
         vec2(100, 100),
@@ -284,6 +284,7 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
   }
 
   fromBSON([roadMapElement], toLeftCorner = true) {
+    const {scale} = this;
     const {points, sceneMeta} = roadMapElement.params;
     const parsedPoints = R.map(Vector.fromArray, points);
 
@@ -293,8 +294,8 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
 
       R.forEach(
         (point) => {
-          point[0] -= topLeft[0] / transform.scale[0] - 30; // x
-          point[1] -= topLeft[1] / transform.scale[1] - 30; // y
+          point[0] -= topLeft[0] / transform.scale[0] - 40 / scale; // x
+          point[1] -= topLeft[1] / transform.scale[1] - 40 / scale; // y
         },
         parsedPoints,
       );

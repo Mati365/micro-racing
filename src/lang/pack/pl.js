@@ -40,6 +40,8 @@ export default {
 
       room_edit: {
         header: 'Pokój:',
+        predefined_maps: 'Wybierz inne mapy:',
+        racing_config: 'Konfiguracja wyścigu:',
       },
     },
 

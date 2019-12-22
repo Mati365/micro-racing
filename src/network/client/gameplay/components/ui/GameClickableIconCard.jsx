@@ -9,7 +9,10 @@ import {flexCenteredStyle} from '@ui/basic-components/styled/Flex';
 import {Margin} from '@ui/basic-components/styled';
 import GameClickableCard from './GameClickableCard';
 
-const GameClickableIconCard = ({icon, title, classes, className, children, ...props}) => (
+const GameClickableIconCard = ({
+  icon, iconSize, title, classes, className, children,
+  ...props
+}) => (
   <GameClickableCard
     square={false}
     className={c(
@@ -19,7 +22,12 @@ const GameClickableIconCard = ({icon, title, classes, className, children, ...pr
     {...props}
   >
     {icon && (
-      <span className={classes.icon}>
+      <span
+        className={c(
+          classes.icon,
+          iconSize && classes[`icon-size-${iconSize}`],
+        )}
+      >
         {icon}
       </span>
     )}
@@ -56,6 +64,9 @@ export default injectClassesStylesheet(
       },
     },
 
+    'icon-size-medium-big': {width: '60%'},
+    'icon-size-big': {width: '70%'},
+
     title: {
       position: 'absolute',
       left: 0,
@@ -67,6 +78,10 @@ export default injectClassesStylesheet(
       fontSize: '11px',
       fontWeight: 900,
       opacity: 0.5,
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      padding: '0 4px',
     },
   },
 )(GameClickableIconCard);

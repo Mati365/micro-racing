@@ -4,6 +4,8 @@ import {
   CRIMSON_RED_DARKEN_5,
   DODGER_BLUE,
   DODGER_BLUE_DARKEN_5,
+  SPRING_GREEN,
+  SPRING_GREEN_DARKEN_5,
 } from '@ui/colors';
 
 import {styled} from '@pkg/fast-stylesheet/src/react';
@@ -20,7 +22,7 @@ const GameButton = styled(
       cursor: 'pointer',
       textShadow: '0 1px 2px rgba(0,0,0,.25)',
       borderRadius: 7,
-      padding: 7,
+      padding: [7, 10],
       textAlign: 'center',
       textTransform: 'uppercase',
       fontWeight: 900,
@@ -50,6 +52,12 @@ const GameButton = styled(
       color: WHITE,
       background: DODGER_BLUE,
       boxShadow: `0 0.2em ${DODGER_BLUE_DARKEN_5}`,
+    },
+
+    'type-green': {
+      color: WHITE,
+      background: SPRING_GREEN,
+      boxShadow: `0 0.2em ${SPRING_GREEN_DARKEN_5}`,
     },
 
     'type-red': {

@@ -10,7 +10,7 @@ import {
 
 import PlayerClientSocket from '../../../protocol/PlayerClientSocket';
 import TitledScreen from '../TitledScreen';
-import {GameInput} from '../../components/ui';
+import {GameInput, GameButton} from '../../components/ui';
 
 import MapChooseColumn from './MapChooseColumn';
 import RacingConfigColumn from './RacingConfigColumn';
@@ -30,6 +30,11 @@ const RoomEdit = ({client, room}) => { // eslint-disable-line no-unused-vars
                 width: 400,
               }}
             />
+          </Margin>
+          <Margin left='auto'>
+            <GameButton type='red'>
+              {t('leave')}
+            </GameButton>
           </Margin>
         </Flex>
       )}

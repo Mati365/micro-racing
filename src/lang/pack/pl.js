@@ -41,9 +41,14 @@ export default {
       room_edit: {
         header: 'Pokój:',
         predefined_maps: 'Wybierz inne mapy:',
-        racing_config: 'Konfiguracja wyścigu:',
         leave: 'Opuść pokój',
         edit_road: 'Edytuj tor',
+
+        tabs: {
+          chat: 'Czat',
+          players: 'Obecni',
+          settings: 'Opcje',
+        },
       },
     },
 

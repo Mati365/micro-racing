@@ -1,16 +1,47 @@
 import React from 'react';
 
 import {useI18n} from '@ui/i18n';
-import {GameHeader} from '../../components/ui';
+import {GameTabs} from '../../components/ui';
 
 const RacingConfigColumn = () => {
   const t = useI18n('game.screens.room_edit');
 
   return (
     <>
-      <GameHeader>
-        {t('racing_config')}
-      </GameHeader>
+      <GameTabs>
+        <GameTabs.Tab
+          id='settings'
+          title={t('tabs.settings')}
+        >
+          {() => (
+            <div>
+              COŚ
+            </div>
+          )}
+        </GameTabs.Tab>
+
+        <GameTabs.Tab
+          id='players'
+          title={t('tabs.players')}
+        >
+          {() => (
+            <div>
+              COŚ
+            </div>
+          )}
+        </GameTabs.Tab>
+
+        <GameTabs.Tab
+          id='chat'
+          title={t('tabs.chat')}
+        >
+          {() => (
+            <div>
+              COŚ
+            </div>
+          )}
+        </GameTabs.Tab>
+      </GameTabs>
     </>
   );
 };

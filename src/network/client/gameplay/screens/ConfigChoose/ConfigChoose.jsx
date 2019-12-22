@@ -43,71 +43,73 @@ const ConfigChoose = ({initialData, created, onConfigSet}) => {
     },
   ];
 
+  const renderForm = ({l, modified, promiseState: {loading, errors}}) => (
+    <>
+      <GameHeader>
+        {t('headers.car')}
+      </GameHeader>
+
+      <CarsChooseRow
+        carsInfo={carsInfo}
+        {...l.input('carType')}
+      />
+
+      <div style={{width: 200}}>
+        <GameDivider
+          spacing='medium'
+          type='dashed'
+        />
+
+        <GameHeader>
+          {t('headers.nick')}
+        </GameHeader>
+
+        <AutofocusInput>
+          <GameInput
+            {...l.input('nick')}
+            style={{
+              textAlign: 'center',
+            }}
+            expanded
+            required
+          />
+        </AutofocusInput>
+
+        <Margin
+          top={3}
+          block
+        >
+          <GameButton
+            type='red'
+            disabled={
+              loading || (created && !modified)
+            }
+            expanded
+          >
+            {t((() => {
+              if (loading) return 'sending';
+              if (created) return 'update';
+              return 'play';
+            })())}
+          </GameButton>
+        </Margin>
+
+        {errors && (
+          <Margin top={2}>
+            <ServerErrorsList errors={errors} />
+          </Margin>
+        )}
+      </div>
+    </>
+  );
+
   return (
     <ScreenHolder expanded={false}>
       <ConfigChooseForm
         initialData={initialData}
         onSubmit={onConfigSet}
       >
-        {({l, modified, promiseState: {loading, errors}}) => (
-          <>
-            <GameHeader>
-              {t('headers.car')}
-            </GameHeader>
-
-            <CarsChooseRow
-              carsInfo={carsInfo}
-              {...l.input('carType')}
-            />
-
-            <div style={{width: 200}}>
-              <GameDivider
-                spacing='medium'
-                type='dashed'
-              />
-
-              <GameHeader>
-                {t('headers.nick')}
-              </GameHeader>
-
-              <AutofocusInput>
-                <GameInput
-                  {...l.input('nick')}
-                  style={{
-                    textAlign: 'center',
-                  }}
-                  expanded
-                  required
-                />
-              </AutofocusInput>
-
-              <Margin
-                top={3}
-                block
-              >
-                <GameButton
-                  type='red'
-                  disabled={
-                    loading || (created && !modified)
-                  }
-                  expanded
-                >
-                  {t((() => {
-                    if (loading) return 'sending';
-                    if (created) return 'update';
-                    return 'play';
-                  })())}
-                </GameButton>
-              </Margin>
-
-              {errors && (
-                <Margin top={2}>
-                  <ServerErrorsList errors={errors} />
-                </Margin>
-              )}
-            </div>
-          </>
-        )}
+        {renderForm}
       </ConfigChooseForm>
     </ScreenHolder>
   );

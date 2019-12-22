@@ -45,7 +45,7 @@ const TrackEditorCanvas = ({dimensions, canvasConfig}) => {
         style={{
           outline: 0,
           width: dimensions?.w || '100%',
-          height: dimensions?.h || '100%',
+          height: dimensions?.h || 'calc(100% - 40px)',
         }}
       />
 
@@ -66,4 +66,4 @@ TrackEditorCanvas.defaultProps = {
   canvasConfig: null,
 };
 
-export default TrackEditorCanvas;
+export default React.memo(TrackEditorCanvas);

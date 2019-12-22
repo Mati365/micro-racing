@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import useInterval from '../useInterval';
+import useMountedRef from '../useMountedRef';
 
 const useIntervalResourceFetch = (
   {
@@ -7,6 +8,7 @@ const useIntervalResourceFetch = (
     delay = 1000,
   },
 ) => {
+  const mountedRef = useMountedRef();
   const [fetchState, setFetchState] = useState(
     {
       loading: true,
@@ -17,15 +19,19 @@ const useIntervalResourceFetch = (
   useInterval(
     async () => {
       try {
-        setFetchState(
+        if (!mountedRef.current)
+          return;
+
+        const result = await fetchFn();
+        mountedRef.current && setFetchState(
           {
             loading: false,
-            result: await fetchFn(),
+            result,
           },
         );
       } catch (e) {
         console.error(e);
-        setFetchState(
+        mountedRef.current && setFetchState(
           {
             loading: false,
             error: e,

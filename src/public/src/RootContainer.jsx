@@ -24,7 +24,6 @@ const Container = styled.div(
       alignItems: 'center',
       justifyContent: 'center',
       height: '100vh',
-      background: 'black',
       fontFamily: 'Arial',
     },
 
@@ -32,6 +31,7 @@ const Container = styled.div(
       'body, html': {
         margin: 0,
         padding: 0,
+        background: 'black',
 
         '& *': {
           boxSizing: 'border-box',

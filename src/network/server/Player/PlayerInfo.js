@@ -2,10 +2,12 @@ import uniqid from 'uniqid';
 import * as R from 'ramda';
 
 import {
+  CAR_TYPES,
   PLAYER_RACE_STATES,
   PLAYER_TYPES,
 } from '@game/network/constants/serverCodes';
 
+import {getRandomObjValue} from '@pkg/basic-helpers';
 import {
   removeFlag,
   hasFlag,
@@ -129,7 +131,7 @@ export default class PlayerInfo {
     this.inputs = [];
     this.lastProcessedInput = -1;
     this.lastIdleTime = null;
-    this.carType = null;
+    this.carType = getRandomObjValue(CAR_TYPES);
     this.racingState = racingState;
   }
 

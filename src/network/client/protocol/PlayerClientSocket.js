@@ -70,16 +70,18 @@ export default class PlayerClientSocket {
     ws.onopen = () => {
       const clientSocket = new PlayerClientSocket;
       clientSocket.listeners = {
-        [PLAYER_ACTIONS.CONNECTION_SUCCESS]: () => resolve(clientSocket),
         [PLAYER_ACTIONS.CONNECTION_ERROR]: reject,
       };
 
-      clientSocket.init(
-        {
-          ws,
-          ...clientParams,
-        },
-      );
+      clientSocket
+        .init(
+          {
+            ws,
+            ...clientParams,
+          },
+        )
+        .then(() => resolve(clientSocket))
+        .catch(reject);
     };
 
     ws.onerror = reject;

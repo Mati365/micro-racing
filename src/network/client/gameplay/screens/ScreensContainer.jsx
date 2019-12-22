@@ -1,15 +1,19 @@
-import React, {useCallback} from 'react';
-import {Route, MemoryRouter} from 'react-router-dom';
+import React, {useEffect} from 'react';
+import {
+  Route,
+  MemoryRouter,
+  Switch,
+} from 'react-router-dom';
 
 import {styled} from '@pkg/fast-stylesheet/src/react';
 
-import {withSSRSwitch} from '@ui/basic-components/SSRRenderSwitch';
 import useClientSocket from '../hooks/useClientSocket';
 
 import ConfigChooseScreen from './ConfigChoose';
 import {GameCanvasHolder} from '../components';
 import ServersList from './ServersList';
 import RoomEdit from './RoomEdit';
+import ConnectingScreen from './ConnectingScreen';
 
 const ScreensHolder = styled(
   GameCanvasHolder,
@@ -32,66 +36,67 @@ const ScreensContainer = () => {
     client,
   } = useClientSocket();
 
-  const onConfigSet = useCallback(
-    history => async ({nick, carType}) => {
-      const _client = await connect(
-        {
-          playerInfo: {
-            nick,
-            carType,
-          },
-        },
-      );
-
-      history.push('/servers-list');
-      return _client;
+  useEffect(
+    () => {
+      connect();
     },
-    [connect],
+    [],
   );
 
-  return (
-    <ScreensHolder>
+  const onUpdateConfig = playerInfo => client.setPlayerInfo(playerInfo);
+
+  let content = null;
+  if (!client) {
+    content = (
+      <ConnectingScreen />
+    );
+  } else {
+    content = (
       <MemoryRouter>
         <Route
           render={
-            ({history}) => (
+            () => (
               <ConfigChooseScreen
+                initialData={client.info}
                 created={!!client}
-                onConfigSet={onConfigSet(history)}
+                onConfigSet={onUpdateConfig}
               />
             )
           }
         />
 
         <BoardContainer>
-          <Route
-            path='/room-edit'
-            render={
-              ({location: {state}}) => (
-                <RoomEdit
-                  client={client}
-                  room={state.room}
-                />
-              )
-            }
-          />
+          <Switch>
+            <Route
+              path='/room-edit'
+              render={
+                ({location: {state}}) => (
+                  <RoomEdit
+                    client={client}
+                    room={state.room}
+                  />
+                )
+              }
+            />
 
-          <Route
-            path='/servers-list'
-            render={
-              () => <ServersList client={client} />
-            }
-          />
+            <Route
+              render={
+                () => <ServersList client={client} />
+              }
+            />
+          </Switch>
         </BoardContainer>
       </MemoryRouter>
+    );
+  }
+
+  return (
+    <ScreensHolder>
+      {content}
     </ScreensHolder>
   );
 };
 
 ScreensContainer.displayName = 'ScreensContainer';
 
-export default withSSRSwitch(
-  {
-    allowSSR: false,
-  },
-)(ScreensContainer);
+export default ScreensContainer;

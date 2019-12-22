@@ -1,14 +1,10 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import {CAR_TYPES} from '@game/network/constants/serverCodes';
 
-import generateName from '@pkg/name-generator';
 import {styled} from '@pkg/fast-stylesheet/src/react';
-import {
-  asyncTimeout,
-  getRandomObjValue,
-} from '@pkg/basic-helpers';
+import {asyncTimeout} from '@pkg/basic-helpers';
 
 import {useI18n} from '@ui/i18n';
 
@@ -38,7 +34,7 @@ const ConfigChooseForm = styled(
   },
 );
 
-const ConfigChoose = ({created, onConfigSet}) => {
+const ConfigChoose = ({initialData, created, onConfigSet}) => {
   const t = useI18n('game.screens.choose_config');
   const carsInfo = [
     {
@@ -52,10 +48,7 @@ const ConfigChoose = ({created, onConfigSet}) => {
   return (
     <ScreenHolder expanded={false}>
       <ConfigChooseForm
-        initialData={{
-          carType: getRandomObjValue(CAR_TYPES),
-          nick: useMemo(generateName, []),
-        }}
+        initialData={initialData}
         onSubmit={
           async (...args) => {
             await asyncTimeout(500);

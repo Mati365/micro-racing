@@ -26,7 +26,7 @@ const RoomEdit = ({client, room}) => { // eslint-disable-line no-unused-vars
           {t('header')}
           <Margin left={3}>
             <GameInput
-              value={room.name}
+              defaultValue={room.name}
               style={{
                 width: 400,
               }}

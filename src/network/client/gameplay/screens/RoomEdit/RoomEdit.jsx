@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {useHistory} from 'react-router-dom';
 import {useI18n} from '@ui/i18n';
 
 import {
@@ -17,6 +18,12 @@ import RacingConfigColumn from './RacingConfigColumn';
 
 const RoomEdit = ({client, room}) => { // eslint-disable-line no-unused-vars
   const t = useI18n('game.screens.room_edit');
+  const history = useHistory();
+
+  const onLeaveRoom = async () => {
+    await client.leaveRoom();
+    history.goBack();
+  };
 
   return (
     <TitledScreen
@@ -32,7 +39,10 @@ const RoomEdit = ({client, room}) => { // eslint-disable-line no-unused-vars
             />
           </Margin>
           <Margin left='auto'>
-            <GameButton type='red'>
+            <GameButton
+              type='red'
+              onClick={onLeaveRoom}
+            >
               {t('leave')}
             </GameButton>
           </Margin>

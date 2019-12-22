@@ -155,9 +155,9 @@ export default class PlayerSocket extends Player {
   /**
    * Append player to both rooms
    */
-  @logFunction(
-    (_, room) => {
-      consola.info(`Player ${chalk.white.bold(this.info.nick)} joined to ${chalk.green.bold(room.name)}!`);
+  @logMethod(
+    ({info}, room) => {
+      consola.info(`Player ${chalk.white.bold(info.nick)} joined to ${chalk.red.bold(room.name)}!`);
     },
     {
       afterExec: true,
@@ -184,6 +184,19 @@ export default class PlayerSocket extends Player {
     return room;
   }
 
+  @logMethod(
+    ({info}) => {
+      consola.info(`Player ${chalk.white.bold(info.nick)} left ${chalk.red.bold(info.room?.name || 'rootChannel')}!`);
+    },
+  )
+  leaveRoom() {
+    const {info} = this;
+
+    info.room?.leave(this);
+    info.room = null;
+  }
+
+
   /**
    * Remove user from root players list and room
    */
@@ -196,11 +209,8 @@ export default class PlayerSocket extends Player {
     },
   )
   leave() {
-    const {server, info} = this;
-    const {room} = info;
-
-    room?.leave(this);
-    server.rootRoom.leave(this);
+    this.leaveRoom();
+    this.server.rootRoom.leave(this);
   }
 
   /**
@@ -281,27 +291,22 @@ export default class PlayerSocket extends Player {
       );
     },
 
-    [PLAYER_ACTIONS.JOIN_ROOM]: logFunction(
-      (_, room) => {
-        consola.info(`Player ${chalk.white.bold(this.info.nick)} joined to ${chalk.green.bold(room.name)}!`);
-      },
-      {
-        afterExec: true,
-      },
-    )(
-      (cmdID, {name}) => {
-        const room = this.joinRoom(name);
-        this.sendActionResponse(
-          cmdID,
-          room.toBSON(),
-        );
-        return room;
-      },
-    ),
+    [PLAYER_ACTIONS.LEAVE_ROOM]: () => {
+      this.leaveRoom();
+    },
+
+    [PLAYER_ACTIONS.JOIN_ROOM]: (cmdID, {name}) => {
+      const room = this.joinRoom(name);
+      this.sendActionResponse(
+        cmdID,
+        room.toBSON(),
+      );
+      return room;
+    },
 
     [PLAYER_ACTIONS.START_ROOM_RACE]: logFunction(
       () => {
-        consola.info(`Player ${chalk.white.bold(this.info.nick)} started racing in ${chalk.green.bold(this.info.room.name)}!`);
+        consola.info(`Player ${chalk.white.bold(this.info.nick)} started racing in ${chalk.red.bold(this.info.room.name)}!`);
       },
       {
         afterExec: true,

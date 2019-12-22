@@ -29,6 +29,10 @@ export default class PlayerClientSocket {
       },
     },
 
+    leaveRoom: {
+      action: PLAYER_ACTIONS.LEAVE_ROOM,
+    },
+
     joinRoom: {
       action: PLAYER_ACTIONS.JOIN_ROOM,
       serialize: R.objOf('name'),

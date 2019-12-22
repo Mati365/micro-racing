@@ -5,11 +5,8 @@ import * as R from 'ramda';
 import {useLowLatencyObservable} from '@pkg/basic-hooks';
 import {useI18n} from '@ui/i18n';
 
-import {
-  Text,
-  UnorderedList,
-} from '@ui/basic-components/styled';
-
+import {UnorderedList} from '@ui/basic-components/styled';
+import {GameLabel} from '../../../components/ui';
 import PlayerListItem from './PlayerListItem';
 
 const pluckPlayersArray = R.compose(
@@ -27,17 +24,12 @@ const PlayersUnorderedList = ({
 
   return (
     <>
-      <Text
-        size='small'
-        type='dim_gray'
-        {...spaced && {
-          style: {
-            marginTop: 15,
-          },
-        }}
+      <GameLabel
+        spaceTop={spaced ? 2 : 0}
+        spaceBottom={0}
       >
         {title}
-      </Text>
+      </GameLabel>
 
       <UnorderedList>
         {players.map(

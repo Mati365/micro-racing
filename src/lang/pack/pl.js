@@ -55,6 +55,10 @@ export default {
           in_race: 'Zawodnicy:',
           observers: 'Obserwatorzy:',
         },
+
+        race_config: {
+          players_count: 'Ilość graczy:',
+        },
       },
     },
 

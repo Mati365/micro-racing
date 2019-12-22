@@ -3,6 +3,7 @@ import React from 'react';
 import {useI18n} from '@ui/i18n';
 
 import PlayersListConfig from './PlayersListConfig';
+import RaceConfig from './RaceConfig';
 import {
   GameDivider,
   GameTabs,
@@ -32,9 +33,7 @@ const RacingConfigColumn = ({gameBoard}) => {
           title={t('tabs.settings')}
         >
           {() => (
-            <div>
-              COŚ
-            </div>
+            <RaceConfig />
           )}
         </GameTabs.Tab>
 

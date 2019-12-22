@@ -56,6 +56,7 @@ const RoomEdit = ({client, gameBoard}) => { // eslint-disable-line no-unused-var
               }}
             />
           </Margin>
+
           <Margin left='auto'>
             <GameButton
               type='red'

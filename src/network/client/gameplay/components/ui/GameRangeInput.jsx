@@ -35,7 +35,7 @@ const GameRangeInput = ({min, max, classes, className, l, value}) => (
 
     <GameInput
       className={classes.input}
-      size='tiny'
+      size='small'
       type='number'
       min={min}
       max={max}
@@ -78,17 +78,16 @@ export default R.compose(
       button: {
         flexShrink: 0,
         padding: 0,
-        width: 32,
-        height: 32,
+        width: 24,
+        height: 24,
 
         '& > span': {
-          fontSize: '25px',
+          fontSize: '20px',
         },
       },
 
       input: {
         margin: [0, 10],
-        flexGrow: '1',
         textAlign: 'center',
         '-moz-appearance': 'textfield',
 

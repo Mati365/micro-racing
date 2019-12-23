@@ -5,10 +5,11 @@ import {
   Margin,
 } from '@ui/basic-components/styled';
 
-const GameLabel = ({children, spaceBottom = 2, spaceTop}) => (
+const GameLabel = ({children, spaceBottom = 2, spaceTop, ...props}) => (
   <Margin
     top={spaceTop}
     bottom={spaceBottom}
+    {...props}
   >
     <Text
       size='small'

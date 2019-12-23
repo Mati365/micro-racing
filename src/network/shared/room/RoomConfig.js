@@ -5,8 +5,8 @@ export default class RoomConfig {
   constructor(
     {
       laps = 4,
-      countdown = 0,
       playersLimit = 4,
+      countdown = 6000,
       playerIdleTime = 6000,
       spawnBotsBeforeStart = true,
       aiTraining = false,
@@ -25,6 +25,7 @@ export default class RoomConfig {
       this,
       {
         laps: R.defaultTo(this.laps, clamp(1, 8, config.laps)),
+        countdown: R.defaultTo(this.laps, clamp(0, 30000, config.countdown)),
         playerIdleTime: R.defaultTo(this.playerIdleTime, clamp(3000, 15000, config.playerIdleTime)),
         playersLimit: R.defaultTo(this.playersLimit, clamp(1, 6, config.playersLimit)),
       },

@@ -385,13 +385,23 @@ export default class Room {
     return true;
   }
 
+  /**
+   * Name provided by user
+   *
+   * @param {Object} info
+   * @returns
+   * @memberof Room
+   */
   safeAssignRoomInfo(info) {
     if (!info)
       return false;
 
-    const {config} = info;
+    const {name, config} = info;
     if (config)
       this.config.safeAssignConfig(config);
+
+    if (!R.isNil(name))
+      this.name = name;
 
     return this.broadcastRoomInfo();
   }

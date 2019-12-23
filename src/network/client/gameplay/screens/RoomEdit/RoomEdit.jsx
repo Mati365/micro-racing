@@ -14,10 +14,11 @@ import {
 import PlayerClientSocket from '../../../protocol/PlayerClientSocket';
 
 import TitledScreen from '../TitledScreen';
-import {GameInput, GameButton} from '../../components/ui';
+import {GameButton} from '../../components/ui';
 
 import MapChooseColumn from './MapChooseColumn';
 import RacingConfigColumn from './RacingConfigColumn';
+import EditRoomNameForm from './EditRoomNameForm';
 
 const RoomEdit = ({client, gameBoard}) => { // eslint-disable-line no-unused-vars
   const t = useI18n('game.screens.room_edit');
@@ -49,12 +50,7 @@ const RoomEdit = ({client, gameBoard}) => { // eslint-disable-line no-unused-var
         <Flex direction='row'>
           {t('header')}
           <Margin left={3}>
-            <GameInput
-              defaultValue={gameBoard.roomInfo.name}
-              style={{
-                width: 400,
-              }}
-            />
+            <EditRoomNameForm gameBoard={gameBoard} />
           </Margin>
 
           <Margin left='auto'>

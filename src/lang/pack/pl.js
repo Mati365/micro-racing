@@ -59,6 +59,7 @@ export default {
         race_config: {
           players_count: 'Ilość graczy:',
           laps_count: 'Ilość okrążeń:',
+          countdown: 'Odliczaj (s):',
         },
       },
     },

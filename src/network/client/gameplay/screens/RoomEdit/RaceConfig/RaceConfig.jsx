@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import * as R from 'ramda';
 
 import {useI18n} from '@ui/i18n';
@@ -11,37 +11,42 @@ import {
 } from '../../../components/ui';
 
 const configResponseSelector = R.compose(
-  R.pick(['laps', 'playersLimit']),
+  ({laps, playersLimit, countdown}) => ({
+    laps,
+    playersLimit,
+    countdown: countdown / 1000,
+  }),
   R.propOr({}, 'config'),
 );
 
 const RaceConfigForm = ({l, optimisticValueLink, gameBoard}) => {
   const t = useI18n('game.screens.room_edit.race_config');
 
-  const config = useLowLatencyObservable(
+  useLowLatencyObservable(
     {
       observable: gameBoard.observers.roomInfo,
-    },
-  )?.config;
+      watchOnly: true,
+      onChange: (info) => {
+        if (!info)
+          return;
 
-  useEffect(
-    () => {
-      if (!config)
-        return;
-
-      const {value} = l;
-      if (config.laps !== value?.laps || config.playersLimit !== value?.playersLimit) {
-        optimisticValueLink.setValue(
-          {
-            ...value,
-            laps: config.laps,
-            playersLimit: config.playersLimit,
-          },
-          null,
-        );
-      }
+        const {config} = info;
+        const {value} = l;
+        if (config.laps !== value?.laps
+            || config.playersLimit !== value?.playersLimit
+            || config.countdown !== value?.countdown) {
+          optimisticValueLink.setValue(
+            {
+              ...value,
+              countdown: config.countdown / 1000,
+              laps: config.laps,
+              playersLimit: config.playersLimit,
+            },
+            null,
+          );
+        }
+      },
     },
-    [config],
   );
 
   return (
@@ -71,6 +76,19 @@ const RaceConfigForm = ({l, optimisticValueLink, gameBoard}) => {
           />
         )}
       />
+
+      <GameInlineFormGroup
+        label={
+          t('countdown')
+        }
+        input={(
+          <GameRangeInput
+            min={0}
+            max={30}
+            {...l.input('countdown')}
+          />
+        )}
+      />
     </>
   );
 };
@@ -79,11 +97,12 @@ const RaceConfig = ({gameBoard}) => (
   <OptimisticForm
     selectorFn={configResponseSelector}
     asyncSubmitFn={
-      async ({laps, playersLimit}) => gameBoard.client.setRoomInfo(
+      async ({laps, playersLimit, countdown}) => gameBoard.client.setRoomInfo(
         {
           config: {
             laps,
             playersLimit,
+            countdown: countdown * 1000,
           },
         },
       )

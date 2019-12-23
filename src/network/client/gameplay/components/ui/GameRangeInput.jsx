@@ -87,6 +87,7 @@ export default R.compose(
       },
 
       input: {
+        minWidth: 42,
         margin: [0, 10],
         textAlign: 'center',
         '-moz-appearance': 'textfield',

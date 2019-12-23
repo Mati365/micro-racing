@@ -1,4 +1,4 @@
-import {useState, useRef} from 'react';
+import React, {useState, useRef} from 'react';
 import * as R from 'ramda';
 
 import {
@@ -54,16 +54,17 @@ const processInputValue = (prevValue, name, e) => {
   return prevValue;
 };
 
-export const pickUpdateValue = (name, data, defaults) => {
-  if (R.isNil(data))
-    return data;
+export const pickUpdateValue = (name, data, defaults = '') => {
+  let pickedValue = data;
+  if (!R.isNil(name)) {
+    pickedValue = (
+      R.is(String, name) && R.contains('.', name)
+        ? dig(R.split('.', name), data)
+        : data[name]
+    );
+  }
 
-  return R.defaultTo(
-    defaults,
-    R.is(String, name) && R.contains('.', name)
-      ? dig(R.split('.', name), data)
-      : data[name],
-  );
+  return R.defaultTo(defaults, pickedValue);
 };
 
 /**
@@ -111,11 +112,16 @@ const useInputs = (config = {}) => {
     },
   };
 
-  return {
+  const sharedAttrs = {
     initialData,
     value: state.value,
     setValue: cacheRef.current.setValue,
+  };
+
+  return {
+    ...sharedAttrs,
     l: {
+      ...sharedAttrs,
       input: (name = null, flags) => {
         const {
           defaultInputValue,
@@ -135,7 +141,7 @@ const useInputs = (config = {}) => {
         }
 
         // assign values to listeners
-        inputProps.value = pickUpdateValue(name, state.value, defaultInputValue || null);
+        inputProps.value = pickUpdateValue(name, state.value, defaultInputValue || '');
         if (addDefaultValueToProps)
           inputProps.defaultInputValue = defaultInputValue;
 
@@ -147,6 +153,20 @@ const useInputs = (config = {}) => {
       },
     },
   };
+};
+
+export const withInputs = Component => (props) => {
+  const {l, value} = useInputs(
+    R.pick(['value', 'initialData', 'onChange'], props),
+  );
+
+  return (
+    <Component
+      {...R.omit(['value', 'initialData', 'onChange'], props)}
+      l={l}
+      value={value}
+    />
+  );
 };
 
 export default useInputs;

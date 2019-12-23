@@ -1,69 +1,61 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import c from 'classnames';
+import * as R from 'ramda';
 
 import {clamp} from '@pkg/gl-math';
 
-import {useInputs} from '@pkg/basic-hooks';
+import {withInputs} from '@pkg/basic-hooks/src/inputs/useInputs';
 import {injectClassesStylesheet} from '@pkg/fast-stylesheet/src/react';
 
 import {Flex} from '@ui/basic-components/styled';
 import GameButton from './GameButton';
 import GameInput from './GameInput';
 
-const GameRangeInput = ({min, max, classes, className, value, onChange}) => {
-  const {l, setValue} = useInputs(
-    {
-      value,
-      onChange,
-    },
-  );
-
-  return (
-    <Flex
-      direction='row'
-      className={c(
-        classes.base,
-        className,
-      )}
+const GameRangeInput = ({min, max, classes, className, l, value}) => (
+  <Flex
+    direction='row'
+    className={c(
+      classes.base,
+      className,
+    )}
+  >
+    <GameButton
+      className={classes.button}
+      size='tiny'
+      type='red'
+      onClick={
+        () => l.setValue(
+          clamp(min, max, (value || min) - 1),
+        )
+      }
     >
-      <GameButton
-        className={classes.button}
-        size='tiny'
-        type='red'
-        onClick={
-          () => setValue(
-            clamp(min, max, (value || min) - 1),
-          )
-        }
-      >
-        <span>-</span>
-      </GameButton>
+      <span>-</span>
+    </GameButton>
 
-      <GameInput
-        className={classes.input}
-        size='tiny'
-        type='number'
-        min={min}
-        max={max}
-        {...l.input()}
-      />
+    <GameInput
+      className={classes.input}
+      size='tiny'
+      type='number'
+      min={min}
+      max={max}
+      {...l.input()}
+    />
 
-      <GameButton
-        className={classes.button}
-        size='tiny'
-        type='red'
-        onClick={
-          () => setValue(
-            clamp(min, max, (value || min) + 1)
-          )
-        }
-      >
-        <span>+</span>
-      </GameButton>
-    </Flex>
-  );
-};
+    <GameButton
+      className={classes.button}
+      size='tiny'
+      type='red'
+      onClick={
+        () => l.setValue(
+          clamp(min, max, (value || min) + 1),
+        )
+      }
+    >
+      <span>+</span>
+    </GameButton>
+  </Flex>
+);
 
 GameRangeInput.displayName = 'GameRangeInput';
 
@@ -77,7 +69,8 @@ GameRangeInput.defaultProps = {
   max: 4,
 };
 
-export default React.memo(
+export default R.compose(
+  React.memo,
   injectClassesStylesheet(
     {
       base: {},
@@ -95,12 +88,19 @@ export default React.memo(
 
       input: {
         margin: [0, 10],
-        maxWidth: 'calc(100% - 84px)',
+        flexGrow: '1',
         textAlign: 'center',
+        '-moz-appearance': 'textfield',
+
+        '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
+          '-webkit-appearance': 'none',
+          margin: 0,
+        },
       },
     },
     {
       index: 5,
     },
-  )(GameRangeInput),
-);
+  ),
+  withInputs,
+)(GameRangeInput);

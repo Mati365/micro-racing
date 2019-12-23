@@ -32,9 +32,8 @@ const GameInput = styled(
   },
   {
     index: 3,
-    omitProps: ['type', 'expanded', 'size'],
-    classSelector: (classes, {type, expanded, size}) => [
-      classes[`type-${type}`],
+    omitProps: ['expanded', 'size'],
+    classSelector: (classes, {expanded, size}) => [
       size && classes[`size-${size}`],
       expanded && classes.expanded,
     ],

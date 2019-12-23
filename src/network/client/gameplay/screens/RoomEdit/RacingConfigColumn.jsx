@@ -4,6 +4,7 @@ import {useI18n} from '@ui/i18n';
 
 import PlayersListConfig from './PlayersListConfig';
 import RaceConfig from './RaceConfig';
+import StartRaceButton from './StartRaceButton';
 import {
   GameDivider,
   GameTabs,
@@ -21,6 +22,17 @@ const RacingConfigColumn = ({gameBoard}) => {
         >
           {() => (
             <PlayersListConfig gameBoard={gameBoard} />
+          )}
+        </GameTabs.Tab>
+
+        <GameTabs.Tab
+          id='banned'
+          title={t('tabs.banned')}
+        >
+          {() => (
+            <div>
+              AA
+            </div>
           )}
         </GameTabs.Tab>
       </GameTabs>
@@ -48,6 +60,10 @@ const RacingConfigColumn = ({gameBoard}) => {
           )}
         </GameTabs.Tab>
       </GameTabs>
+
+      <GameDivider />
+
+      <StartRaceButton />
     </>
   );
 };

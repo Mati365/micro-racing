@@ -16,6 +16,7 @@ const PlayerListItem = ({player, current, classes, op, onKick, onBan, ...props})
     className={c(
       classes.base,
       current && classes.current,
+      !current && classes.buttonsVisible,
     )}
   >
     <img
@@ -70,6 +71,12 @@ export default injectClassesStylesheet(
       color: WHITE,
       fontSize: 10,
       textTransform: 'uppercase',
+    },
+
+    buttonsVisible: {
+      '&:not(:last-of-type)': {
+        marginBottom: 7,
+      },
     },
 
     icon: {

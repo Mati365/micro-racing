@@ -2,8 +2,10 @@ import React, {useState} from 'react';
 
 import {useI18n} from '@ui/i18n';
 
+import {IdleRender} from '@ui/basic-components';
 import {Margin} from '@ui/basic-components/styled';
-import TrackEditorCanvas from './TrackEditorCanvas';
+
+import {LoadingOverlay} from '../../components/parts';
 import {
   GameCard,
   GameHeader,
@@ -11,6 +13,7 @@ import {
 } from '../../components/ui';
 
 import RoomMapsList from './RoomMapsList';
+import TrackEditorCanvas from './TrackEditorCanvas';
 
 const EditableEditorCanvas = React.memo((props) => {
   const [editing] = useState(false);
@@ -32,13 +35,17 @@ const EditableEditorCanvas = React.memo((props) => {
           paddingBottom: '75%',
         }}
       >
-        <TrackEditorCanvas
-          canvasConfig={{
-            scale: 0.5,
-          }}
-          disabled={!editing}
-          {...props}
-        />
+        <IdleRender loadingComponent={LoadingOverlay}>
+          {() => (
+            <TrackEditorCanvas
+              canvasConfig={{
+                scale: 0.5,
+              }}
+              disabled={!editing}
+              {...props}
+            />
+          )}
+        </IdleRender>
       </GameCard>
     </div>
   );

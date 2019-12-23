@@ -7,6 +7,7 @@ import {getRandomObjValue} from '@pkg/basic-helpers/base/random';
 import {
   logMethod,
   findByID,
+  removeByID,
 } from '@pkg/basic-helpers';
 
 import PlayerSocket from './Player/types/PlayerSocket';
@@ -130,8 +131,8 @@ export default class GameServer {
       consola.info(`Remove room ${chalk.green.bold(name)}!`);
     },
   )
-  removeRoom(name) {
-    this.rooms = removeByProp('name')(name, this.rooms);
+  removeRoom(roomId) {
+    this.rooms = removeByID(roomId, this.rooms);
   }
 
   /**
@@ -153,7 +154,7 @@ export default class GameServer {
         owner,
         name,
         map: getRandomObjValue(this.maps),
-        onDestroy: () => this.removeRoom(name),
+        onDestroy: () => this.removeRoom(room.id),
       },
     );
 

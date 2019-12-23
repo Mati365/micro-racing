@@ -1,5 +1,7 @@
 import {
+  BLACK,
   WHITE,
+  WHITE_DARKEN_5,
   CRIMSON_RED,
   CRIMSON_RED_DARKEN_5,
   DODGER_BLUE,
@@ -70,6 +72,13 @@ const GameButton = styled(
       color: WHITE,
       background: CRIMSON_RED,
       boxShadow: `0 0.2em ${CRIMSON_RED_DARKEN_5}`,
+    },
+
+
+    'type-white': {
+      color: BLACK,
+      background: WHITE,
+      boxShadow: `0 0.2em ${WHITE_DARKEN_5}`,
     },
   },
   {

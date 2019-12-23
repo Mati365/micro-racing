@@ -8,6 +8,9 @@ export default {
     },
   },
   game: {
+    shared: {
+      loading: 'Wczytywanie...',
+    },
     errors: {
       [ERROR_CODES.ROOM_FULL]: 'Pokój / serwer jest pełny!',
       [ERROR_CODES.ROOM_ALREADY_EXISTS]: 'Podany pokój już istnieje!',
@@ -28,6 +31,7 @@ export default {
           nick: 'Wybierz nick',
         },
         play: 'Graj',
+        start_race: 'Start wyścigu',
         update: 'Zaktualizuj',
         sending: 'Wysyłanie...',
       },
@@ -47,6 +51,7 @@ export default {
         tabs: {
           chat: 'Czat',
           players: 'Obecni',
+          banned: 'Zbanowani',
           settings: 'Opcje',
         },
 

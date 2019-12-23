@@ -13,6 +13,7 @@ const CarsChooseRow = ({carsInfo, value, onChange, ...props}) => (
       ({type}) => (
         <li key={type}>
           <GameClickableCard
+            size='small'
             active={value === type}
             onClick={() => onChange(type)}
           >

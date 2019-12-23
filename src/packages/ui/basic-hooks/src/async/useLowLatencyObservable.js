@@ -5,17 +5,25 @@ import * as R from 'ramda';
  * @see createLowLatencyObservable
  */
 const useLowLatencyObservable = ({observable, parserFn = R.identity}) => {
-  const [value, setValue] = useState(null);
+  const [state, setState] = useState(
+    {
+      value: null,
+    },
+  );
 
   useEffect(
     () => observable.subscribe(
-      newValue => setValue(parserFn(newValue)),
+      newValue => setState(
+        {
+          value: parserFn(newValue),
+        },
+      ),
       true,
     ),
     [observable],
   );
 
-  return value;
+  return state.value;
 };
 
 export default useLowLatencyObservable;

@@ -4,3 +4,5 @@ export {default as AutofocusInput} from './AutofocusInput';
 
 export {default as AsyncOperationForm} from './AsyncOperationForm';
 export {default as AsyncLockButton} from './AsyncLockButton';
+
+export {default as OptimisticForm} from './OptimisticForm';

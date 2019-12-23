@@ -241,6 +241,17 @@ export default class PlayerSocket extends Player {
       );
     },
 
+    [PLAYER_ACTIONS.SET_ROOM_INFO]: (cmdID, roomInfo) => {
+      const {room} = this.info;
+      if (!room)
+        throw new ServerError(ERROR_CODES.ACCESS_DENIED);
+
+      this.sendActionResponse(
+        cmdID,
+        room.safeAssignRoomInfo(roomInfo),
+      );
+    },
+
     [PLAYER_ACTIONS.SET_PLAYER_INFO]: (cmdID, {nick, carType}) => {
       const {
         room,

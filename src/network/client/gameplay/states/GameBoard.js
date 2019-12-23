@@ -12,7 +12,10 @@ import carKeyboardDriver, {GameKeyboardController} from '@game/logic/drivers/car
 
 import RoomMapNode from '../objects/RoomMapNode';
 import RemoteRoomStateListener from '../RemoteRoomStateListener';
-import RaceState from '../../../shared/room/RoomRaceState';
+import {
+  RoomRaceState,
+  RoomConfig,
+} from '../../../shared/room';
 
 export default class GameBoard {
   constructor(
@@ -95,7 +98,7 @@ export default class GameBoard {
       name: initialRoomState.name,
       ownerID: initialRoomState.ownerID,
       state: initialRoomState.state,
-      config: initialRoomState.config,
+      config: RoomConfig.fromBSON(initialRoomState.config),
     };
 
     if (createRoomMapNode)
@@ -114,7 +117,8 @@ export default class GameBoard {
             {
               name: roomInfo.name,
               ownerID: roomInfo.owner.id,
-              state: RaceState.fromBSON(roomInfo.state),
+              state: RoomRaceState.fromBSON(roomInfo.state),
+              config: RoomConfig.fromBSON(roomInfo.config),
             },
           );
 

@@ -33,7 +33,7 @@ const RacingConfigColumn = ({gameBoard}) => {
           title={t('tabs.settings')}
         >
           {() => (
-            <RaceConfig />
+            <RaceConfig gameBoard={gameBoard} />
           )}
         </GameTabs.Tab>
 

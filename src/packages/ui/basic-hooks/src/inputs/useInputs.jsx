@@ -56,7 +56,7 @@ const processInputValue = (prevValue, name, e) => {
 
 export const pickUpdateValue = (name, data, defaults = '') => {
   let pickedValue = data;
-  if (!R.isNil(name)) {
+  if (data && !R.isNil(name)) {
     pickedValue = (
       R.is(String, name) && R.contains('.', name)
         ? dig(R.split('.', name), data)
@@ -95,10 +95,10 @@ const useInputs = (config = {}) => {
     setValue: (e, name, flags) => {
       const newValue = processInputValue(state.value, name, e);
 
-      if (onChange)
-        onChange(newValue);
+      if (!flags?.suppressPropagation && onChange)
+        onChange(newValue, state.value);
 
-      if (!controlled) {
+      if (flags?.suppressPropagation || !controlled) {
         if (flags?.noRerenderAfterUpdate)
           state.value = newValue;
         else {

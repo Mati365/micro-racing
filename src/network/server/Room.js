@@ -233,12 +233,16 @@ export default class Room {
    * Sends basic info about room
    */
   broadcastRoomInfo() {
+    const data = this.toListBSON();
+
     this.sendBroadcastAction(
       null,
       PLAYER_ACTIONS.UPDATE_ROOM_INFO,
       null,
-      this.toListBSON(),
+      data,
     );
+
+    return data;
   }
 
   /**
@@ -379,5 +383,16 @@ export default class Room {
     );
 
     return true;
+  }
+
+  safeAssignRoomInfo(info) {
+    if (!info)
+      return false;
+
+    const {config} = info;
+    if (config)
+      this.config.safeAssignConfig(config);
+
+    return this.broadcastRoomInfo();
   }
 }

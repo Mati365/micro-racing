@@ -48,6 +48,13 @@ export default class PlayerClientSocket {
       },
     },
 
+    setRoomInfo: {
+      action: PLAYER_ACTIONS.SET_ROOM_INFO,
+      flags: {
+        waitForResponse: true,
+      },
+    },
+
     setPlayerInfo: {
       action: PLAYER_ACTIONS.SET_PLAYER_INFO,
       flags: {

@@ -9,6 +9,14 @@ multiplayer 2.5D isometric racing game written in WebGL 2.x
 
 ![GIF](/doc/screens/gameplay.gif)
 
+## Features
+- Client side prediction
+- High performance isometric engine using WebGL 2.x
+- Neural networks trained using evolution algorithms
+- Function precompilation in stuct-pack deserializers
+- Physics engine
+- Optimistic forms
+
 ## Goals
 - Use monorepo, separated logic
 - Create tiny matrix math library

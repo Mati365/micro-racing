@@ -1,7 +1,6 @@
 import React from 'react';
 import * as R from 'ramda';
 
-// import {useI18n} from '@ui/i18n';
 import {useLowLatencyObservable} from '@pkg/basic-hooks';
 import {useI18n} from '@ui/i18n';
 

@@ -15,9 +15,11 @@ import {
 
 import createActionMessage from '../shared/utils/createActionMessage';
 import genUniquePlayerColor from './utils/genUniquePlayerColor';
+import serializeBsonList from './utils/serializeBsonList';
 
 import ServerError from '../shared/ServerError';
 import RoomRacing from './RoomRacing';
+import RoomChat from './RoomChat';
 import {RoomConfig} from '../shared/room';
 
 import {PlayerBot} from './Player/types';
@@ -45,6 +47,11 @@ export default class Room {
     this.owner = owner;
     this.abstract = abstract;
     this.kickedPlayers = kickedPlayers;
+    this.chat = new RoomChat(
+      {
+        room: this,
+      },
+    );
 
     if (!abstract) {
       this.racing = new RoomRacing(
@@ -119,10 +126,7 @@ export default class Room {
   }
 
   getKickedPlayersListBSON() {
-    return R.map(
-      kicked => kicked.toListBSON(),
-      this.kickedPlayers,
-    );
+    return serializeBsonList(this.kickedPlayers);
   }
 
   /**

@@ -6,6 +6,7 @@ import PlayersListConfig from './PlayersListConfig';
 import RaceConfig from './RaceConfig';
 import StartRaceButton from './StartRaceButton';
 import KickedPlayersConfig from './KickedPlayersConfig';
+import RaceChat from './RaceChat';
 import {
   GameDivider,
   GameTabs,
@@ -49,13 +50,27 @@ const RacingConfigColumn = ({gameBoard}) => {
         </GameTabs.Tab>
 
         <GameTabs.Tab
-          id='chat'
-          title={t('tabs.chat')}
+          id='score'
+          title={t('tabs.score')}
         >
           {() => (
             <div>
               COŚ
             </div>
+          )}
+        </GameTabs.Tab>
+      </GameTabs>
+
+      <GameDivider />
+
+      <GameTabs>
+        <GameTabs.Tab
+          id='chat'
+          title={t('tabs.chat')}
+          padding='small'
+        >
+          {() => (
+            <RaceChat gameBoard={gameBoard} />
           )}
         </GameTabs.Tab>
       </GameTabs>

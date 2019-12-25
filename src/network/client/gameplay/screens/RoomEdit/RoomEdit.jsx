@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import {useHistory} from 'react-router-dom';
@@ -19,6 +19,7 @@ import {GameButton} from '../../components/ui';
 import MapChooseColumn from './MapChooseColumn';
 import RacingConfigColumn from './RacingConfigColumn';
 import EditRoomNameForm from './EditRoomNameForm';
+import useClientChainListener from '../../hooks/useClientChainListener';
 
 const RoomEdit = ({client, gameBoard}) => { // eslint-disable-line no-unused-vars
   const t = useI18n('game.screens.room_edit');
@@ -29,19 +30,15 @@ const RoomEdit = ({client, gameBoard}) => { // eslint-disable-line no-unused-var
     history.goBack();
   };
 
-  useEffect(
-    () => {
-      const unmountListener = client.rpc.chainListener(
-        PLAYER_ACTIONS.YOU_ARE_KICKED,
-        onLeaveRoom,
-      );
-
-      return () => {
+  useClientChainListener(
+    {
+      client,
+      action: PLAYER_ACTIONS.YOU_ARE_KICKED,
+      method: onLeaveRoom,
+      afterReleaseFn: () => {
         gameBoard?.release();
-        unmountListener();
-      };
+      },
     },
-    [client],
   );
 
   return (

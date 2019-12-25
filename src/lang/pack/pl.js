@@ -49,7 +49,8 @@ export default {
         edit_road: 'Edytuj tor',
 
         tabs: {
-          chat: 'Czat',
+          score: 'Ranking',
+          chat: 'Chat',
           players: 'Obecni',
           banned: 'Zbanowani',
           settings: 'Opcje',
@@ -72,6 +73,11 @@ export default {
           laps_count: 'Ilość okrążeń:',
           countdown: 'Odliczaj (s):',
         },
+      },
+
+      chat: {
+        type_message: 'Wpisz wiadomość...',
+        send: 'Wyślij',
       },
     },
 

@@ -22,6 +22,20 @@ export default class PlayerClientSocket {
       },
     },
 
+    getChatMessages: {
+      action: PLAYER_ACTIONS.GET_CHAT_MESSAGES,
+      flags: {
+        waitForResponse: true,
+      },
+    },
+
+    sendChatMessage: {
+      action: PLAYER_ACTIONS.SEND_CHAT_MESSAGE,
+      flags: {
+        waitForResponse: true,
+      },
+    },
+
     fetchRoomsList: {
       action: PLAYER_ACTIONS.GET_ROOMS_LIST,
       flags: {

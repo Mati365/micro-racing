@@ -17,7 +17,7 @@ const usePromiseCallback = (
   promiseFn,
   {
     silent = false,
-    cacheKeys = [],
+    keys = [],
     rethrow = false,
     afterExecFn = R.F,
     initialPromiseState,
@@ -91,11 +91,13 @@ const usePromiseCallback = (
 
         if (rethrow)
           throw errorSelectorFn(e);
+        else
+          console.error(e);
       }
 
       return null;
     },
-    cacheKeys,
+    keys,
   );
 
   return [

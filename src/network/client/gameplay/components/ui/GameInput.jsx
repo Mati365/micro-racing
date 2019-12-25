@@ -17,8 +17,11 @@ const GameInput = styled(
       border: `2px solid ${DARKEST_GRAY}`,
       color: '#929292',
       padding: 7,
-      textTransform: 'uppercase',
       fontWeight: 900,
+    },
+
+    uppercase: {
+      textTransform: 'uppercase',
     },
 
     'size-small': {
@@ -32,10 +35,11 @@ const GameInput = styled(
   },
   {
     index: 3,
-    omitProps: ['expanded', 'size'],
-    classSelector: (classes, {expanded, size}) => [
+    omitProps: ['expanded', 'size', 'uppercase'],
+    classSelector: (classes, {expanded, size, uppercase}) => [
       size && classes[`size-${size}`],
       expanded && classes.expanded,
+      uppercase && classes.uppercase,
     ],
   },
 );
@@ -44,10 +48,12 @@ GameInput.displayName = 'GameInput';
 
 GameInput.propTypes = {
   size: PropTypes.string,
+  uppercase: PropTypes.bool,
 };
 
 GameInput.defaultProps = {
   size: null,
+  uppercase: true,
 };
 
 export default GameInput;

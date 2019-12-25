@@ -7,6 +7,7 @@ const usePromise = (fn, {keys = [], ...promiseFlags} = {}) => {
     fn,
     {
       ...promiseFlags,
+      keys,
       initialPromiseState: {
         loading: true,
       },

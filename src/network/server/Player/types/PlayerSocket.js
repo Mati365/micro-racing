@@ -359,5 +359,24 @@ export default class PlayerSocket extends Player {
         room.startRace();
       },
     ),
+
+
+    [PLAYER_ACTIONS.GET_CHAT_MESSAGES]: requireRoomWrapper((cmdID, room) => {
+      this.sendActionResponse(
+        cmdID,
+        room.chat.toListBSON(),
+      );
+    }),
+
+    [PLAYER_ACTIONS.SEND_CHAT_MESSAGE]: requireRoomWrapper((cmdID, room, {message}) => {
+      room.chat.post(message, this);
+
+      this.sendActionResponse(
+        cmdID,
+        {
+          result: true,
+        },
+      );
+    }),
   }
 }

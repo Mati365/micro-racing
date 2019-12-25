@@ -15,9 +15,18 @@ import {
 
 const TabContent = styled.div(
   {
-    flex: 1,
-    padding: 10,
-    border: `1px solid ${DARKEST_GRAY}`,
+    base: {
+      flex: 1,
+      border: `1px solid ${DARKEST_GRAY}`,
+    },
+
+    'padding-none': {padding: 0},
+    'padding-small': {padding: 5},
+    'padding-medium': {padding: 10},
+  },
+  {
+    omitProps: ['padding'],
+    classSelector: (classes, {padding}) => classes[`padding-${padding}`],
   },
 );
 
@@ -53,7 +62,7 @@ const GameTabs = ({initialTab, children}) => {
         )}
       </UnorderedList>
 
-      <TabContent>
+      <TabContent padding={tabElement?.props?.padding || 'medium'}>
         {tabElement?.props.children(
           {
             activeTabId,

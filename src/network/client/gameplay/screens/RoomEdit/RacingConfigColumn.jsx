@@ -5,6 +5,7 @@ import {useI18n} from '@ui/i18n';
 import PlayersListConfig from './PlayersListConfig';
 import RaceConfig from './RaceConfig';
 import StartRaceButton from './StartRaceButton';
+import KickedPlayersConfig from './KickedPlayersConfig';
 import {
   GameDivider,
   GameTabs,
@@ -30,9 +31,7 @@ const RacingConfigColumn = ({gameBoard}) => {
           title={t('tabs.banned')}
         >
           {() => (
-            <div>
-              AA
-            </div>
+            <KickedPlayersConfig gameBoard={gameBoard} />
           )}
         </GameTabs.Tab>
       </GameTabs>

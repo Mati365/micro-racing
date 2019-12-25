@@ -57,8 +57,14 @@ export default {
 
         players_list: {
           ops: 'Administrator:',
-          in_race: 'Zawodnicy:',
+          in_race: 'Userzy:',
           observers: 'Obserwatorzy:',
+        },
+
+        banned_list: {
+          list_title: 'Zbanowani:',
+          no_banned: 'Brak zbanowanych :)',
+          unban: 'Odbanuj',
         },
 
         race_config: {

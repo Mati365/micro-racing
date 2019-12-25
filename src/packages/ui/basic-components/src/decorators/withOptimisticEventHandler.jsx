@@ -7,6 +7,8 @@ import {withInputs} from '@pkg/basic-hooks/src/inputs/useInputs';
 export default Component => (
   @withInputs
   class OptimisticEventHandler extends React.Component {
+    pendingPromises = {};
+
     static propTypes = {
       discardResponseWhen: PropTypes.func,
     };
@@ -14,8 +16,6 @@ export default Component => (
     static defaultProps = {
       discardResponseWhen: R.F,
     };
-
-    pendingPromises = {};
 
     onOptimisticEvent = async (
       {

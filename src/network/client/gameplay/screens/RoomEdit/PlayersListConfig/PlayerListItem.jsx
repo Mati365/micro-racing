@@ -1,5 +1,6 @@
 import React from 'react';
 import c from 'classnames';
+import * as R from 'ramda';
 
 import {WHITE} from '@ui/colors';
 
@@ -7,16 +8,13 @@ import carIconUrl from '@game/res/img/icons/car.png';
 import {injectClassesStylesheet} from '@pkg/fast-stylesheet/src/react';
 import textTruncateStyle from '@ui/basic-components/styled/styles/textTruncate';
 
-import {AsyncLockButton} from '@ui/basic-components';
-import {GameButton} from '../../../components/ui';
-
-const PlayerListItem = ({player, current, classes, op, onKick, onBan, ...props}) => (
+const PlayerListItem = ({player, current, classes, buttons, ...props}) => (
   <li
     {...props}
     className={c(
       classes.base,
       current && classes.current,
-      !current && classes.buttonsVisible,
+      !R.isNil(buttons) && classes.withButtons,
     )}
   >
     <img
@@ -35,26 +33,9 @@ const PlayerListItem = ({player, current, classes, op, onKick, onBan, ...props})
     </span>
 
     {!current && (
-      <>
-        <AsyncLockButton
-          component={GameButton}
-          type='green'
-          size='tiny'
-          className={classes.toolbarButton}
-          onClick={onKick}
-        >
-          Kick
-        </AsyncLockButton>
-
-        <AsyncLockButton
-          component={GameButton}
-          type='red'
-          size='tiny'
-          onClick={onBan}
-        >
-          Ban
-        </AsyncLockButton>
-      </>
+      <span className={classes.toolbarButton}>
+        {buttons}
+      </span>
     )}
   </li>
 );
@@ -73,7 +54,7 @@ export default injectClassesStylesheet(
       textTransform: 'uppercase',
     },
 
-    buttonsVisible: {
+    withButtons: {
       '&:not(:last-of-type)': {
         marginBottom: 7,
       },
@@ -99,9 +80,10 @@ export default injectClassesStylesheet(
     },
 
     toolbarButton: {
+      display: 'inherit',
       marginLeft: 'auto',
 
-      '&:not(:last-of-type)': {
+      '& > button:not(:last-of-type)': {
         marginRight: 5,
       },
     },

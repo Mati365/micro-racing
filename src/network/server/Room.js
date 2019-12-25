@@ -22,6 +22,7 @@ import {RoomConfig} from '../shared/room';
 
 import {PlayerBot} from './Player/types';
 import {PlayerRacingState} from './Player/PlayerInfo';
+import KickedPlayerInfo from './Player/KickedPlayerInfo';
 
 export default class Room {
   constructor(
@@ -117,6 +118,13 @@ export default class Room {
     );
   }
 
+  getKickedPlayersListBSON() {
+    return R.map(
+      kicked => kicked.toListBSON(),
+      this.kickedPlayers,
+    );
+  }
+
   /**
    * Returns info about room used in some
    * for example rooms list, it must be compressed
@@ -161,6 +169,7 @@ export default class Room {
       ownerID: owner.info.id,
 
       // objects
+      banned: this.getKickedPlayersListBSON(),
       players: R.map(
         ({info}) => info.toBSON(),
         players,
@@ -216,6 +225,24 @@ export default class Room {
   }
 
   /**
+   * Sends list of banned players
+   */
+  broadcastBannedPlayersRoomState() {
+    const banned = this.getKickedPlayersListBSON();
+
+    this.sendBroadcastAction(
+      null,
+      PLAYER_ACTIONS.BANNED_LIST_UPDATE,
+      null,
+      {
+        banned,
+      },
+    );
+
+    return banned;
+  }
+
+  /**
    * Sends playerInfo
    */
   broadcastPlayersRoomState() {
@@ -255,7 +282,6 @@ export default class Room {
   join(player, broadcast = true) {
     const {
       abstract,
-      kickedPlayers,
       players,
       racing,
     } = this;
@@ -270,7 +296,7 @@ export default class Room {
     if (findByID(id, players))
       throw new ServerError(ERROR_CODES.ALREADY_JOINED);
 
-    if (R.contains(id, kickedPlayers))
+    if (this.isKickedPlayer(player))
       throw new ServerError(ERROR_CODES.ALREADY_KICKED);
 
     if (R.isNil(this.owner))
@@ -357,6 +383,32 @@ export default class Room {
   }
 
   /**
+   * Check if player is
+   *
+   * @param {Player} player
+   * @memberof Room
+   */
+  isKickedPlayer(player) {
+    return R.any(
+      kicked => kicked.isSimilarToPlayer(player),
+      this.kickedPlayers,
+    );
+  }
+
+  /**
+   * Removes player from kicked list
+   *
+   * @param {ID} playerId
+   * @memberof Room
+   */
+  unban(playerId) {
+    this.kickedPlayers = removeByID(playerId, this.kickedPlayers);
+    this.broadcastBannedPlayersRoomState();
+
+    return true;
+  }
+
+  /**
    * Removes player from room
    *
    * @param {ID} playerId
@@ -367,10 +419,15 @@ export default class Room {
     if (!player)
       return false;
 
-    if (ban)
-      this.kickedPlayers.push(playerId);
+    if (ban) {
+      this.kickedPlayers.push(
+        KickedPlayerInfo.fromPlayer(player),
+      );
+    }
 
     this.leave(player);
+    this.broadcastBannedPlayersRoomState();
+
     player.ws.send(
       createActionMessage(
         null,

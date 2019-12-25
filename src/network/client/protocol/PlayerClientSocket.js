@@ -41,6 +41,13 @@ export default class PlayerClientSocket {
       },
     },
 
+    unbanPlayer: {
+      action: PLAYER_ACTIONS.UNBAN_PLAYER,
+      flags: {
+        waitForResponse: true,
+      },
+    },
+
     kickPlayer: {
       action: PLAYER_ACTIONS.KICK_PLAYER,
       flags: {

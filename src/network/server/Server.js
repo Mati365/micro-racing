@@ -2,7 +2,6 @@ import WebSocket from 'ws';
 import consola from 'consola';
 import chalk from 'chalk';
 
-import {removeByProp} from '@pkg/basic-helpers/list/removeByID';
 import {getRandomObjValue} from '@pkg/basic-helpers/base/random';
 import {
   logMethod,
@@ -77,11 +76,12 @@ export default class GameServer {
     this.wss = new WebSocket.Server(socketOptions);
     this.wss.binaryType = 'arraybuffer';
 
-    this.wss.on('connection', (ws) => {
+    this.wss.on('connection', (ws, req) => {
       try {
         new PlayerSocket(
           {
             server: this,
+            ip: req.connection.remoteAddress,
             ws,
           },
         );

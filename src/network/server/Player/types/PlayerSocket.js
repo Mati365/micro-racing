@@ -25,12 +25,21 @@ import ServerError from '../../../shared/ServerError';
 import PlayerInfo from '../PlayerInfo';
 import Player from '../Player';
 
+const requireRoomWrapper = fn => (function requireRoomWrapperFn(cmdID, ...args) {
+  const {room} = this.info;
+  if (!room)
+    throw new ServerError(ERROR_CODES.ACCESS_DENIED);
+
+  return fn(cmdID, room, ...args);
+});
+
 /**
  * Socket API provider for player
  */
 export default class PlayerSocket extends Player {
   constructor(
     {
+      ip,
       ws,
       server,
       info = new PlayerInfo(
@@ -49,6 +58,7 @@ export default class PlayerSocket extends Player {
 
     this.server = server;
     this.ws = ws;
+    this.ip = ip;
     this.onDisconnect = onDisconnect;
 
     this.mountMessagesHandler();
@@ -106,14 +116,15 @@ export default class PlayerSocket extends Player {
 
     server.rootRoom.join(this);
 
-    ws.on('message', async (message) => {
+    ws.on('message', (message) => {
       const {cmdID, action} = getMessageMeta(message);
       const listener = listeners[action];
       if (!listener)
         return;
 
       try {
-        await listener(
+        listener.call(
+          this,
           cmdID,
           getMessageContent(message),
         );
@@ -232,25 +243,30 @@ export default class PlayerSocket extends Player {
       );
     },
 
-    [PLAYER_ACTIONS.KICK_PLAYER]: (cmdID, {id, ban}) => {
+    [PLAYER_ACTIONS.UNBAN_PLAYER]: requireRoomWrapper((cmdID, room, {id}) => {
       this.sendActionResponse(
         cmdID,
         {
-          result: this.info.room?.kick(id, ban),
+          result: room.unban(id),
         },
       );
-    },
+    }),
 
-    [PLAYER_ACTIONS.SET_ROOM_INFO]: (cmdID, roomInfo) => {
-      const {room} = this.info;
-      if (!room)
-        throw new ServerError(ERROR_CODES.ACCESS_DENIED);
+    [PLAYER_ACTIONS.KICK_PLAYER]: requireRoomWrapper((cmdID, room, {id, ban}) => {
+      this.sendActionResponse(
+        cmdID,
+        {
+          result: room.kick(id, ban),
+        },
+      );
+    }),
 
+    [PLAYER_ACTIONS.SET_ROOM_INFO]: requireRoomWrapper((cmdID, room, roomInfo) => {
       this.sendActionResponse(
         cmdID,
         room.safeAssignRoomInfo(roomInfo),
       );
-    },
+    }),
 
     [PLAYER_ACTIONS.SET_PLAYER_INFO]: (cmdID, {nick, carType}) => {
       const {
@@ -312,9 +328,9 @@ export default class PlayerSocket extends Player {
       );
     },
 
-    [PLAYER_ACTIONS.LEAVE_ROOM]: () => {
+    [PLAYER_ACTIONS.LEAVE_ROOM]: requireRoomWrapper(() => {
       this.leaveRoom();
-    },
+    }),
 
     [PLAYER_ACTIONS.JOIN_ROOM]: (cmdID, {name}) => {
       const room = this.joinRoom(name);

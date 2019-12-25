@@ -24,6 +24,12 @@ const Text = styled(
 
     base: {},
 
+    expanded: {
+      width: '100%',
+    },
+
+    'align-center': {textAlign: 'center'},
+
     'size-tiny': {fontSize: '9px'},
     'size-small': {fontSize: '11px'},
 
@@ -35,11 +41,13 @@ const Text = styled(
   {
     index: 1,
     omitProps: ['display', 'type', 'weight'],
-    classSelector: (classes, {display, type, weight, size}) => [
+    classSelector: (classes, {display, type, weight, expanded, align, size}) => [
       display && classes[`display-${display}`],
       type && classes[`type-${type}`],
       weight && classes[`weight-${weight}`],
       size && classes[`size-${size}`],
+      align && classes[`align-${align}`],
+      expanded && classes.expanded,
     ],
   },
 );
@@ -49,7 +57,9 @@ Text.displayName = 'Text';
 Text.propTypes = {
   display: PropTypes.string,
   size: PropTypes.string,
+  align: PropTypes.string,
   type: PropTypes.string,
+  expanded: PropTypes.bool,
   weight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 

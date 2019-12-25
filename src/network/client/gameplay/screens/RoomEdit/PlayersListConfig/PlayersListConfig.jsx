@@ -4,55 +4,13 @@ import * as R from 'ramda';
 import {useLowLatencyObservable} from '@pkg/basic-hooks';
 import {useI18n} from '@ui/i18n';
 
-import {UnorderedList} from '@ui/basic-components/styled';
-import {GameLabel} from '../../../components/ui';
-import PlayerListItem from './PlayerListItem';
+import TitledPlayersList from './TitledPlayersList';
 
 const pluckPlayersArray = R.compose(
   R.pluck('player'),
   R.values,
   R.prop('nodes'),
 );
-
-const PlayersUnorderedList = ({
-  title, players, spaced, gameBoard,
-  onKick, onBan,
-}) => {
-  if (!players || !players.length)
-    return null;
-
-  return (
-    <>
-      <GameLabel
-        spaceTop={spaced ? 2 : 0}
-        spaceBottom={0}
-      >
-        {title}
-      </GameLabel>
-
-      <UnorderedList>
-        {players.map(
-          (player) => {
-            const {ownerID} = gameBoard.roomInfo;
-
-            return (
-              <PlayerListItem
-                key={player.id}
-                op={ownerID}
-                current={
-                  gameBoard.client.info.id === player.id
-                }
-                player={player}
-                onKick={() => onKick(player)}
-                onBan={() => onBan(player)}
-              />
-            );
-          },
-        )}
-      </UnorderedList>
-    </>
-  );
-};
 
 const PlayersListConfig = ({gameBoard}) => {
   const t = useI18n('game.screens.room_edit.players_list');
@@ -86,19 +44,23 @@ const PlayersListConfig = ({gameBoard}) => {
 
   return (
     <>
-      <PlayersUnorderedList
+      <TitledPlayersList
         title={t('ops')}
-        players={groupedPlayers.op || []}
+        list={
+          groupedPlayers.op || []
+        }
+        listItemProps={sharedProps}
         gameBoard={gameBoard}
-        {...sharedProps}
       />
 
-      <PlayersUnorderedList
+      <TitledPlayersList
         title={t('in_race')}
-        players={groupedPlayers.inRace || []}
+        list={
+          groupedPlayers.inRace || []
+        }
+        listItemProps={sharedProps}
         gameBoard={gameBoard}
         spaced
-        {...sharedProps}
       />
     </>
   );

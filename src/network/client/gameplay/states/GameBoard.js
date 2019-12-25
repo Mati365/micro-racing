@@ -31,6 +31,7 @@ export default class GameBoard {
       roomInfo: createLowLatencyObservable(),
       raceState: createLowLatencyObservable(),
       players: createLowLatencyObservable(),
+      bannedPlayers: createLowLatencyObservable(),
     };
 
     this.roomInfo = {
@@ -106,6 +107,7 @@ export default class GameBoard {
 
     this.notifyPlayersChange();
     observers.roomInfo.notify(this.roomInfo);
+    observers.bannedPlayers.notify(initialRoomState.banned);
 
     this.roomRemoteListener = new RemoteRoomStateListener(
       {
@@ -138,6 +140,10 @@ export default class GameBoard {
         onUpdatePlayersRaceState: (playersStates) => {
           playersStates.forEach(this.onSyncPlayerRaceState);
           this.notifyPlayersChange();
+        },
+
+        onUpdateBannedList: (bannedPlayers) => {
+          observers.bannedPlayers.notify(bannedPlayers);
         },
 
         onJoinPlayer: async (player, carObject) => {

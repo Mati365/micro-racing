@@ -5,10 +5,10 @@ import {usePromise} from '@pkg/basic-hooks';
 import {
   GameCardsList,
   GameRoadCard,
-} from '../../components/ui';
+} from '../../../components/ui';
 
-const RoomMapsList = ({client}) => {
-  const {result: maps} = usePromise(::client.fetchMapsList);
+const RoomMapsList = ({gameBoard}) => {
+  const {result: maps} = usePromise(::gameBoard.client.fetchMapsList);
 
   return (
     <GameCardsList>

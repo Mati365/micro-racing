@@ -47,7 +47,7 @@ export default {
 
       room_edit: {
         header: 'Pokój:',
-        predefined_maps: 'Wybierz inne mapy:',
+        predefined_maps: 'Wybierz inne tory:',
         leave: 'Opuść pokój',
         edit_road: 'Edytuj tor',
 

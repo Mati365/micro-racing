@@ -14,7 +14,7 @@ import {
 } from '@ui/basic-components';
 
 import ScreensContainer from '@game/network/client/gameplay/screens';
-import TrackEditorCanvas from '@game/network/client/gameplay/screens/RoomEdit/TrackEditorCanvas';
+import TrackEditorCanvas from '@game/network/client/gameplay/screens/RoomEdit/MapChooseColumn/TrackEditorCanvas';
 import PhysicsCanvas from './ui/PhysicsCanvas/PhysicsCanvas';
 
 const Container = styled.div(

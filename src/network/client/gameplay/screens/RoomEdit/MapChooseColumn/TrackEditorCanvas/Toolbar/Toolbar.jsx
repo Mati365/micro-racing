@@ -24,7 +24,7 @@ import {
 } from '@ui/basic-components/styled';
 
 import TrackEditor from '../TrackEditor';
-import {GameInput} from '../../../../components/ui';
+import {GameInput} from '../../../../../components/ui';
 
 const ToolbarHolder = styled(
   UnorderedList,

@@ -63,7 +63,7 @@ const RoomEdit = ({client, gameBoard}) => { // eslint-disable-line no-unused-var
     >
       <Flex direction='row'>
         <div style={{width: '70%'}}>
-          <MapChooseColumn client={client} />
+          <MapChooseColumn gameBoard={gameBoard} />
         </div>
 
         <div

@@ -5,12 +5,12 @@ import {useI18n} from '@ui/i18n';
 import {IdleRender} from '@ui/basic-components';
 import {Margin} from '@ui/basic-components/styled';
 
-import {LoadingOverlay} from '../../components/parts';
+import {LoadingOverlay} from '../../../components/parts';
 import {
   GameCard,
   GameHeader,
   GameButton,
-} from '../../components/ui';
+} from '../../../components/ui';
 
 import RoomMapsList from './RoomMapsList';
 import TrackEditorCanvas from './TrackEditorCanvas';
@@ -51,7 +51,7 @@ const EditableEditorCanvas = React.memo((props) => {
   );
 });
 
-const MapChooseColumn = ({client}) => {
+const MapChooseColumn = ({gameBoard}) => {
   const t = useI18n('game.screens.room_edit');
 
   return (
@@ -64,7 +64,7 @@ const MapChooseColumn = ({client}) => {
           {t('predefined_maps')}
         </GameHeader>
 
-        <RoomMapsList client={client} />
+        <RoomMapsList gameBoard={gameBoard} />
       </Margin>
     </>
   );

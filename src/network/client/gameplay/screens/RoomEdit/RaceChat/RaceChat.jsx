@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import * as R from 'ramda';
 
 import {PLAYER_ACTIONS} from '@game/network/constants/serverCodes';
@@ -16,13 +16,23 @@ const RaceChatListHolder = styled(
   {
     height: 220,
     marginBottom: 10,
-    overflowY: 'scroll',
+    overflowY: 'auto',
   },
 );
 
 const RaceChat = ({gameBoard}) => {
+  const messagesListRef = useRef();
+
   const {client} = gameBoard;
   const [messages, setMessages] = useState(null);
+
+  const onSendMessage = async (data) => {
+    await gameBoard.client.sendChatMessage(data);
+
+    const {current: listNode} = messagesListRef;
+    if (listNode)
+      listNode.scrollTop = listNode.scrollHeight;
+  };
 
   usePromise(
     client.getChatMessages,
@@ -50,7 +60,7 @@ const RaceChat = ({gameBoard}) => {
 
   return (
     <div>
-      <RaceChatListHolder>
+      <RaceChatListHolder ref={messagesListRef}>
         {(messages || []).map(
           message => (
             <RoomMessageItem
@@ -61,7 +71,7 @@ const RaceChat = ({gameBoard}) => {
         )}
       </RaceChatListHolder>
 
-      <RaceChatMessageBox gameBoard={gameBoard} />
+      <RaceChatMessageBox onSendMessage={onSendMessage} />
     </div>
   );
 };

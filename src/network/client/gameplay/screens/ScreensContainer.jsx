@@ -9,8 +9,10 @@ import {styled} from '@pkg/fast-stylesheet/src/react';
 
 import useClientSocket from '../hooks/useClientSocket';
 
-import ConfigChooseScreen from './ConfigChoose';
 import {GameCanvasHolder} from '../components';
+import {GameScrollbars} from '../components/ui';
+
+import ConfigChooseScreen from './ConfigChoose';
 import ServersList from './ServersList';
 import RoomEdit from './RoomEdit';
 import ConnectingScreen from './ConnectingScreen';
@@ -91,9 +93,11 @@ const ScreensContainer = () => {
   }
 
   return (
-    <ScreensHolder>
-      {content}
-    </ScreensHolder>
+    <GameScrollbars>
+      <ScreensHolder>
+        {content}
+      </ScreensHolder>
+    </GameScrollbars>
   );
 };
 

@@ -11,6 +11,7 @@ export {default as GameCardsList} from './GameCardsList';
 export {default as GameRangeInput} from './GameRangeInput';
 export {default as GameLabel} from './GameLabel';
 export {default as GameInlineFormGroup} from './GameInlineFormGroup';
+export {default as GameScrollbars} from './GameScrollbars';
 
 export {default as GameRoadCard} from './parts/GameRoadCard';
 export {default as GameRoomCard} from './parts/GameRoomCard';

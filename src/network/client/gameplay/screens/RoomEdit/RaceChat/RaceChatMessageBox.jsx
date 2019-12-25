@@ -34,17 +34,19 @@ const styles = {
   },
 };
 
-const RaceChatMessageBox = ({classes, gameBoard}) => {
+const RaceChatMessageBox = ({classes, onSendMessage}) => {
   const t = useI18n('game.screens.chat');
   const {l, value} = useInputs();
-
   const title = t('send');
-  const onSendMessage = () => {
-    l.setValue('');
 
-    return gameBoard.client.sendChatMessage(
+  const sendMessage = () => {
+    if (!value || value.length > 100)
+      return false;
+
+    l.setValue('');
+    return onSendMessage(
       {
-        message: l.value,
+        message: R.trim(l.value),
       },
     );
   };
@@ -64,8 +66,10 @@ const RaceChatMessageBox = ({classes, gameBoard}) => {
         {...l.input()}
         onKeyDown={(e) => {
           // enter
-          if (e.keyCode === 13)
-            onSendMessage();
+          if (e.keyCode === 13) {
+            sendMessage();
+            e.preventDefault();
+          }
         }}
       />
 
@@ -87,7 +91,7 @@ const RaceChatMessageBox = ({classes, gameBoard}) => {
         title={title}
         size='tiny'
         type='white'
-        onClick={onSendMessage}
+        onClick={sendMessage}
       />
     </Flex>
   );

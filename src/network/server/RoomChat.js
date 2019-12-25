@@ -76,6 +76,12 @@ export default class RoomChat {
   }
 
   post(message, player) {
+    if (R.is(String, message))
+      message = R.trim(message);
+
+    if (!message || message.length > 100)
+      return;
+
     if (R.is(String, message) && player)
       message = new RoomPlayerMessage(player, message);
     else if (!player)

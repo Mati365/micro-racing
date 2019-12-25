@@ -14,7 +14,7 @@ export const ScreenHolder = styled.div(
     },
 
     expanded: {
-      width: 800,
+      width: 850,
       maxWidth: '90vw',
     },
   },

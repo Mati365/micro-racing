@@ -4,6 +4,7 @@
 multiplayer 2.5D isometric racing game written in WebGL 2.x
 
 ## Gameplay
+![Screen 3](/doc/screens/screen-3.png) <br />
 ![Screen](/doc/screens/screen.png) <br />
 ![Screen 2](/doc/screens/screen-2.png) <br />
 

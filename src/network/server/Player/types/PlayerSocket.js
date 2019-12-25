@@ -6,6 +6,7 @@ import logMethod, {logFunction} from '@pkg/basic-helpers/decorators/logMethod';
 import {getRandomObjValue} from '@pkg/basic-helpers';
 
 import {
+  ROOM_SERVER_MESSAGES_TYPES,
   PLAYER_TYPES,
   ERROR_CODES,
   PLAYER_ACTIONS,
@@ -290,7 +291,18 @@ export default class PlayerSocket extends Player {
         },
       );
 
-      room?.broadcastPlayersRoomState();
+      if (room) {
+        room.broadcastPlayersRoomState();
+        room.chat.post(
+          {
+            code: ROOM_SERVER_MESSAGES_TYPES.PLAYER_RENAME,
+            color: this.info.racingState?.color,
+            prevNick,
+            nick,
+          },
+        );
+      }
+
       this.sendActionResponse(
         cmdID,
         this.toBSON(),

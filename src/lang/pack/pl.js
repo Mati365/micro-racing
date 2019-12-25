@@ -88,6 +88,7 @@ export default {
           [ROOM_SERVER_MESSAGES_TYPES.PLAYER_JOIN]: 'przyszedł %{}!',
           [ROOM_SERVER_MESSAGES_TYPES.PLAYER_LEFT]: 'odszedł %{}!',
           [ROOM_SERVER_MESSAGES_TYPES.PLAYER_KICK]: 'gracz %{} wykopany!',
+          [ROOM_SERVER_MESSAGES_TYPES.PLAYER_RENAME]: 'gracz %{} zmienił nick na %{}!',
         },
       },
     },

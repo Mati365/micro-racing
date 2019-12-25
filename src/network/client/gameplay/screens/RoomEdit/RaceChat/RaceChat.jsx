@@ -1,4 +1,4 @@
-import React, {useRef, useState, useMemo} from 'react';
+import React, {useRef, useState, useMemo, useEffect} from 'react';
 import * as R from 'ramda';
 
 import {
@@ -23,21 +23,28 @@ import RaceChatMessageBox from './RaceChatMessageBox';
 import useClientChainListener from '../../../hooks/useClientChainListener';
 import RoomMessageItem from './RoomMessageItem';
 
+const PlayerNickLabel = ({color, nick}) => (
+  <Text
+    style={{
+      color,
+    }}
+    weight={800}
+  >
+    {capitalize(nick)}
+  </Text>
+);
+
 const processServerMessage = (t) => {
   const translations = t('server_messages');
   const formatNickMessage = (translation, styles) => ({color, nick}) => {
     const formattedMessage = reactFormat(
       translation,
       [
-        <Text
+        <PlayerNickLabel
           key='nick'
-          style={{
-            color,
-          }}
-          weight={800}
-        >
-          {capitalize(nick)}
-        </Text>,
+          nick={nick}
+          color={color}
+        />,
       ],
     );
 
@@ -66,6 +73,23 @@ const processServerMessage = (t) => {
 
     [ROOM_SERVER_MESSAGES_TYPES.PLAYER_KICK]: formatNickMessage(
       translations[ROOM_SERVER_MESSAGES_TYPES.PLAYER_KICK],
+    ),
+
+    [ROOM_SERVER_MESSAGES_TYPES.PLAYER_RENAME]: ({prevNick, nick, color}) => reactFormat(
+      translations[ROOM_SERVER_MESSAGES_TYPES.PLAYER_RENAME],
+      [
+        <PlayerNickLabel
+          key='prevNick'
+          nick={prevNick}
+          color={color}
+        />,
+
+        <PlayerNickLabel
+          key='nick'
+          nick={nick}
+          color={color}
+        />,
+      ],
     ),
   };
 
@@ -108,12 +132,15 @@ const RaceChat = ({gameBoard}) => {
   const {client} = gameBoard;
   const [messages, setMessages] = useState(null);
 
-  const onSendMessage = async (data) => {
-    await gameBoard.client.sendChatMessage(data);
-
+  const resetScroll = () => {
     const {current: listNode} = messagesListRef;
     if (listNode)
       listNode.scrollTop = listNode.scrollHeight;
+  };
+
+  const onSendMessage = async (data) => {
+    await gameBoard.client.sendChatMessage(data);
+    resetScroll();
   };
 
   usePromise(
@@ -145,6 +172,23 @@ const RaceChat = ({gameBoard}) => {
         );
       },
     },
+  );
+
+  const firstMount = useRef(false);
+  useEffect(
+    () => {
+      const {current: listNode} = messagesListRef;
+
+      if (!messages || !listNode)
+        return;
+
+      if (!firstMount.current
+          || listNode.scrollTop >= (listNode.scrollHeight - listNode.offsetHeight) - 50)
+        resetScroll();
+
+      firstMount.current = true;
+    },
+    [messages?.length],
   );
 
   return (

@@ -1,3 +1,4 @@
+import uniqid from 'uniqid';
 import * as R from 'ramda';
 
 import {
@@ -17,7 +18,7 @@ export class RoomMessage {
   ) {
     this.type = type;
     this.date = Date.now();
-    this.id = id || `${this.date}-${type}`;
+    this.id = id || uniqid();
     this.content = content;
   }
 

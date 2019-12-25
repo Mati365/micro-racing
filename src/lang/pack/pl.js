@@ -1,4 +1,7 @@
-import {ERROR_CODES} from '../../network/constants/serverCodes';
+import {
+  ERROR_CODES,
+  ROOM_SERVER_MESSAGES_TYPES,
+} from '../../network/constants/serverCodes';
 
 export default {
   editor: {
@@ -78,6 +81,14 @@ export default {
       chat: {
         type_message: 'Wpisz wiadomość...',
         send: 'Wyślij',
+
+        server_nick: 'Serwer',
+        server_messages: {
+          [ROOM_SERVER_MESSAGES_TYPES.PLAYER_CREATED_ROOM]: '%{} utworzył pokój!',
+          [ROOM_SERVER_MESSAGES_TYPES.PLAYER_JOIN]: 'przyszedł %{}!',
+          [ROOM_SERVER_MESSAGES_TYPES.PLAYER_LEFT]: 'odszedł %{}!',
+          [ROOM_SERVER_MESSAGES_TYPES.PLAYER_KICK]: 'gracz %{} wykopany!',
+        },
       },
     },
 

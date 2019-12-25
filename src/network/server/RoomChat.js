@@ -51,12 +51,13 @@ export class RoomPlayerMessage extends RoomMessage {
 }
 
 export class RoomServerMessage extends RoomMessage {
-  constructor(message) {
+  constructor({code, ...content}) {
     super(
       {
         type: ROOM_MESSAGE_TYPES.ROOM_BOT_MESSAGE,
         content: {
-          message,
+          code,
+          ...content,
         },
       },
     );

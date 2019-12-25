@@ -1,9 +1,12 @@
 import React from 'react';
+import c from 'classnames';
 import * as R from 'ramda';
 
 import {WHITE} from '@ui/colors';
 
 import {injectClassesStylesheet} from '@pkg/fast-stylesheet/src/react';
+import {capitalize} from '@pkg/basic-helpers';
+
 import {GameLabel} from '../../../components/ui';
 
 const styles = {
@@ -15,12 +18,17 @@ const styles = {
       fontSize: '10px',
     },
   },
+
+  muted: {
+    opacity: 0.5,
+  },
 };
 
 const RoomMessageItem = ({
   classes,
   roomMessage: {
     content: {
+      muted,
       nick,
       color,
       contentColor,
@@ -28,19 +36,24 @@ const RoomMessageItem = ({
     },
   },
 }) => (
-  <li className={classes.base}>
+  <li
+    className={c(
+      classes.base,
+      muted && classes.muted,
+    )}
+  >
     <GameLabel
       spaceBottom={0}
       right={1}
-      textProps={
-        color && {
-          style: {
+      textProps={{
+        style: {
+          ...color && {
             color,
           },
-        }
-      }
+        },
+      }}
     >
-      {`[${nick}]: `}
+      {`[${capitalize(nick)}]: `}
     </GameLabel>
     {(
       contentColor

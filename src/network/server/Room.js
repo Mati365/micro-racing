@@ -2,6 +2,7 @@ import uniqid from 'uniqid';
 import * as R from 'ramda';
 
 import {
+  ROOM_SERVER_MESSAGES_TYPES,
   PLAYER_TYPES,
   ERROR_CODES,
   PLAYER_ACTIONS,
@@ -71,6 +72,17 @@ export default class Room {
     );
 
     this.onDestroy = onDestroy;
+
+    // initial message
+    if (!abstract && owner) {
+      this.chat.post(
+        {
+          code: ROOM_SERVER_MESSAGES_TYPES.PLAYER_CREATED_ROOM,
+          nick: owner.info.nick,
+          color: owner.info.racingState.color,
+        },
+      );
+    }
   }
 
   startRace() {
@@ -285,6 +297,7 @@ export default class Room {
    */
   join(player, broadcast = true) {
     const {
+      chat,
       abstract,
       players,
       racing,
@@ -333,13 +346,23 @@ export default class Room {
         },
       );
 
-      broadcast && this.sendBroadcastAction(
-        null,
-        PLAYER_ACTIONS.PLAYER_JOINED_TO_ROOM,
-        null,
+      if (broadcast) {
+        this.sendBroadcastAction(
+          null,
+          PLAYER_ACTIONS.PLAYER_JOINED_TO_ROOM,
+          null,
+          {
+            player: player.toBSON(),
+            car: playerCar,
+          },
+        );
+      }
+
+      chat.post(
         {
-          player: player.toBSON(),
-          car: playerCar,
+          code: ROOM_SERVER_MESSAGES_TYPES.PLAYER_JOIN,
+          nick: player.info.nick,
+          color: player.info.racingState.color,
         },
       );
     }
@@ -352,7 +375,7 @@ export default class Room {
    * @param {Boolean} broadcast
    */
   leave(player, broadcast = true) {
-    const {abstract, owner} = this;
+    const {abstract, owner, chat} = this;
 
     this.players = removeByID(player.id, this.players);
     if (!abstract)
@@ -361,6 +384,14 @@ export default class Room {
     if (this.isEmpty || this.bots.length === this.players.length)
       this.destroy();
     else if (!abstract) {
+      broadcast && chat.post(
+        {
+          code: ROOM_SERVER_MESSAGES_TYPES.PLAYER_LEFT,
+          nick: player.info.nick,
+          color: player.info.racingState.color,
+        },
+      );
+
       player.assignRoom(
         {
           room: null,
@@ -428,6 +459,15 @@ export default class Room {
         KickedPlayerInfo.fromPlayer(player),
       );
     }
+
+    this.chat.post(
+      {
+        code: ROOM_SERVER_MESSAGES_TYPES.PLAYER_KICK,
+        nick: player.info.nick,
+        color: player.info.racingState.color,
+        ban,
+      },
+    );
 
     this.leave(player);
     this.broadcastBannedPlayersRoomState();

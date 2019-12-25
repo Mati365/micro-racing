@@ -14,12 +14,24 @@ const idleFn = (fn) => {
   };
 };
 
-const IdleRender = ({children, loadingComponent: LoadingComponent = 'div'}) => {
+const IdleRender = ({
+  children,
+  pause,
+  loadingComponent: LoadingComponent = 'div',
+}) => {
   const [visible, setVisible] = useState();
 
-  useEffect(() => idleFn(() => {
-    setVisible(true);
-  }));
+  useEffect(
+    () => {
+      if (pause || visible)
+        return undefined;
+
+      return idleFn(() => {
+        setVisible(true);
+      });
+    },
+    [!!pause],
+  );
 
   return (
     visible

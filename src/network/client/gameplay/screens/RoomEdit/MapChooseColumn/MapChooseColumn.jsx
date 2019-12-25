@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 
 import {useI18n} from '@ui/i18n';
+import {useLowLatencyObservable} from '@pkg/basic-hooks';
 
 import {IdleRender} from '@ui/basic-components';
 import {Margin} from '@ui/basic-components/styled';
@@ -14,8 +15,9 @@ import {
 
 import RoomMapsList from './RoomMapsList';
 import TrackEditorCanvas from './TrackEditorCanvas';
+import * as Layers from './TrackEditorCanvas/Layers';
 
-const EditableEditorCanvas = React.memo((props) => {
+const EditableEditorCanvas = React.memo(({roadMapElement, ...props}) => {
   const [editing] = useState(false);
   const t = useI18n('game.screens.room_edit');
 
@@ -35,11 +37,19 @@ const EditableEditorCanvas = React.memo((props) => {
           paddingBottom: '75%',
         }}
       >
-        <IdleRender loadingComponent={LoadingOverlay}>
+        <IdleRender
+          pause={!roadMapElement}
+          loadingComponent={LoadingOverlay}
+        >
           {() => (
             <TrackEditorCanvas
-              canvasConfig={{
-                scale: 0.5,
+              layers={{
+                track: new Layers.TrackLayer(
+                  {
+                    scale: 0.5,
+                    roadMapElement,
+                  },
+                ),
               }}
               disabled={!editing}
               {...props}
@@ -53,11 +63,15 @@ const EditableEditorCanvas = React.memo((props) => {
 
 const MapChooseColumn = ({gameBoard}) => {
   const t = useI18n('game.screens.room_edit');
+  const roadMapElement = useLowLatencyObservable(
+    {
+      observable: gameBoard.observers.roomMap,
+    },
+  )?.map?.roadElement[0];
 
   return (
     <>
-
-      <EditableEditorCanvas />
+      <EditableEditorCanvas roadMapElement={roadMapElement} />
 
       <Margin top={4}>
         <GameHeader>
@@ -72,4 +86,4 @@ const MapChooseColumn = ({gameBoard}) => {
 
 MapChooseColumn.displayName = 'MapChooseColumn';
 
-export default MapChooseColumn;
+export default React.memo(MapChooseColumn);

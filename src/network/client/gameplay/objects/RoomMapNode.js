@@ -237,6 +237,11 @@ export default class RoomMapNode {
 
       this.render = ::this.sceneBuffer.render;
     } else {
+      this.roadElement = R.filter(
+        ({type}) => type === OBJECT_TYPES.ROAD,
+        objects,
+      );
+
       this.refs = createOffscreenRefs(
         {
           players,

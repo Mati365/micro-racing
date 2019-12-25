@@ -21,9 +21,13 @@ const useTrackEditor = initialConfig => useMemo(
  *
  * @export
  */
-const TrackEditorCanvas = ({disabled, dimensions, canvasConfig}) => {
+const TrackEditorCanvas = ({layers, disabled, dimensions, canvasConfig}) => {
   const roadRef = useRef();
-  const editor = useTrackEditor();
+  const editor = useTrackEditor(
+    {
+      layers,
+    },
+  );
 
   useEffect(
     () => {

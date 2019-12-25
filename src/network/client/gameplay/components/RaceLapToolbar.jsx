@@ -59,7 +59,7 @@ const RaceLapToolbar = ({gameBoard}) => {
         return undefined;
 
       return createObservablesUnmounter(
-        gameBoard.observers.roomMap.subscribe(
+        gameBoard.observers.roomInfo.subscribe(
           ({config}) => {
             setTotalLaps(config.laps);
           },

@@ -9,9 +9,11 @@ import * as Layers from './Layers';
  * than webpack tree
  */
 export default class TrackEditor {
-  layers = {
-    track: new Layers.TrackLayer,
-  };
+  constructor({layers} = {}) {
+    this.layers = layers || {
+      track: new Layers.TrackLayer,
+    };
+  }
 
   mapLayers(fn) {
     const {layers} = this;

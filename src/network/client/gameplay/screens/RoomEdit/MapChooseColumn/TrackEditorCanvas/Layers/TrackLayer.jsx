@@ -18,7 +18,8 @@ import {
 
 import {
   vec2, toRadians,
-  getPathCornersBox, Vector,
+  getPathCornersBox,
+  Vector, CornersBox,
 } from '@pkg/gl-math';
 
 import {
@@ -244,10 +245,16 @@ const renderTrack = ({
 };
 
 export default class TrackLayer extends AbstractDraggableEditorLayer {
-  constructor({track} = {}) {
+  constructor(
+    {
+      track,
+      scale = 1.0,
+      roadMapElement,
+    } = {},
+  ) {
     super('Track Layer');
 
-    this.track = track;
+    this.scale = scale;
     this.sceneMeta = {
       segmentWidth: 2.5,
       transform: {
@@ -255,6 +262,12 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
         translate: [0.0, 0.0, -0.01],
       },
     };
+
+    this.track = (
+      roadMapElement
+        ? () => this.fromBSON([roadMapElement])
+        : track
+    );
 
     this.focused = null;
 
@@ -271,7 +284,8 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
   setCanvas(canvasConfig) {
     super.setCanvas(canvasConfig);
 
-    if (!this.track) {
+    const {track} = this;
+    if (!track) {
       this.track = TrackPath.fromRandomPath(
         R.mapObjIndexed(
           R.multiply(0.8 / this.scale),
@@ -280,22 +294,33 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
         vec2(100, 100),
       );
       this.render();
-    }
+    } else if (R.is(Function, track))
+      track();
   }
 
-  fromBSON([roadMapElement], toLeftCorner = true) {
-    const {scale} = this;
+  fromBSON([roadMapElement], centerize = true) {
+    const {ctx, scale, dimensions} = this;
     const {points, sceneMeta} = roadMapElement.params;
     const parsedPoints = R.map(Vector.fromArray, points);
 
-    if (toLeftCorner) {
+    if (centerize) {
       const {transform, box} = sceneMeta;
-      const {topLeft} = box;
+      const {width, height, topLeft} = CornersBox.fromBSON(box);
+
+      const realScale = [
+        transform.scale[0] / scale,
+        transform.scale[1] / scale,
+      ];
 
       R.forEach(
         (point) => {
-          point[0] -= topLeft[0] / transform.scale[0] - 40 / scale; // x
-          point[1] -= topLeft[1] / transform.scale[1] - 40 / scale; // y
+          // move to left top corner
+          point[0] -= topLeft[0] / realScale[0] + 30; // x
+          point[1] -= topLeft[1] / realScale[1] + 30; // y
+
+          // move to center
+          point[0] += dimensions.w / 2 - width / 2 / realScale[0];
+          point[1] += dimensions.h / 2 - height / 2 / realScale[1];
         },
         parsedPoints,
       );
@@ -304,7 +329,10 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
     this.sceneMeta = sceneMeta;
     this.track = new TrackPath(parsedPoints);
 
-    this.render();
+    if (ctx)
+      this.render();
+
+    return this.track;
   }
 
   toBSON() {
@@ -312,8 +340,17 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
     const {transform} = this.sceneMeta;
 
     const interpolated = this.track.getInterpolatedPathPoints();
-    const roadBox = getPathCornersBox(interpolated);
+    const {
+      barriers,
+      expandedPath: expandedBarriersPath,
+    } = getTrackBarriers(
+      {
+        scale: transform.scale,
+        points: interpolated,
+      },
+    );
 
+    const roadBox = getPathCornersBox(expandedBarriersPath[0]);
     const {topLeft, width, height} = roadBox;
 
     const terrainMargin = 80;
@@ -329,16 +366,6 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
         1.0,
       ],
     };
-
-    const {
-      barriers,
-      expandedPath: expandedBarriersPath,
-    } = getTrackBarriers(
-      {
-        scale: transform.scale,
-        points: interpolated,
-      },
-    );
 
     const barriersMeshes = R.map(
       ({point, angle, meshResPath}) => new MeshMapElement(
@@ -454,7 +481,7 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
     } = this;
 
     super.render(() => {
-      if (track)
+      if (track?.path)
         renderTrack()(ctx, track);
     });
   }

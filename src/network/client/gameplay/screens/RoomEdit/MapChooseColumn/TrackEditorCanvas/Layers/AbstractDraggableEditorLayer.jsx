@@ -7,6 +7,7 @@ import {
 export default class AbstractDraggableEditorLayer {
   constructor(layerDisplayName) {
     this.layerDisplayName = layerDisplayName;
+    this.scale = 1.0;
   }
 
   getRelativeEventPos(e) {
@@ -97,12 +98,10 @@ export default class AbstractDraggableEditorLayer {
 
   setCanvas(
     {
-      scale = 0.85,
       canvas,
       dimensions,
     },
   ) {
-    this.scale = scale;
     this.canvas = canvas;
     this.dimensions = dimensions || getElementDimensions(canvas);
     this.ctx = canvas.getContext('2d');

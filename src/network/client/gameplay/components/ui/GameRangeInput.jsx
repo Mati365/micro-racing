@@ -80,6 +80,7 @@ export default R.compose(
         padding: 0,
         width: 24,
         height: 24,
+        lineHeight: '100%',
 
         '& > span': {
           fontSize: '20px',
@@ -87,6 +88,7 @@ export default R.compose(
       },
 
       input: {
+        width: 0,
         minWidth: 42,
         margin: [0, 10],
         textAlign: 'center',

@@ -32,6 +32,7 @@ const SHARED_ALIASES = R.mapObjIndexed(
     '@game/server-res': 'server/res/',
     '@game/public': 'public/',
     '@game/network': 'network/',
+    '@game/screens': 'network/client/gameplay/screens/',
     '@game/server': 'network/server/',
     '@game/shared': 'network/shared/',
     '@game/logic': 'network/shared/logic/',

@@ -25,11 +25,19 @@ export default class TrackEditor {
     this.mapLayers(layer => layer.setCanvas(canvasParams));
   }
 
-  toBSON(meta) {
+  toLayerMap(meta) {
     return new LayerMap(
       meta,
       this.mapLayers(layer => layer.toBSON()),
-    ).toBSON();
+    );
+  }
+
+  toBSON(meta) {
+    return (
+      this
+        .toLayerMap(meta)
+        .toBSON()
+    );
   }
 
   fromBSON(bson) {

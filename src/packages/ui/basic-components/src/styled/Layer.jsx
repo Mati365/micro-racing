@@ -13,13 +13,20 @@ const Layer = styled.div(
       height: '100%',
     },
 
+    fixed: {
+      position: 'fixed',
+    },
+
     centered: {
       extend: flexCenteredStyle,
     },
   },
   {
-    omitProps: ['centered'],
-    classSelector: (classes, {centered}) => centered && classes.centered,
+    omitProps: ['centered', 'fixed'],
+    classSelector: (classes, {fixed, centered}) => [
+      fixed && classes.fixed,
+      centered && classes.centered,
+    ],
   },
 );
 
@@ -27,6 +34,7 @@ Layer.displayName = 'Layer';
 
 Layer.propTypes = {
   centered: PropTypes.bool,
+  fixed: PropTypes.bool,
 };
 
 Layer.defaultProps = {

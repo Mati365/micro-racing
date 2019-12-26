@@ -14,6 +14,10 @@ import {
   removeByID,
 } from '@pkg/basic-helpers';
 
+import TrackPath from '@game/logic/track/TrackPath';
+import TrackEditor from '@game/screens/RoomEdit/MapChooseColumn/TrackEditorCanvas/TrackEditor';
+import * as Layers from '@game/screens/RoomEdit/MapChooseColumn/TrackEditorCanvas/Layers';
+
 import createActionMessage from '../shared/utils/createActionMessage';
 import genUniquePlayerColor from './utils/genUniquePlayerColor';
 import serializeBsonList from './utils/serializeBsonList';
@@ -187,8 +191,8 @@ export default class Room {
    */
   toBSON() {
     const {
-      id, name, owner, config,
-      racing, players,
+      id, name, owner,
+      config, racing,
     } = this;
 
     return {
@@ -550,12 +554,26 @@ export default class Room {
    * @param {Object} {points, name}
    * @memberof Room
    */
-  loadProvidedMap({id}) {
+  loadProvidedMap({id, points}) {
     const {server} = this;
     let map = null;
 
     if (!R.isNil(id))
       map = findByID(id, server.maps);
+
+    if (points) {
+      map = new TrackEditor(
+        {
+          layers: {
+            track: new Layers.TrackLayer(
+              {
+                track: new TrackPath(points),
+              },
+            ),
+          },
+        },
+      ).toLayerMap();
+    }
 
     if (!map)
       throw new ServerError(ERROR_CODES.PROVIDED_EMPTY_MAP);

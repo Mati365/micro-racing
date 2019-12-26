@@ -10,6 +10,7 @@ import {
 export const ScreenHolder = styled.div(
   {
     base: {
+      position: 'relative',
       height: '90vh',
     },
 

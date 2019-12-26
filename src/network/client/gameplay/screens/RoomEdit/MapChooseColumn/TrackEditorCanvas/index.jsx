@@ -22,7 +22,10 @@ const useTrackEditor = initialConfig => useMemo(
  *
  * @export
  */
-const TrackEditorCanvas = React.forwardRef(({layers, disabled, dimensions, canvasConfig}, ref) => {
+const TrackEditorCanvas = React.forwardRef((
+  {layers, disabled, dimensions, canvasConfig, style},
+  ref,
+) => {
   const roadRef = useRef();
   const editor = useTrackEditor(
     {
@@ -49,14 +52,17 @@ const TrackEditorCanvas = React.forwardRef(({layers, disabled, dimensions, canva
 
   return (
     <Wrapper
-      style={(
-        disabled
-          ? {
-            filter: 'grayscale(1.0)',
-            pointerEvents: 'none',
-          }
-          : null
-      )}
+      style={{
+        ...style,
+        ...(
+          disabled
+            ? {
+              filter: 'grayscale(1.0)',
+              pointerEvents: 'none',
+            }
+            : null
+        ),
+      }}
       expanded
     >
       <canvas

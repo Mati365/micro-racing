@@ -11,6 +11,7 @@ import useClientSocket from '../hooks/useClientSocket';
 
 import {GameCanvasHolder} from '../components';
 import {GameScrollbars} from '../components/ui';
+import {GamePortalHolder} from '../components/ui/GameLayerPortal';
 
 import ConfigChooseScreen from './ConfigChoose';
 import ServersList from './ServersList';
@@ -97,6 +98,7 @@ const ScreensContainer = () => {
       <ScreensHolder>
         {content}
       </ScreensHolder>
+      <GamePortalHolder />
     </GameScrollbars>
   );
 };

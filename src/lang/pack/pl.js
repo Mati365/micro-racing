@@ -50,6 +50,8 @@ export default {
         predefined_maps: 'Wybierz inne tory:',
         leave: 'Opuść pokój',
         edit_road: 'Edytuj tor',
+        save_road: 'Zapisz tor',
+        discard_road: 'Odrzuć zmiany',
 
         tabs: {
           score: 'Ranking',

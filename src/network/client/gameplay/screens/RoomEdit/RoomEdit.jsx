@@ -15,10 +15,12 @@ import PlayerClientSocket from '../../../protocol/PlayerClientSocket';
 
 import TitledScreen from '../TitledScreen';
 import {GameButton} from '../../components/ui';
+import {GamePortalHolder} from '../../components/ui/GameLayerPortal';
 
 import MapChooseColumn from './MapChooseColumn';
 import RacingConfigColumn from './RacingConfigColumn';
 import EditRoomNameForm from './EditRoomNameForm';
+
 import useClientChainListener from '../../hooks/useClientChainListener';
 
 const RoomEdit = ({client, gameBoard}) => { // eslint-disable-line no-unused-vars
@@ -75,6 +77,8 @@ const RoomEdit = ({client, gameBoard}) => { // eslint-disable-line no-unused-var
           <RacingConfigColumn gameBoard={gameBoard} />
         </div>
       </Flex>
+
+      <GamePortalHolder />
     </TitledScreen>
   );
 };

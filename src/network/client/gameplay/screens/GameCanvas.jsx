@@ -12,9 +12,8 @@ import {
 } from '../components';
 
 import * as Overlays from '../components/overlays';
-import GameBoard from '../states/GameBoard';
 
-const GameCanvas = ({dimensions, client}) => {
+const GameCanvas = ({dimensions, gameBoard}) => {
   const canvasRef = useRef();
   const [gameState, setGameState] = useState(
     {
@@ -25,6 +24,7 @@ const GameCanvas = ({dimensions, client}) => {
     },
   );
 
+  const {client} = gameBoard;
   const {roadsSegments, roomConfig} = gameState;
   const mergeGameState = useRef();
 
@@ -38,13 +38,7 @@ const GameCanvas = ({dimensions, client}) => {
   useEffect(
     () => {
       (async () => {
-        const board = new GameBoard(
-          {
-            client,
-          },
-        );
-
-        board.observers.raceState.subscribe(
+        gameBoard.observers.raceState.subscribe(
           state => mergeGameState.current(
             {
               state,
@@ -52,7 +46,7 @@ const GameCanvas = ({dimensions, client}) => {
           ),
         );
 
-        board.observers.roomMap.subscribe(
+        gameBoard.observers.roomMap.subscribe(
           ({state, config, map}) => mergeGameState.current(
             {
               state,
@@ -62,7 +56,7 @@ const GameCanvas = ({dimensions, client}) => {
           ),
         );
 
-        await board.setCanvas(
+        await gameBoard.setCanvas(
           {
             canvas: canvasRef.current,
             aspectRatio: 1.05,
@@ -71,18 +65,11 @@ const GameCanvas = ({dimensions, client}) => {
 
         mergeGameState.current(
           {
-            board,
+            board: gameBoard,
           },
         );
 
-        await board.loadInitialRoomState(
-          await client.joinRoom('general'),
-        );
-
-        if (board.roomInfo.ownerID === client.info.id)
-          client.startRace();
-
-        board.start();
+        gameBoard.start();
       })();
     },
     [],
@@ -147,7 +134,7 @@ GameCanvas.displayName = 'GameCanvas';
 
 GameCanvas.propTypes = {
   dimensions: DIMENSIONS_SCHEMA,
-  client: PropTypes.object.isRequired,
+  gameBoard: PropTypes.object.isRequired,
 };
 
 GameCanvas.defaultProps = {

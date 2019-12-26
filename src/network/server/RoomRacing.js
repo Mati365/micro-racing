@@ -32,7 +32,7 @@ export default class RoomRacing {
     this.startTime = null;
 
     this.map = new RoadMapObjectsManager(room.map);
-    this.state = new RaceState(RACE_STATES.WAIT_FOR_SERVER);
+    this.state = new RaceState(RACE_STATES.BOARD_VIEW);
     this.aiTrainer = room.config.aiTraining && new CarNeuralTrainer(
       {
         map: this.map,
@@ -47,6 +47,7 @@ export default class RoomRacing {
     return (
       type === RACE_STATES.COUNT_TO_START
         || type === RACE_STATES.WAIT_FOR_SERVER
+        || type === RACE_STATES.BOARD_VIEW
     );
   }
 
@@ -69,10 +70,14 @@ export default class RoomRacing {
   async start() {
     const {config} = this;
 
+    this.setRaceState(
+      new RaceState(RACE_STATES.PREPARE_TO_RACE),
+    );
+
     if (config.countdown) {
       await intervalCountdown(
         {
-          times: config.countdown,
+          times: config.countdown / 1000,
         },
       )(
         (countdown) => {

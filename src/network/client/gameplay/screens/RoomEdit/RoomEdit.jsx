@@ -1,10 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import {useHistory} from 'react-router-dom';
-import {useI18n} from '@ui/i18n';
 
-import {PLAYER_ACTIONS} from '@game/network/constants/serverCodes';
+import {useI18n} from '@ui/i18n';
+import {useLowLatencyObservable} from '@pkg/basic-hooks';
+
+import {
+  RACE_STATES,
+  PLAYER_ACTIONS,
+} from '@game/network/constants/serverCodes';
 
 import {
   Flex,
@@ -39,6 +43,26 @@ const RoomEdit = ({client, gameBoard}) => { // eslint-disable-line no-unused-var
       method: onLeaveRoom,
       afterReleaseFn: () => {
         gameBoard?.release();
+      },
+    },
+  );
+
+  useLowLatencyObservable(
+    {
+      observable: gameBoard.observers.roomInfo,
+      watchOnly: true,
+      onChange: (info) => {
+        if (!info)
+          return;
+
+        if (info.state?.type === RACE_STATES.PREPARE_TO_RACE) {
+          history.push(
+            '/race',
+            {
+              gameBoard,
+            },
+          );
+        }
       },
     },
   );

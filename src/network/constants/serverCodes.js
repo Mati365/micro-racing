@@ -109,11 +109,13 @@ export const OBJECT_TYPES = {
 };
 
 export const RACE_STATES = {
+  BOARD_VIEW: 0,
   WAIT_FOR_SERVER: 1,
-  COUNT_TO_START: 2,
-  RACE: 3,
-  ALL_FINISH: 4,
-  PAUSE: 5,
+  PREPARE_TO_RACE: 2,
+  COUNT_TO_START: 3,
+  RACE: 4,
+  ALL_FINISH: 5,
+  PAUSE: 6,
 };
 
 export const PLAYER_RACE_STATES = {

@@ -77,7 +77,7 @@ const RacingConfigColumn = ({gameBoard}) => {
 
       <GameDivider />
 
-      <StartRaceButton />
+      <StartRaceButton gameBoard={gameBoard} />
     </>
   );
 };

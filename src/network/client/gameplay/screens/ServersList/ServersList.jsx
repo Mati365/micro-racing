@@ -37,7 +37,7 @@ const ServersList = ({client}) => {
       );
 
       history.push(
-        '/room-edit',
+        '/config/room-edit',
         {
           gameBoard,
         },

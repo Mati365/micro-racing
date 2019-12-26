@@ -27,10 +27,17 @@ import {PlayerBot} from './Player/types';
 import {PlayerRacingState} from './Player/PlayerInfo';
 import KickedPlayerInfo from './Player/KickedPlayerInfo';
 
+/**
+ * Contains list of players and race state
+ *
+ * @export
+ * @class Room
+ */
 export default class Room {
   constructor(
     {
       id = uniqid(),
+      server,
       owner,
       name,
       map,
@@ -42,8 +49,8 @@ export default class Room {
     },
   ) {
     this.id = id;
+    this.server = server;
     this.config = config;
-    this.map = map;
     this.name = name;
     this.owner = owner;
     this.abstract = abstract;
@@ -54,14 +61,7 @@ export default class Room {
       },
     );
 
-    if (!abstract) {
-      this.racing = new RoomRacing(
-        {
-          room: this,
-        },
-      );
-    }
-
+    this.setMap(map, false);
     this.players = [];
 
     R.map(
@@ -141,6 +141,20 @@ export default class Room {
     return serializeBsonList(this.kickedPlayers);
   }
 
+  toMapBSON() {
+    const {racing, players} = this;
+
+    return {
+      players: R.map(
+        ({info}) => info.toBSON(),
+        players,
+      ),
+
+      // field used to create of map instance on client
+      map: racing.map.toBSON(),
+    };
+  }
+
   /**
    * Returns info about room used in some
    * for example rooms list, it must be compressed
@@ -183,15 +197,10 @@ export default class Room {
       config: config.toBSON(),
       state: racing.getRaceState().toBSON(),
       ownerID: owner.info.id,
-
-      // objects
       banned: this.getKickedPlayersListBSON(),
-      players: R.map(
-        ({info}) => info.toBSON(),
-        players,
-      ),
 
-      ...racing.map.toBSON(),
+      // map info
+      ...this.toMapBSON(),
     };
   }
 
@@ -505,5 +514,52 @@ export default class Room {
       this.name = name;
 
     return this.broadcastRoomInfo();
+  }
+
+  /**
+   * Sets already loaded map and broadcasts it
+   *
+   * @param {Object} map
+   * @memberof Room
+   */
+  setMap(map, broadcast = true) {
+    this.map = map;
+
+    if (!this.abstract) {
+      this.racing?.stop();
+      this.racing = new RoomRacing(
+        {
+          room: this,
+        },
+      );
+    }
+
+    if (broadcast) {
+      this.sendBroadcastAction(
+        null,
+        PLAYER_ACTIONS.ROOM_MAP_CHANGED,
+        null,
+        this.toMapBSON(),
+      );
+    }
+  }
+
+  /**
+   * Loads map provided by user and broadcasts it to clients
+   *
+   * @param {Object} {points, name}
+   * @memberof Room
+   */
+  loadProvidedMap({id}) {
+    const {server} = this;
+    let map = null;
+
+    if (!R.isNil(id))
+      map = findByID(id, server.maps);
+
+    if (!map)
+      throw new ServerError(ERROR_CODES.PROVIDED_EMPTY_MAP);
+
+    this.setMap(map);
   }
 }

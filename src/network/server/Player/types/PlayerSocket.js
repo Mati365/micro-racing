@@ -353,6 +353,33 @@ export default class PlayerSocket extends Player {
       return room;
     },
 
+    [PLAYER_ACTIONS.LOAD_MAP]: R.compose(
+      requireRoomWrapper,
+      logFunction(
+        () => {
+          consola.info(`Player ${chalk.white.bold(this.info.nick)} changed map!`);
+        },
+        {
+          afterExec: true,
+        },
+      ),
+    )(
+      (cmdID, room, {id, points}) => {
+        room.loadProvidedMap(
+          {
+            id,
+            points,
+          },
+        );
+        this.sendActionResponse(
+          cmdID,
+          {
+            result: true,
+          },
+        );
+      },
+    ),
+
     [PLAYER_ACTIONS.START_ROOM_RACE]: logFunction(
       () => {
         consola.info(`Player ${chalk.white.bold(this.info.nick)} started racing in ${chalk.red.bold(this.info.room.name)}!`);

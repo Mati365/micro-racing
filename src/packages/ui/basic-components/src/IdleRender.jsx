@@ -19,7 +19,9 @@ const IdleRender = ({
   pause,
   loadingComponent: LoadingComponent = 'div',
 }) => {
-  const [visible, setVisible] = useState();
+  const [visible, setVisible] = useState(false);
+  if (pause && visible)
+    setVisible(false);
 
   useEffect(
     () => {
@@ -30,7 +32,7 @@ const IdleRender = ({
         setVisible(true);
       });
     },
-    [!!pause],
+    [!!pause, visible],
   );
 
   return (

@@ -7,6 +7,10 @@ import {PlayerMapElement} from '../../shared/map';
 
 export default class RemoteRoomStateListener {
   boardListeners = {
+    [PLAYER_ACTIONS.ROOM_MAP_CHANGED]: (mapLoadData) => {
+      this.onMapChanged(mapLoadData);
+    },
+
     [PLAYER_ACTIONS.BANNED_LIST_UPDATE]: ({banned}) => {
       this.onUpdateBannedList(banned);
     },
@@ -50,6 +54,7 @@ export default class RemoteRoomStateListener {
   constructor(
     {
       client,
+      onMapChanged = R.F,
       onUpdateBannedList = R.F,
       onLeavePlayer = R.F,
       onJoinPlayer = R.F,
@@ -59,6 +64,7 @@ export default class RemoteRoomStateListener {
       onUpdatePlayersRaceState = R.F,
     } = {},
   ) {
+    this.onMapChanged = onMapChanged;
     this.onUpdateBannedList = onUpdateBannedList;
     this.onUpdateBoardObjects = onUpdateBoardObjects;
     this.onLeavePlayer = onLeavePlayer;

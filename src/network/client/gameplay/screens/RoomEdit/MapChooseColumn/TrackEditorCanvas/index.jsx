@@ -1,4 +1,5 @@
 import React, {
+  useImperativeHandle,
   useRef,
   useEffect,
   useMemo,
@@ -21,12 +22,17 @@ const useTrackEditor = initialConfig => useMemo(
  *
  * @export
  */
-const TrackEditorCanvas = ({layers, disabled, dimensions, canvasConfig}) => {
+const TrackEditorCanvas = React.forwardRef(({layers, disabled, dimensions, canvasConfig}, ref) => {
   const roadRef = useRef();
   const editor = useTrackEditor(
     {
       layers,
     },
+  );
+
+  useImperativeHandle(
+    ref,
+    () => editor,
   );
 
   useEffect(
@@ -69,7 +75,7 @@ const TrackEditorCanvas = ({layers, disabled, dimensions, canvasConfig}) => {
       />
     </Wrapper>
   );
-};
+});
 
 TrackEditorCanvas.displayName = 'TrackEditorCanvas';
 

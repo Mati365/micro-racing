@@ -89,7 +89,12 @@ export default class GameBoard {
       },
     );
 
-    await this.roomMapNode.loadInitialRoomState(roomState);
+    await this.roomMapNode.loadInitialRoomState(
+      {
+        players: roomState.players,
+        objects: roomState.map.objects,
+      },
+    );
   }
 
   async loadInitialRoomState(initialRoomState, createRoomMapNode = true) {
@@ -112,6 +117,18 @@ export default class GameBoard {
     this.roomRemoteListener = new RemoteRoomStateListener(
       {
         client,
+
+        onMapChanged: async (newMapLoadData) => {
+          if (createRoomMapNode)
+            await this.loadRoomMapNode(newMapLoadData);
+
+          observers.roomMap.notify(
+            {
+              ...initialRoomState,
+              map: this.roomMapNode,
+            },
+          );
+        },
 
         onUpdateRoomInfo: (roomInfo) => {
           Object.assign(

@@ -151,6 +151,7 @@ export default class GameServer {
 
     const room = new Room(
       {
+        server: this,
         owner,
         name,
         map: getRandomObjValue(this.maps),

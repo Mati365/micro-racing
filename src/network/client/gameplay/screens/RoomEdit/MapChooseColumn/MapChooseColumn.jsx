@@ -1,7 +1,11 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 
 import {useI18n} from '@ui/i18n';
-import {useLowLatencyObservable} from '@pkg/basic-hooks';
+import {
+  useUpdateEffect,
+  useLowLatencyObservable,
+  usePromiseCallback,
+} from '@pkg/basic-hooks';
 
 import {IdleRender} from '@ui/basic-components';
 import {Margin} from '@ui/basic-components/styled';
@@ -17,9 +21,25 @@ import RoomMapsList from './RoomMapsList';
 import TrackEditorCanvas from './TrackEditorCanvas';
 import * as Layers from './TrackEditorCanvas/Layers';
 
-const EditableEditorCanvas = React.memo(({roadMapElement, ...props}) => {
+const EditableEditorCanvas = React.memo(({roadMapElement, reloading, ...props}) => {
   const [editing] = useState(false);
+  const editorRef = useRef();
   const t = useI18n('game.screens.room_edit');
+
+  useUpdateEffect(
+    () => {
+      const {current: editor} = editorRef;
+      if (reloading || !editor)
+        return;
+
+      editor.layers.track.fromBSON(
+        [
+          roadMapElement,
+        ],
+      );
+    },
+    [reloading, roadMapElement],
+  );
 
   return (
     <div>
@@ -38,11 +58,14 @@ const EditableEditorCanvas = React.memo(({roadMapElement, ...props}) => {
         }}
       >
         <IdleRender
-          pause={!roadMapElement}
+          pause={
+            !roadMapElement || reloading
+          }
           loadingComponent={LoadingOverlay}
         >
           {() => (
             <TrackEditorCanvas
+              ref={editorRef}
               layers={{
                 track: new Layers.TrackLayer(
                   {
@@ -62,23 +85,36 @@ const EditableEditorCanvas = React.memo(({roadMapElement, ...props}) => {
 });
 
 const MapChooseColumn = ({gameBoard}) => {
+  const {client} = gameBoard;
   const t = useI18n('game.screens.room_edit');
+
   const roadMapElement = useLowLatencyObservable(
     {
       observable: gameBoard.observers.roomMap,
     },
   )?.map?.roadElement[0];
 
+
+  const [onRequestMap, {loading}] = usePromiseCallback(
+    ::client.loadMap,
+  );
+
   return (
     <>
-      <EditableEditorCanvas roadMapElement={roadMapElement} />
+      <EditableEditorCanvas
+        reloading={loading}
+        roadMapElement={roadMapElement}
+      />
 
       <Margin top={4}>
         <GameHeader>
           {t('predefined_maps')}
         </GameHeader>
 
-        <RoomMapsList gameBoard={gameBoard} />
+        <RoomMapsList
+          gameBoard={gameBoard}
+          onRequestMap={onRequestMap}
+        />
       </Margin>
     </>
   );

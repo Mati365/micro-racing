@@ -23,6 +23,12 @@ const GameClickableCard = styled(
       },
     },
 
+    disabled: {
+      opacity: 0.5,
+      cursor: 'default',
+      pointerEvents: 'none',
+    },
+
     'size-auto': {
       width: '100%',
       paddingBottom: '100%',
@@ -55,9 +61,10 @@ const GameClickableCard = styled(
     props: {
       square: true,
     },
-    omitProps: ['active', 'size'],
-    classSelector: (classes, {active, size}) => [
+    omitProps: ['active', 'size', 'disabled'],
+    classSelector: (classes, {active, size, disabled}) => [
       active && classes.active,
+      disabled && classes.disabled,
       classes[`size-${size || 'medium'}`],
     ],
   },

@@ -2,24 +2,34 @@ import React from 'react';
 
 import {usePromise} from '@pkg/basic-hooks';
 
+import {AsyncLockButton} from '@ui/basic-components';
 import {
   GameCardsList,
   GameRoadCard,
 } from '../../../components/ui';
 
-const RoomMapsList = ({gameBoard}) => {
-  const {result: maps} = usePromise(::gameBoard.client.fetchMapsList);
+const RoomMapsList = ({gameBoard, onRequestMap}) => {
+  const {client} = gameBoard;
+  const {result: maps} = usePromise(::client.fetchMapsList);
 
   return (
     <GameCardsList>
       {(maps?.list || []).map(
         ({id, title, thumbnail}) => (
           <li key={id}>
-            <GameRoadCard
+            <AsyncLockButton
+              component={GameRoadCard}
               road={{
                 title,
                 thumbnail,
               }}
+              onClick={
+                () => onRequestMap(
+                  {
+                    id,
+                  },
+                )
+              }
             />
           </li>
         ),

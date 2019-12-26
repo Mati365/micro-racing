@@ -55,6 +55,13 @@ export default class PlayerClientSocket {
       },
     },
 
+    loadMap: {
+      action: PLAYER_ACTIONS.LOAD_MAP,
+      flags: {
+        waitForResponse: true,
+      },
+    },
+
     unbanPlayer: {
       action: PLAYER_ACTIONS.UNBAN_PLAYER,
       flags: {

@@ -69,7 +69,7 @@ export default class AbstractDraggableEditorLayer {
     const {handlers, focused} = this;
 
     if (e.keyCode === 46 && focused) {
-      handlers.removeElement?.(this.draggingElement);
+      handlers.removeElement?.(focused);
       this.render();
     }
   };

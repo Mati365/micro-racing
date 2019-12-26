@@ -478,16 +478,36 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
   }
 
   appendTrackPoint(vec) {
-    const insertIndex = (
-      this.focused
-        ? this.focused.index + CURVE_CHUNK_SIZE
-        : null
+    const nearestIndex = R.compose(
+      R.unless(
+        R.isNil,
+        ({p}) => R.findIndex(
+          ({point}) => point === p,
+          this.track.path,
+        ),
+      ),
+      R.head,
+      R.sortBy(R.prop('dist')),
+      points => R.addIndex(R.map)(
+        (p, index) => ({
+          dist: vec2.dist(
+            vec2.lerp(0.5, p, points[(index + 1) % points.length]),
+            vec,
+          ),
+          p,
+        }),
+        points,
+      ),
+    )(
+      this.track.getRealPathPoints(),
     );
 
     this.setFocused(
       this.track.appendPoint(
         vec,
-        insertIndex,
+        R.isNil(nearestIndex)
+          ? null
+          : nearestIndex + CURVE_CHUNK_SIZE,
       ),
     );
     this.render();

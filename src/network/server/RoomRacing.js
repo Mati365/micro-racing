@@ -2,6 +2,8 @@ import chalk from 'chalk';
 import consola from 'consola';
 
 import {intervalCountdown} from '@pkg/basic-helpers';
+import {wrapAroundMod} from '@pkg/gl-math';
+
 import {createAnimationFrameRenderer} from '@pkg/isometric-renderer/FGL/core/viewport/createDtRenderLoop';
 import {isDiagonalCollisionWithEdge} from '@pkg/physics-scene/src/engines/diagonal';
 
@@ -19,8 +21,6 @@ import {CarNeuralTrainer} from '../shared/logic/drivers/neural';
 
 import RoadMapObjectsManager from './RoadMapObjectsManager';
 import RaceState from '../shared/room/RoomRaceState';
-
-const wrapAroundMod = (num, length) => (num + length) % length;
 
 export default class RoomRacing {
   constructor(

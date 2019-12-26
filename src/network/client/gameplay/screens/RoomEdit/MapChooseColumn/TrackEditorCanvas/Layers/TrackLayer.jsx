@@ -114,6 +114,7 @@ const getTrackBarriers = (
  */
 const renderTrack = ({
   segmentize = true,
+  renderCheckpoints = false,
   colors = {
     points: DODGER_BLUE,
     segments: DARKEST_GRAY,
@@ -179,15 +180,17 @@ const renderTrack = ({
       });
 
       // checkpoints
-      getExpandedPathCheckpoints()(expandedPath).forEach((edge) => {
-        drawLine(
-          edge.from,
-          edge.to,
-          CRIMSON_RED,
-          1,
-          ctx,
-        );
-      });
+      if (renderCheckpoints) {
+        getExpandedPathCheckpoints()(expandedPath).forEach((edge) => {
+          drawLine(
+            edge.from,
+            edge.to,
+            CRIMSON_RED,
+            1,
+            ctx,
+          );
+        });
+      }
     }
   }
 
@@ -241,6 +244,46 @@ const renderTrack = ({
       // print index
       ctx.fillText(`#${Number.parseInt(i / CURVE_CHUNK_SIZE, 10)}`, x, y - 10);
     }
+  }
+};
+
+const renderSheet = ({
+  dimensions,
+  color = '#0f0f0f',
+  spacing = vec2(40, 40),
+}) => (ctx) => {
+  const [from, to] = [vec2(0, 0), vec2(0, dimensions.h)];
+
+  for (let i = 0; i < dimensions.w / spacing.x; ++i) {
+    from.x += spacing.x;
+    to.x += spacing.y;
+
+    drawLine(
+      from,
+      to,
+      color,
+      1,
+      ctx,
+    );
+  }
+
+  from.x = 0;
+  from.y = 0;
+
+  to.x = dimensions.w;
+  to.y = 0;
+
+  for (let i = 0; i < dimensions.h / spacing.y; ++i) {
+    from.y += spacing.x;
+    to.y += spacing.y;
+
+    drawLine(
+      from,
+      to,
+      color,
+      1,
+      ctx,
+    );
   }
 };
 
@@ -480,9 +523,21 @@ export default class TrackLayer extends AbstractDraggableEditorLayer {
       ctx,
     } = this;
 
-    super.render(() => {
-      if (track?.path)
-        renderTrack()(ctx, track);
-    });
+    super.render(
+      {
+        prerender: () => {
+          renderSheet(
+            {
+              dimensions: this.dimensions,
+            },
+          )(ctx);
+        },
+
+        postrender: () => {
+          if (track?.path)
+            renderTrack()(ctx, track);
+        },
+      },
+    );
   }
 }

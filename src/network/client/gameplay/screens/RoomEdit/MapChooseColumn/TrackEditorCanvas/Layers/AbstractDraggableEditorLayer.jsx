@@ -132,7 +132,7 @@ export default class AbstractDraggableEditorLayer {
     return this;
   }
 
-  render(fn) {
+  render({postrender, prerender} = {}) {
     const {
       scale,
       ctx,
@@ -143,10 +143,12 @@ export default class AbstractDraggableEditorLayer {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, dimensions.w, dimensions.h);
 
+    prerender && prerender();
+
     ctx.save();
     ctx.scale(scale, scale);
 
-    fn && fn();
+    postrender && postrender();
 
     ctx.restore();
   }

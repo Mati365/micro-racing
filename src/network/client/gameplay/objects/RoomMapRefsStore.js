@@ -1,5 +1,7 @@
 import * as R from 'ramda';
+
 import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
+import PlayerInfo from '@game/server/Player/PlayerInfo';
 
 export const createOffscreenRefs = ({players, objects}) => ({
   objects,
@@ -88,10 +90,12 @@ export default class RoomMapRefsStore {
   static fromInitialRoomState(initialRoomState) {
     const store = new RoomMapRefsStore({});
 
-    return store.loadInitialRoomState(initialRoomState);
+    return store.bootstrapRefs(initialRoomState);
   }
 
-  loadInitialRoomState({players, objects}) {
+  bootstrapRefs({players, objects}) {
+    this.release();
+
     this.roadElement = R.filter(
       ({type}) => type === OBJECT_TYPES.ROAD,
       objects,
@@ -99,7 +103,7 @@ export default class RoomMapRefsStore {
 
     this.refs = createOffscreenRefs(
       {
-        players,
+        players: R.map(PlayerInfo.fromBSON, players),
         objects,
       },
     );
@@ -108,6 +112,11 @@ export default class RoomMapRefsStore {
   }
 
   release() {
+    R.forEachObjIndexed(
+      obj => obj.release?.(),
+      this.refs?.objects || {},
+    );
+
     this.refs = createMapRefs();
   }
 }

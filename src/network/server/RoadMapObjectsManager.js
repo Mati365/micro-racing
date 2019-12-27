@@ -1,9 +1,6 @@
 import * as R from 'ramda';
 
-import {
-  CAR_TYPES,
-  CAR_ALIGN,
-} from '@game/network/constants/serverCodes';
+import {CAR_ALIGN} from '@game/network/constants/serverCodes';
 
 import PhysicsScene from '@pkg/physics-scene';
 import PlayerMapElement, {genCarSegmentTransform} from '../shared/map/PlayerMapElement';
@@ -73,13 +70,8 @@ export default class RoadMapObjectsManager {
     const playerElement = new PlayerMapElement(
       {
         player,
-        carType: R.when(
-          R.isNil,
-          () => {
-            const carTypesList = R.keys(CAR_TYPES);
-
-            return CAR_TYPES[carTypesList[this.totalPlayers % carTypesList.length]];
-          },
+        carType: R.defaultTo(
+          player.info.carType,
           carType,
         ),
         body: {},

@@ -1,5 +1,3 @@
-import * as R from 'ramda';
-
 import {PLAYER_TYPES} from '@game/network/constants/serverCodes';
 
 import {
@@ -10,8 +8,6 @@ import {
 
 import {angleLerp, vec2} from '@pkg/gl-math';
 import carKeyboardDriver from '@game/logic/drivers/carKeyboardDriver';
-
-import PlayerInfo from '@game/server/Player/PlayerInfo';
 
 import RemoteRoomStateListener from '../RemoteRoomStateListener';
 import RoomMapRefsStore from '../objects/RoomMapRefsStore';
@@ -52,6 +48,10 @@ export default class GameBoard {
     this.roomRemoteListener = null;
   }
 
+  updateCurrentPlayerRef() {
+    this.currentPlayerRef = this.refsStore.refs.players[this.currentPlayer.id];
+  }
+
   notifyPlayersChange(left, join) {
     const {players} = this.refsStore || {};
     const {currentPlayerRef} = this;
@@ -69,9 +69,8 @@ export default class GameBoard {
   mountRemoteListeners() {
     const {client, observers} = this;
 
-    this.currentPlayerRef = this.refsStore.refs.players[this.currentPlayer.id];
-
     // broadcast new players list and map changes
+    this.updateCurrentPlayerRef();
     this.notifyPlayersChange();
 
     observers.roomInfo.notify(this.roomInfo);
@@ -83,13 +82,14 @@ export default class GameBoard {
         client,
 
         onMapChanged: async (newMapLoadData) => {
-          await this.refsStore.loadInitialRoomState(
+          await this.refsStore.bootstrapRefs(
             {
               players: newMapLoadData.players,
               objects: newMapLoadData.map.objects,
             },
           );
 
+          this.updateCurrentPlayerRef();
           observers.roomMap.notify(
             {
               roomInfo: this.roomInfo,
@@ -174,14 +174,6 @@ export default class GameBoard {
   }
 
   async loadInitialRoomState(initialRoomState) {
-    initialRoomState = {
-      ...initialRoomState,
-      players: R.map(
-        PlayerInfo.fromBSON,
-        initialRoomState.players,
-      ),
-    };
-
     this.banned = initialRoomState.banned || [];
     this.roomInfo = {
       name: initialRoomState.name,
@@ -190,7 +182,7 @@ export default class GameBoard {
       config: RoomConfig.fromBSON(initialRoomState.config),
     };
 
-    this.refsStore.loadInitialRoomState(
+    this.refsStore.bootstrapRefs(
       {
         players: initialRoomState.players,
         objects: initialRoomState.map.objects,

@@ -31,7 +31,13 @@ export const appendToSceneBuffer = f => ({
 }) => async (buffer) => {
   const findRefsPlayer = (
     R.is(Array, players)
-      ? playerID => findByID(playerID, players)
+      ? (playerID) => {
+        const obj = findByID(playerID, players);
+        if (obj?.player)
+          return obj.player;
+
+        return obj;
+      }
       : (playerID) => {
         const obj = players[playerID];
         if (obj?.player)
@@ -195,8 +201,8 @@ export default class RoomMapNode extends RoomMapRefsStore {
     this.roadNodes = [];
   }
 
-  async bootstrapOffscreenRefs({players, objects}) {
-    this.releaseBuffer();
+  async bootstrapRefs({players, objects}) {
+    this.release();
 
     const {f} = this;
     const {
@@ -224,13 +230,9 @@ export default class RoomMapNode extends RoomMapRefsStore {
     };
   }
 
-  releaseBuffer() {
-    this.buffer?.release();
-  }
-
   release() {
+    this.buffer?.release();
     super.release();
-    this.releaseBuffer();
   }
 
   update(interpolate) {

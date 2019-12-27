@@ -58,7 +58,7 @@ export default class RenderableGameBoard extends GameBoard {
       ...offscreenBoard.roomInfo,
     };
 
-    await board.refsStore.bootstrapOffscreenRefs(
+    await board.refsStore.bootstrapRefs(
       offscreenBoard.refsStore.refs,
     );
 

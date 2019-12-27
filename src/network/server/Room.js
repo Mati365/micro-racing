@@ -23,6 +23,7 @@ import genUniquePlayerColor from './utils/genUniquePlayerColor';
 import serializeBsonList from './utils/serializeBsonList';
 
 import ServerError from '../shared/ServerError';
+import PrerenderedLayerMap from './PrerenderedLayerMap';
 import RoomRacing from './RoomRacing';
 import RoomChat from './RoomChat';
 import {RoomConfig} from '../shared/room';
@@ -322,7 +323,7 @@ export default class Room {
     if (racing?.allowPlayerJoin === false)
       throw new ServerError(ERROR_CODES.RACING_ALREADY_ACTIVE);
 
-    const {carType, id} = player.info;
+    const {id} = player.info;
     if (findByID(id, players))
       throw new ServerError(ERROR_CODES.ALREADY_JOINED);
 
@@ -340,7 +341,6 @@ export default class Room {
       const playerCar = this.racing.map.appendPlayerCar(
         player,
         {
-          carType,
           ...racing.aiTrainer && {
             position: 0,
           },
@@ -536,6 +536,20 @@ export default class Room {
           room: this,
         },
       );
+
+      R.forEach(
+        (player) => {
+          player.info.car = this.racing.map.appendPlayerCar(
+            player,
+            {
+              ...this.racing.aiTrainer && {
+                position: 0,
+              },
+            },
+          );
+        },
+        this.players || [],
+      );
     }
 
     if (broadcast) {
@@ -562,17 +576,19 @@ export default class Room {
       map = findByID(id, server.maps);
 
     if (points) {
-      map = new TrackEditor(
-        {
-          layers: {
-            track: new Layers.TrackLayer(
-              {
-                track: new TrackPath(points),
-              },
-            ),
+      map = PrerenderedLayerMap.prerender(
+        new TrackEditor(
+          {
+            layers: {
+              track: new Layers.TrackLayer(
+                {
+                  track: new TrackPath(points),
+                },
+              ),
+            },
           },
-        },
-      ).toLayerMap();
+        ).toLayerMap(),
+      );
     }
 
     if (!map)

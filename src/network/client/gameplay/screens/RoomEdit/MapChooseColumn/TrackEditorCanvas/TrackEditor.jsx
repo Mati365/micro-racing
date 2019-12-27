@@ -27,8 +27,10 @@ export default class TrackEditor {
 
   toLayerMap(meta) {
     return new LayerMap(
-      meta,
-      this.mapLayers(layer => layer.toBSON()),
+      {
+        meta,
+        layers: this.mapLayers(layer => layer.toBSON()),
+      },
     );
   }
 

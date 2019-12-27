@@ -12,11 +12,11 @@ export const PREDEFINED_MAP_LAYERS = {
 };
 
 export default class LayerMap {
-  constructor(meta, layers) {
+  constructor({meta, layers, roadElement}) {
     this.id = uniqid();
     this.meta = meta;
     this.layers = layers;
-    this.roadElement = RoadMapElement.fromBSON(
+    this.roadElement = roadElement || RoadMapElement.fromBSON(
       findByProp('type')(
         OBJECT_TYPES.ROAD,
         this.layers[PREDEFINED_MAP_LAYERS.TRACK],
@@ -47,8 +47,10 @@ export default class LayerMap {
     const {meta, layers} = BSON.deserialize(bson);
 
     return new LayerMap(
-      meta,
-      layers,
+      {
+        meta,
+        layers,
+      },
     );
   }
 }

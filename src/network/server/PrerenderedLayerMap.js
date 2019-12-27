@@ -7,8 +7,8 @@ import prerenderMapThumbnail from '../shared/map/utils/prerenderMapThumbnail';
 import LayerMap from '../shared/map/LayerMap';
 
 export default class PrerenderedLayerMap extends LayerMap {
-  constructor(meta, layers, {thumbnailSize = new Size(256, 256)} = {}) {
-    super(meta, layers);
+  constructor(layerMapConfig, {thumbnailSize = new Size(256, 256)} = {}) {
+    super(layerMapConfig);
 
     const {roadElement} = this;
     this.thumbnailSize = thumbnailSize;
@@ -31,9 +31,21 @@ export default class PrerenderedLayerMap extends LayerMap {
     };
   }
 
+  static prerender(layerMap, prerenderConfig) {
+    return new PrerenderedLayerMap(
+      layerMap,
+      prerenderConfig,
+    );
+  }
+
   static fromBSON(bson) {
     const {meta, layers} = BSON.deserialize(bson);
 
-    return new PrerenderedLayerMap(meta, layers);
+    return new PrerenderedLayerMap(
+      {
+        meta,
+        layers,
+      },
+    );
   }
 }

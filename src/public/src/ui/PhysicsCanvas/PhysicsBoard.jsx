@@ -112,7 +112,7 @@ export default class PhysicsBoard {
   }
 
   update(delta) {
-    const rotateSpeed = toRadians(4);
+    const rotateSpeed = toRadians(8);
     const {car, keycodes, physics} = this;
     const {body} = car;
 

@@ -190,8 +190,6 @@ export default class RoomRacing {
          * AI
          */
         allAiFreezed = false;
-        info.lastNonIdleTime = now;
-
         ai.drive(aiWorldParams);
       }
 
@@ -296,6 +294,8 @@ export default class RoomRacing {
         && isDiagonalCollisionWithEdge(carBody, checkpoints[0])) {
       racingState.lastCheckpointTime = racingState.currentLapTime;
     } else if (isDiagonalCollisionWithEdge(carBody, checkpoints[nextCheckpoint])) {
+      info.lastNonIdleTime = Date.now();
+
       racingState.currentCheckpoint++;
       racingState.lastCheckpointTime = racingState.currentLapTime;
 
@@ -359,7 +359,7 @@ export default class RoomRacing {
     const {map} = this;
     const {info} = player;
 
-    info.lastIdleTime = Date.now();
+    info.lastNonIdleTime = Date.now();
     info.racingState.flash();
 
     map.resetPlayerPositionToSegment(

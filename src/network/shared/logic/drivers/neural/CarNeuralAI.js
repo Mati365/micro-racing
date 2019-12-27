@@ -129,7 +129,7 @@ export default class CarNeuralAI {
     if (Math.abs(body.speed) < 1)
       speedUp += 14;
 
-    body.speedUp(speedUp, false);
+    body.speedUp(speedUp, false, 0.4);
     body.turnSteerWheels(
       neuralOutput[NEURAL_CAR_OUTPUTS.TURN_OUTPUT],
     );

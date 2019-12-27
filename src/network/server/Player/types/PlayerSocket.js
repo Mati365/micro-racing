@@ -2,9 +2,6 @@ import consola from 'consola';
 import chalk from 'chalk';
 import * as R from 'ramda';
 
-import logMethod, {logFunction} from '@pkg/basic-helpers/decorators/logMethod';
-import {getRandomObjValue} from '@pkg/basic-helpers';
-
 import {
   ROOM_SERVER_MESSAGES_TYPES,
   PLAYER_TYPES,
@@ -13,6 +10,11 @@ import {
   ACTION_FLAGS,
   CAR_TYPES,
 } from '@game/network/constants/serverCodes';
+
+import {PLAYER_TYPES_BODY_CONFIG} from '@game/network/shared/map/PlayerMapElement';
+
+import logMethod, {logFunction} from '@pkg/basic-helpers/decorators/logMethod';
+import {getRandomObjValue} from '@pkg/basic-helpers';
 
 import CarNeuralAI from '@game/logic/drivers/neural';
 
@@ -77,7 +79,14 @@ export default class PlayerSocket extends Player {
     if (!this.ai || info.kind !== PLAYER_TYPES.ZOMBIE) {
       info.kind = PLAYER_TYPES.ZOMBIE;
       info.inputs = [];
-      info.car.body.steerAngle = 0.0;
+
+      Object.assign(
+        info.car.body,
+        {
+          steerAngle: 0,
+          ...PLAYER_TYPES_BODY_CONFIG[PLAYER_TYPES.BOT],
+        },
+      );
 
       this.ai = new CarNeuralAI(
         {
@@ -94,6 +103,14 @@ export default class PlayerSocket extends Player {
 
     if (info.kind !== PLAYER_TYPES.HUMAN) {
       info.kind = PLAYER_TYPES.HUMAN;
+      Object.assign(
+        info.car.body,
+        {
+          steerAngle: 0,
+          ...PLAYER_TYPES_BODY_CONFIG[PLAYER_TYPES.HUMAN],
+        },
+      );
+
       this.ai = null;
     }
 

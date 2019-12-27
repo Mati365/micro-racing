@@ -106,7 +106,11 @@ const GameCanvas = ({dimensions, gameBoard}) => {
     default:
   }
 
-  const hud = !overlayModal && roomConfig && gameState.board && (
+  const hud = (!overlayModal
+  && gameState.state.type === RACE_STATES.RACE
+  && roomConfig
+  && gameState.board
+  && (
     <>
       <Hud.Minimap
         roadsSegments={roadsSegments}
@@ -117,7 +121,7 @@ const GameCanvas = ({dimensions, gameBoard}) => {
 
       <Hud.NetworkStats client={client} />
     </>
-  );
+  ));
 
 
   /* eslint-disable jsx-a11y/tabindex-no-positive */

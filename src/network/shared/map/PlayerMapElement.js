@@ -18,6 +18,10 @@ export const PLAYER_TYPES_BODY_CONFIG = {
   [PLAYER_TYPES.BOT]: {
     maxGrip: 40,
   },
+
+  [PLAYER_TYPES.HUMAN]: {
+    maxGrip: 120,
+  },
 };
 
 /**

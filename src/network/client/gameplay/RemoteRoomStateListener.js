@@ -79,16 +79,15 @@ export default class RemoteRoomStateListener {
 
   mountSocketListeners(client) {
     const {boardListeners} = this;
+    const unmounters = R.mapObjIndexed(
+      (listener, type) => client.rpc.chainListener(type, listener),
+      boardListeners,
+    );
 
-    Object.assign(client.listeners, boardListeners);
-    return () => {
-      R.forEachObjIndexed(
-        (listener, key) => {
-          delete client.listeners[key];
-        },
-        boardListeners,
-      );
-    };
+    return () => R.forEachObjIndexed(
+      R.applyTo(true),
+      unmounters,
+    );
   }
 
   releaseListeners() {

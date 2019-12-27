@@ -15,12 +15,12 @@ import createTerrain from '@game/shared/sceneResources/terrain';
 import {fetchMeshURLResource} from '@game/shared/sceneResources/utils';
 
 import PhysicsScene from '@pkg/physics-scene';
-import PlayerInfo from '@game/server/Player/PlayerInfo';
 import {RoadMapElement} from '@game/network/shared/map';
 
 import PhysicsMeshNode from './PhysicsMeshNode';
 import CarNode from './Car';
 import RoadNode from './RoadNode/RoadNode';
+import RoomMapRefsStore from './RoomMapRefsStore';
 
 /**
  * @see MapElement
@@ -29,7 +29,20 @@ export const appendToSceneBuffer = f => ({
   players = [],
   objects,
 }) => async (buffer) => {
+  const findRefsPlayer = (
+    R.is(Array, players)
+      ? playerID => findByID(playerID, players)
+      : (playerID) => {
+        const obj = players[playerID];
+        if (obj?.player)
+          return obj.player;
+
+        return obj;
+      }
+  );
+
   let mapNodes = {};
+
   R.forEach(
     (item) => {
       const {type, params, id} = item; // some engine methods can modify item
@@ -123,7 +136,7 @@ export const appendToSceneBuffer = f => ({
               ...renderParams,
               id,
               type: carType,
-              player: findByID(playerID, players),
+              player: findRefsPlayer(playerID),
             },
           ));
         } break;
@@ -137,134 +150,87 @@ export const appendToSceneBuffer = f => ({
   mapNodes = await mapObjValuesToPromise(R.identity, mapNodes);
   return {
     buffer,
-    refs: {
-      objects: mapNodes,
-      players: R.reduce(
-        (acc, [, object]) => {
-          if (object.player)
-            acc[object.player.id] = object;
+    refsStore: new RoomMapRefsStore(
+      {
+        objects: mapNodes,
+        players: R.reduce(
+          (acc, [, object]) => {
+            const {player} = object;
+            if (player)
+              acc[player.id] = object;
 
-          return acc;
-        },
-        {},
-        R.toPairs(mapNodes),
-      ),
-    },
+            return acc;
+          },
+          {},
+          R.toPairs(mapNodes),
+        ),
+      },
+    ),
   };
 };
 
-export const createOffscreenRefs = ({players, objects}) => ({
-  objects,
-  players: R.reduce(
-    (acc, player) => {
-      if (player) {
-        acc[player.id] = {
-          player,
-        };
-      }
-
-      return acc;
-    },
-    {},
-    players,
-  ),
-});
-
 /**
  * @see
- *  It works in two modes! Offscreen is used in game board!
- *  In offscreen mode FGL is not provided and scene is not created
+ *  Stores information about SCENE nodes. Used on client!
  *
  * @export
  * @class RoomMapNode
  */
-export default class RoomMapNode {
+export default class RoomMapNode extends RoomMapRefsStore {
   constructor(
     {
       f,
       board,
-      initialRoomState, // response from loadInitialRoomState
       currentPlayer,
     },
   ) {
+    super();
+
     this.f = f;
     this.board = board;
     this.currentPlayer = currentPlayer;
     this.physics = new PhysicsScene;
 
     // variables that are set after load map
-    this.currentPlayerCar = null;
     this.roadNodes = [];
-
-    if (initialRoomState)
-      this.loadInitialRoomState(initialRoomState);
   }
 
-  async loadInitialRoomState({players, objects}) {
-    players = R.map(
-      PlayerInfo.fromBSON,
-      players,
+  async bootstrapOffscreenRefs({players, objects}) {
+    this.releaseBuffer();
+
+    const {f} = this;
+    const {
+      buffer,
+      refsStore,
+    } = await appendToSceneBuffer(f)(
+      {
+        players,
+        objects,
+      },
+    )(f.createSceneBuffer());
+
+    this.sceneBuffer = buffer;
+    this.refs = refsStore.refs;
+    this.roadNodes = R.filter(
+      R.is(RoadNode),
+      buffer.list || [],
     );
 
-    // assign new player info after loading scene
-    const updatedCurrentPlayerInfo = findByID(this.currentPlayer.id, players);
-    if (updatedCurrentPlayerInfo) {
-      updatedCurrentPlayerInfo.current = true;
-      Object.assign(
-        this.currentPlayer,
-        updatedCurrentPlayerInfo,
-      );
-    }
+    this.render = ::this.sceneBuffer.render;
 
-    const {f, currentPlayer} = this;
-    if (f) {
-      const {
-        buffer,
-        refs,
-      } = await appendToSceneBuffer(f)(
-        {
-          players,
-          objects,
-        },
-      )(f.createSceneBuffer());
-
-      this.sceneBuffer = buffer;
-      this.refs = refs;
-      this.roadNodes = R.filter(
-        R.is(RoadNode),
-        buffer.list || [],
-      );
-
-      this.render = ::this.sceneBuffer.render;
-    } else {
-      this.roadElement = R.filter(
-        ({type}) => type === OBJECT_TYPES.ROAD,
-        objects,
-      );
-
-      this.refs = createOffscreenRefs(
-        {
-          players,
-          objects,
-        },
-      );
-    }
-
-    this.currentPlayerCar = this.refs.players[currentPlayer.id];
+    return {
+      refsStore,
+      buffer,
+    };
   }
 
-  get players() {
-    return this.refs.players;
+  releaseBuffer() {
+    this.buffer?.release();
   }
 
   release() {
-    const {buffer} = this;
-
-    buffer?.release();
-    this.refs = {
-      players: {},
-      objects: {},
-    };
+    super.release();
+    this.releaseBuffer();
   }
 
   update(interpolate) {
@@ -288,9 +254,7 @@ export default class RoomMapNode {
     const carNode = refs.players[player.id];
 
     sceneBuffer?.removeNode(carNode);
-
-    delete refs.players[player.id];
-    delete refs.objects[carNode.id];
+    this.removePlayerCar(player);
   }
 
   async appendObjects(
@@ -299,35 +263,13 @@ export default class RoomMapNode {
       objects,
     },
   ) {
-    const {f} = this;
-    let refs = null;
-
-    if (!f) {
-      refs = createOffscreenRefs(
+    this.appendRefsStore(
+      await appendToSceneBuffer(this.f)(
         {
           players,
           objects,
         },
-      );
-    } else {
-      refs = await appendToSceneBuffer(f)(
-        {
-          players,
-          objects,
-        },
-      )(this.sceneBuffer);
-    }
-
-    this.refs = {
-      players: {
-        ...this.refs.players,
-        ...refs.players,
-      },
-
-      objects: {
-        ...this.refs.objects,
-        ...refs.objects,
-      },
-    };
+      )(this.sceneBuffer),
+    );
   }
 }

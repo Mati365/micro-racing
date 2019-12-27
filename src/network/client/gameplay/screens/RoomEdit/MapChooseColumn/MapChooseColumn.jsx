@@ -19,8 +19,7 @@ const MapChooseColumn = ({gameBoard}) => {
     {
       observable: gameBoard.observers.roomMap,
     },
-  )?.map?.roadElement[0];
-
+  )?.refsStore?.roadElement[0];
 
   const [onRequestMap, {loading}] = usePromiseCallback(
     ::client.loadMap,

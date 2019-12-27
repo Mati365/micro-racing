@@ -36,17 +36,30 @@ export default class BinarySocketRPCWrapper {
   }
 
   chainListener(type, fn) {
-    let prevListeners = this.listeners[type];
-    if (prevListeners)
-      prevListeners = safeArray(prevListeners);
+    if (!fn)
+      return R.F;
 
-    this.listeners[type] = [
-      ...(prevListeners || []),
-      fn,
-    ];
+    let prevListeners = this.listeners[type];
+
+    if (!prevListeners)
+      this.listeners[type] = fn;
+    else {
+      if (prevListeners)
+        prevListeners = safeArray(prevListeners);
+
+      this.listeners[type] = [
+        ...(prevListeners || []),
+        fn,
+      ];
+    }
 
     return () => {
-      this.listeners[type] = R.without([fn], this.listeners[type]);
+      const cachedListener = this.listeners[type];
+
+      if (cachedListener === fn)
+        delete this.listeners[type];
+      else if (R.is(Array, cachedListener))
+        this.listeners[type] = R.without([fn], cachedListener);
     };
   }
 

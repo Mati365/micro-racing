@@ -11,6 +11,7 @@ import {
   GameCanvasHolder,
 } from '../components';
 
+import RenderableGameBoard from '../states/RenderableGameBoard';
 import * as Overlays from '../components/overlays';
 
 const GameCanvas = ({dimensions, gameBoard}) => {
@@ -38,7 +39,18 @@ const GameCanvas = ({dimensions, gameBoard}) => {
   useEffect(
     () => {
       (async () => {
-        gameBoard.observers.raceState.subscribe(
+        const renderableBoard = await RenderableGameBoard.fromOffscreenBoard(
+          gameBoard,
+          {
+            canvas: canvasRef.current,
+            aspectRatio: 1.05,
+          },
+        );
+
+        // todo: remove it
+        gameBoard.release();
+
+        renderableBoard.observers.raceState.subscribe(
           state => mergeGameState.current(
             {
               state,
@@ -46,7 +58,7 @@ const GameCanvas = ({dimensions, gameBoard}) => {
           ),
         );
 
-        gameBoard.observers.roomMap.subscribe(
+        renderableBoard.observers.roomMap.subscribe(
           ({state, config, map}) => mergeGameState.current(
             {
               state,
@@ -56,20 +68,13 @@ const GameCanvas = ({dimensions, gameBoard}) => {
           ),
         );
 
-        await gameBoard.setCanvas(
-          {
-            canvas: canvasRef.current,
-            aspectRatio: 1.05,
-          },
-        );
-
         mergeGameState.current(
           {
             board: gameBoard,
           },
         );
 
-        gameBoard.start();
+        renderableBoard.start();
       })();
     },
     [],

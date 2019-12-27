@@ -130,7 +130,7 @@ export default class PlayerInfo {
     this.room = room;
     this.inputs = [];
     this.lastProcessedInput = -1;
-    this.lastIdleTime = null;
+    this.lastNonIdleTime = null;
     this.carType = getRandomObjValue(CAR_TYPES);
     this.racingState = racingState;
   }

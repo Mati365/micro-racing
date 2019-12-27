@@ -26,6 +26,7 @@ export default class RoomRacing {
   constructor(
     {
       room,
+      aiTrainer,
     },
   ) {
     this.room = room;
@@ -33,12 +34,12 @@ export default class RoomRacing {
 
     this.map = new RoadMapObjectsManager(room.map);
     this.state = new RaceState(RACE_STATES.BOARD_VIEW);
-    this.aiTrainer = room.config.aiTraining && new CarNeuralTrainer(
+    this.aiTrainer = room.config.aiTraining && (aiTrainer || new CarNeuralTrainer(
       {
         map: this.map,
         room: this.room,
       },
-    );
+    ));
   }
 
   get allowPlayerJoin() {
@@ -183,14 +184,14 @@ export default class RoomRacing {
         }
 
         if (!idle)
-          info.lastIdleTime = null;
-        else if (info.lastIdleTime === null)
-          info.lastIdleTime = Date.now();
+          info.lastNonIdleTime = now;
       } else {
         /**
          * AI
          */
         allAiFreezed = false;
+        info.lastNonIdleTime = now;
+
         ai.drive(aiWorldParams);
       }
 
@@ -201,7 +202,7 @@ export default class RoomRacing {
     // AI training
     if (aiTrainer && allAiFreezed) {
       aiTrainer.trainPopulation(players);
-      this.startTime = Date.now();
+      this.startTime = now;
     }
 
     // update physics
@@ -256,19 +257,8 @@ export default class RoomRacing {
         }
 
         // try to reset if bot stuck
-        if (body.speed < 3 && !collision.moveable) {
-          const {info} = player;
-
-          info.racingState.flash();
-          map.resetPlayerPositionToSegment(
-            {
-              position: info.racingState.currentCheckpoint,
-              absolutePosition: true,
-              playerElement: info.car,
-              align: CAR_ALIGN.CENTER,
-            },
-          );
-        }
+        if (body.speed < 3 && !collision.moveable)
+          this.flashResetCar(player);
       }
     }
   }
@@ -342,9 +332,9 @@ export default class RoomRacing {
 
     // detect non progress players
     const nonProgressTime = racingState.currentLapTime - (racingState.lastCheckpointTime || 0);
-    if (nonProgressTime > playerIdleTime) {
+    if (aiTrainer && nonProgressTime > playerIdleTime) {
       // punish bot
-      if (aiTrainer && ai) {
+      if (ai) {
         consola.info(`${chalk.green.bold('AiTrainer:')} Player ${chalk.bold.white(info.nick)} killed, it was ${chalk.bold.bold('idle')}!`);
         car.freeze();
       }
@@ -353,14 +343,33 @@ export default class RoomRacing {
     }
 
     // transform to bots idle players
-    if (info.kind === PLAYER_TYPES.HUMAN
-        && info.lastIdleTime !== null
-        && time - info.lastIdleTime > playerIdleTime) {
-      player.transformToZombie();
+    if (time - (info.lastNonIdleTime || this.startTime) > playerIdleTime) {
+      if (info.kind === PLAYER_TYPES.HUMAN)
+        player.transformToZombie();
+      else
+        this.flashResetCar(player);
+
       return true;
     }
 
     return false;
+  }
+
+  flashResetCar(player) {
+    const {map} = this;
+    const {info} = player;
+
+    info.lastIdleTime = Date.now();
+    info.racingState.flash();
+
+    map.resetPlayerPositionToSegment(
+      {
+        absolutePosition: true,
+        position: info.racingState.currentCheckpoint,
+        playerElement: info.car,
+        align: CAR_ALIGN.CENTER,
+      },
+    );
   }
 
   /**

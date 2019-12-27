@@ -101,7 +101,7 @@ export default class Room {
 
     if (spawnBotsBeforeStart) {
       this.spawnBots(
-        Math.max(0, playersLimit - this.players.length - 1),
+        Math.max(0, playersLimit - this.players.length),
       );
     }
 
@@ -530,12 +530,17 @@ export default class Room {
     this.map = map;
 
     if (!this.abstract) {
+      const {aiTrainer} = this.racing || {};
+
       this.racing?.stop();
       this.racing = new RoomRacing(
         {
           room: this,
         },
       );
+
+      if (aiTrainer && this.racing.aiTrainer)
+        this.racing.aiTrainer.observers = aiTrainer.observers;
 
       R.forEach(
         (player) => {

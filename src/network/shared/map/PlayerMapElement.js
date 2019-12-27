@@ -168,6 +168,10 @@ export default class PlayerMapElement extends MapElement {
           count: 2,
           srcPath: 'body.pos',
         },
+        stateBitset: {
+          type: 'int16',
+          srcPath: 'player.info.racingState.state',
+        },
         velocity: {
           type: 'float64',
           count: 2,

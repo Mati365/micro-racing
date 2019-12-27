@@ -9,7 +9,7 @@ const writeAiPopulation = async ({filename}, population) => {
   let prevPopulation = null;
   try {
     prevPopulation = JSON.parse(await fs.promises.readFile(filename));
-    if (prevPopulation && prevPopulation[0].score > population[0].score)
+    if (prevPopulation && prevPopulation[0]?.score > population[0]?.score)
       return false;
   } catch (e) {} // eslint-disable-line no-empty
 

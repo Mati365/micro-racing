@@ -263,6 +263,7 @@ export default class GameBoard {
     const prevAngle = body.angle;
     const prevVelocity = body.velocity;
 
+    racingState.state = playerSyncInfo.stateBitset;
     Object.assign(
       body,
       {
@@ -325,14 +326,16 @@ export default class GameBoard {
       }
     }
 
-    if (!racingState.isFlashing()) {
-      body.angle = angleLerp(prevAngle, body.angle, 0.05);
-      body.pos = vec2.lerp(0.05, prevPos, body.pos);
-      body.velocity = vec2.lerp(0.05, prevVelocity, body.velocity);
-    }
+    if (!aiTraining) {
+      if (!racingState.isFlashing()) {
+        body.angle = angleLerp(prevAngle, body.angle, 0.05);
+        body.pos = vec2.lerp(0.05, prevPos, body.pos);
+        body.velocity = vec2.lerp(0.05, prevVelocity, body.velocity);
+      }
 
-    node.body.updateVerticesShapeCache();
-    physics.updateObjectPhysics(body, aiTraining);
+      node.body.updateVerticesShapeCache();
+      physics.updateObjectPhysics(body, aiTraining);
+    }
 
     this.waitForSync = false;
   };

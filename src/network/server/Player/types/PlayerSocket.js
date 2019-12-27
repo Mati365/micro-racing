@@ -77,6 +77,7 @@ export default class PlayerSocket extends Player {
     if (!this.ai || info.kind !== PLAYER_TYPES.ZOMBIE) {
       info.kind = PLAYER_TYPES.ZOMBIE;
       info.inputs = [];
+      info.car.body.steerAngle = 0.0;
 
       this.ai = new CarNeuralAI(
         {
@@ -93,7 +94,6 @@ export default class PlayerSocket extends Player {
 
     if (info.kind !== PLAYER_TYPES.HUMAN) {
       info.kind = PLAYER_TYPES.HUMAN;
-      info.lastIdleTime = null;
       this.ai = null;
     }
 

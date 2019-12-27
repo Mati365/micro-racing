@@ -154,13 +154,19 @@ const PlayersTabs = ({gameBoard}) => {
 
       return createObservablesUnmounter(
         gameBoard.observers.roomInfo.subscribe(
-          ({config}) => {
-            setTotalLaps(config.laps);
+          (roomInfo) => {
+            if (roomInfo)
+              setTotalLaps(roomInfo.config.laps);
           },
+          true,
         ),
 
         gameBoard.observers.players.subscribe(
-          ({nodes, currentPlayerNode}) => {
+          (players) => {
+            if (!players)
+              return;
+
+            const {nodes, currentPlayerNode} = players;
             setPlayersNodes(
               {
                 list: R.values(nodes),
@@ -168,6 +174,7 @@ const PlayersTabs = ({gameBoard}) => {
               },
             );
           },
+          true,
         ),
       );
     },

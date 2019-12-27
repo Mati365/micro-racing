@@ -3,6 +3,10 @@ import * as R from 'ramda';
 import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
 import PlayerInfo from '@game/server/Player/PlayerInfo';
 
+export const findRoadElement = R.filter(
+  ({type}) => type === OBJECT_TYPES.ROAD,
+);
+
 export const createOffscreenRefs = ({players, objects}) => ({
   objects,
   players: R.reduce(
@@ -96,11 +100,7 @@ export default class RoomMapRefsStore {
   bootstrapRefs({players, objects}) {
     this.release();
 
-    this.roadElement = R.filter(
-      ({type}) => type === OBJECT_TYPES.ROAD,
-      objects,
-    );
-
+    this.roadElement = findRoadElement(objects);
     this.refs = createOffscreenRefs(
       {
         players: R.map(PlayerInfo.fromBSON, players),

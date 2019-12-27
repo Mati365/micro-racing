@@ -39,7 +39,7 @@ export default class RenderableGameBoard extends GameBoard {
     );
   }
 
-  static async fromOffscreenBoard(
+  static fromOffscreenBoard(
     offscreenBoard,
     initParams,
   ) {
@@ -58,11 +58,16 @@ export default class RenderableGameBoard extends GameBoard {
       ...offscreenBoard.roomInfo,
     };
 
-    await board.refsStore.bootstrapRefs(
-      offscreenBoard.refsStore.refs,
-    );
+    return {
+      board,
+      async bootstrap() {
+        await board.refsStore.bootstrapRefs(
+          offscreenBoard.refsStore.refs,
+        );
 
-    return board.mountRemoteListeners();
+        return board.mountRemoteListeners();
+      },
+    };
   }
 
   start() {

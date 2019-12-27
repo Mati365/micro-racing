@@ -29,6 +29,7 @@ const NetworkStats = ({client}) => {
 
           setPing(delay);
         },
+        true,
       );
 
       return ::subscriber.unsubscribe;

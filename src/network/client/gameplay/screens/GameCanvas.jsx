@@ -39,7 +39,10 @@ const GameCanvas = ({dimensions, gameBoard}) => {
   useEffect(
     () => {
       (async () => {
-        const renderableBoard = await RenderableGameBoard.fromOffscreenBoard(
+        const {
+          board: renderableBoard,
+          bootstrap,
+        } = RenderableGameBoard.fromOffscreenBoard(
           gameBoard,
           {
             canvas: canvasRef.current,
@@ -49,6 +52,11 @@ const GameCanvas = ({dimensions, gameBoard}) => {
 
         // todo: remove it
         gameBoard.release();
+        mergeGameState.current(
+          {
+            board: renderableBoard,
+          },
+        );
 
         renderableBoard.observers.raceState.subscribe(
           state => mergeGameState.current(
@@ -59,21 +67,24 @@ const GameCanvas = ({dimensions, gameBoard}) => {
         );
 
         renderableBoard.observers.roomMap.subscribe(
-          ({state, config, map}) => mergeGameState.current(
+          ({
+            roomInfo: {
+              state,
+              config,
+            },
+            refsStore: {
+              roadNodes,
+            },
+          }) => mergeGameState.current(
             {
               state,
               roomConfig: config,
-              roadsSegments: R.pluck('segmentsInfo', map.roadNodes),
+              roadsSegments: R.pluck('segmentsInfo', roadNodes),
             },
           ),
         );
 
-        mergeGameState.current(
-          {
-            board: gameBoard,
-          },
-        );
-
+        await bootstrap();
         renderableBoard.start();
       })();
     },
@@ -100,7 +111,7 @@ const GameCanvas = ({dimensions, gameBoard}) => {
       <Hud.Minimap
         roadsSegments={roadsSegments}
         playersAccessorFn={
-          () => gameState.board.roomMapNode.players
+          () => gameState.board.refsStore.players
         }
       />
 

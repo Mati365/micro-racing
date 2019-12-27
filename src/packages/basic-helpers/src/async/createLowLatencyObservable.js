@@ -12,6 +12,10 @@ const createLowLatencyObservable = (initialValue = null) => {
   let lastValue = initialValue;
 
   return {
+    get observers() {
+      return observers.current;
+    },
+
     getLastValue() { return lastValue; },
 
     notify(value) {

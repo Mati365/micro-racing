@@ -6,6 +6,8 @@ import {
 
 import * as R from 'ramda';
 
+import useMountedRef from '../useMountedRef';
+
 /**
  * @see createLowLatencyObservable
  */
@@ -17,6 +19,7 @@ const useLowLatencyObservable = (
     onChange,
   },
 ) => {
+  const mountedRef = useMountedRef();
   const changeListenerRef = useRef();
   const [state, setState] = useState(
     {
@@ -29,6 +32,9 @@ const useLowLatencyObservable = (
   useEffect(
     () => observable.subscribe(
       (newValue) => {
+        if (!mountedRef.current)
+          return;
+
         const parsedValue = parserFn(newValue);
 
         if (watchOnly && changeListenerRef.current)

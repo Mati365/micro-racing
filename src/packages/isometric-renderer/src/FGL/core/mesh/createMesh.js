@@ -3,7 +3,7 @@ import {
   IN_VERTEX_POS_ATTRIB,
 } from '../constants/predefinedShaderParams';
 
-import attachShaderMaterialParameters from './utils/attachShaderMaterialParameters';
+import attachShaderMaterialParameters, {detachShaderMaterialParameters} from './utils/attachShaderMaterialParameters';
 import createMeshDescriptor from './createMeshDescriptor';
 import bindBufferAttrib from '../buffer/bindBufferAttrib';
 
@@ -119,9 +119,10 @@ export class MeshRenderer {
    * Cleanup VAOs and etc.
    */
   detachBuffers() {
-    const {gl} = this;
-    const {vao} = this.meshDescriptor;
+    const {gl, meshDescriptor} = this;
+    const {material, vao} = meshDescriptor;
 
+    detachShaderMaterialParameters(material, meshDescriptor);
     if (vao)
       gl.bindVertexArray(null);
   }

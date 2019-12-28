@@ -50,6 +50,8 @@ export default class GameBoard {
 
   updateCurrentPlayerRef() {
     this.currentPlayerRef = this.refsStore.refs.players[this.currentPlayer.id];
+    if (this.currentPlayerRef)
+      this.currentPlayerRef.player.current = true;
   }
 
   notifyPlayersChange(left, join) {

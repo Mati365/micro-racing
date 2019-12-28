@@ -136,7 +136,7 @@ export const appendToSceneBuffer = f => ({
         case OBJECT_TYPES.PLAYER: {
           const {carType, playerID, ...renderParams} = params;
 
-          mapNodes[id] = buffer.createNode(async sceneParams => new CarNode(
+          mapNodes[id] = buffer.createNode(sceneParams => new CarNode(
             {
               ...sceneParams,
               ...renderParams,

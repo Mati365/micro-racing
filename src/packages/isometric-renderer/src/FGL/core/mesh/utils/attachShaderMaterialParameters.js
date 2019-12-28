@@ -30,4 +30,14 @@ const attachShaderMaterialParameters = (
     material.setTextures(textures);
 };
 
+export const detachShaderMaterialParameters = (
+  material,
+  {
+    buffers,
+  },
+) => {
+  if (buffers)
+    material.setAttributes(buffers, true);
+};
+
 export default attachShaderMaterialParameters;

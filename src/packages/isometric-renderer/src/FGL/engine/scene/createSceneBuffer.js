@@ -138,13 +138,22 @@ export class SceneBuffer {
 
   render(interpolate, mpMatrix) {
     const {f, list, camera} = this;
+    const transparentNodes = [];
 
     camera.render(interpolate, mpMatrix);
+
     for (let i = 0, len = list.length; i < len; ++i) {
       const node = list[i];
+      const {opacity} = node.renderConfig.uniforms;
 
-      node.render(interpolate, camera.mpMatrix, f);
+      if (R.isNil(opacity) || opacity === 1.0)
+        node.render(interpolate, camera.mpMatrix, f);
+      else
+        transparentNodes.push(node);
     }
+
+    for (let i = 0, len = transparentNodes.length; i < len; ++i)
+      transparentNodes[i].render(interpolate, camera.mpMatrix, f);
   }
 }
 

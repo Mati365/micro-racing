@@ -1,10 +1,12 @@
 import React from 'react';
+import * as R from 'ramda';
 import {
   Route,
   Switch,
 } from 'react-router-dom';
 
 import {styled} from '@pkg/fast-stylesheet/src/react';
+import {capitalize} from '@pkg/basic-helpers';
 
 import ConfigChooseScreen from '../ConfigChoose';
 import ServersList from '../ServersList';
@@ -19,7 +21,13 @@ const BoardContainer = styled.div(
 );
 
 const GameConfigRoute = React.memo(({match, client}) => {
-  const onUpdateConfig = playerInfo => client.setPlayerInfo(playerInfo);
+  const onUpdateConfig = playerInfo => client.setPlayerInfo(
+    R.evolve(
+      {
+        nick: capitalize,
+      },
+    )(playerInfo),
+  );
 
   return (
     <>

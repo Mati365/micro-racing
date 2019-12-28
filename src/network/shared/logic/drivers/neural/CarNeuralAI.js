@@ -24,7 +24,7 @@ const NEURAL_CAR_OUTPUTS = {
   TURN_OUTPUT: 1,
 };
 
-export const MAX_TANH_DISTANCE = 2.5;
+export const MAX_TANH_DISTANCE = 3.0;
 
 const createTanH = T.createLayer(T.NEURAL_ACTIVATION_TYPES.TAN_H);
 
@@ -95,8 +95,8 @@ export default class CarNeuralAI {
     } = this;
 
     return [
-      body.speed / MAX_CAR_SPEED * 3, // nornalize speed
-      (body.steerAngle / body.maxSteerAngle) * 3,
+      body.speed / MAX_CAR_SPEED * MAX_TANH_DISTANCE, // nornalize speed
+      (body.steerAngle / body.maxSteerAngle) * MAX_TANH_DISTANCE,
       ...R.map(
         (intersection) => {
           if (!intersection)
@@ -129,7 +129,7 @@ export default class CarNeuralAI {
     if (Math.abs(body.speed) < 1)
       speedUp += 14;
 
-    body.speedUp(speedUp, false, 0.4);
+    body.speedUp(speedUp, false, 0.25);
     body.turnSteerWheels(
       neuralOutput[NEURAL_CAR_OUTPUTS.TURN_OUTPUT],
     );

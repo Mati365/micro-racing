@@ -14,6 +14,8 @@ import {capitalize} from '@pkg/basic-helpers';
 import {usePromise} from '@ui/basic-hooks';
 import {useI18n} from '@ui/i18n';
 
+import {layerStyle} from '@ui/basic-components/styled/Layer';
+
 import {
   Flex,
   Text,
@@ -114,8 +116,8 @@ const processServerMessage = (t) => {
 const RaceChatListHolder = styled(
   UnorderedList,
   {
-    flex: 1,
-    marginBottom: 10,
+    extend: layerStyle,
+
     overflowY: 'auto',
   },
 );
@@ -197,16 +199,24 @@ const RaceChat = ({gameBoard, ...props}) => {
       direction='column'
       {...props}
     >
-      <RaceChatListHolder ref={messagesListRef}>
-        {(messages || []).map(
-          message => (
-            <RoomMessageItem
-              key={message.id}
-              roomMessage={message}
-            />
-          ),
-        )}
-      </RaceChatListHolder>
+      <div
+        style={{
+          position: 'relative',
+          flex: 1,
+          marginBottom: 10,
+        }}
+      >
+        <RaceChatListHolder ref={messagesListRef}>
+          {(messages || []).map(
+            message => (
+              <RoomMessageItem
+                key={message.id}
+                roomMessage={message}
+              />
+            ),
+          )}
+        </RaceChatListHolder>
+      </div>
 
       <RaceChatMessageBox onSendMessage={onSendMessage} />
     </Flex>

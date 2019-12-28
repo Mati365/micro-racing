@@ -136,6 +136,7 @@ export default class CarNode extends PhysicsMeshNode {
     super.update(interpolate);
 
     const {
+      body,
       player,
       nickNode,
       renderConfig,
@@ -147,7 +148,10 @@ export default class CarNode extends PhysicsMeshNode {
       const {racingState} = player;
       let opacity = 1.0;
 
-      if (racingState.isFlashing()) {
+      if (racingState.isFinish()) {
+        opacity = 0.25;
+        body.transparentToOthers = true;
+      } else if (racingState.isFlashing()) {
         this.flashCounter--;
         if (this.flashCounter < -FLASH_INTERVAL)
           this.flashCounter = FLASH_INTERVAL;

@@ -354,7 +354,12 @@ export default class GameBoard {
       return;
 
     const {currentPlayerRef: car} = this;
-    const input = keyboardController.storeInputs(this.frameId);
+    const input = (
+      car.player.racingState.isFinish()
+        ? false
+        : keyboardController.storeInputs(this.frameId)
+    );
+
     if (input)
       carKeyboardDriver(input.bitset, car.body);
 

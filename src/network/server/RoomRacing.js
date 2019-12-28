@@ -146,6 +146,10 @@ export default class RoomRacing {
       const player = players[i];
       const {info, ai} = player;
       const {body: carBody} = info.car;
+      const {racingState} = info;
+
+      if (racingState.isFinish())
+        continue;
 
       if (info.inputs.length > 15)
         info.inputs = info.inputs.slice(0, 2);
@@ -304,12 +308,21 @@ export default class RoomRacing {
       if (!nextCheckpoint) {
         // WIN!
         if (racingState.lap + 1 >= roomConfig.laps) {
-          if (aiTrainer && player.ai)
+          if (aiTrainer && player.ai) {
             consola.info(`${chalk.green.bold('AiTrainer:')} Player ${chalk.bold.white(player.info.nick)} killed, it ${chalk.bold.green('win')}!`);
-          else
+            car.freeze();
+          } else {
             info.racingState.state |= PLAYER_RACE_STATES.FINISH;
 
-          car.freeze();
+            Object.assign(
+              carBody,
+              {
+                transparentToOthers: true,
+                throttle: 0,
+                lockInputs: true,
+              },
+            );
+          }
         } else
           racingState.lap++;
 

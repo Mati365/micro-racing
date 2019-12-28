@@ -71,6 +71,8 @@ export class PlayerRacingState {
 
   isFlashing() { return hasFlag(PLAYER_RACE_STATES.FLASH, this.state); }
 
+  isFinish() { return hasFlag(PLAYER_RACE_STATES.FINISH, this.state); }
+
   freeze() {
     this.state |= PLAYER_RACE_STATES.FREEZE;
     return this;

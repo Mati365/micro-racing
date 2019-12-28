@@ -66,7 +66,7 @@ export default class PhysicsScene {
       if (b.moveable && checkOnlyWithStatic)
         continue;
 
-      if (a === b || (!a.moveable && !b.moveable))
+      if (a === b || (!a.moveable && !b.moveable) || b.transparentToOthers)
         continue;
 
       // ignore if not AABB, it is much faster than diagonal checks

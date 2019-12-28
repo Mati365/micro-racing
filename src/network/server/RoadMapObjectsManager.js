@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 
 import {CAR_ALIGN} from '@game/network/constants/serverCodes';
+import {wrapAroundMod} from '@pkg/gl-math';
 
 import PhysicsScene from '@pkg/physics-scene';
 import PlayerMapElement, {genCarSegmentTransform} from '../shared/map/PlayerMapElement';
@@ -119,11 +120,14 @@ export default class RoadMapObjectsManager {
     const {segments} = this.segmentsInfo;
     const bodyParams = alignFn(
       {
-        segment: segments[(
-          absolutePosition
-            ? position
-            : (segments.length - position - 1)
-        ) % segments.length],
+        segment: segments[
+          wrapAroundMod(
+            absolutePosition
+              ? position
+              : (segments.length - position - 1),
+            segments.length,
+          )
+        ],
         align,
       },
     );

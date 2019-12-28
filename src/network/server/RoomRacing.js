@@ -6,12 +6,14 @@ import {wrapAroundMod} from '@pkg/gl-math';
 
 import {createAnimationFrameRenderer} from '@pkg/isometric-renderer/FGL/core/viewport/createDtRenderLoop';
 import {isDiagonalCollisionWithEdge} from '@pkg/physics-scene/src/engines/diagonal';
+import {aabb} from '@pkg/physics-scene/src/engines';
 
 import carKeyboardDriver from '../shared/logic/drivers/carKeyboardDriver';
 
 import {
   CAR_ALIGN,
   PLAYER_ACTIONS,
+  PLAYER_RACE_STATES,
   PLAYER_TYPES,
   RACE_STATES,
 } from '../constants/serverCodes';
@@ -302,10 +304,12 @@ export default class RoomRacing {
       if (!nextCheckpoint) {
         // WIN!
         if (racingState.lap + 1 >= roomConfig.laps) {
-          if (aiTrainer && player.ai) {
+          if (aiTrainer && player.ai)
             consola.info(`${chalk.green.bold('AiTrainer:')} Player ${chalk.bold.white(player.info.nick)} killed, it ${chalk.bold.green('win')}!`);
-            car.freeze();
-          }
+          else
+            info.racingState.state |= PLAYER_RACE_STATES.FINISH;
+
+          car.freeze();
         } else
           racingState.lap++;
 
@@ -357,19 +361,34 @@ export default class RoomRacing {
 
   flashResetCar(player) {
     const {map} = this;
+    const {players} = this.room;
     const {info} = player;
 
     info.lastNonIdleTime = Date.now();
     info.racingState.flash();
 
-    map.resetPlayerPositionToSegment(
-      {
-        absolutePosition: true,
-        position: info.racingState.currentCheckpoint,
-        playerElement: info.car,
-        align: CAR_ALIGN.CENTER,
-      },
-    );
+    // check aabb collisions with other players
+    for (let i = 0; i < 10; ++i) {
+      map.resetPlayerPositionToSegment(
+        {
+          absolutePosition: true,
+          position: info.racingState.currentCheckpoint - i,
+          playerElement: info.car,
+          align: CAR_ALIGN.CENTER,
+        },
+      );
+
+      let resetSegment = false;
+      for (let j = 0; j < players.length; ++j) {
+        if (players[j] !== player && aabb(players[j].info.car.body.box, info.car.body.box)) {
+          resetSegment = true;
+          break;
+        }
+      }
+
+      if (!resetSegment)
+        break;
+    }
   }
 
   /**

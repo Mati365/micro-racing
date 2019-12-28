@@ -2,7 +2,6 @@ import * as R from 'ramda';
 import * as T from '@pkg/neural-network';
 
 import BASIC_NEURAL_AI from '@game/server-res/ai/basic-ai.json';
-import BASIC_NEURAL_AI_2 from '@game/server-res/ai/basic-ai-2.json';
 
 import {getRandomArrayItem} from '@pkg/basic-helpers';
 
@@ -11,7 +10,6 @@ import CarIntersectRays from './CarIntersectRays';
 
 const AI_DB = [
   BASIC_NEURAL_AI,
-  BASIC_NEURAL_AI_2,
 ];
 
 const NEURAL_CAR_INPUTS = {

@@ -99,7 +99,7 @@ export default class PhysicsScene {
       }
 
       if (!collided && (!toggleFlagOnStatic || !b.moveable))
-        collided = !mtv || !mtv2 ? b : null;
+        collided = mtv || mtv2 ? b : null;
     }
 
     return collided;

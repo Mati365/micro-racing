@@ -40,18 +40,20 @@ export const applyTransformsToMatrix = (transform, dest = mat4.from.identity()) 
  *    + lighting (bool)
  */
 export default class SceneNode {
-  constructor({
-    f,
-    id,
-    initialCacheInit = true,
-    matrix = mat4.from.identity(), // executed before transforms
-    transform = null,
-    scene = null,
-    uniforms = {},
-    ubo = {},
-    renderer,
-    attributes,
-  } = {}) {
+  constructor(
+    {
+      f,
+      id,
+      initialCacheInit = true,
+      matrix = mat4.from.identity(), // executed before transforms
+      transform = null,
+      scene = null,
+      uniforms = {},
+      ubo = {},
+      renderer,
+      attributes,
+    } = {},
+  ) {
     this.f = f; // optional renderer handle
     this.id = id;
     this.scene = scene;

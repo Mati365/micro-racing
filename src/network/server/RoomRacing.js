@@ -148,7 +148,12 @@ export default class RoomRacing {
       const {body: carBody} = info.car;
       const {racingState} = info;
 
-      if (racingState.isFinish())
+      const finish = racingState.isFinish();
+      const flashing = racingState.isFlashing();
+
+      carBody.transparentToOthers = finish || flashing;
+
+      if (finish)
         continue;
 
       if (info.inputs.length > 15)
@@ -319,6 +324,7 @@ export default class RoomRacing {
               {
                 transparentToOthers: true,
                 throttle: 0,
+                steerAngle: 0,
                 lockInputs: true,
               },
             );

@@ -14,6 +14,7 @@ class SimpleBody extends PhysicsBody {
     moveable = true,
 
     // left top corner
+    angle = 0.0,
     pos = vec2(0, 0),
     size = vec2(0, 0),
 
@@ -30,6 +31,7 @@ class SimpleBody extends PhysicsBody {
     super(
       {
         pos,
+        angle,
         moveable,
         perspectiveAngleCorrection: 0,
         points: [

@@ -148,19 +148,21 @@ export default class CarNode extends PhysicsMeshNode {
       const {racingState} = player;
       let opacity = 1.0;
 
-      if (racingState.isFinish()) {
+      if (racingState.isFinish())
         opacity = 0.25;
-        body.transparentToOthers = true;
-      } else if (racingState.isFlashing()) {
+      else if (racingState.isFlashing()) {
         this.flashCounter--;
         if (this.flashCounter < -FLASH_INTERVAL)
           this.flashCounter = FLASH_INTERVAL;
 
         if (this.flashCounter > 0)
           opacity = 0.15;
+        else
+          opacity = 0.9;
       } else if (racingState.isFreezed())
         opacity = 0.5;
 
+      body.transparentToOthers = opacity !== 1.0;
       renderConfig.uniforms.opacity = opacity;
     }
   }

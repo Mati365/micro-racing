@@ -8,11 +8,13 @@ import {
 } from './engines';
 
 export default class PhysicsScene {
-  constructor({
-    items,
-    maxReflectionAngle,
-    ...config
-  } = {}) {
+  constructor(
+    {
+      items,
+      maxReflectionAngle,
+      ...config
+    } = {},
+  ) {
     this.config = config;
     this.items = items || [];
   }
@@ -30,14 +32,13 @@ export default class PhysicsScene {
       const cornerCollision = intersection.uB < 0.1 || intersection.uB > 0.9;
 
       let newVelocity = null;
+      const edgeNormal = intersection.edgeB.normal(true);
 
-      if (cornerCollision)
-        newVelocity = !b.moveable && vec2.mul(-0.5, a.velocityVector);
-      else {
-        const edgeNormal = intersection.edgeB.normal(true);
-        newVelocity = vec2.mul(
-          0.15,
-          vec2.reflectByNormal(edgeNormal, a.velocityVector, true),
+      if (!cornerCollision) {
+        newVelocity = vec2.reflectByNormal(
+          edgeNormal,
+          vec2.mul(0.5, a.velocityVector),
+          true,
         );
       }
 

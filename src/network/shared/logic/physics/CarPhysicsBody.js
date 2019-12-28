@@ -50,6 +50,10 @@ export default class CarPhysicsBody extends PhysicsBody {
       steerAngle = toRadians(0), // relative to root angle
       maxSteerAngle = toRadians(45),
       maxGrip = 120,
+      corneringStiffness = {
+        front: -80.0,
+        rear: -80.2,
+      },
 
       // left top corner
       velocity = vec2(0, 0),
@@ -114,10 +118,7 @@ export default class CarPhysicsBody extends PhysicsBody {
       rear: axles.rear / this.wheelBase * this.weight,
     };
 
-    this.corneringStiffness = {
-      front: -80.0,
-      rear: -80.2,
-    };
+    this.corneringStiffness = corneringStiffness;
 
     this.maxGrip = maxGrip;
     this.resistance = 5.0;

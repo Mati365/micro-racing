@@ -29,6 +29,7 @@ const GameCanvasHolder = styled(
   {
     props: {
       direction: 'column',
+      justify: 'center',
     },
     index: 1,
     omitProps: ['freeze', 'expanded'],

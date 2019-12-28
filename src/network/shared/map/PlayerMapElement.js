@@ -17,10 +17,18 @@ import {CARS_RESOURCES} from '../sceneResources/cars';
 export const PLAYER_TYPES_BODY_CONFIG = {
   [PLAYER_TYPES.BOT]: {
     maxGrip: 40,
+    corneringStiffness: {
+      front: -80.0,
+      rear: -80.2,
+    },
   },
 
   [PLAYER_TYPES.HUMAN]: {
-    maxGrip: 120,
+    maxGrip: 160,
+    corneringStiffness: {
+      front: -100.0,
+      rear: -100.2,
+    },
   },
 };
 

@@ -156,6 +156,7 @@ const GameCanvas = ({dimensions, gameBoard}) => {
           gameBoard={gameState.board}
           style={{
             flex: 1,
+            maxHeight: 200,
           }}
         />
       )}

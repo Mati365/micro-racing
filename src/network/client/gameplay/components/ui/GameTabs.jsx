@@ -30,7 +30,7 @@ const TabContent = styled.div(
   },
 );
 
-const GameTabs = ({initialTab, children}) => {
+const GameTabs = ({initialTab, children, style, className}) => {
   const childrenArray = React.Children.toArray(children);
   const [activeTabId, setActiveTab] = useState(
     R.defaultTo(childrenArray[0].props.id, initialTab),
@@ -42,7 +42,11 @@ const GameTabs = ({initialTab, children}) => {
   );
 
   return (
-    <Flex direction='column'>
+    <Flex
+      direction='column'
+      style={style}
+      className={className}
+    >
       <UnorderedList row>
         {React.Children.map(
           children,

@@ -12,11 +12,24 @@ import {
   GameTabs,
 } from '../../components/ui';
 
-const RacingConfigColumn = ({gameBoard}) => {
+const RacingConfigColumn = ({gameBoard, onBeforeStart}) => {
   const t = useI18n('game.screens.room_edit');
 
   return (
     <>
+      <GameTabs>
+        <GameTabs.Tab
+          id='settings'
+          title={t('tabs.settings')}
+        >
+          {() => (
+            <RaceConfig gameBoard={gameBoard} />
+          )}
+        </GameTabs.Tab>
+      </GameTabs>
+
+      <GameDivider />
+
       <GameTabs>
         <GameTabs.Tab
           id='players'
@@ -33,30 +46,6 @@ const RacingConfigColumn = ({gameBoard}) => {
         >
           {() => (
             <KickedPlayersConfig gameBoard={gameBoard} />
-          )}
-        </GameTabs.Tab>
-      </GameTabs>
-
-      <GameDivider />
-
-      <GameTabs>
-        <GameTabs.Tab
-          id='settings'
-          title={t('tabs.settings')}
-        >
-          {() => (
-            <RaceConfig gameBoard={gameBoard} />
-          )}
-        </GameTabs.Tab>
-
-        <GameTabs.Tab
-          id='score'
-          title={t('tabs.score')}
-        >
-          {() => (
-            <div>
-              COŚ
-            </div>
           )}
         </GameTabs.Tab>
       </GameTabs>
@@ -82,7 +71,10 @@ const RacingConfigColumn = ({gameBoard}) => {
 
       <GameDivider />
 
-      <StartRaceButton gameBoard={gameBoard} />
+      <StartRaceButton
+        gameBoard={gameBoard}
+        onClick={onBeforeStart}
+      />
     </>
   );
 };

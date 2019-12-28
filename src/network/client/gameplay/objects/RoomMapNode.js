@@ -256,7 +256,7 @@ export default class RoomMapNode extends RoomMapRefsStore {
     const carNode = refs.players[player.id];
 
     sceneBuffer?.removeNode(carNode);
-    this.removePlayerCar(player);
+    super.removePlayerCar(player);
   }
 
   async appendObjects(

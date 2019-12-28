@@ -91,19 +91,8 @@ export default class Room {
   }
 
   startRace() {
-    const {
-      spawnBotsBeforeStart,
-      playersLimit,
-    } = this.config;
-
     if (this.abstract)
       return;
-
-    if (spawnBotsBeforeStart) {
-      this.spawnBots(
-        Math.max(0, playersLimit - this.players.length),
-      );
-    }
 
     this.racing.start();
   }
@@ -485,7 +474,7 @@ export default class Room {
     this.leave(player);
     this.broadcastBannedPlayersRoomState();
 
-    player.ws.send(
+    player.ws?.send(
       createActionMessage(
         null,
         PLAYER_ACTIONS.YOU_ARE_KICKED,
@@ -516,6 +505,19 @@ export default class Room {
 
     if (!R.isNil(name))
       this.name = name;
+
+    if (this.playersCount > this.config.playersLimit) {
+      const {owner, players} = this;
+      const kickablePlayers = R.reverse(
+        R.reject(
+          R.propEq('id', owner.id),
+          players,
+        ),
+      );
+
+      for (let i = 0; i < this.playersCount - this.config.playersLimit; ++i)
+        this.kick(kickablePlayers[i].id);
+    }
 
     return this.broadcastRoomInfo();
   }

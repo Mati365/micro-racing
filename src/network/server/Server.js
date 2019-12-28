@@ -145,7 +145,12 @@ export default class GameServer {
       consola.info(`Create room ${chalk.green.bold(name)} by ${chalk.white.bold(owner.info.nick)}!`);
     },
   )
-  createRoom({name, owner}) {
+  createRoom(
+    {
+      name,
+      owner,
+    },
+  ) {
     if (this.findRoom(name))
       throw new ServerError(ERROR_CODES.ROOM_ALREADY_EXISTS);
 
@@ -158,6 +163,14 @@ export default class GameServer {
         onDestroy: () => this.removeRoom(room.id),
       },
     );
+
+    const {
+      spawnBots,
+      playersLimit,
+    } = room.config;
+
+    if (spawnBots)
+      room.spawnBots(playersLimit - 1);
 
     if (room.config.aiTraining)
       room.racing.aiTrainer.observers.bestNeuralItems.subscribe(this.onDumpTrainingPopulation);

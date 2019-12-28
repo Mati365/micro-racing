@@ -5,10 +5,13 @@ import {useI18n} from '@ui/i18n';
 import {AsyncLockButton} from '@ui/basic-components';
 import {GameButton} from '../../components/ui';
 
-const StartRaceButton = ({gameBoard}) => {
+const StartRaceButton = ({gameBoard, onClick}) => {
   const t = useI18n('game.screens.choose_config');
 
-  const onStartRace = () => gameBoard.client.startRace();
+  const onStartRace = async () => {
+    onClick?.();
+    await gameBoard.client.startRace();
+  };
 
   return (
     <AsyncLockButton

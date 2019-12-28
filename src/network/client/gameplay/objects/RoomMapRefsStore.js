@@ -85,10 +85,18 @@ export default class RoomMapRefsStore {
 
   removePlayerCar(player) {
     const {refs} = this;
-    const carNode = refs.players[player.id];
+    const carNode = refs.players[player.id]?.player;
 
     delete refs.players[player.id];
-    delete refs.objects[carNode.id];
+
+    // array is not loaded
+    if (R.is(Array, refs.objects)) {
+      refs.objects = R.filter(
+        ({params}) => params.playerID !== player.id,
+        refs.objects,
+      );
+    } else
+      delete refs.objects[carNode.id];
   }
 
   static fromInitialRoomState(initialRoomState) {

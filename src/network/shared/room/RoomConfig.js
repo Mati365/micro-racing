@@ -5,17 +5,17 @@ export default class RoomConfig {
   constructor(
     {
       laps = 1,
-      playersLimit = 4,
+      playersLimit = 6,
       countdown = 600,
       playerIdleTime = 2500,
-      spawnBotsBeforeStart = true,
+      spawnBots = true,
       aiTraining = false,
     } = {},
   ) {
     this.laps = laps;
     this.countdown = countdown;
     this.playersLimit = playersLimit;
-    this.spawnBotsBeforeStart = spawnBotsBeforeStart;
+    this.spawnBots = spawnBots;
     this.playerIdleTime = playerIdleTime;
     this.aiTraining = aiTraining;
   }
@@ -41,7 +41,7 @@ export default class RoomConfig {
       laps: this.laps,
       countdown: this.countdown,
       playerIdleTime: this.playerIdleTime,
-      spawnBotsBeforeStart: this.spawnBotsBeforeStart,
+      spawnBots: this.spawnBots,
       aiTraining: this.aiTraining,
       playersLimit: this.playersLimit,
     };

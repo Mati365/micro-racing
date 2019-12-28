@@ -11,9 +11,9 @@ import {
   GameCanvasHolder,
 } from '../../components';
 
-import RenderableGameBoard from '../../states/RenderableGameBoard';
 import * as Overlays from '../../components/overlays';
-import RaceChat from '../RoomEdit/RaceChat';
+import RenderableGameBoard from '../../states/RenderableGameBoard';
+import ChatSidebar from './ChatSidebar';
 
 const GameCanvas = ({dimensions, gameBoard}) => {
   const canvasRef = useRef();
@@ -128,37 +128,33 @@ const GameCanvas = ({dimensions, gameBoard}) => {
   /* eslint-disable jsx-a11y/tabindex-no-positive */
   return (
     <GameCanvasHolder
-      expanded
+      direction='row'
       freeze={
         gameState.state.type !== RACE_STATES.RACE
       }
     >
-      <RaceLapToolbar gameBoard={gameState.board} />
-      <div
-        style={{
-          position: 'relative',
-          textAlign: 'center',
-        }}
-      >
-        <canvas-html-wrapper>
-          <canvas
-            tabIndex={1}
-            ref={canvasRef}
-            width={dimensions.w}
-            height={dimensions.h}
-          />
-        </canvas-html-wrapper>
-        {hud}
-        {overlayModal}
+      <div>
+        <RaceLapToolbar gameBoard={gameState.board} />
+        <div
+          style={{
+            position: 'relative',
+            textAlign: 'center',
+          }}
+        >
+          <canvas-html-wrapper>
+            <canvas
+              tabIndex={1}
+              ref={canvasRef}
+              width={dimensions.w}
+              height={dimensions.h}
+            />
+          </canvas-html-wrapper>
+          {hud}
+          {overlayModal}
+        </div>
       </div>
       {gameState.board && (
-        <RaceChat
-          gameBoard={gameState.board}
-          style={{
-            flex: 1,
-            maxHeight: 200,
-          }}
-        />
+        <ChatSidebar gameBoard={gameState.board} />
       )}
     </GameCanvasHolder>
   );

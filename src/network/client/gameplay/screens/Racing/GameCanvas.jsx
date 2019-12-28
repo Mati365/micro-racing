@@ -5,14 +5,15 @@ import * as R from 'ramda';
 import {DIMENSIONS_SCHEMA} from '@ui/schemas';
 import {RACE_STATES} from '@game/network/constants/serverCodes';
 
-import * as Hud from '../components/hud';
+import * as Hud from '../../components/hud';
 import {
   RaceLapToolbar,
   GameCanvasHolder,
-} from '../components';
+} from '../../components';
 
-import RenderableGameBoard from '../states/RenderableGameBoard';
-import * as Overlays from '../components/overlays';
+import RenderableGameBoard from '../../states/RenderableGameBoard';
+import * as Overlays from '../../components/overlays';
+import RaceChat from '../RoomEdit/RaceChat';
 
 const GameCanvas = ({dimensions, gameBoard}) => {
   const canvasRef = useRef();
@@ -126,7 +127,12 @@ const GameCanvas = ({dimensions, gameBoard}) => {
 
   /* eslint-disable jsx-a11y/tabindex-no-positive */
   return (
-    <GameCanvasHolder freeze={gameState.state.type !== RACE_STATES.RACE}>
+    <GameCanvasHolder
+      expanded
+      freeze={
+        gameState.state.type !== RACE_STATES.RACE
+      }
+    >
       <RaceLapToolbar gameBoard={gameState.board} />
       <div
         style={{
@@ -145,6 +151,14 @@ const GameCanvas = ({dimensions, gameBoard}) => {
         {hud}
         {overlayModal}
       </div>
+      {gameState.board && (
+        <RaceChat
+          gameBoard={gameState.board}
+          style={{
+            flex: 1,
+          }}
+        />
+      )}
     </GameCanvasHolder>
   );
   /* eslint-enable */

@@ -15,6 +15,11 @@ const GameCanvasHolder = styled(
       },
     },
 
+    expanded: {
+      height: '100vh',
+      padding: 10,
+    },
+
     freeze: {
       '& canvas-html-wrapper > canvas': {
         filter: 'blur(2px) brightness(0.1) grayscale(1.0)',
@@ -26,8 +31,11 @@ const GameCanvasHolder = styled(
       direction: 'column',
     },
     index: 1,
-    omitProps: ['freeze'],
-    classSelector: (classes, {freeze}) => freeze && classes.freeze,
+    omitProps: ['freeze', 'expanded'],
+    classSelector: (classes, {expanded, freeze}) => [
+      expanded && classes.expanded,
+      freeze && classes.freeze,
+    ],
   },
 );
 
@@ -35,6 +43,7 @@ GameCanvasHolder.displayName = 'GameCanvasHolder';
 
 GameCanvasHolder.propTypes = {
   freeze: PropTypes.bool,
+  expanded: PropTypes.bool,
 };
 
 export default GameCanvasHolder;

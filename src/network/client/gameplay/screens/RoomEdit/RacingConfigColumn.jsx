@@ -70,7 +70,12 @@ const RacingConfigColumn = ({gameBoard}) => {
           padding='small'
         >
           {() => (
-            <RaceChat gameBoard={gameBoard} />
+            <RaceChat
+              gameBoard={gameBoard}
+              style={{
+                height: 220,
+              }}
+            />
           )}
         </GameTabs.Tab>
       </GameTabs>

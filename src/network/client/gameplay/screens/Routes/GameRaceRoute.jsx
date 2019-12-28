@@ -1,5 +1,5 @@
 import React from 'react';
-import GameCanvas from '../GameCanvas';
+import GameCanvas from '../Racing';
 
 const GameRaceRoute = ({gameBoard}) => (
   <GameCanvas gameBoard={gameBoard} />

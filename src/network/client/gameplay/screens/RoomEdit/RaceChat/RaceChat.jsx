@@ -15,6 +15,7 @@ import {usePromise} from '@ui/basic-hooks';
 import {useI18n} from '@ui/i18n';
 
 import {
+  Flex,
   Text,
   UnorderedList,
 } from '@ui/basic-components/styled';
@@ -113,13 +114,13 @@ const processServerMessage = (t) => {
 const RaceChatListHolder = styled(
   UnorderedList,
   {
-    height: 220,
+    flex: 1,
     marginBottom: 10,
     overflowY: 'auto',
   },
 );
 
-const RaceChat = ({gameBoard}) => {
+const RaceChat = ({gameBoard, ...props}) => {
   const t = useI18n();
   const messageParser = useMemo(
     () => processServerMessage(
@@ -192,7 +193,10 @@ const RaceChat = ({gameBoard}) => {
   );
 
   return (
-    <div>
+    <Flex
+      direction='column'
+      {...props}
+    >
       <RaceChatListHolder ref={messagesListRef}>
         {(messages || []).map(
           message => (
@@ -205,7 +209,7 @@ const RaceChat = ({gameBoard}) => {
       </RaceChatListHolder>
 
       <RaceChatMessageBox onSendMessage={onSendMessage} />
-    </div>
+    </Flex>
   );
 };
 

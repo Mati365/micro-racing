@@ -38,7 +38,9 @@ const ScreensContainer = () => {
   let content = null;
   if (!client) {
     content = (
-      <ConnectingScreen />
+      <ScreensHolder>
+        <ConnectingScreen />
+      </ScreensHolder>
     );
   } else {
     content = (
@@ -47,10 +49,12 @@ const ScreensContainer = () => {
           path='/config'
           render={
             ({match}) => (
-              <Routes.GameConfigRoute
-                match={match}
-                client={client}
-              />
+              <ScreensHolder>
+                <Routes.GameConfigRoute
+                  match={match}
+                  client={client}
+                />
+              </ScreensHolder>
             )
           }
         />
@@ -69,9 +73,7 @@ const ScreensContainer = () => {
 
   return (
     <GameScrollbars>
-      <ScreensHolder>
-        {content}
-      </ScreensHolder>
+      {content}
       <GamePortalHolder />
     </GameScrollbars>
   );

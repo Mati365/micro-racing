@@ -43,6 +43,13 @@ export default class PlayerClientSocket {
       },
     },
 
+    getRoomInitialState: {
+      action: PLAYER_ACTIONS.GET_ROOM_INITIAL_STATE,
+      flags: {
+        waitForResponse: true,
+      },
+    },
+
     leaveRoom: {
       action: PLAYER_ACTIONS.LEAVE_ROOM,
     },

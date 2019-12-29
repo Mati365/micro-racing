@@ -211,7 +211,7 @@ export default class RoomMapNode extends RoomMapRefsStore {
     } = await appendToSceneBuffer(f)(
       {
         players,
-        objects,
+        objects: R.values(objects),
       },
     )(f.createSceneBuffer());
 

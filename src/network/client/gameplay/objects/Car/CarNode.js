@@ -136,7 +136,6 @@ export default class CarNode extends PhysicsMeshNode {
     super.update(interpolate);
 
     const {
-      body,
       player,
       nickNode,
       renderConfig,

@@ -5,6 +5,8 @@ import * as R from 'ramda';
 import {DIMENSIONS_SCHEMA} from '@ui/schemas';
 import {RACE_STATES} from '@game/network/constants/serverCodes';
 
+import {createObservablesUnmounter} from '@pkg/basic-helpers/async/createLowLatencyObservable';
+
 import * as Hud from '../../components/hud';
 import {
   RaceLapToolbar,
@@ -13,7 +15,7 @@ import {
 
 import * as Overlays from '../../components/overlays';
 import RenderableGameBoard from '../../states/RenderableGameBoard';
-import ChatSidebar from './ChatSidebar';
+import RaceSidebar from './RaceSidebar';
 
 const GameCanvas = ({dimensions, gameBoard}) => {
   const canvasRef = useRef();
@@ -50,22 +52,17 @@ const GameCanvas = ({dimensions, gameBoard}) => {
         },
       );
 
-      (async () => {
-        // todo: remove it
-        gameBoard.release();
-        mergeGameState.current(
-          {
-            board: renderableBoard,
-          },
-        );
+      // remove old map
+      gameBoard.release();
 
+      const unmountObservables = createObservablesUnmounter(
         renderableBoard.observers.raceState.subscribe(
           state => mergeGameState.current(
             {
               state,
             },
           ),
-        );
+        ),
 
         renderableBoard.observers.roomMap.subscribe(
           ({
@@ -83,6 +80,14 @@ const GameCanvas = ({dimensions, gameBoard}) => {
               roadsSegments: R.pluck('segmentsInfo', roadNodes),
             },
           ),
+        ),
+      );
+
+      (async () => {
+        mergeGameState.current(
+          {
+            board: renderableBoard,
+          },
         );
 
         await bootstrap();
@@ -90,6 +95,7 @@ const GameCanvas = ({dimensions, gameBoard}) => {
       })();
 
       return () => {
+        unmountObservables();
         renderableBoard.release();
       };
     },
@@ -158,7 +164,7 @@ const GameCanvas = ({dimensions, gameBoard}) => {
         </div>
       </div>
       {gameState.board && (
-        <ChatSidebar gameBoard={gameState.board} />
+        <RaceSidebar gameBoard={gameState.board} />
       )}
     </GameCanvasHolder>
   );

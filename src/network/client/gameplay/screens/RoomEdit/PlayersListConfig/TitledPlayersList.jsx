@@ -24,7 +24,12 @@ const TitledPlayersList = ({
         </GameLabel>
       )}
 
-      <UnorderedList>
+      <UnorderedList
+        style={{
+          maxHeight: 90,
+          overflowY: 'auto',
+        }}
+      >
         {list.map(
           (player) => {
             const {ownerID} = gameBoard.roomInfo;

@@ -14,8 +14,9 @@ export default class RenderableGameBoard extends GameBoard {
   ) {
     super(
       {
-        client,
         refsStore: null,
+        watchBoardRaceObjects: true,
+        client,
       },
     );
 

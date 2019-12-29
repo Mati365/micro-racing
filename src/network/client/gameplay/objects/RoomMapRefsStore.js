@@ -7,12 +7,12 @@ export const findRoadElement = R.filter(
   ({type}) => type === OBJECT_TYPES.ROAD,
 );
 
-export const createOffscreenRefs = ({players, objects}) => ({
-  objects,
-  players: R.reduce(
+export const createOffscreenRefs = ({players, objects}) => {
+  const playersObject = R.reduce(
     (acc, player) => {
       if (player) {
         acc[player.id] = {
+          racingState: {},
           player,
         };
       }
@@ -21,8 +21,27 @@ export const createOffscreenRefs = ({players, objects}) => ({
     },
     {},
     players,
-  ),
-});
+  );
+
+  return {
+    objects: R.when(
+      R.is(Array),
+      R.reduce(
+        (acc, obj) => {
+          const {playerID} = obj.params;
+          if (playerID)
+            obj.player = playersObject[playerID];
+
+          acc[obj.id] = obj;
+          return acc;
+        },
+        {},
+      ),
+      objects,
+    ),
+    players: playersObject,
+  };
+};
 
 export const createMapRefs = () => ({
   players: {},
@@ -62,17 +81,10 @@ export default class RoomMapRefsStore {
 
   appendRefsStore(refsStore) {
     this.refs = {
-      objects: (
-        R.is(Array, this.refs.objects)
-          ? [
-            ...this.refs.objects,
-            ...refsStore.refs.objects,
-          ]
-          : {
-            ...this.refs.objects,
-            ...refsStore.refs.objects,
-          }
-      ),
+      objects: {
+        ...this.refs.objects,
+        ...refsStore.refs.objects,
+      },
 
       players: {
         ...this.refs.players,
@@ -88,15 +100,7 @@ export default class RoomMapRefsStore {
     const carNode = refs.players[player.id]?.player;
 
     delete refs.players[player.id];
-
-    // array is not loaded
-    if (R.is(Array, refs.objects)) {
-      refs.objects = R.filter(
-        ({params}) => params.playerID !== player.id,
-        refs.objects,
-      );
-    } else
-      delete refs.objects[carNode.id];
+    delete refs.objects[carNode.id];
   }
 
   static fromInitialRoomState(initialRoomState) {

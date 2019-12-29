@@ -48,6 +48,7 @@ export default injectClassesStylesheet(
       display: 'flex',
       alignItems: 'center',
       flexDirection: 'row',
+      padding: [0, 5],
 
       color: WHITE,
       fontSize: 10,

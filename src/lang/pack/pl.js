@@ -50,8 +50,9 @@ export default {
         predefined_maps: 'Wybierz inne tory:',
         leave: 'Opuść pokój',
         edit_road: 'Edytuj tor',
-        save_road: 'Zapisz tor',
+        save_road: 'Użyj toru',
         discard_road: 'Odrzuć zmiany',
+        stop_race: 'Zatrzymaj wyścig',
 
         tabs: {
           score: 'Ranking',
@@ -78,6 +79,10 @@ export default {
           laps_count: 'Ilość okrążeń:',
           countdown: 'Odliczaj (s):',
         },
+      },
+
+      racing: {
+        leave_racing: 'Opuść wyścig',
       },
 
       chat: {

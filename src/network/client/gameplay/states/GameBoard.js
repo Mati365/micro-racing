@@ -21,9 +21,11 @@ export default class GameBoard {
   constructor(
     {
       refsStore = new RoomMapRefsStore,
+      watchBoardRaceObjects = false,
       client,
     },
   ) {
+    this.watchBoardRaceObjects = watchBoardRaceObjects;
     this.client = client;
     this.frameId = 1;
 
@@ -69,7 +71,7 @@ export default class GameBoard {
   }
 
   mountRemoteListeners() {
-    const {client, observers} = this;
+    const {watchBoardRaceObjects, client, observers} = this;
 
     // broadcast new players list and map changes
     this.updateCurrentPlayerRef();
@@ -116,7 +118,8 @@ export default class GameBoard {
         },
 
         onUpdateBoardObjects: (players) => {
-          players.forEach(this.onSyncObject);
+          if (watchBoardRaceObjects)
+            players.forEach(this.onSyncObject);
         },
 
         onUpdatePlayersRoomState: ({players: playersInfos}) => {

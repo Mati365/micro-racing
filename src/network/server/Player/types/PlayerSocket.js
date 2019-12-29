@@ -279,6 +279,13 @@ export default class PlayerSocket extends Player {
       );
     }),
 
+    [PLAYER_ACTIONS.GET_ROOM_INITIAL_STATE]: requireRoomWrapper((cmdID, room) => {
+      this.sendActionResponse(
+        cmdID,
+        room.toBSON(),
+      );
+    }),
+
     [PLAYER_ACTIONS.SET_ROOM_INFO]: requireRoomWrapper((cmdID, room, roomInfo) => {
       this.sendActionResponse(
         cmdID,

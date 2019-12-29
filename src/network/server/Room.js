@@ -399,6 +399,7 @@ export default class Room {
         {
           room: null,
           car: null,
+          racingState: null,
         },
       );
 

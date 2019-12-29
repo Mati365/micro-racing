@@ -54,6 +54,8 @@ export class PlayerRacingState {
   }
 
   reset() {
+    this.release();
+
     Object.assign(
       this,
       {
@@ -154,6 +156,12 @@ export default class PlayerInfo {
       carType: this.carType,
       racingState: this.racingState?.toBSON(),
     };
+  }
+
+  reset() {
+    this.inputs = [];
+    this.lastProcessedInput = -1;
+    this.lastNonIdleTime = null;
   }
 
   release() {

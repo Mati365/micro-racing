@@ -52,6 +52,7 @@ export default class RoomRacing {
       type === RACE_STATES.COUNT_TO_START
         || type === RACE_STATES.WAIT_FOR_SERVER
         || type === RACE_STATES.BOARD_VIEW
+        || type === RACE_STATES.ALL_FINISH
     );
   }
 

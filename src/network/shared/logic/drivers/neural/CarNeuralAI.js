@@ -53,20 +53,18 @@ export default class CarNeuralAI {
     {
       raysCount = 6,
       neural = getRandomArrayItem(AI_DB),
-      car,
+      player,
     } = {},
   ) {
-    this.car = car;
+    this.player = player;
     this.raysCount = raysCount;
-    this.intersections = new CarIntersectRays(
-      car.body,
-      {
-        viewDistance: 10,
-        raysCount,
-      },
-    );
+    this.intersections = null;
 
     this.setNeural(neural);
+  }
+
+  get car() {
+    return this.player.info.car;
   }
 
   updateScore() {
@@ -110,12 +108,22 @@ export default class CarNeuralAI {
   drive({physics}) {
     const {
       car: {body},
-      intersections,
+      raysCount,
       neural,
     } = this;
 
+    if (!this.intersections) {
+      this.intersections = new CarIntersectRays(
+        this.car.body,
+        {
+          viewDistance: 10,
+          raysCount,
+        },
+      );
+    }
+
     // neural control
-    intersections.update(physics, true);
+    this.intersections.update(physics, false);
     const neuralOutput = T.exec(
       this.getNeuralInputs(),
       neural,

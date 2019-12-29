@@ -19,14 +19,14 @@ export default class PlayerBot extends Player {
     );
   }
 
-  assignRoom(config) {
-    const {room, car} = config;
-    this.ai = room && new CarNeuralAI(
+  setCar(car) {
+    const result = super.setCar(car);
+    this.ai = new CarNeuralAI(
       {
-        car,
+        player: this,
       },
     );
 
-    return super.assignRoom(config);
+    return result;
   }
 }

@@ -328,18 +328,9 @@ export default class Room {
 
     // broadcast it to all players, exclude added
     if (!abstract) {
-      const playerCar = this.racing.map.appendPlayerCar(
-        player,
-        {
-          ...racing.aiTrainer && {
-            position: 0,
-          },
-        },
-      );
-
       player.assignRoom(
         {
-          car: playerCar,
+          car: null,
           room: this,
           racingState: new PlayerRacingState(
             {
@@ -356,7 +347,6 @@ export default class Room {
           null,
           {
             player: player.toBSON(),
-            car: playerCar,
           },
         );
       }
@@ -553,13 +543,15 @@ export default class Room {
     R.forEach(
       (player) => {
         player.info.racingState.reset();
-        player.info.car = this.racing.map.appendPlayerCar(
-          player,
-          {
-            ...this.racing.aiTrainer && {
-              position: 0,
+        player.setCar(
+          this.racing.map.appendPlayerCar(
+            player,
+            {
+              ...this.racing.aiTrainer && {
+                position: 0,
+              },
             },
-          },
+          ),
         );
       },
       this.players || [],

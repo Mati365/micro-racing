@@ -62,7 +62,7 @@ export default class Car {
 
   update(physicsScene) {
     this.body.update();
-    this.intersectRays.update(physicsScene, true);
+    this.intersectRays.update(physicsScene);
   }
 
   renderRays(ctx) {

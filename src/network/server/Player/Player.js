@@ -9,6 +9,11 @@ export default class Player {
     this.info = info;
   }
 
+  setCar(car) {
+    this.info.car = car;
+    return this;
+  }
+
   assignRoom({car, room, racingState}) {
     Object.assign(
       this.info,

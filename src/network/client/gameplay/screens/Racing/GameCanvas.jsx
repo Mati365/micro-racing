@@ -41,19 +41,16 @@ const GameCanvas = ({dimensions, gameBoard}) => {
 
   useEffect(
     () => {
-      const {
-        board: renderableBoard,
-        bootstrap,
-      } = RenderableGameBoard.fromOffscreenBoard(
-        gameBoard,
+      // remove old map
+      gameBoard.release();
+
+      const renderableBoard = new RenderableGameBoard(
         {
+          client,
           canvas: canvasRef.current,
           aspectRatio: 1.05,
         },
       );
-
-      // remove old map
-      gameBoard.release();
 
       const unmountObservables = createObservablesUnmounter(
         renderableBoard.observers.raceState.subscribe(
@@ -90,7 +87,10 @@ const GameCanvas = ({dimensions, gameBoard}) => {
           },
         );
 
-        await bootstrap();
+        await renderableBoard.loadInitialRoomState(
+          await client.getRoomInitialState(),
+        );
+
         renderableBoard.start();
       })();
 

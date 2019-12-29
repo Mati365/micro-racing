@@ -14,6 +14,7 @@ import {
 import createTerrain from '@game/shared/sceneResources/terrain';
 import {fetchMeshURLResource} from '@game/shared/sceneResources/utils';
 
+import PlayerInfo from '@game/server/Player/PlayerInfo';
 import PhysicsScene from '@pkg/physics-scene';
 import {RoadMapElement} from '@game/network/shared/map';
 
@@ -210,7 +211,7 @@ export default class RoomMapNode extends RoomMapRefsStore {
       refsStore,
     } = await appendToSceneBuffer(f)(
       {
-        players,
+        players: R.map(PlayerInfo.fromBSON, players),
         objects: R.values(objects),
       },
     )(f.createSceneBuffer());

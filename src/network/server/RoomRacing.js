@@ -163,10 +163,8 @@ export default class RoomRacing {
       const {racingState} = info;
 
       const finish = racingState.isFinish();
-      const flashing = racingState.isFlashing();
 
-      carBody.transparentToOthers = finish || flashing;
-
+      carBody.transparentToOthers = finish;
       if (finish)
         continue;
 
@@ -273,14 +271,11 @@ export default class RoomRacing {
       body.update && body.update();
 
       const collision = physics.updateObjectPhysics(body, aiTrainer, true);
-      if (collision && player.ai) {
+      if (player && player.ai && collision) {
         if (aiTrainer) {
           consola.info(`${chalk.green.bold('AiTrainer:')} Player ${chalk.bold.white(player.info.nick)} killed, it ${chalk.bold.red('collided')}!`);
           item.freeze();
-        }
-
-        // try to reset if bot stuck
-        if (body.speed < 3 && !collision.moveable)
+        } else if (body.speed < 3 && !collision.moveable)
           this.flashResetCar(player);
       }
     }
@@ -405,7 +400,7 @@ export default class RoomRacing {
     if (time - (info.lastNonIdleTime || this.startTime) > playerIdleTime) {
       if (info.kind === PLAYER_TYPES.HUMAN)
         player.transformToZombie();
-      else
+      else if (!aiTrainer)
         this.flashResetCar(player);
 
       return true;

@@ -191,7 +191,7 @@ export default class GameBoard {
       config: RoomConfig.fromBSON(initialRoomState.config),
     };
 
-    this.refsStore.bootstrapRefs(
+    await this.refsStore.bootstrapRefs(
       {
         players: initialRoomState.players,
         objects: initialRoomState.map.objects,
@@ -335,12 +335,7 @@ export default class GameBoard {
       }
     }
 
-    const [flashing, finish] = [
-      racingState.isFlashing(),
-      racingState.isFinish(),
-    ];
-
-    body.transparentToOthers = flashing || finish;
+    body.transparentToOthers = racingState.isFinish();
 
     if (!aiTraining) {
       if (!racingState.isFlashing()) {

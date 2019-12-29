@@ -99,7 +99,7 @@ export default class PlayerSocket extends Player {
 
       this.ai = new CarNeuralAI(
         {
-          car: info.car,
+          player: this,
         },
       );
     }
@@ -424,7 +424,7 @@ export default class PlayerSocket extends Player {
         },
       ),
     )(
-      () => {
+      (cmdID) => {
         const {room} = this.info;
 
         if (room?.owner !== this)
@@ -432,6 +432,13 @@ export default class PlayerSocket extends Player {
 
         this.info.keyMap = {};
         room.startRace();
+
+        this.sendActionResponse(
+          cmdID,
+          {
+            result: true,
+          },
+        );
       },
     ),
 

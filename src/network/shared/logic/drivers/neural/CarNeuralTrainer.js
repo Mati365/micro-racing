@@ -4,7 +4,10 @@ import consola from 'consola';
 import {CAR_ALIGN} from '@game/network/constants/serverCodes';
 
 import forkPopulation from '@pkg/neural-network/src/genetic/forkPopulation';
-import {createLowLatencyObservable} from '@pkg/basic-helpers';
+import {
+  createLowLatencyObservable,
+  getRandomObjValue,
+} from '@pkg/basic-helpers';
 
 const sortByScore = R.sortWith(
   [
@@ -60,6 +63,8 @@ export default class CarNeuralTrainer {
     }
 
     const forkedNeurals = forkPopulation(neuralItems);
+    const align = getRandomObjValue(CAR_ALIGN);
+
     for (let i = 0, neuralIndex = 0; i < players.length; ++i) {
       const player = players[i];
       const {ai} = player;
@@ -75,7 +80,7 @@ export default class CarNeuralTrainer {
       map.resetPlayerPositionToSegment(
         {
           playerElement: car,
-          align: CAR_ALIGN.CENTER,
+          align,
         },
       );
       car.unfreeze();

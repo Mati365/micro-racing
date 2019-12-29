@@ -133,6 +133,8 @@ export default class RoadMapObjectsManager {
     );
 
     Object.assign(playerElement.body, bodyParams);
+    playerElement.body.updateVerticesShapeCache();
+
     return playerElement;
   }
 

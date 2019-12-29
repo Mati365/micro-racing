@@ -328,6 +328,13 @@ export default class GameBoard {
       }
     }
 
+    const [flashing, finish] = [
+      racingState.isFlashing(),
+      racingState.isFinish(),
+    ];
+
+    body.transparentToOthers = flashing || finish;
+
     if (!aiTraining) {
       if (!racingState.isFlashing()) {
         body.angle = angleLerp(prevAngle, body.angle, 0.2);

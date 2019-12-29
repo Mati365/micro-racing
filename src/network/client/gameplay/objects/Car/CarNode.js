@@ -162,7 +162,6 @@ export default class CarNode extends PhysicsMeshNode {
       } else if (racingState.isFreezed())
         opacity = 0.5;
 
-      body.transparentToOthers = opacity !== 1.0;
       renderConfig.uniforms.opacity = opacity;
     }
   }

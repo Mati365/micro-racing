@@ -1,3 +1,4 @@
+
 /* eslint-disable prefer-template, no-restricted-syntax */
 import {MAGIC_HYDRATED_STORE_ID_ATTRIB} from '../../constants/magicFlags';
 
@@ -19,23 +20,31 @@ export class DOMSheet extends Sheet {
 
   remove() {
     const {node} = this;
-    const {index, store} = this.options;
+    const {index, store, sheetID} = this.options;
     const {indexedNodeStore, registry} = store;
 
     if (!node)
       return;
 
-    if (indexedNodeStore[index]?.node === node)
-      indexedNodeStore.delete(index);
+    this.usages--;
+    if (this.usages <= 0) {
+      delete store.cacheStore[sheetID];
 
-    registry.splice(
-      registry.indexOf(this),
-      1,
-    );
+      const equalLevelNodes = indexedNodeStore.get(index);
+      if (equalLevelNodes) {
+        const nodeIndex = equalLevelNodes.indexOf(node);
+        if (nodeIndex !== -1)
+          equalLevelNodes.splice(nodeIndex, 1);
+      }
 
-    // ID is equal for cached stylesheets
-    if (!this.usages)
+      registry.splice(
+        registry.indexOf(this),
+        1,
+      );
+
+      // ID is equal for cached stylesheets
       node.remove();
+    }
   }
 }
 
@@ -57,6 +66,7 @@ export default class DOMSheetStore extends SheetStore {
     const {registry, indexedNodeStore} = this;
 
     const sheetNode = document.createTextNode(text);
+    const equalLevelNodes = indexedNodeStore.get(index);
 
     // node is lazy added to DOM
     if (storeNode.parentNode === null)
@@ -65,36 +75,42 @@ export default class DOMSheetStore extends SheetStore {
     // add rules in proper order
     if (index === null && registry.length === 0)
       storeNode.appendChild(sheetNode);
-    else {
+    else if (equalLevelNodes?.length) {
       // find nearest node with lowest index
-      const equalLevelNode = indexedNodeStore.get(index);
+      insertAfter(
+        equalLevelNodes[equalLevelNodes.length - 1],
+        sheetNode,
+      );
+    } else {
+      const nearest = {
+        index: null,
+        node: null,
+      };
 
-      if (equalLevelNode)
-        insertAfter(equalLevelNode, sheetNode);
-      else {
-        const nearest = {
-          index: null,
-          node: null,
-        };
-
-        for (const [_index, _node] of indexedNodeStore.entries()) {
-          // watch SSR code!
-          if (index >= _index && _index >= nearest.index) {
-            nearest.index = _index;
-            nearest.node = _node;
-          }
+      for (const [_index, _node] of indexedNodeStore.entries()) {
+        // watch SSR code!
+        if (index >= _index && _index >= nearest.index) {
+          nearest.index = _index;
+          nearest.node = _node;
         }
-
-        if (nearest.node !== null)
-          insertAfter(nearest.node, sheetNode);
-        else if (storeNode.firstChild)
-          storeNode.insertBefore(sheetNode, storeNode.firstChild);
-        else
-          storeNode.appendChild(sheetNode);
       }
+
+      if (nearest.node !== null)
+        insertAfter(nearest.node, sheetNode);
+      else if (storeNode.firstChild)
+        storeNode.insertBefore(sheetNode, storeNode.firstChild);
+      else
+        storeNode.appendChild(sheetNode);
     }
 
-    indexedNodeStore.set(index, sheetNode);
+    indexedNodeStore.set(
+      index,
+      [
+        ...(equalLevelNodes || []),
+        sheetNode,
+      ],
+    );
+
     sheet.node = sheetNode;
 
     return sheet;

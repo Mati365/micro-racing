@@ -542,17 +542,18 @@ export default class Room {
 
     R.forEach(
       (player) => {
-        player.info.racingState.reset();
-        player.setCar(
-          this.racing.map.appendPlayerCar(
-            player,
-            {
-              ...this.racing.aiTrainer && {
-                position: 0,
+        player
+          .reset()
+          .setCar(
+            this.racing.map.appendPlayerCar(
+              player,
+              {
+                ...this.racing.aiTrainer && {
+                  position: 0,
+                },
               },
-            },
-          ),
-        );
+            ),
+          );
       },
       this.players || [],
     );

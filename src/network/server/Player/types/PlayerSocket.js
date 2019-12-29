@@ -76,6 +76,12 @@ export default class PlayerSocket extends Player {
     this.mountMessagesHandler();
   }
 
+  reset() {
+    this.transformToHuman();
+
+    return super.reset();
+  }
+
   assignRoom(config) {
     super.assignRoom(config);
     if (!this.ai && this.info.kind === PLAYER_TYPES.ZOMBIE)

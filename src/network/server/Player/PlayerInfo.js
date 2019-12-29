@@ -59,6 +59,7 @@ export class PlayerRacingState {
     Object.assign(
       this,
       {
+        state: PLAYER_RACE_STATES.RACE,
         lastCheckpointTime: null,
         currentCheckpoint: 0,
         currentLapTime: 0,
@@ -162,6 +163,7 @@ export default class PlayerInfo {
     this.inputs = [];
     this.lastProcessedInput = -1;
     this.lastNonIdleTime = null;
+    this.racingState?.reset();
   }
 
   release() {

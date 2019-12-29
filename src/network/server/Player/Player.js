@@ -9,6 +9,11 @@ export default class Player {
     this.info = info;
   }
 
+  reset() {
+    this.info.reset();
+    return this;
+  }
+
   setCar(car) {
     this.info.car = car;
     return this;

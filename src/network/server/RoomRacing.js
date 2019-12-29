@@ -78,22 +78,30 @@ export default class RoomRacing {
     );
 
     if (config.countdown) {
-      await intervalCountdown(
+      const result = await intervalCountdown(
         {
           times: config.countdown / 1000,
         },
       )(
-        (countdown) => {
-          this.setRaceState(
-            new RaceState(
-              RACE_STATES.COUNT_TO_START,
-              {
-                countdown,
-              },
-            ),
-          );
+        ({countdown, stopInterval}) => {
+          if (this.state?.type === RACE_STATES.BOARD_VIEW) // see stop()
+            stopInterval(false);
+          else {
+            this.setRaceState(
+              new RaceState(
+                RACE_STATES.COUNT_TO_START,
+                {
+                  countdown,
+                },
+              ),
+            );
+          }
         },
       );
+
+      // room destroyed
+      if (result === false)
+        return;
     }
 
     this.setRaceState(
@@ -116,6 +124,10 @@ export default class RoomRacing {
   }
 
   stop() {
+    this.setRaceState(
+      new RaceState(RACE_STATES.BOARD_VIEW),
+    );
+
     this.renderLoop?.();
     delete this.renderLoop;
   }

@@ -39,18 +39,18 @@ const GameCanvas = ({dimensions, gameBoard}) => {
 
   useEffect(
     () => {
-      (async () => {
-        const {
-          board: renderableBoard,
-          bootstrap,
-        } = RenderableGameBoard.fromOffscreenBoard(
-          gameBoard,
-          {
-            canvas: canvasRef.current,
-            aspectRatio: 1.05,
-          },
-        );
+      const {
+        board: renderableBoard,
+        bootstrap,
+      } = RenderableGameBoard.fromOffscreenBoard(
+        gameBoard,
+        {
+          canvas: canvasRef.current,
+          aspectRatio: 1.05,
+        },
+      );
 
+      (async () => {
         // todo: remove it
         gameBoard.release();
         mergeGameState.current(
@@ -88,6 +88,10 @@ const GameCanvas = ({dimensions, gameBoard}) => {
         await bootstrap();
         renderableBoard.start();
       })();
+
+      return () => {
+        renderableBoard.release();
+      };
     },
     [],
   );

@@ -1,7 +1,10 @@
 import React from 'react';
 import {useHistory} from 'react-router-dom';
 
+import {RACE_STATES} from '@game/network/constants/serverCodes';
+
 import {useI18n} from '@ui/i18n';
+import {useLowLatencyObservable} from '@pkg/basic-hooks';
 
 import {Flex} from '@ui/basic-components/styled';
 import {AsyncLockButton} from '@ui/basic-components';
@@ -36,6 +39,21 @@ const RaceSidebar = ({gameBoard}) => {
       },
     );
   };
+
+  useLowLatencyObservable(
+    {
+      observable: gameBoard.observers.roomInfo,
+      watchOnly: true,
+      onChange: (info) => {
+        if (!info)
+          return;
+
+        if (info.state?.type === RACE_STATES.ALL_FINISH
+            || info.state?.type === RACE_STATES.BOARD_VIEW)
+          onLeaveRacing();
+      },
+    },
+  );
 
   return (
     <Flex

@@ -94,6 +94,7 @@ export default class Room {
     if (this.abstract)
       return;
 
+    this.resetRacingState(false);
     this.racing.start();
   }
 
@@ -456,7 +457,7 @@ export default class Room {
     if (!player)
       return false;
 
-    if (ban) {
+    if (ban && player.info.kind !== PLAYER_TYPES.BOT) {
       this.kickedPlayers.push(
         KickedPlayerInfo.fromPlayer(player),
       );
@@ -517,6 +518,10 @@ export default class Room {
 
       for (let i = 0; i < this.playersCount - this.config.playersLimit; ++i)
         this.kick(kickablePlayers[i].id);
+    } else if (this.playersCount < this.config.playersLimit) {
+      this.spawnBots(
+        this.config.playersLimit - this.playersCount,
+      );
     }
 
     return this.broadcastRoomInfo();
@@ -528,36 +533,36 @@ export default class Room {
    * @param {Object} map
    * @memberof Room
    */
-  setMap(map, broadcast = true) {
-    this.map = map;
+  resetRacingState(broadcast) {
+    if (this.abstract)
+      return;
 
-    if (!this.abstract) {
-      const {aiTrainer} = this.racing || {};
+    const {aiTrainer} = this.racing || {};
 
-      this.racing?.stop();
-      this.racing = new RoomRacing(
-        {
-          room: this,
-        },
-      );
+    this.racing?.stop();
+    this.racing = new RoomRacing(
+      {
+        room: this,
+      },
+    );
 
-      if (aiTrainer && this.racing.aiTrainer)
-        this.racing.aiTrainer.observers = aiTrainer.observers;
+    if (aiTrainer && this.racing.aiTrainer)
+      this.racing.aiTrainer.observers = aiTrainer.observers;
 
-      R.forEach(
-        (player) => {
-          player.info.car = this.racing.map.appendPlayerCar(
-            player,
-            {
-              ...this.racing.aiTrainer && {
-                position: 0,
-              },
+    R.forEach(
+      (player) => {
+        player.info.racingState.reset();
+        player.info.car = this.racing.map.appendPlayerCar(
+          player,
+          {
+            ...this.racing.aiTrainer && {
+              position: 0,
             },
-          );
-        },
-        this.players || [],
-      );
-    }
+          },
+        );
+      },
+      this.players || [],
+    );
 
     if (broadcast) {
       this.sendBroadcastAction(
@@ -567,6 +572,11 @@ export default class Room {
         this.toMapBSON(),
       );
     }
+  }
+
+  setMap(map, broadcast = true) {
+    this.map = map;
+    this.resetRacingState(broadcast);
   }
 
   /**

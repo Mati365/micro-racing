@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import consola from 'consola';
+import * as R from 'ramda';
 
 import {intervalCountdown} from '@pkg/basic-helpers';
 import {wrapAroundMod} from '@pkg/gl-math';
@@ -340,6 +341,8 @@ export default class RoomRacing {
                 lockInputs: true,
               },
             );
+
+            this.checkRaceFinish();
           }
         } else
           racingState.lap++;
@@ -349,6 +352,26 @@ export default class RoomRacing {
         racingState.currentLapTime = 0;
       }
     }
+  }
+
+  /**
+   * Check if all players are on finish
+   *
+   * @memberof RoomRacing
+   */
+  checkRaceFinish() {
+    const {room} = this;
+    const {players} = room;
+
+    if (!R.all(player => player.info.racingState.isFinish(), players))
+      return false;
+
+    this.stop();
+    this.setRaceState(
+      new RaceState(RACE_STATES.ALL_FINISH),
+    );
+
+    return true;
   }
 
   /**
@@ -390,6 +413,12 @@ export default class RoomRacing {
     return false;
   }
 
+  /**
+   * Moves car to center of road and make it flash
+   *
+   * @param {*} player
+   * @memberof RoomRacing
+   */
   flashResetCar(player) {
     const {map} = this;
     const {players} = this.room;

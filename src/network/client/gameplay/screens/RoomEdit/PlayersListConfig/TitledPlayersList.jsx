@@ -38,6 +38,9 @@ const TitledPlayersList = ({
               <ListItem
                 key={player.id}
                 op={ownerID}
+                currentOp={
+                  gameBoard.isClientOP()
+                }
                 current={
                   gameBoard.client.info.id === player.id
                 }

@@ -4,12 +4,12 @@ import {AsyncLockButton} from '@ui/basic-components';
 import {GameButton} from '../../../components/ui';
 import PlayerListItem from './PlayerListItem';
 
-const KickablePlayerListItem = ({current, buttons, onKick, onBan, ...props}) => (
+const KickablePlayerListItem = ({current, currentOp, buttons, onKick, onBan, ...props}) => (
   <PlayerListItem
     {...props}
     current={current}
     buttons={(
-      !current && (
+      !current && currentOp && (
         <>
           <AsyncLockButton
             component={GameButton}

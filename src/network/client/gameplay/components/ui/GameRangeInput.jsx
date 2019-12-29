@@ -12,7 +12,10 @@ import {Flex} from '@ui/basic-components/styled';
 import GameButton from './GameButton';
 import GameInput from './GameInput';
 
-const GameRangeInput = ({min, max, classes, className, l, value}) => (
+const GameRangeInput = ({
+  disabled, min, max,
+  classes, className, l, value,
+}) => (
   <Flex
     direction='row'
     className={c(
@@ -24,6 +27,7 @@ const GameRangeInput = ({min, max, classes, className, l, value}) => (
       className={classes.button}
       size='tiny'
       type='red'
+      disabled={disabled}
       onClick={
         () => l.setValue(
           clamp(min, max, (value || min) - 1),
@@ -39,6 +43,7 @@ const GameRangeInput = ({min, max, classes, className, l, value}) => (
       type='number'
       min={min}
       max={max}
+      disabled={disabled}
       {...l.input()}
     />
 
@@ -46,6 +51,7 @@ const GameRangeInput = ({min, max, classes, className, l, value}) => (
       className={classes.button}
       size='tiny'
       type='red'
+      disabled={disabled}
       onClick={
         () => l.setValue(
           clamp(min, max, (value || min) + 1),

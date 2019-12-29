@@ -50,6 +50,10 @@ export default class GameBoard {
     this.roomRemoteListener = null;
   }
 
+  isClientOP() {
+    return this.client.info?.id === this.roomInfo?.ownerID;
+  }
+
   updateCurrentPlayerRef() {
     this.currentPlayerRef = this.refsStore.refs.players[this.currentPlayer.id];
     if (this.currentPlayerRef)

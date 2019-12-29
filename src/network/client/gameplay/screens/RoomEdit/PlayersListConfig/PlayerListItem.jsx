@@ -56,9 +56,7 @@ export default injectClassesStylesheet(
     },
 
     withButtons: {
-      '&:not(:last-of-type)': {
-        marginBottom: 7,
-      },
+      marginBottom: 7,
     },
 
     icon: {

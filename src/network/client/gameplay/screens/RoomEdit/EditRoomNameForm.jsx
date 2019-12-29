@@ -6,7 +6,11 @@ import {useLowLatencyObservable} from '@pkg/basic-hooks';
 import {OptimisticForm} from '@ui/basic-components';
 import {GameInput} from '../../components/ui';
 
+import useIsClientBoardOP from '../../hooks/useIsClientBoardOP';
+
 const RoomEditInnerForm = ({l, optimisticValueLink, gameBoard}) => {
+  const op = useIsClientBoardOP(gameBoard);
+
   useLowLatencyObservable(
     {
       observable: gameBoard.observers.roomInfo,
@@ -25,6 +29,7 @@ const RoomEditInnerForm = ({l, optimisticValueLink, gameBoard}) => {
   return (
     <GameInput
       {...l.input()}
+      disabled={!op}
       style={{
         width: 400,
       }}
@@ -32,7 +37,7 @@ const RoomEditInnerForm = ({l, optimisticValueLink, gameBoard}) => {
   );
 };
 
-const RoomEditName = React.memo(({gameBoard}) => (
+const RoomEditName = ({gameBoard}) => (
   <OptimisticForm
     selectorFn={
       R.propOr('', 'name')
@@ -55,6 +60,6 @@ const RoomEditName = React.memo(({gameBoard}) => (
       />
     )}
   </OptimisticForm>
-));
+);
 
-export default RoomEditName;
+export default React.memo(RoomEditName);

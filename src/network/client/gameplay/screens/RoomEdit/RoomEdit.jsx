@@ -33,7 +33,7 @@ const RoomEdit = ({client, gameBoard}) => { // eslint-disable-line no-unused-var
 
   const onLeaveRoom = async () => {
     await client.leaveRoom();
-    history.goBack();
+    history.push('/config');
   };
 
   useClientChainListener(

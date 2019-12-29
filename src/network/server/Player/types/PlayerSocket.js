@@ -33,8 +33,17 @@ const requireRoomWrapper = fn => (function requireRoomWrapperFn(cmdID, ...args) 
   if (!room)
     throw new ServerError(ERROR_CODES.ACCESS_DENIED);
 
-  return fn(cmdID, room, ...args);
+  return fn.call(this, cmdID, room, ...args);
 });
+
+const requireRoomOwnerWrapper = fn => requireRoomWrapper(
+  function requireOwnerWrapperFn(cmdID, room, ...args) {
+    if (room?.owner !== this)
+      throw new ServerError(ERROR_CODES.ACCESS_DENIED);
+
+    return fn(cmdID, room, ...args);
+  },
+);
 
 /**
  * Socket API provider for player
@@ -261,7 +270,7 @@ export default class PlayerSocket extends Player {
       );
     },
 
-    [PLAYER_ACTIONS.UNBAN_PLAYER]: requireRoomWrapper((cmdID, room, {id}) => {
+    [PLAYER_ACTIONS.UNBAN_PLAYER]: requireRoomOwnerWrapper((cmdID, room, {id}) => {
       this.sendActionResponse(
         cmdID,
         {
@@ -270,7 +279,7 @@ export default class PlayerSocket extends Player {
       );
     }),
 
-    [PLAYER_ACTIONS.KICK_PLAYER]: requireRoomWrapper((cmdID, room, {id, ban}) => {
+    [PLAYER_ACTIONS.KICK_PLAYER]: requireRoomOwnerWrapper((cmdID, room, {id, ban}) => {
       this.sendActionResponse(
         cmdID,
         {
@@ -286,7 +295,7 @@ export default class PlayerSocket extends Player {
       );
     }),
 
-    [PLAYER_ACTIONS.SET_ROOM_INFO]: requireRoomWrapper((cmdID, room, roomInfo) => {
+    [PLAYER_ACTIONS.SET_ROOM_INFO]: requireRoomOwnerWrapper((cmdID, room, roomInfo) => {
       this.sendActionResponse(
         cmdID,
         room.safeAssignRoomInfo(roomInfo),
@@ -378,7 +387,7 @@ export default class PlayerSocket extends Player {
     },
 
     [PLAYER_ACTIONS.LOAD_MAP]: R.compose(
-      requireRoomWrapper,
+      requireRoomOwnerWrapper,
       logFunction(
         () => {
           consola.info(`Player ${chalk.white.bold(this.info.nick)} changed map!`);
@@ -404,13 +413,16 @@ export default class PlayerSocket extends Player {
       },
     ),
 
-    [PLAYER_ACTIONS.START_ROOM_RACE]: logFunction(
-      () => {
-        consola.info(`Player ${chalk.white.bold(this.info.nick)} started racing in ${chalk.red.bold(this.info.room.name)}!`);
-      },
-      {
-        afterExec: true,
-      },
+    [PLAYER_ACTIONS.START_ROOM_RACE]: R.compose(
+      requireRoomOwnerWrapper,
+      logFunction(
+        () => {
+          consola.info(`Player ${chalk.white.bold(this.info.nick)} started racing in ${chalk.red.bold(this.info.room.name)}!`);
+        },
+        {
+          afterExec: true,
+        },
+      ),
     )(
       () => {
         const {room} = this.info;

@@ -12,8 +12,34 @@ import {
   GameTabs,
 } from '../../components/ui';
 
+import useIsClientBoardOP from '../../hooks/useIsClientBoardOP';
+
+export const ChatTabs = React.memo(({gameBoard}) => {
+  const t = useI18n('game.screens.room_edit');
+
+  return (
+    <GameTabs>
+      <GameTabs.Tab
+        id='chat'
+        title={t('tabs.chat')}
+        padding='small'
+      >
+        {() => (
+          <RaceChat
+            gameBoard={gameBoard}
+            style={{
+              height: 220,
+            }}
+          />
+        )}
+      </GameTabs.Tab>
+    </GameTabs>
+  );
+});
+
 const RacingConfigColumn = ({gameBoard, onBeforeStart}) => {
   const t = useI18n('game.screens.room_edit');
+  const op = useIsClientBoardOP(gameBoard);
 
   return (
     <>
@@ -23,7 +49,10 @@ const RacingConfigColumn = ({gameBoard, onBeforeStart}) => {
           title={t('tabs.settings')}
         >
           {() => (
-            <RaceConfig gameBoard={gameBoard} />
+            <RaceConfig
+              gameBoard={gameBoard}
+              op={op}
+            />
           )}
         </GameTabs.Tab>
       </GameTabs>
@@ -50,31 +79,20 @@ const RacingConfigColumn = ({gameBoard, onBeforeStart}) => {
         </GameTabs.Tab>
       </GameTabs>
 
-      <GameDivider />
+      {op && (
+        <>
+          <GameDivider />
 
-      <GameTabs>
-        <GameTabs.Tab
-          id='chat'
-          title={t('tabs.chat')}
-          padding='small'
-        >
-          {() => (
-            <RaceChat
-              gameBoard={gameBoard}
-              style={{
-                height: 220,
-              }}
-            />
-          )}
-        </GameTabs.Tab>
-      </GameTabs>
+          <ChatTabs gameBoard={gameBoard} />
 
-      <GameDivider />
+          <GameDivider />
 
-      <StartRaceButton
-        gameBoard={gameBoard}
-        onClick={onBeforeStart}
-      />
+          <StartRaceButton
+            gameBoard={gameBoard}
+            onClick={onBeforeStart}
+          />
+        </>
+      )}
     </>
   );
 };

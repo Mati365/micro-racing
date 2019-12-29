@@ -114,6 +114,9 @@ export default class RoomMapRefsStore {
       );
     } else
       delete refs.objects[carNode.id];
+
+    // delete hash players list
+    delete refs.players[player.id];
   }
 
   static fromInitialRoomState(initialRoomState) {

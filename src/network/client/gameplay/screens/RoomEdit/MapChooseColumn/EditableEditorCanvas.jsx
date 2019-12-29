@@ -19,7 +19,7 @@ import {
 import TrackEditorCanvas from './TrackEditorCanvas';
 import * as Layers from './TrackEditorCanvas/Layers';
 
-const EditorToolbar = ({children, t, editing, setEditing, onSaveMap}) => (
+const EditorToolbar = ({disabled, children, t, editing, setEditing, onSaveMap}) => (
   <GameButtonsList
     style={{
       marginBottom: 10,
@@ -30,6 +30,7 @@ const EditorToolbar = ({children, t, editing, setEditing, onSaveMap}) => (
         ? (
           <AsyncLockButton
             component={GameButton}
+            disabled={disabled}
             type='green'
             onClick={
               async () => {
@@ -44,6 +45,7 @@ const EditorToolbar = ({children, t, editing, setEditing, onSaveMap}) => (
         : (
           <GameButton
             type='green'
+            disabled={disabled}
             onClick={() => setEditing(true)}
           >
             {t('edit_road')}
@@ -54,7 +56,9 @@ const EditorToolbar = ({children, t, editing, setEditing, onSaveMap}) => (
   </GameButtonsList>
 );
 
-const EditableEditorCanvas = React.memo(({roadMapElement, reloading, onSaveMap, ...props}) => {
+const EditableEditorCanvas = React.memo(({
+  disabled, roadMapElement, reloading, onSaveMap, ...props
+}) => {
   const t = useI18n('game.screens.room_edit');
 
   const [editing, setEditing] = useState(false);
@@ -108,7 +112,9 @@ const EditableEditorCanvas = React.memo(({roadMapElement, reloading, onSaveMap, 
               },
             ),
           }}
-          disabled={!editing}
+          disabled={
+            disabled || !editing
+          }
           {...props}
         />
       )}
@@ -117,7 +123,10 @@ const EditableEditorCanvas = React.memo(({roadMapElement, reloading, onSaveMap, 
 
   return (
     <div>
-      <EditorToolbar {...editorProps} />
+      <EditorToolbar
+        {...editorProps}
+        disabled={disabled}
+      />
       <GameCard
         style={{
           paddingBottom: '75%',
@@ -129,6 +138,7 @@ const EditableEditorCanvas = React.memo(({roadMapElement, reloading, onSaveMap, 
               <GameLayerPortal black>
                 <EditorToolbar
                   {...editorProps}
+                  disabled={disabled}
                   onSaveMap={onSaveEditorMap}
                 >
                   <GameButton

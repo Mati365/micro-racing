@@ -19,7 +19,7 @@ const configResponseSelector = R.compose(
   R.propOr({}, 'config'),
 );
 
-const RaceConfigForm = ({l, optimisticValueLink, gameBoard}) => {
+const RaceConfigForm = ({op, l, optimisticValueLink, gameBoard}) => {
   const t = useI18n('game.screens.room_edit.race_config');
 
   useLowLatencyObservable(
@@ -59,6 +59,7 @@ const RaceConfigForm = ({l, optimisticValueLink, gameBoard}) => {
           <GameRangeInput
             min={1}
             max={6}
+            disabled={!op}
             {...l.input('playersLimit')}
           />
         )}
@@ -72,6 +73,7 @@ const RaceConfigForm = ({l, optimisticValueLink, gameBoard}) => {
           <GameRangeInput
             min={1}
             max={8}
+            disabled={!op}
             {...l.input('laps')}
           />
         )}
@@ -85,6 +87,7 @@ const RaceConfigForm = ({l, optimisticValueLink, gameBoard}) => {
           <GameRangeInput
             min={0}
             max={30}
+            disabled={!op}
             {...l.input('countdown')}
           />
         )}
@@ -93,7 +96,7 @@ const RaceConfigForm = ({l, optimisticValueLink, gameBoard}) => {
   );
 };
 
-const RaceConfig = ({gameBoard}) => (
+const RaceConfig = ({op, gameBoard}) => (
   <OptimisticForm
     selectorFn={configResponseSelector}
     asyncSubmitFn={
@@ -113,6 +116,7 @@ const RaceConfig = ({gameBoard}) => (
         l={l}
         optimisticValueLink={optimisticValueLink}
         gameBoard={gameBoard}
+        op={op}
       />
     )}
   </OptimisticForm>

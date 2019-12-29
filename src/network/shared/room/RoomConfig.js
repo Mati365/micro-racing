@@ -6,7 +6,7 @@ export default class RoomConfig {
     {
       laps = 1,
       playersLimit = 4,
-      countdown = 60,
+      countdown = 5000,
       playerIdleTime = 2500,
       spawnBots = true,
       aiTraining = false,

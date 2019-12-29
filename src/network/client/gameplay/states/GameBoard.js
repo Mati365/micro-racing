@@ -145,7 +145,11 @@ export default class GameBoard {
           await this.refsStore?.appendObjects(
             {
               players: [player],
-              objects: [carObject],
+              objects: (
+                carObject
+                  ? [carObject]
+                  : []
+              ),
             },
           );
 
@@ -293,7 +297,8 @@ export default class GameBoard {
     if (lastProcessedInput !== -1) {
       if (human
           && predictedInputs.length < 20
-          && predictedInputs.length && currentPlayerSync) {
+          && predictedInputs.length
+          && currentPlayerSync) {
         let serverInputIndex = getIndexByID(lastProcessedInput, predictedInputs);
 
         if (serverInputIndex !== -1 && serverInputIndex + 1 < predictedInputs.length) {

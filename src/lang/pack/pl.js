@@ -79,6 +79,10 @@ export default {
           laps_count: 'Ilość okrążeń:',
           countdown: 'Odliczaj (s):',
         },
+
+        score_list: {
+          header: 'Wyniki',
+        },
       },
 
       racing: {

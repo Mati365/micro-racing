@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useImperativeHandle, useRef} from 'react';
 import PropTypes from 'prop-types';
 import c from 'classnames';
 import * as R from 'ramda';
@@ -37,6 +37,9 @@ const PlayersTabsWrapper = styled(
     },
   },
 );
+
+// eslint-disable-next-line prefer-template
+const formatLapTime = time => (time / 1000).toFixed(3) + 's';
 
 const PlayerTab = injectClassesStylesheet(
   {
@@ -100,45 +103,85 @@ const PlayerTab = injectClassesStylesheet(
     },
   },
 )(
-  ({classes, player: {nick, racingState}, totalLaps, last, currentPlayer}) => (
-    <li
-      className={c(
-        classes.base,
-        !last && classes.notLast,
-        !currentPlayer && classes.secondary,
-      )}
-      style={{
-        order: racingState.position,
-      }}
-    >
-      <div
-        className={classes.position}
-        style={{
-          color: racingState.color,
-        }}
-      >
-        {`#${racingState.position || ''}`}
-      </div>
+  React.forwardRef(
+    ({
+      classes, player: {nick, racingState},
+      totalLaps, last, currentPlayer,
+    }, ref) => {
+      const lapNode = useRef();
+      const elementNode = useRef();
 
-      <div className={classes.content}>
-        <div className={classes.nick}>
-          {nick}
-        </div>
+      useImperativeHandle(
+        ref,
+        () => ({
+          setPosition: (() => {
+            let prevPosition = null;
 
-        <div className={classes.time}>
-          <span>
-            {`${racingState.lap + 1} / ${totalLaps}`}
-          </span>
-          <span>
-            {`${(racingState.currentLapTime / 1000).toFixed(3)}s`}
-          </span>
-        </div>
-      </div>
-    </li>
+            return (position) => {
+              const {current: node} = elementNode;
+              if (node) {
+                if (position === prevPosition)
+                  return;
+
+                node.style.order = position;
+                prevPosition = position;
+              }
+            };
+          })(),
+
+          setLapTime: (time) => {
+            const {current: node} = lapNode;
+            if (node)
+              node.textContent = formatLapTime(time);
+          },
+        }),
+      );
+
+      return (
+        <li
+          ref={elementNode}
+          className={c(
+            classes.base,
+            !last && classes.notLast,
+            !currentPlayer && classes.secondary,
+          )}
+          style={{
+            order: racingState.position,
+          }}
+        >
+          <div
+            className={classes.position}
+            style={{
+              color: racingState.color,
+            }}
+          >
+            {`#${racingState.position || ''}`}
+          </div>
+
+          <div className={classes.content}>
+            <div className={classes.nick}>
+              {nick}
+            </div>
+
+            <div className={classes.time}>
+              <span>
+                {`${racingState.lap + 1} / ${totalLaps}`}
+              </span>
+              <span ref={lapNode}>
+                {formatLapTime(racingState.currentLapTime)}
+              </span>
+            </div>
+          </div>
+        </li>
+      );
+    },
   ),
 );
 
 const PlayersTabs = ({gameBoard}) => {
+  const playersHandlesRef = useRef();
+  const readStateRef = useRef();
+
   const [totalLaps, setTotalLaps] = useState(null);
   const [playersNodes, setPlayersNodes] = useState(
     {
@@ -146,6 +189,8 @@ const PlayersTabs = ({gameBoard}) => {
       current: null,
     },
   );
+
+  readStateRef.current = () => playersNodes;
 
   useEffect(
     () => {
@@ -166,13 +211,31 @@ const PlayersTabs = ({gameBoard}) => {
             if (!players)
               return;
 
+            const {current: playersHandles} = playersHandlesRef;
             const {nodes, currentPlayerNode} = players;
-            setPlayersNodes(
-              {
-                list: R.values(nodes),
-                current: currentPlayerNode,
-              },
-            );
+            const newState = {
+              list: R.values(nodes),
+              current: currentPlayerNode,
+            };
+
+            if (readStateRef.current().current === null)
+              setPlayersNodes(newState);
+            else {
+              const {list} = newState;
+
+              for (let i = list.length - 1; i >= 0; --i) {
+                const {player} = list[i];
+                const handle = playersHandles[player.id];
+
+                if (handle) {
+                  handle.setLapTime(player.racingState.currentLapTime);
+                  handle.setPosition(player.racingState.position);
+                } else {
+                  setPlayersNodes(newState);
+                  break;
+                }
+              }
+            }
           },
           true,
         ),
@@ -187,12 +250,17 @@ const PlayersTabs = ({gameBoard}) => {
       : playersNodes.list
   );
 
+  playersHandlesRef.current = {};
+
   return (
     <PlayersTabsWrapper>
       {slicedList.map(
         ({player}, index) => (
           <PlayerTab
             key={player.id}
+            ref={(element) => {
+              playersHandlesRef.current[player.id] = element;
+            }}
             player={player}
             totalLaps={totalLaps}
             currentPlayer={

@@ -344,9 +344,9 @@ export default class GameBoard {
 
     if (!aiTraining) {
       if (!racingState.isFlashing()) {
-        body.angle = angleLerp(prevAngle, body.angle, 0.2);
-        body.pos = vec2.lerp(0.2, prevPos, body.pos);
-        body.velocity = vec2.lerp(0.2, prevVelocity, body.velocity);
+        body.angle = angleLerp(prevAngle, body.angle, 0.1);
+        body.pos = vec2.lerp(0.1, prevPos, body.pos);
+        body.velocity = vec2.lerp(0.1, prevVelocity, body.velocity);
       }
 
       node.body.updateVerticesShapeCache();

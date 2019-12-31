@@ -323,7 +323,7 @@ export default class PlayerSocket extends Player {
         {
           nick: newNick,
           carType: (
-            R.contains(CAR_TYPES, R.values(CAR_TYPES))
+            R.contains(carType, R.values(CAR_TYPES))
               ? carType
               : getRandomObjValue(CAR_TYPES)
           ),

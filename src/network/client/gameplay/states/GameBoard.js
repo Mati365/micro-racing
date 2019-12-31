@@ -294,49 +294,50 @@ export default class GameBoard {
     const {predictedInputs} = this.keyboardController;
     const human = kind === PLAYER_TYPES.HUMAN;
 
-    if (lastProcessedInput !== -1) {
-      if (human
-          && predictedInputs.length < 20
-          && predictedInputs.length
-          && currentPlayerSync) {
-        let serverInputIndex = getIndexByID(lastProcessedInput, predictedInputs);
+    if (currentPlayerSync) {
+      if (lastProcessedInput !== -1) {
+        if (human
+            && predictedInputs.length < 20
+            && predictedInputs.length) {
+          let serverInputIndex = getIndexByID(lastProcessedInput, predictedInputs);
 
-        if (serverInputIndex !== -1 && serverInputIndex + 1 < predictedInputs.length) {
-          serverInputIndex++;
+          if (serverInputIndex !== -1 && serverInputIndex + 1 < predictedInputs.length) {
+            serverInputIndex++;
 
-          let prevFrameId = predictedInputs[serverInputIndex].frameId;
+            let prevFrameId = predictedInputs[serverInputIndex].frameId;
 
-          for (let i = serverInputIndex; i < predictedInputs.length; ++i) {
-            const {bitset, frameId, tempOnly} = predictedInputs[i];
-            if (tempOnly)
-              break;
+            for (let i = serverInputIndex; i < predictedInputs.length; ++i) {
+              const {bitset, frameId, tempOnly} = predictedInputs[i];
+              if (tempOnly)
+                break;
 
-            carKeyboardDriver(bitset, body);
+              carKeyboardDriver(bitset, body);
 
-            if (!tempOnly && (
-              prevFrameId !== frameId
-                  || i + 1 >= predictedInputs.length
-                  || predictedInputs[i + 1].tempOnly)) {
-              body.update();
-              physics.updateObjectPhysics(body, aiTraining);
+              if (!tempOnly && (
+                prevFrameId !== frameId
+                    || i + 1 >= predictedInputs.length
+                    || predictedInputs[i + 1].tempOnly)) {
+                body.update();
+                physics.updateObjectPhysics(body, aiTraining);
+              }
+
+              prevFrameId = frameId;
             }
-
-            prevFrameId = frameId;
           }
+
+          predictedInputs.splice(0, serverInputIndex);
+        } else {
+          if (human)
+            console.warn(`Skipping prediction! Predicted inputs: ${predictedInputs.length}!`);
+
+          Object.assign(
+            this.keyboardController,
+            {
+              predictedInputs: [],
+              batch: [],
+            },
+          );
         }
-
-        predictedInputs.splice(0, serverInputIndex);
-      } else {
-        if (human)
-          console.warn(`Skipping prediction! Predicted inputs: ${predictedInputs.length}!`);
-
-        Object.assign(
-          this.keyboardController,
-          {
-            predictedInputs: [],
-            batch: [],
-          },
-        );
       }
     }
 

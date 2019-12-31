@@ -1,22 +1,27 @@
 import * as R from 'ramda';
 
 import {vec2} from '@pkg/gl-math';
+import QuadTree from '@pkg/quad-tree';
 
 import {
-  aabb,
   diagonal,
+  aabb,
 } from './engines';
 
 export default class PhysicsScene {
   constructor(
     {
+      sceneSize,
       items,
-      maxReflectionAngle,
       ...config
     } = {},
   ) {
     this.config = config;
-    this.items = items || [];
+    this.quadTree = new QuadTree(sceneSize, null, items);
+  }
+
+  get items() {
+    return this.quadTree.allNodes;
   }
 
   static performBodyReaction(a, b, mtv) {
@@ -52,15 +57,19 @@ export default class PhysicsScene {
   }
 
   updateObjectPhysics(a, checkOnlyWithStatic, toggleFlagOnStatic) {
-    const {items} = this;
+    const {quadTree} = this;
     const {box: boxA, moveable} = a;
     let collided = null;
 
     if (!moveable || !boxA)
       return collided;
 
-    for (let j = 0; j < items.length; ++j) {
-      const item = items[j];
+    const siblings = quadTree.retrieve(boxA);
+    for (let j = 0; j < siblings.length; ++j) {
+      const item = siblings[j];
+      if (item === a)
+        continue;
+
       const b = item.body || item;
 
       // ignore if e.g. AI is testing neural network
@@ -74,8 +83,9 @@ export default class PhysicsScene {
         continue;
 
       // ignore if not AABB, it is much faster than diagonal checks
+      // quad tree already performs aabb for static, do it only for moveable
       const {box: boxB} = b;
-      if (!boxB || !aabb(boxA, boxB))
+      if (b.moveable && !aabb(boxA, boxB))
         continue;
 
       // DIAGONAL
@@ -107,6 +117,21 @@ export default class PhysicsScene {
     }
 
     return collided;
+  }
+
+  resetMoveable() {
+    const {quadTree, items} = this;
+
+    for (let i = 0; i < items.length; ++i) {
+      const item = items[i];
+      const body = item.body || item;
+
+      if (body.moveable) {
+        quadTree
+          .remove(item)
+          .insert(item);
+      }
+    }
   }
 
   update(

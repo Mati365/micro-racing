@@ -1,6 +1,8 @@
 import * as R from 'ramda';
 
 import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
+
+import {findByID} from '@pkg/basic-helpers';
 import PlayerInfo from '@game/server/Player/PlayerInfo';
 
 export const findRoadElement = R.filter(
@@ -58,8 +60,9 @@ export const createMapRefs = () => ({
  * @class RoomMapRefsStore
  */
 export default class RoomMapRefsStore {
-  constructor(refs) {
+  constructor(refs, currentPlayer) {
     this.refs = refs || createMapRefs();
+    this.currentPlayer = currentPlayer;
   }
 
   get players() {
@@ -119,19 +122,16 @@ export default class RoomMapRefsStore {
     delete refs.players[player.id];
   }
 
-  static fromInitialRoomState(initialRoomState) {
-    const store = new RoomMapRefsStore({});
-
-    return store.bootstrapRefs(initialRoomState);
-  }
-
   bootstrapRefs({players, objects}) {
     this.release();
+
+    const parsedPlayers = R.map(PlayerInfo.fromBSON, players);
+    findByID(this.currentPlayer.id, parsedPlayers).current = true;
 
     this.roadElement = findRoadElement(objects);
     this.refs = createOffscreenRefs(
       {
-        players: R.map(PlayerInfo.fromBSON, players),
+        players: parsedPlayers,
         objects,
       },
     );

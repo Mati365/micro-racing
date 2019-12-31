@@ -96,7 +96,7 @@ export default class SceneNode {
     if (R.is(Promise, renderer))
       renderer.then(::this.setRenderer);
     else
-      this.renderer = renderer;
+      this.setRenderer(renderer);
   }
 
   release() {

@@ -20,7 +20,7 @@ import {
 export default class GameBoard {
   constructor(
     {
-      refsStore = new RoomMapRefsStore,
+      refsStore,
       watchBoardRaceObjects = false,
       client,
     },
@@ -44,8 +44,8 @@ export default class GameBoard {
       ownerID: null,
     };
 
-    this.refsStore = refsStore;
     this.currentPlayer = client.info;
+    this.refsStore = refsStore || new RoomMapRefsStore(null, this.currentPlayer);
 
     this.roomRemoteListener = null;
   }

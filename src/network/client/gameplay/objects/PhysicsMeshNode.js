@@ -2,25 +2,27 @@ import {MeshNode} from '@pkg/isometric-renderer/FGL/engine/scene';
 import PhysicsBody from '@pkg/physics-scene/src/types/PhysicsBody';
 
 export default class PhysicsMeshNode extends MeshNode {
-  constructor({
-    body,
-    physicsBodyEngine = PhysicsBody,
-    ...meshConfig
-  }) {
+  constructor(
+    {
+      body,
+      physicsBodyEngine = PhysicsBody,
+      ...meshConfig
+    },
+  ) {
     super(meshConfig);
 
     this.physicsBodyEngine = physicsBodyEngine;
     this.bodyConfig = body;
     this.cachedInterpolatedBody = null; // see update()
+
+    this.initBodyConfig();
   }
 
-  setRenderer(renderer) {
+  initBodyConfig() {
     const {
       physicsBodyEngine: PhysicsBodyEngine,
       bodyConfig,
     } = this;
-
-    super.setRenderer(renderer);
 
     if (bodyConfig) {
       if (bodyConfig instanceof PhysicsBodyEngine)
@@ -36,6 +38,13 @@ export default class PhysicsMeshNode extends MeshNode {
         },
       );
     }
+  }
+
+  setRenderer(renderer) {
+    super.setRenderer(renderer);
+
+    if (!this.body && this.physicsBodyEngine)
+      this.initBodyConfig();
   }
 
   update(interpolate) {

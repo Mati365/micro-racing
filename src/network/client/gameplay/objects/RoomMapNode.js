@@ -23,6 +23,8 @@ import CarNode from './Car';
 import RoadNode from './RoadNode/RoadNode';
 import RoomMapRefsStore from './RoomMapRefsStore';
 
+import {createTexturedCarRenderer} from './Car/CarNode';
+
 /**
  * @see MapElement
  */
@@ -113,12 +115,12 @@ export const appendToSceneBuffer = f => ({
           const {meshResPath, ...renderParams} = params;
 
           mapNodes[id] = buffer.createNode(
-            sceneParams => new PhysicsMeshNode(
+            async sceneParams => new PhysicsMeshNode(
               {
                 ...sceneParams,
                 ...renderParams,
                 id,
-                renderer: f.loaders.mesh.from.cached(
+                renderer: await f.loaders.mesh.from.cached(
                   {
                     key: `mesh-${meshResPath}`,
                     resolver: () => fetchMeshURLResource(
@@ -137,13 +139,14 @@ export const appendToSceneBuffer = f => ({
         case OBJECT_TYPES.PLAYER: {
           const {carType, playerID, ...renderParams} = params;
 
-          mapNodes[id] = buffer.createNode(sceneParams => new CarNode(
+          mapNodes[id] = buffer.createNode(async sceneParams => new CarNode(
             {
               ...sceneParams,
               ...renderParams,
               id,
               type: carType,
               player: findRefsPlayer(playerID),
+              renderer: await createTexturedCarRenderer(sceneParams.f)(carType),
             },
           ));
         } break;
@@ -191,12 +194,10 @@ export default class RoomMapNode extends RoomMapRefsStore {
       currentPlayer,
     },
   ) {
-    super();
+    super(null, currentPlayer);
 
     this.f = f;
     this.board = board;
-    this.currentPlayer = currentPlayer;
-    this.physics = new PhysicsScene;
 
     // variables that are set after load map
     this.roadNodes = [];
@@ -206,23 +207,36 @@ export default class RoomMapNode extends RoomMapRefsStore {
     this.release();
 
     const {f} = this;
+    const parsedPlayers = R.map(PlayerInfo.fromBSON, players);
+    findByID(this.currentPlayer.id, parsedPlayers).current = true;
+
     const {
       buffer,
       refsStore,
     } = await appendToSceneBuffer(f)(
       {
-        players: R.map(PlayerInfo.fromBSON, players),
+        players: parsedPlayers,
         objects: R.values(objects),
       },
-    )(f.createSceneBuffer());
+    )(
+      f.createSceneBuffer(),
+    );
 
     this.sceneBuffer = buffer;
     this.refs = refsStore.refs;
     this.roadNodes = R.filter(
       R.is(RoadNode),
-      buffer.list || [],
+      buffer.items || [],
     );
 
+    this.physics = new PhysicsScene(
+      {
+        sceneSize: this.roadNodes[0].segmentsInfo.box,
+        items: buffer.items,
+      },
+    );
+
+    this.sceneBuffer.itemsContainer = this.physics.quadTree;
     this.render = ::this.sceneBuffer.render;
 
     return {
@@ -238,13 +252,10 @@ export default class RoomMapNode extends RoomMapRefsStore {
 
   update(interpolate) {
     const {physics, board} = this;
-    const {list} = this.sceneBuffer;
+    const {items} = this.physics;
 
-    // fixme: Maybe integrate sceneBuffer with phyics in different way?
-    physics.items = list;
-
-    for (let i = 0, len = list.length; i < len; ++i) {
-      const item = list[i];
+    for (let i = 0, len = items.length; i < len; ++i) {
+      const item = items[i];
 
       item.update && item.update(interpolate);
       if (item.body && interpolate.fixedStepUpdate)

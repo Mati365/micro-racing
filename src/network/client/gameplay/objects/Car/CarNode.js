@@ -93,36 +93,42 @@ export default class CarNode extends PhysicsMeshNode {
       {
         ...meshConfig,
         physicsBodyEngine: CarPhysicsBody,
-        renderer: createTexturedCarRenderer(meshConfig.f)(type),
+        renderer: meshConfig.renderer || createTexturedCarRenderer(meshConfig.f)(type),
       },
     );
 
     this.player = player;
     this.type = type;
     this.flashCounter = FLASH_INTERVAL;
+    this.assignEffects();
   }
 
   setRenderer(renderer) {
-    const {player, f} = this;
-
+    this.assignEffects();
     super.setRenderer(renderer);
+  }
 
-    if (player) {
-      this.wireframe = new CarNodeEffects(
-        f, this,
-        {
-          renderBorders: player.current,
-          wireframeColor: hexToVec4(player.racingState.color),
-        },
-      );
+  assignEffects() {
+    const {player, f} = this;
+    if (!player)
+      return;
 
-      this.nickNode = new PlayerNickTextNode(
-        {
-          f,
-          player,
-        },
-      );
-    }
+    this.wireframe?.release();
+    this.wireframe = new CarNodeEffects(
+      f, this,
+      {
+        renderBorders: player.current,
+        wireframeColor: hexToVec4(player.racingState.color),
+      },
+    );
+
+    this.nickNode?.release();
+    this.nickNode = new PlayerNickTextNode(
+      {
+        f,
+        player,
+      },
+    );
   }
 
   release() {

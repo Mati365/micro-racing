@@ -78,13 +78,17 @@ export default class CarIntersectRays {
    */
   checkCollisions(physicsScene, checkOnlyWithStatic) {
     const {body, rays, raysBox} = this;
-    const {items} = physicsScene;
+    const {quadTree} = physicsScene;
 
     // reset collisions
-    for (let i = rays.length - 1; i >= 0; --i)
-      rays[i].collisionPoints = [];
+    for (let i = rays.length - 1; i >= 0; --i) {
+      const ray = rays[i];
+      if (ray.collisionPoints.length)
+        ray.collisionPoints = [];
+    }
 
     // check with all bodies
+    const items = quadTree.retrieve(raysBox);
     for (let j = 0, n = items.length; j < n; ++j) {
       let boardItemBody = items[j];
       if (boardItemBody.body)
@@ -94,10 +98,6 @@ export default class CarIntersectRays {
         continue;
 
       if (checkOnlyWithStatic && boardItemBody.moveable)
-        continue;
-
-      // skip if body not match rays aabb
-      if (!aabb(raysBox, boardItemBody.box))
         continue;
 
       // check all rays collisions with body

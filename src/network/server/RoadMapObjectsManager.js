@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 
 import {CAR_ALIGN} from '@game/network/constants/serverCodes';
-import {wrapAroundMod} from '@pkg/gl-math';
+import {wrapAroundMod, CornersBox} from '@pkg/gl-math';
 
 import PhysicsScene from '@pkg/physics-scene';
 import PlayerMapElement, {genCarSegmentTransform} from '../shared/map/PlayerMapElement';
@@ -21,7 +21,11 @@ export default class RoadMapObjectsManager {
 
   constructor(map) {
     this.segmentsInfo = map.roadElement.getSegmentsInfo();
-    this.physics = new PhysicsScene;
+    this.physics = new PhysicsScene(
+      {
+        sceneSize: CornersBox.fromBSON(map.roadElement.params.sceneMeta.box),
+      },
+    );
 
     this.appendObjects(map.objects);
   }
@@ -35,7 +39,7 @@ export default class RoadMapObjectsManager {
   })();
 
   appendObjects(objects) {
-    const {items} = this.physics;
+    const {quadTree} = this.physics;
 
     R.forEach(
       (object) => {
@@ -44,20 +48,23 @@ export default class RoadMapObjectsManager {
           object = MAP_BINARY_ELEMENTS_DESERIALIZERS[object.type]?.(object) || object;
 
         object.id = this.generateID();
-        items.push(object);
+        quadTree.insert(object);
       },
       objects,
     );
   }
 
   removePlayerCar(player) {
-    const {items} = this.physics;
-
-    this.totalPlayers--;
-    this.physics.items = R.reject(
+    const {items, quadTree} = this.physics;
+    const carObject = R.find(
       obj => obj.player?.id === player.id,
       items,
     );
+
+    if (carObject)
+      quadTree.remove(carObject);
+
+    this.totalPlayers--;
   }
 
   appendPlayerCar(

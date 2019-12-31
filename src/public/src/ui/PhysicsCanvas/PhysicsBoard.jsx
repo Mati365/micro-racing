@@ -1,7 +1,9 @@
 import {useMemo} from 'react';
 
-import {vec2, toRadians} from '@pkg/gl-math';
+import {vec2, toRadians, Rectangle} from '@pkg/gl-math';
 import {createAnimationFrameRenderer} from '@pkg/isometric-renderer/FGL/core/viewport/createDtRenderLoop';
+
+import {drawRect} from '@pkg/ctx';
 
 import PhysicsScene from '@pkg/physics';
 import {Car, Shape} from './objects';
@@ -36,64 +38,32 @@ export default class PhysicsBoard {
       delete this.keycodes[e.keyCode];
     });
 
+    const points = [
+      [dimensions.w / 2 + 200, dimensions.h / 2 - 130, 0],
+      [dimensions.w / 2 + 300, dimensions.h / 2 - 130, 0],
+      [dimensions.w / 2 + 400, dimensions.h / 2 - 130, 0],
+      [dimensions.w / 2 + 500, dimensions.h / 2 - 130, 0],
+      [dimensions.w / 2 + 600, dimensions.h / 2 - 130, 0],
+    ];
+
     this.physics = new PhysicsScene(
       {
+        sceneSize: new Rectangle(0, 0, dimensions.w, dimensions.h),
         items: [
           this.car,
-          new Shape(
+          ...points.map(p => new Shape(
             {
-              pos: vec2(dimensions.w / 2 + 200, dimensions.h / 2 - 30),
+              pos: vec2(p[0], p[1]),
               points: [
-                vec2(-100, 100),
-                vec2(100, 100),
-                vec2(100, -100),
-                vec2(-100, -100),
+                vec2(-30, 30),
+                vec2(30, 30),
+                vec2(30, -30),
+                vec2(-30, -30),
               ],
+              angle: p[2],
               moveable: false,
             },
-          ),
-
-          new Shape(
-            {
-              pos: vec2(dimensions.w / 2 + 100, dimensions.h / 2 - 60),
-              points: [
-                vec2(-100, 100),
-                vec2(100, 100),
-                vec2(100, -100),
-                vec2(-100, -100),
-              ],
-              angle: Math.PI / 3,
-              moveable: false,
-            },
-          ),
-
-          new Shape(
-            {
-              pos: vec2(dimensions.w / 2 - 500, dimensions.h / 2 + 150),
-              points: [
-                vec2(-50, 50),
-                vec2(50, 50),
-                vec2(50, -50),
-                vec2(-50, -50),
-              ],
-              angle: -Math.PI / 3,
-              moveable: false,
-            },
-          ),
-
-          new Shape(
-            {
-              pos: vec2(dimensions.w / 2 - 500, 150),
-              points: [
-                vec2(-50, 50),
-                vec2(50, 50),
-                vec2(50, -50),
-                vec2(-50, -50),
-              ],
-              angle: Math.PI / 4.5,
-              moveable: false,
-            },
-          ),
+          )),
         ],
       },
     );
@@ -148,6 +118,17 @@ export default class PhysicsBoard {
     // cleanup
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, dimensions.w, dimensions.h);
+
+    physics.quadTree.iterateQuads(
+      (quad) => {
+        drawRect(
+          quad.box,
+          1,
+          '#00ff00',
+          ctx,
+        );
+      },
+    );
 
     // render test car
     car.render(ctx, delta);

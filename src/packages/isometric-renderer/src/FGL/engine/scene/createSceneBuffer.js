@@ -21,12 +21,28 @@ const chainMethods = (context) => {
   return boundContext.current;
 };
 
+export class SceneItemsContainer {
+  allNodes = [];
+
+  insert(node) {
+    this.allNodes.push(node);
+  }
+
+  remove(node) {
+    this.allNodes = R.without([node], this.allNodes);
+  }
+
+  release() {
+    this.allNodes = [];
+  }
+}
+
 export class SceneBuffer {
-  constructor(f, {cameraConfig} = {}) {
+  constructor(f, {itemsContainer = new SceneItemsContainer, cameraConfig} = {}) {
     this.f = f;
 
     // lists
-    this.list = [];
+    this.itemsContainer = itemsContainer;
     this.lights = new LightsSceneManager(
       {
         f,
@@ -49,6 +65,10 @@ export class SceneBuffer {
         ...cameraConfig,
       },
     );
+  }
+
+  get items() {
+    return this.itemsContainer.allNodes;
   }
 
   /**
@@ -81,14 +101,14 @@ export class SceneBuffer {
     if (!node)
       return this;
 
-    this.list = R.without([node], this.list);
+    this.itemsContainer.remove(node);
     node.release?.();
 
     return this;
   }
 
   async createNode(nodeConfig) {
-    const {f, list} = this;
+    const {f, itemsContainer} = this;
     const sceneParams = {
       f,
     };
@@ -111,39 +131,44 @@ export class SceneBuffer {
     );
 
     node.setScene(this);
-    list.push(node);
+    itemsContainer.insert(node);
     return node;
   }
 
   release() {
-    const {list} = this;
+    const {itemsContainer} = this;
+    const {allNodes} = itemsContainer;
 
-    for (let i = 0, len = list.length; i < len; ++i)
-      list[i]?.release();
+    for (let i = 0, len = allNodes.length; i < len; ++i)
+      allNodes[i]?.release();
 
-    this.list = [];
+    itemsContainer.release();
   }
 
   /**
    * SceneNode methods
    */
   update(interpolate) {
-    const {list} = this;
+    const {itemsContainer: {allNodes}} = this;
 
-    for (let i = 0, len = list.length; i < len; ++i) {
-      const item = list[i];
+    for (let i = 0, len = allNodes.length; i < len; ++i) {
+      const item = allNodes[i];
       item.update && item.update(interpolate);
     }
   }
 
   render(interpolate, mpMatrix) {
-    const {f, list, camera} = this;
+    const {
+      f, camera,
+      itemsContainer: {allNodes},
+    } = this;
+
     const transparentNodes = [];
 
     camera.render(interpolate, mpMatrix);
 
-    for (let i = 0, len = list.length; i < len; ++i) {
-      const node = list[i];
+    for (let i = 0, len = allNodes.length; i < len; ++i) {
+      const node = allNodes[i];
       const {opacity} = node.renderConfig.uniforms;
 
       if (R.isNil(opacity) || opacity === 1.0)

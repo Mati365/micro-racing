@@ -21,7 +21,6 @@ export default class RenderableGameBoard extends GameBoard {
     );
 
     this.canvas = canvas;
-
     this.keyboardController = new GameKeyboardController(canvas);
     this.scene = createIsometricScene(
       {
@@ -38,37 +37,6 @@ export default class RenderableGameBoard extends GameBoard {
         board: this,
       },
     );
-  }
-
-  static fromOffscreenBoard(
-    offscreenBoard,
-    initParams,
-  ) {
-    const board = new RenderableGameBoard(
-      {
-        ...initParams,
-        client: offscreenBoard.client,
-      },
-    );
-
-    board.banned = [...offscreenBoard.banned];
-    board.currentPlayer = {
-      ...offscreenBoard.currentPlayer,
-    };
-    board.roomInfo = {
-      ...offscreenBoard.roomInfo,
-    };
-
-    return {
-      board,
-      async bootstrap() {
-        await board.refsStore.bootstrapRefs(
-          offscreenBoard.refsStore.refs,
-        );
-
-        return board.mountRemoteListeners();
-      },
-    };
   }
 
   start() {

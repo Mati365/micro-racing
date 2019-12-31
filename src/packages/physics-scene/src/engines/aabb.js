@@ -10,4 +10,11 @@ const aabb = (boxA, boxB) => {
   );
 };
 
+export const contains = (parent, child) => (
+  parent.x <= child.x
+    && parent.x + parent.w >= child.x + child.w
+    && parent.y <= child.y
+    && parent.y + parent.h >= child.y + child.h
+);
+
 export default aabb;

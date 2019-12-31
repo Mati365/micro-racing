@@ -17,24 +17,7 @@ const createIsometricScene = (
   const f = fgl(canvas);
   const {canvasDimensions} = f.state;
 
-  const matrices = {
-    sceneScaling: mat4.from.scaling([
-      sceneScale, sceneScale, sceneScale,
-    ]),
-
-    camera: mat4.from.translation([
-      0.0, 0.0, 0.2 / sceneScale * 5,
-    ]),
-
-    projection: createIsometricProjection(
-      {
-        w: canvasDimensions.w,
-        h: canvasDimensions.w / aspectRatio,
-      },
-      canvasDimensions,
-    ),
-  };
-
+  const matrices = {};
   const context = {
     f,
     matrices,
@@ -50,7 +33,30 @@ const createIsometricScene = (
       matrices.projection,
     );
   };
-  refreshModelProjectionMatrix();
+
+  const setSceneScale = (scale) => {
+    sceneScale = scale;
+
+    matrices.sceneScaling = mat4.from.scaling([
+      scale, scale, scale,
+    ]);
+
+    matrices.camera = mat4.from.translation([
+      0.0, 0.0, 0.2 / scale * 5,
+    ]);
+
+    matrices.projection = createIsometricProjection(
+      {
+        w: canvasDimensions.w,
+        h: canvasDimensions.w / aspectRatio,
+      },
+      canvasDimensions,
+    );
+
+    refreshModelProjectionMatrix();
+  };
+
+  setSceneScale(sceneScale);
 
   /**
    * Render loop
@@ -66,6 +72,8 @@ const createIsometricScene = (
   return {
     f,
     frame,
+    refreshModelProjectionMatrix,
+    setSceneScale,
   };
 };
 

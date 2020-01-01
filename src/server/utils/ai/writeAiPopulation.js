@@ -4,6 +4,7 @@ import fs from 'fs';
 import * as R from 'ramda';
 
 import {logFunction} from '@pkg/basic-helpers/decorators/logMethod';
+import writeJSONToFile from '../writeJSONToFile';
 
 const writeAiPopulation = async ({filename}, population) => {
   let prevPopulation = null;
@@ -13,18 +14,7 @@ const writeAiPopulation = async ({filename}, population) => {
       return false;
   } catch (e) {} // eslint-disable-line no-empty
 
-  try {
-    await fs.promises.writeFile(
-      filename,
-      JSON.stringify(population),
-      'utf8',
-    );
-  } catch (e) {
-    console.error(e);
-    return false;
-  }
-
-  return true;
+  return writeJSONToFile({filename}, population);
 };
 
 export default R.compose(

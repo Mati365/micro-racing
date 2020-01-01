@@ -5,10 +5,10 @@ import Player from '../Player';
 import PlayerInfo from '../PlayerInfo';
 
 export default class PlayerBot extends Player {
-  constructor({server, room, info}) {
+  constructor({room, info}) {
     super(
       {
-        server,
+        room,
         info: info || new PlayerInfo(
           {
             kind: PLAYER_TYPES.BOT,

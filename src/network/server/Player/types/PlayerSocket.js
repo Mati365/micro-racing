@@ -66,11 +66,11 @@ export default class PlayerSocket extends Player {
   ) {
     super(
       {
+        server,
         info,
       },
     );
 
-    this.server = server;
     this.ws = ws;
     this.ip = ip;
     this.onDisconnect = onDisconnect;

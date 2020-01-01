@@ -92,7 +92,7 @@ const backwardPropagate = (learningRate, preferredOutput, network) => {
     // iterate all neurons in each layer
     for (let neuronIndex = hiddenNeurons.length - 1; neuronIndex >= 0; --neuronIndex) {
       const neuron = hiddenNeurons[neuronIndex];
-      const inputSum = getNeuronsWeightsSum(prevLayer, neuronIndex);
+      const inputSum = getNeuronsWeightsSum(neuron, prevLayer, neuronIndex);
 
       // iterate over all neuron outputs to next layer
       // and sum their erorrDleta and weight

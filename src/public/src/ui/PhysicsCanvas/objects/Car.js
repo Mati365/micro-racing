@@ -73,6 +73,8 @@ export default class Car {
       },
     } = this;
 
+    // console.log(rays.map(ray => ray.getClosestRayIntersection()));
+
     for (let i = rays.length - 1; i >= 0; --i) {
       const ray = rays[i];
       const intersection = ray.getClosestRayIntersection();

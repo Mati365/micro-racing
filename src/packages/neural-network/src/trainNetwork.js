@@ -1,4 +1,6 @@
 import * as R from 'ramda';
+
+import {getRandomArrayItem} from '@pkg/basic-helpers/base/random';
 import * as T from './unsafe';
 
 /**
@@ -20,16 +22,18 @@ import * as T from './unsafe';
 const trainNetwork = (trainData, learningRate, times, network) => {
   const trainedNetwork = R.clone(network);
 
-  for (let i = times - 1; i >= 0; --i) {
+  for (let i = R.defaultTo(trainData.length, times) - 1; i >= 0; --i) {
     const {
-      input,
-      output,
-    } = trainData[
-      Math.floor(Math.random() * trainData.length)
-    ];
+      inputs,
+      outputs,
+    } = (
+      times === null
+        ? trainData[i]
+        : getRandomArrayItem(trainData)
+    );
 
-    T.unsafeForwardPropagate(input, trainedNetwork);
-    T.unsafeBackwardPropagate(learningRate, output, trainedNetwork);
+    T.unsafeForwardPropagate(inputs, trainedNetwork);
+    T.unsafeBackwardPropagate(learningRate, outputs, trainedNetwork);
   }
 
   return trainedNetwork;

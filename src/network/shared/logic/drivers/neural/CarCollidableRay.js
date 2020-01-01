@@ -1,5 +1,10 @@
 import {Edge, CornersBox, vec2} from '@pkg/gl-math';
 
+export const DEFAULT_RAYS_SETTINGS = {
+  raysCount: 6,
+  viewDistance: 10,
+};
+
 export default class CarCollidableRay {
   constructor(edge = new Edge) {
     this.edge = edge;

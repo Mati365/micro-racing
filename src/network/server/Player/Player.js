@@ -4,8 +4,12 @@ export default class Player {
   constructor(
     {
       info = new PlayerInfo,
+      room,
+      server,
     },
   ) {
+    this.server = server || room?.server;
+    this.room = room;
     this.info = info;
   }
 

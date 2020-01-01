@@ -5,11 +5,12 @@ export default class RoomConfig {
   constructor(
     {
       laps = 1,
-      playersLimit = 1,
+      playersLimit = 2,
       countdown = 1000,
-      playerIdleTime = 3000,
+      playerIdleTime = 3500,
       spawnBots = true,
       aiTraining = false,
+      recordHumanRace = false,
     } = {},
   ) {
     this.laps = laps;
@@ -18,6 +19,7 @@ export default class RoomConfig {
     this.spawnBots = spawnBots;
     this.playerIdleTime = playerIdleTime;
     this.aiTraining = aiTraining;
+    this.recordHumanRace = recordHumanRace;
   }
 
   safeAssignConfig(config) {

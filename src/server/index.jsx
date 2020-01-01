@@ -22,7 +22,9 @@ import ProvideGlobalJSON from './components/ProvideGlobalJSON';
 import staticManifest from './constants/staticManifest';
 import {
   loadMapsDirectory,
+  loadAiRecordingsDirectory,
   writeAiPopulation,
+  writeTrackRecording,
 } from './utils';
 
 const APP_PORT = 3000;
@@ -38,9 +40,21 @@ const app = express();
     },
   );
 
+  const {neural} = await loadAiRecordingsDirectory(
+    {
+      dir: resolve(__dirname, 'res/recordings/'),
+    },
+  );
+
   new GameServer(
     {
       maps,
+      neurals: [neural],
+      onDumpTrackRecord: writeTrackRecording(
+        {
+          filename: resolve(__dirname, `res/recordings/recording-${Date.now()}.json`),
+        },
+      ),
       onDumpTrainingPopulation: writeAiPopulation(
         {
           filename: resolve(__dirname, 'res/ai/cars-ai.json'),

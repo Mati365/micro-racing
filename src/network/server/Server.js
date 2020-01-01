@@ -31,14 +31,17 @@ export default class GameServer {
   constructor(
     {
       maps,
+      neurals,
       playersLimit = 64,
       socketOptions = {
         port: 8080,
         perMessageDeflate: false,
       },
       onDumpTrainingPopulation,
+      onDumpTrackRecord,
     } = {},
   ) {
+    this.neurals = neurals;
     this.maps = maps || {};
     this.socketOptions = socketOptions;
 
@@ -60,6 +63,7 @@ export default class GameServer {
     );
 
     this.onDumpTrainingPopulation = onDumpTrainingPopulation;
+    this.onDumpTrackRecord = onDumpTrackRecord;
   }
 
   /**
@@ -167,13 +171,18 @@ export default class GameServer {
     const {
       spawnBots,
       playersLimit,
+      aiTraining,
+      recordHumanRace,
     } = room.config;
 
     if (spawnBots)
       room.spawnBots(playersLimit - 1);
 
-    if (room.config.aiTraining)
+    if (aiTraining)
       room.racing.aiTrainer.observers.bestNeuralItems.subscribe(this.onDumpTrainingPopulation);
+
+    if (recordHumanRace)
+      room.racing.recorder.observers.recordedCar.subscribe(this.onDumpTrackRecord);
 
     this.rooms.push(room);
     return room;

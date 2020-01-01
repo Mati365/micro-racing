@@ -528,7 +528,7 @@ export default class Room {
     if (this.abstract)
       return;
 
-    const {aiTrainer} = this.racing || {};
+    const {recorder, aiTrainer} = this.racing || {};
 
     this.racing?.stop();
     this.racing = new RoomRacing(
@@ -539,6 +539,9 @@ export default class Room {
 
     if (aiTrainer && this.racing.aiTrainer)
       this.racing.aiTrainer.observers = aiTrainer.observers;
+
+    if (recorder && this.racing.recorder)
+      this.racing.recorder = recorder;
 
     R.forEach(
       (player) => {

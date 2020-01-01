@@ -65,8 +65,8 @@ module.exports = [
       plugins: [
         new CopyPlugin([
           {
-            from: resolve(__dirname, '../src/server/res/'),
-            to: resolve(__dirname, '../dist/api/res/'),
+            from: resolve(__dirname, '../src/server/res/maps/'),
+            to: resolve(__dirname, '../dist/api/res/maps/'),
           },
         ]),
         ...(

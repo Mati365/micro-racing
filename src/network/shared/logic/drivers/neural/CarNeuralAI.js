@@ -1,28 +1,28 @@
 import * as R from 'ramda';
 import * as T from '@pkg/neural-network';
 
-import BASIC_NEURAL_AI from '@game/server-res/ai/basic-ai.json';
-
 import {getRandomArrayItem} from '@pkg/basic-helpers';
 
 import {MAX_CAR_SPEED} from '../../physics/CarPhysicsBody';
+import {DEFAULT_RAYS_SETTINGS} from './CarCollidableRay';
+
 import CarIntersectRays from './CarIntersectRays';
 
-const AI_DB = [
-  BASIC_NEURAL_AI,
-];
-
-const NEURAL_CAR_INPUTS = {
+export const NEURAL_CAR_INPUTS = {
   THROTTLE_INPUT: 0,
   STEER_INPUT: 1,
 };
 
-const NEURAL_CAR_OUTPUTS = {
+export const NEURAL_CAR_OUTPUTS = {
   THROTTLE_OUTPUT: 0,
   TURN_OUTPUT: 1,
 };
 
 export const MAX_TANH_DISTANCE = 3.0;
+
+export {
+  DEFAULT_RAYS_SETTINGS,
+};
 
 const createTanH = T.createLayer(T.NEURAL_ACTIVATION_TYPES.TAN_H);
 
@@ -33,7 +33,7 @@ const createTanH = T.createLayer(T.NEURAL_ACTIVATION_TYPES.TAN_H);
  *
  * @returns {NeuralNetwork}
  */
-export const createCarNeuralNetwork = (raysCount) => {
+export const createCarNeuralNetwork = (raysCount = DEFAULT_RAYS_SETTINGS.raysCount) => {
   const inputCount = raysCount + R.keys(NEURAL_CAR_INPUTS).length;
   const outputsCount = R.keys(NEURAL_CAR_OUTPUTS).length;
 
@@ -51,16 +51,20 @@ export const createCarNeuralNetwork = (raysCount) => {
 export default class CarNeuralAI {
   constructor(
     {
-      raysCount = 6,
-      neural = getRandomArrayItem(AI_DB),
+      raysCount = DEFAULT_RAYS_SETTINGS.raysCount,
+      viewDistance = DEFAULT_RAYS_SETTINGS.viewDistance,
+      neural,
       player,
     } = {},
   ) {
     this.player = player;
     this.raysCount = raysCount;
+    this.viewDistance = viewDistance;
     this.intersections = null;
 
-    this.setNeural(neural);
+    this.setNeural(
+      neural || getRandomArrayItem(player.server.neurals),
+    );
   }
 
   get car() {
@@ -79,17 +83,16 @@ export default class CarNeuralAI {
     return this;
   }
 
+  resetNeural() {
+    this.setNeural(null);
+  }
+
   setNeural(neural) {
     this.neural = neural || createCarNeuralNetwork(this.raysCount);
     return this;
   }
 
-  getNeuralInputs() {
-    const {
-      car: {body},
-      intersections,
-    } = this;
-
+  static getNeuralInputs(body, intersections) {
     return [
       body.speed / MAX_CAR_SPEED * MAX_TANH_DISTANCE, // nornalize speed
       (body.steerAngle / body.maxSteerAngle) * MAX_TANH_DISTANCE,
@@ -107,8 +110,11 @@ export default class CarNeuralAI {
 
   drive({physics}) {
     const {
-      car: {body},
+      car: {
+        body,
+      },
       raysCount,
+      viewDistance,
       neural,
     } = this;
 
@@ -116,7 +122,7 @@ export default class CarNeuralAI {
       this.intersections = new CarIntersectRays(
         this.car.body,
         {
-          viewDistance: 10,
+          viewDistance,
           raysCount,
         },
       );
@@ -125,7 +131,7 @@ export default class CarNeuralAI {
     // neural control
     this.intersections.update(physics, false);
     const neuralOutput = T.exec(
-      this.getNeuralInputs(),
+      CarNeuralAI.getNeuralInputs(body, this.intersections),
       neural,
     );
 

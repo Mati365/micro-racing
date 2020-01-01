@@ -20,7 +20,10 @@ import {
 } from '../constants/serverCodes';
 
 import {PlayerMapElement} from '../shared/map';
-import {CarNeuralTrainer} from '../shared/logic/drivers/neural';
+import {
+  CarNeuralTrainer,
+  CarTrackRecorder,
+} from '../shared/logic/drivers/neural';
 
 import RoadMapObjectsManager from './RoadMapObjectsManager';
 import RaceState from '../shared/room/RoomRaceState';
@@ -37,12 +40,15 @@ export default class RoomRacing {
 
     this.map = new RoadMapObjectsManager(room.map);
     this.state = new RaceState(RACE_STATES.BOARD_VIEW);
+
     this.aiTrainer = room.config.aiTraining && (aiTrainer || new CarNeuralTrainer(
       {
         map: this.map,
         room: this.room,
       },
     ));
+
+    this.recorder = room.config.recordHumanRace && new CarTrackRecorder;
   }
 
   get allowPlayerJoin() {
@@ -73,7 +79,10 @@ export default class RoomRacing {
   }
 
   async start() {
-    const {config} = this;
+    const {recorder, config} = this;
+
+    if (recorder)
+      recorder.clear();
 
     this.setRaceState(
       new RaceState(RACE_STATES.PREPARE_TO_RACE),
@@ -289,12 +298,14 @@ export default class RoomRacing {
    */
   updatePlayerLaps(time, player) {
     const {
+      recorder,
       aiTrainer,
       startTime,
       room: {
         config: roomConfig,
       },
       map: {
+        physics,
         segmentsInfo: {checkpoints},
       },
     } = this;
@@ -317,6 +328,18 @@ export default class RoomRacing {
 
       racingState.currentCheckpoint++;
       racingState.lastCheckpointTime = racingState.currentLapTime;
+
+      if (recorder && info.kind === PLAYER_TYPES.HUMAN) {
+        recorder.record(
+          {
+            physics,
+            body: carBody,
+          },
+        );
+
+        if (!nextCheckpoint)
+          recorder.flush();
+      }
 
       if (!nextCheckpoint) {
         racingState.lapsTimes.push(racingState.currentLapTime);

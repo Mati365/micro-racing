@@ -20,7 +20,7 @@ export const getWinnersByFitness = count => R.compose(
 );
 
 // 0.5, without gene it worked
-const mutateValues = (mutateRate, mutateMaxValue = 0.05) => R.map(
+const mutateValues = (mutateRate, mutateMaxValue = 0.25) => R.map(
   (gene) => {
     if (Math.random() > mutateRate) {
       return (
@@ -73,7 +73,7 @@ const createNeuralMutator = (mutateRate, winnersNeurals) => {
 
     // first is made from the best items
     if (!itemIndex)
-      return winnersNeurals[0];
+      [new1D] = winners1D;
 
     if (itemIndex < total / 2)
       new1D = mutate1DNeural(mutateRate)(winners1D[0]);

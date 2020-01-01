@@ -8,14 +8,14 @@ import {
   toRadians, vec2,
 } from '@pkg/gl-math';
 
-import CarCollidableRay from './CarCollidableRay';
+import CarCollidableRay, {DEFAULT_RAYS_SETTINGS} from './CarCollidableRay';
 
 export default class CarIntersectRays {
   constructor(
     body,
     {
-      viewDistance = 8,
-      raysCount = 6,
+      viewDistance = DEFAULT_RAYS_SETTINGS.viewDistance,
+      raysCount = DEFAULT_RAYS_SETTINGS.raysCount,
       raysViewportAngle = toRadians(80),
       renderInterpolation = false,
     } = {},

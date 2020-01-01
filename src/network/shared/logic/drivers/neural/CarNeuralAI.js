@@ -20,6 +20,11 @@ export const NEURAL_CAR_OUTPUTS = {
 
 export const MAX_TANH_DISTANCE = 3.0;
 
+export const NEURAL_OUTPUT_SCALE = {
+  THROTTLE: 15,
+  TURN: 1 / 5,
+};
+
 export {
   DEFAULT_RAYS_SETTINGS,
 };
@@ -134,7 +139,7 @@ export default class CarNeuralAI {
       neural,
     );
 
-    let speedUp = neuralOutput[NEURAL_CAR_OUTPUTS.THROTTLE_OUTPUT] * 15;
+    let speedUp = neuralOutput[NEURAL_CAR_OUTPUTS.THROTTLE_OUTPUT] * NEURAL_OUTPUT_SCALE.THROTTLE;
 
     // fix for sleeping and lazy bots
     if (Math.abs(body.speed) < 1)
@@ -142,7 +147,7 @@ export default class CarNeuralAI {
 
     body.speedUp(speedUp, false, 0.35);
     body.turnSteerWheels(
-      neuralOutput[NEURAL_CAR_OUTPUTS.TURN_OUTPUT] / 5,
+      neuralOutput[NEURAL_CAR_OUTPUTS.TURN_OUTPUT] * NEURAL_OUTPUT_SCALE.TURN,
     );
   }
 }

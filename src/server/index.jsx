@@ -50,10 +50,11 @@ const app = express();
     {
       maps,
       neurals: [neural],
-      onDumpTrackRecord: writeTrackRecording(
+      onDumpTrackRecord: (...args) => writeTrackRecording(
         {
           filename: resolve(__dirname, `res/recordings/recording-${Date.now()}.json`),
         },
+        ...args,
       ),
       onDumpTrainingPopulation: writeAiPopulation(
         {

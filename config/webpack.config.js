@@ -68,6 +68,10 @@ module.exports = [
             from: resolve(__dirname, '../src/server/res/maps/'),
             to: resolve(__dirname, '../dist/api/res/maps/'),
           },
+          {
+            from: resolve(__dirname, '../src/server/res/recordings/'),
+            to: resolve(__dirname, '../dist/api/res/recordings/'),
+          },
         ]),
         ...(
           process.env.NODE_ENV === 'development'

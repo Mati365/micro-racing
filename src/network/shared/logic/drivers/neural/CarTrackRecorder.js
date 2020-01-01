@@ -4,7 +4,6 @@ import CarIntersectRays from './CarIntersectRays';
 import CarNeuralAI, {
   NEURAL_CAR_OUTPUTS,
   DEFAULT_RAYS_SETTINGS,
-  MAX_TANH_DISTANCE,
 } from './CarNeuralAI';
 
 export class CarTrackRecordItem {
@@ -12,13 +11,9 @@ export class CarTrackRecordItem {
     this.inputs = inputs;
     this.outputs = [];
 
-    this.outputs[NEURAL_CAR_OUTPUTS.THROTTLE_OUTPUT] = (
-      body.throttle / body.maxThrottle * MAX_TANH_DISTANCE
-    );
-
-    this.outputs[NEURAL_CAR_OUTPUTS.TURN_OUTPUT] = (
-      body.steerAngle / body.maxSteerAngle * MAX_TANH_DISTANCE
-    );
+    // fixme, it should be scaled to NEURAL_OUTPUT_SCALE
+    this.outputs[NEURAL_CAR_OUTPUTS.THROTTLE_OUTPUT] = body.throttle / body.maxThrottle;
+    this.outputs[NEURAL_CAR_OUTPUTS.TURN_OUTPUT] = body.lastSteerAngleDelta / body.maxSteerAngle;
   }
 
   toBSON() {

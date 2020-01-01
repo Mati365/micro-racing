@@ -89,6 +89,7 @@ export default class CarPhysicsBody extends PhysicsBody {
     this.acceleration = 0;
 
     this.angle = angle;
+    this.lastSteerAngleDelta = 0;
     this.steerAngle = steerAngle;
     this.maxSteerAngle = maxSteerAngle;
 
@@ -147,6 +148,7 @@ export default class CarPhysicsBody extends PhysicsBody {
   }
 
   turnSteerWheels(delta) {
+    this.lastSteerAngleDelta = delta;
     this.steerAngle = clamp(
       -this.maxSteerAngle,
       this.maxSteerAngle,

@@ -5,17 +5,16 @@ import fg from 'fast-glob';
 import fs from 'fs';
 import * as R from 'ramda';
 
-import * as T from '@pkg/neural-network';
-
 import BASIC_NEURAL_AI from '@game/server-res/ai/basic-ai.json';
 
+import * as T from '@pkg/neural-network';
+
 import {logFunction} from '@pkg/basic-helpers/decorators/logMethod';
-import {createCarNeuralNetwork} from '@game/network/shared/logic/drivers/neural/CarNeuralAI';
 import asyncSequentionalMap from '@pkg/basic-helpers/async/asyncSequentionalMap';
 
 const loadAiRecordingsDirectory = async (
   {
-    trainNeural = createCarNeuralNetwork(),
+    trainNeural = BASIC_NEURAL_AI,
     dir,
   },
 ) => {
@@ -30,12 +29,12 @@ const loadAiRecordingsDirectory = async (
       await fs.promises.readFile(recordingPath),
     );
 
-    trainNeural = T.trainNetwork(recording, 0.5, 111000, trainNeural);
+    trainNeural = T.trainNetwork(recording, 0.5, 110000, trainNeural);
   };
 
-  asyncSequentionalMap(loadRecording, paths);
+  await asyncSequentionalMap(loadRecording, paths);
   return {
-    neural: BASIC_NEURAL_AI,
+    neural: trainNeural,
     paths,
   };
 };

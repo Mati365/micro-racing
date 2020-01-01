@@ -21,8 +21,8 @@ export default class GameBoard {
   constructor(
     {
       refsStore,
-      watchBoardRaceObjects = false,
       client,
+      watchBoardRaceObjects = false,
     },
   ) {
     this.watchBoardRaceObjects = watchBoardRaceObjects;
@@ -48,6 +48,21 @@ export default class GameBoard {
     this.refsStore = refsStore || new RoomMapRefsStore(null, this.currentPlayer);
 
     this.roomRemoteListener = null;
+  }
+
+  async forkOffscreen() {
+    const {client} = this;
+    const offscreenGameBoard = new GameBoard(
+      {
+        client,
+      },
+    );
+
+    await offscreenGameBoard.loadInitialRoomState(
+      await client.getRoomInitialState(),
+    );
+
+    return offscreenGameBoard;
   }
 
   isClientOP() {

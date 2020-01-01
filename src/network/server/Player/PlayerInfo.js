@@ -112,6 +112,7 @@ export class PlayerRacingState {
       color: this.color,
       currentLapTime: this.currentLapTime,
       time: this.time,
+      lapsTimes: this.lapsTimes,
       lap: this.lap,
       position: this.position,
       state: this.state,

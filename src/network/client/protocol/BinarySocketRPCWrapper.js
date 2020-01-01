@@ -130,8 +130,13 @@ export default class BinarySocketRPCWrapper {
           deferred.reject(
             ServerError.fromJSON(response.error),
           );
-        } else
-          deferred.resolve(response);
+        } else {
+          deferred.resolve(
+            flags.deserialize
+              ? flags.deserialize(response)
+              : response,
+          );
+        }
       };
 
       cmdResponseQueue.__id = (cmdResponseQueue.__id + 1) % MAX_CMD_ID;

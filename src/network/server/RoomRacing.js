@@ -125,10 +125,9 @@ export default class RoomRacing {
     );
   }
 
-  stop() {
-    this.setRaceState(
-      new RaceState(RACE_STATES.BOARD_VIEW),
-    );
+  stop(state = new RaceState(RACE_STATES.BOARD_VIEW)) {
+    if (state)
+      this.setRaceState(state);
 
     this.renderLoop?.();
     delete this.renderLoop;
@@ -320,6 +319,10 @@ export default class RoomRacing {
       racingState.lastCheckpointTime = racingState.currentLapTime;
 
       if (!nextCheckpoint) {
+        racingState.lapsTimes.push(racingState.currentLapTime);
+        racingState.time += racingState.currentLapTime;
+        racingState.currentLapTime = 0;
+
         // WIN!
         if (racingState.lap + 1 >= roomConfig.laps) {
           if (aiTrainer && player.ai) {
@@ -342,10 +345,6 @@ export default class RoomRacing {
           }
         } else
           racingState.lap++;
-
-        racingState.lapsTimes.push(racingState.currentLapTime);
-        racingState.time += racingState.currentLapTime;
-        racingState.currentLapTime = 0;
       }
     }
   }
@@ -362,8 +361,7 @@ export default class RoomRacing {
     if (!R.all(player => player.info.racingState.isFinish(), players))
       return false;
 
-    this.stop();
-    this.setRaceState(
+    this.stop(
       new RaceState(RACE_STATES.ALL_FINISH),
     );
 

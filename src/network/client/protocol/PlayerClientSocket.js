@@ -43,6 +43,14 @@ export default class PlayerClientSocket {
       },
     },
 
+    getPlayersDescriptions: {
+      action: PLAYER_ACTIONS.GET_PLAYERS_DESCRIPTIONS_LIST,
+      flags: {
+        waitForResponse: true,
+        deserialize: R.prop('players'),
+      },
+    },
+
     getRoomInitialState: {
       action: PLAYER_ACTIONS.GET_ROOM_INITIAL_STATE,
       flags: {

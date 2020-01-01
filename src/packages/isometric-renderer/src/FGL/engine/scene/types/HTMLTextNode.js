@@ -102,7 +102,7 @@ export default class HTMLTextNode {
   }
 
   release() {
-    this.htmlNode.remove();
+    this.htmlNode?.remove();
     this.htmlNode = null;
   }
 

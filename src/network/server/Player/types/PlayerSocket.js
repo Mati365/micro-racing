@@ -18,7 +18,9 @@ import {getRandomObjValue} from '@pkg/basic-helpers';
 
 import CarNeuralAI from '@game/logic/drivers/neural';
 
+import serializeBsonList from '../../utils/serializeBsonList';
 import serializeServerError from '../../../shared/utils/serializeServerError';
+
 import createActionMessage, {
   getMessageMeta,
   getMessageContent,
@@ -463,6 +465,15 @@ export default class PlayerSocket extends Player {
         cmdID,
         {
           result: true,
+        },
+      );
+    }),
+
+    [PLAYER_ACTIONS.GET_PLAYERS_DESCRIPTIONS_LIST]: requireRoomWrapper((cmdID, room) => {
+      this.sendActionResponse(
+        cmdID,
+        {
+          players: serializeBsonList(room.players),
         },
       );
     }),

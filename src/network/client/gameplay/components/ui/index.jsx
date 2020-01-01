@@ -16,3 +16,4 @@ export {default as GameLayerPortal} from './GameLayerPortal';
 export {default as GameRoadCard} from './parts/GameRoadCard';
 export {default as GameRoomCard} from './parts/GameRoomCard';
 export {default as GameButtonsList} from './GameButtonsList';
+export {default as GameTable} from './GameTable';

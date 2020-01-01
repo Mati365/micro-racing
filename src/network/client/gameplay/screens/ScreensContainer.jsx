@@ -60,6 +60,13 @@ const ScreensContainer = () => {
         />
 
         <Route
+          path='/score'
+          render={({location: {state}}) => (
+            <Routes.GameScore gameBoard={state.gameBoard} />
+          )}
+        />
+
+        <Route
           path='/race'
           render={
             ({location: {state}}) => (

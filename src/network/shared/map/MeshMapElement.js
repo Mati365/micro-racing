@@ -1,9 +1,8 @@
-import {vec2} from '@pkg/gl-math';
-
-import {dig, requiredParam} from '@pkg/basic-helpers';
-
 import {MESHES} from '@game/shared/sceneResources/meshes';
 import {OBJECT_TYPES} from '@game/network/constants/serverCodes';
+
+import {vec2} from '@pkg/gl-math';
+import {dig, requiredParam} from '@pkg/basic-helpers';
 
 import PhysicsBody from '@pkg/physics-scene/src/types/PhysicsBody';
 import MapElement from './MapElement';

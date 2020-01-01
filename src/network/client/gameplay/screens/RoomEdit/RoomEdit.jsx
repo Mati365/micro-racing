@@ -1,22 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {useHistory} from 'react-router-dom';
+
+import {RACE_STATES} from '@game/network/constants/serverCodes';
 
 import {useI18n} from '@ui/i18n';
-import {useLowLatencyObservable} from '@pkg/basic-hooks';
-
-import {
-  RACE_STATES,
-  PLAYER_ACTIONS,
-} from '@game/network/constants/serverCodes';
-
 import {
   Flex,
   Margin,
 } from '@ui/basic-components/styled';
 
 import PlayerClientSocket from '../../../protocol/PlayerClientSocket';
-
 import TitledScreen from '../TitledScreen';
 import {GameButton} from '../../components/ui';
 import {GamePortalHolder} from '../../components/ui/GameLayerPortal';
@@ -24,46 +17,14 @@ import {GamePortalHolder} from '../../components/ui/GameLayerPortal';
 import MapChooseColumn from './MapChooseColumn';
 import RacingConfigColumn from './RacingConfigColumn';
 import EditRoomNameForm from './EditRoomNameForm';
-
-import useClientChainListener from '../../hooks/useClientChainListener';
+import useScreensWatcher from '../../hooks/useScreensWatcher';
 
 const RoomEdit = ({client, gameBoard}) => { // eslint-disable-line no-unused-vars
   const t = useI18n('game.screens.room_edit');
-  const history = useHistory();
-
-  const onLeaveRoom = async () => {
-    await client.leaveRoom();
-    history.push('/config');
-  };
-
-  useClientChainListener(
+  const {onLeaveRoom} = useScreensWatcher(
     {
-      client,
-      action: PLAYER_ACTIONS.YOU_ARE_KICKED,
-      method: onLeaveRoom,
-      afterReleaseFn: () => {
-        gameBoard?.release();
-      },
-    },
-  );
-
-  useLowLatencyObservable(
-    {
-      observable: gameBoard.observers.roomInfo,
-      watchOnly: true,
-      onChange: (info) => {
-        if (!info)
-          return;
-
-        if (info.state?.type === RACE_STATES.PREPARE_TO_RACE) {
-          history.push(
-            '/race',
-            {
-              gameBoard,
-            },
-          );
-        }
-      },
+      currentScreen: RACE_STATES.BOARD_VIEW,
+      gameBoard,
     },
   );
 

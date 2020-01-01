@@ -1,57 +1,25 @@
 import React from 'react';
-import {useHistory} from 'react-router-dom';
 
 import {RACE_STATES} from '@game/network/constants/serverCodes';
 
 import {useI18n} from '@ui/i18n';
-import {useLowLatencyObservable} from '@pkg/basic-hooks';
 
 import {Flex} from '@ui/basic-components/styled';
 import {AsyncLockButton} from '@ui/basic-components';
 
 import RaceChat from '../RoomEdit/RaceChat';
-import GameBoard from '../../states/GameBoard';
 import {
   GameButton,
   GameTabs,
 } from '../../components/ui';
+import useScreensWatcher from '../../hooks/useScreensWatcher';
 
 const RaceSidebar = ({gameBoard}) => {
-  const history = useHistory();
   const t = useI18n('game.screens');
-
-  const onLeaveRacing = async () => {
-    const {client} = gameBoard;
-    const offscreenGameBoard = new GameBoard(
-      {
-        client,
-      },
-    );
-
-    await offscreenGameBoard.loadInitialRoomState(
-      await client.getRoomInitialState(),
-    );
-
-    history.push(
-      '/config/room-edit',
-      {
-        gameBoard: offscreenGameBoard,
-      },
-    );
-  };
-
-  useLowLatencyObservable(
+  const {onLeaveRacing} = useScreensWatcher(
     {
-      observable: gameBoard.observers.roomInfo,
-      watchOnly: true,
-      onChange: (info) => {
-        if (!info)
-          return;
-
-        if (info.state?.type === RACE_STATES.ALL_FINISH
-            || info.state?.type === RACE_STATES.BOARD_VIEW)
-          onLeaveRacing();
-      },
+      currentScreen: RACE_STATES.RACE,
+      gameBoard,
     },
   );
 

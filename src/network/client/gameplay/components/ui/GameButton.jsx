@@ -41,6 +41,12 @@ const GameButton = styled(
       },
     },
 
+    cornered: {
+      position: 'absolute',
+      right: 0,
+      bottom: 0,
+    },
+
     disabled: {
       opacity: 0.5,
       cursor: 'default',
@@ -83,12 +89,13 @@ const GameButton = styled(
   },
   {
     index: 3,
-    omitProps: ['type', 'expanded', 'size'],
-    classSelector: (classes, {type, disabled, expanded, size}) => [
+    omitProps: ['type', 'expanded', 'size', 'cornered'],
+    classSelector: (classes, {type, disabled, expanded, size, cornered}) => [
       classes[`type-${type}`],
       expanded && classes.expanded,
       disabled && classes.disabled,
       size && classes[`size-${size}`],
+      cornered && classes.cornered,
     ],
   },
 );

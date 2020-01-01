@@ -45,6 +45,18 @@ export default {
         creating_room: 'Tworzenie pokoju',
       },
 
+      score: {
+        header: 'Wyniki',
+        next_button: 'Dalej',
+        columns: {
+          position: 'Pozycja',
+          kind: 'Typ',
+          nick: 'Nick',
+          nth_lap_time: 'Okrążenie %{}',
+          total_time: 'Czas wyścigu',
+        },
+      },
+
       room_edit: {
         header: 'Pokój:',
         predefined_maps: 'Wybierz inne tory:',

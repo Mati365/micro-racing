@@ -39,7 +39,7 @@ const PlayersTabsWrapper = styled(
 );
 
 // eslint-disable-next-line prefer-template
-const formatLapTime = time => (time / 1000).toFixed(3) + 's';
+export const formatLapTime = time => (time / 1000).toFixed(3) + 's';
 
 const PlayerTab = injectClassesStylesheet(
   {
@@ -48,15 +48,6 @@ const PlayerTab = injectClassesStylesheet(
       flexDirection: 'row',
       flexShrink: 0,
       textAlign: 'left',
-    },
-
-    secondary: {
-      '& > div': {
-        opacity: 0.4,
-      },
-    },
-
-    notLast: {
       paddingRight: 30,
 
       '&:after': {
@@ -70,6 +61,12 @@ const PlayerTab = injectClassesStylesheet(
         background: DARK_GRAY,
 
         opacity: 0.35,
+      },
+    },
+
+    secondary: {
+      '& > div': {
+        opacity: 0.4,
       },
     },
 
@@ -105,8 +102,13 @@ const PlayerTab = injectClassesStylesheet(
 )(
   React.forwardRef(
     ({
-      classes, player: {nick, racingState},
-      totalLaps, last, currentPlayer,
+      classes,
+      player: {
+        nick,
+        racingState,
+      },
+      totalLaps,
+      currentPlayer,
     }, ref) => {
       const lapNode = useRef();
       const elementNode = useRef();
@@ -142,7 +144,6 @@ const PlayerTab = injectClassesStylesheet(
           ref={elementNode}
           className={c(
             classes.base,
-            !last && classes.notLast,
             !currentPlayer && classes.secondary,
           )}
           style={{

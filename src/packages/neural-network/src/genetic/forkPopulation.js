@@ -20,7 +20,7 @@ export const getWinnersByFitness = count => R.compose(
 );
 
 // 0.5, without gene it worked
-const mutateValues = (mutateRate, mutateMaxValue = 0.25) => R.map(
+const mutateValues = (mutateRate, mutateMaxValue = 0.05) => R.map(
   (gene) => {
     if (Math.random() > mutateRate) {
       return (

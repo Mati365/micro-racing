@@ -40,9 +40,8 @@ export const createCarNeuralNetwork = (raysCount = DEFAULT_RAYS_SETTINGS.raysCou
   return T.createNeuralNetwork(
     [
       T.createInputLayer(inputCount),
-      createTanH(
-        Math.floor(inputCount * 2 / 3) + outputsCount,
-      ),
+      createTanH(inputCount),
+      createTanH(4),
       createTanH(outputsCount),
     ],
   );
@@ -98,8 +97,8 @@ export default class CarNeuralAI {
       (body.steerAngle / body.maxSteerAngle) * MAX_TANH_DISTANCE,
       ...R.map(
         (intersection) => {
-          if (!intersection)
-            return 0;
+          if (intersection === null)
+            return MAX_TANH_DISTANCE;
 
           return intersection.uB * MAX_TANH_DISTANCE;
         },
@@ -135,7 +134,7 @@ export default class CarNeuralAI {
       neural,
     );
 
-    let speedUp = neuralOutput[NEURAL_CAR_OUTPUTS.THROTTLE_OUTPUT] * 10;
+    let speedUp = neuralOutput[NEURAL_CAR_OUTPUTS.THROTTLE_OUTPUT] * 15;
 
     // fix for sleeping and lazy bots
     if (Math.abs(body.speed) < 1)
@@ -143,7 +142,7 @@ export default class CarNeuralAI {
 
     body.speedUp(speedUp, false, 0.35);
     body.turnSteerWheels(
-      neuralOutput[NEURAL_CAR_OUTPUTS.TURN_OUTPUT],
+      neuralOutput[NEURAL_CAR_OUTPUTS.TURN_OUTPUT] / 5,
     );
   }
 }

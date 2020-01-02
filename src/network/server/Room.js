@@ -3,6 +3,7 @@ import * as R from 'ramda';
 
 import {
   ROOM_SERVER_MESSAGES_TYPES,
+  RACE_STATES,
   PLAYER_TYPES,
   ERROR_CODES,
   PLAYER_ACTIONS,
@@ -381,10 +382,14 @@ export default class Room {
     if (!abstract)
       this.racing.map.removePlayerCar(player);
 
-    const {humans} = this;
+    const {racing, humans} = this;
+
     if (this.isEmpty || !humans.length)
       this.destroy();
     else if (!abstract) {
+      if (racing?.state?.type === RACE_STATES.RACE)
+        racing.checkRaceFinish();
+
       broadcast && chat.post(
         {
           code: ROOM_SERVER_MESSAGES_TYPES.PLAYER_LEFT,

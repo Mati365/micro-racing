@@ -25,7 +25,7 @@ const KickablePlayerListItem = ({current, currentOp, buttons, onKick, onBan, ...
               Kick
             </AsyncLockButton>
 
-            {player.kind === PLAYER_TYPES.HUMAN && (
+            {player.kind !== PLAYER_TYPES.BOT && (
               <AsyncLockButton
                 component={GameButton}
                 type='red'

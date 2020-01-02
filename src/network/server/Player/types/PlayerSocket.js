@@ -120,13 +120,16 @@ export default class PlayerSocket extends Player {
 
     if (info.kind !== PLAYER_TYPES.HUMAN) {
       info.kind = PLAYER_TYPES.HUMAN;
-      Object.assign(
-        info.car.body,
-        {
-          steerAngle: 0,
-          ...PLAYER_TYPES_BODY_CONFIG[PLAYER_TYPES.HUMAN],
-        },
-      );
+
+      if (info.car) {
+        Object.assign(
+          info.car.body,
+          {
+            steerAngle: 0,
+            ...PLAYER_TYPES_BODY_CONFIG[PLAYER_TYPES.HUMAN],
+          },
+        );
+      }
 
       this.ai = null;
     }
@@ -421,6 +424,28 @@ export default class PlayerSocket extends Player {
       },
     ),
 
+    [PLAYER_ACTIONS.STOP_ROOM_RACE]: R.compose(
+      requireRoomOwnerWrapper,
+      logFunction(
+        () => {
+          consola.info(`Player ${chalk.white.bold(this.info.nick)} stopped racing in ${chalk.red.bold(this.info.room.name)}!`);
+        },
+        {
+          afterExec: true,
+        },
+      ),
+    )(
+      (cmdID, room) => {
+        room.racing?.stop();
+        this.sendActionResponse(
+          cmdID,
+          {
+            result: true,
+          },
+        );
+      },
+    ),
+
     [PLAYER_ACTIONS.START_ROOM_RACE]: R.compose(
       requireRoomOwnerWrapper,
       logFunction(
@@ -432,13 +457,13 @@ export default class PlayerSocket extends Player {
         },
       ),
     )(
-      (cmdID) => {
-        const {room} = this.info;
+      (cmdID, room) => {
+        room.players.forEach(
+          (player) => {
+            player.info.inputs = [];
+          },
+        );
 
-        if (room?.owner !== this)
-          throw new ServerError(ERROR_CODES.ACCESS_DENIED);
-
-        this.info.keyMap = {};
         room.startRace();
 
         this.sendActionResponse(

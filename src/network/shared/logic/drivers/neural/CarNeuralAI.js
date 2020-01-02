@@ -133,7 +133,7 @@ export default class CarNeuralAI {
     }
 
     // neural control
-    this.intersections.update(physics, false);
+    this.intersections.update(physics, Math.random() > 0.5);
     const neuralOutput = T.exec(
       CarNeuralAI.getNeuralInputs(body, this.intersections),
       neural,

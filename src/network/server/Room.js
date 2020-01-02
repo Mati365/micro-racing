@@ -199,6 +199,13 @@ export default class Room {
     };
   }
 
+  get humans() {
+    return R.filter(
+      ({info}) => hasFlag(PLAYER_TYPES.HUMAN, info.kind),
+      this.players,
+    );
+  }
+
   get bots() {
     return R.filter(
       ({info}) => hasFlag(PLAYER_TYPES.BOT, info.kind),
@@ -374,7 +381,8 @@ export default class Room {
     if (!abstract)
       this.racing.map.removePlayerCar(player);
 
-    if (this.isEmpty || this.bots.length === this.players.length)
+    const {humans} = this;
+    if (this.isEmpty || !humans.length)
       this.destroy();
     else if (!abstract) {
       broadcast && chat.post(
@@ -395,7 +403,7 @@ export default class Room {
 
       if (broadcast) {
         if (player.id === owner?.id) {
-          [this.owner] = this.players;
+          [this.owner] = humans;
           this.broadcastRoomInfo();
         }
 

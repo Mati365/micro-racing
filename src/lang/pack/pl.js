@@ -98,7 +98,8 @@ export default {
       },
 
       racing: {
-        leave_racing: 'Opuść wyścig',
+        leave_room: 'Opuść pokój',
+        stop_racing: 'Zatrzymaj wyścig',
       },
 
       chat: {

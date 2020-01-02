@@ -1,4 +1,5 @@
 import React from 'react';
+import * as R from 'ramda';
 
 import {RACE_STATES} from '@game/network/constants/serverCodes';
 
@@ -12,16 +13,24 @@ import {
   GameButton,
   GameTabs,
 } from '../../components/ui';
+
 import useScreensWatcher from '../../hooks/useScreensWatcher';
+import useIsClientBoardOP from '../../hooks/useIsClientBoardOP';
 
 const RaceSidebar = ({gameBoard}) => {
   const t = useI18n('game.screens');
-  const {onLeaveRacing} = useScreensWatcher(
+  const currentOp = useIsClientBoardOP(gameBoard);
+  const {
+    onStopRacing,
+    onLeaveRacing,
+  } = useScreensWatcher(
     {
       currentScreen: RACE_STATES.RACE,
       gameBoard,
     },
   );
+
+  const loading = R.isNil(gameBoard.roomInfo.ownerID);
 
   return (
     <Flex
@@ -56,15 +65,24 @@ const RaceSidebar = ({gameBoard}) => {
       </GameTabs>
 
       <AsyncLockButton
+        disabled={loading}
         component={GameButton}
         type='red'
         style={{
           marginTop: 10,
         }}
         expanded
-        onClick={onLeaveRacing}
+        onClick={(
+          currentOp
+            ? onStopRacing
+            : onLeaveRacing
+        )}
       >
-        {t('racing.leave_racing')}
+        {(
+          loading
+            ? t('game.shared.loading')
+            : t(`racing.${currentOp ? 'stop_racing' : 'leave_room'}`)
+        )}
       </AsyncLockButton>
     </Flex>
   );

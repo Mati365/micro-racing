@@ -42,6 +42,16 @@ const useScreensWatcher = (
     );
   };
 
+  const onStopRacing = async () => {
+    await gameBoard.client.stopRace();
+    history.push(
+      '/config/room-edit',
+      {
+        gameBoard: await gameBoard.forkOffscreen(),
+      },
+    );
+  };
+
   const onLeaveRacing = async () => {
     history.push(
       '/config/room-edit',
@@ -112,6 +122,7 @@ const useScreensWatcher = (
     onLeaveRoom,
     onLeaveRacing,
     onGoToScore,
+    onStopRacing,
   };
 };
 

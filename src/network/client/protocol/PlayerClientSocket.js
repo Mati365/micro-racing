@@ -112,6 +112,13 @@ export default class PlayerClientSocket {
       },
     },
 
+    stopRace: {
+      action: PLAYER_ACTIONS.STOP_ROOM_RACE,
+      flags: {
+        waitForResponse: true,
+      },
+    },
+
     startRace: {
       action: PLAYER_ACTIONS.START_ROOM_RACE,
       flags: {

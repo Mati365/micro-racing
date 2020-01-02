@@ -4,12 +4,12 @@ import {clamp} from '@pkg/gl-math';
 export default class RoomConfig {
   constructor(
     {
-      laps = 1,
+      laps = 2,
       playersLimit = 2,
+      aiTraining = false,
       countdown = 1000,
       playerIdleTime = 3500,
       spawnBots = true,
-      aiTraining = false,
       recordHumanRace = false,
     } = {},
   ) {

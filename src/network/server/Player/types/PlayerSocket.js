@@ -225,6 +225,8 @@ export default class PlayerSocket extends Player {
           name: `${info.nick}'s room`,
         },
       );
+
+      room.spawnRestPlayersBots();
     }
 
     return room;

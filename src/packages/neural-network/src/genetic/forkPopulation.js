@@ -20,11 +20,12 @@ export const getWinnersByFitness = count => R.compose(
 );
 
 // 0.5, without gene it worked
-const mutateValues = (mutateRate, mutateMaxValue = 0.05) => R.map(
+const mutateValues = (mutateRate, mutateMaxValue = 0.4) => R.map(
   (gene) => {
     if (Math.random() > mutateRate) {
       return (
-        getRandomFloatNumber(-mutateMaxValue, mutateMaxValue) + gene
+        getRandomFloatNumber(-mutateMaxValue, mutateMaxValue)
+          + gene * (1 + getRandomFloatNumber(-0.1, 0.15))
       );
     }
 
@@ -32,8 +33,9 @@ const mutateValues = (mutateRate, mutateMaxValue = 0.05) => R.map(
   },
 );
 
-const crossoverValues = (geneA, geneB) => {
-  const slicePoint = getRandomIntInclusive(0, geneA.length - 1);
+const crossoverValues = (geneA, geneB, slicePoint = null) => {
+  if (slicePoint === null)
+    slicePoint = getRandomIntInclusive(0, geneA.length - 1);
 
   return [
     ...geneA.slice(0, slicePoint),

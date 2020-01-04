@@ -76,7 +76,7 @@ export default {
 
         players_list: {
           ops: 'Administrator:',
-          in_race: 'Userzy:',
+          in_race: 'Gracze:',
           observers: 'Obserwatorzy:',
         },
 

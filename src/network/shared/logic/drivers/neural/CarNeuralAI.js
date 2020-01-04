@@ -133,16 +133,19 @@ export default class CarNeuralAI {
     }
 
     // neural control
-    this.intersections.update(physics, Math.random() > 0.5);
+    this.intersections.update(physics, true);
     const neuralOutput = T.exec(
       CarNeuralAI.getNeuralInputs(body, this.intersections),
       neural,
     );
 
-    let speedUp = neuralOutput[NEURAL_CAR_OUTPUTS.THROTTLE_OUTPUT] * NEURAL_OUTPUT_SCALE.THROTTLE;
+    let speedUp = Math.max(
+      3,
+      neuralOutput[NEURAL_CAR_OUTPUTS.THROTTLE_OUTPUT] * NEURAL_OUTPUT_SCALE.THROTTLE,
+    );
 
     // fix for sleeping and lazy bots
-    if (Math.abs(body.speed) < 1)
+    if (Math.abs(body.speed) < 1.0)
       speedUp += 14;
 
     body.speedUp(speedUp, false, 0.35);

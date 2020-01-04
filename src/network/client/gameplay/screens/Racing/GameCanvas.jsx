@@ -134,7 +134,6 @@ const GameCanvas = ({dimensions, gameBoard}) => {
     </>
   ));
 
-
   /* eslint-disable jsx-a11y/tabindex-no-positive */
   return (
     <GameCanvasHolder

@@ -28,7 +28,7 @@ const useScreensWatcher = (
     history.push(
       '/score',
       {
-        gameBoard: await gameBoard.forkOffscreen(),
+        gameBoard,
       },
     );
   };

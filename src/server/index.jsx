@@ -5,6 +5,10 @@ import {resolve} from 'path';
 import express from 'express';
 import consola from 'consola';
 
+import BASIC_NEURAL_AI from '@game/server-res/ai/basic-ai.json';
+import BASIC_NEURAL_AI_2 from '@game/server-res/ai/basic-ai-2.json';
+import BASIC_NEURAL_AI_3 from '@game/server-res/ai/basic-ai-3.json';
+
 import {GAME_LANG_PACK} from '@game/i18n';
 import assignI18nPackMiddleware from '@ui/i18n/server/assignLangPackMiddleware';
 
@@ -22,7 +26,6 @@ import ProvideGlobalJSON from './components/ProvideGlobalJSON';
 import staticManifest from './constants/staticManifest';
 import {
   loadMapsDirectory,
-  loadAiRecordingsDirectory,
   writeAiPopulation,
   writeTrackRecording,
 } from './utils';
@@ -40,16 +43,14 @@ const app = express();
     },
   );
 
-  const {neural} = await loadAiRecordingsDirectory(
-    {
-      dir: resolve(__dirname, 'res/recordings/'),
-    },
-  );
-
   new GameServer(
     {
       maps,
-      neurals: [neural],
+      neurals: [
+        BASIC_NEURAL_AI,
+        BASIC_NEURAL_AI_2,
+        BASIC_NEURAL_AI_3,
+      ],
       onDumpTrackRecord: (...args) => writeTrackRecording(
         {
           filename: resolve(__dirname, `res/recordings/recording-${Date.now()}.json`),

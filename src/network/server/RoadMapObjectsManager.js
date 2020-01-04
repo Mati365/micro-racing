@@ -146,7 +146,7 @@ export default class RoadMapObjectsManager {
       const racing = playerElement.player.info?.racingState;
 
       if (racing) {
-        if (position < 0) {
+        if (position <= 0) {
           racing.laps = Math.max(0, racing.laps - 1);
           racing.lapsTimes.pop();
         }

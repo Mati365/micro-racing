@@ -99,18 +99,22 @@ const RaceConfigForm = ({op, l, optimisticValueLink, gameBoard}) => {
         )}
       />
 
-      <GameDivider />
+      {op && (
+        <>
+          <GameDivider />
 
-      <AsyncLockButton
-        component={GameButton}
-        type='green'
-        onClick={
-          () => gameBoard.client.spawnBots()
-        }
-        expanded
-      >
-        {t('spawn_bots')}
-      </AsyncLockButton>
+          <AsyncLockButton
+            component={GameButton}
+            type='green'
+            onClick={
+              () => gameBoard.client.spawnBots()
+            }
+            expanded
+          >
+            {t('spawn_bots')}
+          </AsyncLockButton>
+        </>
+      )}
     </>
   );
 };

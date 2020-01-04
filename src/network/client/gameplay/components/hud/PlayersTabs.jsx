@@ -24,8 +24,11 @@ const PlayersTabsWrapper = styled(
     display: 'flex',
     alignItems: 'center',
     flexShrink: 1,
+    flexWrap: 'nowrap',
     width: '100%',
     height: 48,
+    maxWidth: 640,
+    overflowX: 'hidden',
     lineHeight: '48px',
     maxHeight: '100%',
     overflow: 'hidden',
@@ -112,6 +115,7 @@ const PlayerTab = injectClassesStylesheet(
     }, ref) => {
       const lapNode = useRef();
       const elementNode = useRef();
+      const positionNode = useRef();
 
       useImperativeHandle(
         ref,
@@ -126,6 +130,9 @@ const PlayerTab = injectClassesStylesheet(
                   return;
 
                 node.style.order = position;
+                if (positionNode.current)
+                  positionNode.current.textContent = `#${position || ''}`;
+
                 prevPosition = position;
               }
             };
@@ -151,6 +158,7 @@ const PlayerTab = injectClassesStylesheet(
           }}
         >
           <div
+            ref={positionNode}
             className={classes.position}
             style={{
               color: racingState.color,
@@ -246,8 +254,8 @@ const PlayersTabs = ({gameBoard}) => {
   );
 
   const slicedList = (
-    playersNodes.list.length > 4
-      ? R.slice(0, 4, playersNodes.list)
+    playersNodes.list.length > 14
+      ? R.slice(0, 14, playersNodes.list)
       : playersNodes.list
   );
 

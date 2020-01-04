@@ -7,7 +7,7 @@
 #### Dynamic Rules
 *Multiple classes:*
 ```js
-import css fom '@pkg/fast-stylesheet';
+import css from '@pkg/fast-stylesheet';
 
 const sheet = css(
   {
@@ -46,7 +46,7 @@ sheet.remove?.(); // removes style tag from DOM, warn: only if dynamic rule
 
 *Single class:*
 ```js
-import {singleClassCSS} fom '@pkg/fast-stylesheet';
+import {singleClassCSS} from '@pkg/fast-stylesheet';
 
 const sheet = singleClassCSS(
   {

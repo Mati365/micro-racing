@@ -92,6 +92,7 @@ export const PLAYER_ACTIONS = {
 
   // FINISH INFO
   GET_PLAYERS_DESCRIPTIONS_LIST: 30,
+  SPAWN_BOTS: 31,
 };
 
 export const CAR_TYPES = {

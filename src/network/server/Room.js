@@ -252,6 +252,12 @@ export default class Room {
     return true;
   }
 
+  spawnRestPlayersBots() {
+    this.spawnBots(
+      this.config.playersLimit - this.playersCount,
+    );
+  }
+
   /**
    * Sends list of banned players
    */
@@ -522,10 +528,6 @@ export default class Room {
 
       for (let i = 0; i < this.playersCount - this.config.playersLimit; ++i)
         this.kick(kickablePlayers[i].id);
-    } else if (this.playersCount < this.config.playersLimit) {
-      this.spawnBots(
-        this.config.playersLimit - this.playersCount,
-      );
     }
 
     return this.broadcastRoomInfo();

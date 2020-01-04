@@ -502,5 +502,16 @@ export default class PlayerSocket extends Player {
         },
       );
     }),
+
+    [PLAYER_ACTIONS.SPAWN_BOTS]: requireRoomOwnerWrapper((cmdID, room) => {
+      room.spawnRestPlayersBots();
+
+      this.sendActionResponse(
+        cmdID,
+        {
+          result: true,
+        },
+      );
+    }),
   }
 }

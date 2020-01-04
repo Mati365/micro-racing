@@ -4,10 +4,16 @@ import * as R from 'ramda';
 import {useI18n} from '@ui/i18n';
 import {useLowLatencyObservable} from '@pkg/basic-hooks';
 
-import {OptimisticForm} from '@ui/basic-components';
+import {
+  AsyncLockButton,
+  OptimisticForm,
+} from '@ui/basic-components';
+
 import {
   GameInlineFormGroup,
   GameRangeInput,
+  GameButton,
+  GameDivider,
 } from '../../../components/ui';
 
 const configResponseSelector = R.compose(
@@ -92,6 +98,19 @@ const RaceConfigForm = ({op, l, optimisticValueLink, gameBoard}) => {
           />
         )}
       />
+
+      <GameDivider />
+
+      <AsyncLockButton
+        component={GameButton}
+        type='green'
+        onClick={
+          () => gameBoard.client.spawnBots()
+        }
+        expanded
+      >
+        {t('spawn_bots')}
+      </AsyncLockButton>
     </>
   );
 };

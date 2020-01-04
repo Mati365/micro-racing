@@ -9,14 +9,12 @@ export default class RoomConfig {
       aiTraining = false,
       countdown = 1000,
       playerIdleTime = 3500,
-      spawnBots = false,
       recordHumanRace = false,
     } = {},
   ) {
     this.laps = laps;
     this.countdown = countdown;
     this.playersLimit = playersLimit;
-    this.spawnBots = spawnBots;
     this.playerIdleTime = playerIdleTime;
     this.aiTraining = aiTraining;
     this.recordHumanRace = recordHumanRace;
@@ -43,7 +41,6 @@ export default class RoomConfig {
       laps: this.laps,
       countdown: this.countdown,
       playerIdleTime: this.playerIdleTime,
-      spawnBots: this.spawnBots,
       aiTraining: this.aiTraining,
       playersLimit: this.playersLimit,
     };

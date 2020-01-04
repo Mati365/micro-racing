@@ -58,6 +58,13 @@ export default class PlayerClientSocket {
       },
     },
 
+    spawnBots: {
+      action: PLAYER_ACTIONS.SPAWN_BOTS,
+      flags: {
+        waitForResponse: true,
+      },
+    },
+
     leaveRoom: {
       action: PLAYER_ACTIONS.LEAVE_ROOM,
     },

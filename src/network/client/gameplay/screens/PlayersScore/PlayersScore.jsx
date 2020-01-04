@@ -3,7 +3,7 @@ import React from 'react';
 import {RACE_STATES} from '@game/network/constants/serverCodes';
 
 import {useI18n} from '@ui/i18n';
-import {usePromise} from '@pkg/basic-hooks';
+import {useIntervalResourceFetch} from '@pkg/basic-hooks';
 
 import {Margin} from '@ui/basic-components/styled';
 import {AsyncLockButton} from '@ui/basic-components';
@@ -18,9 +18,13 @@ import useScreensWatcher from '../../hooks/useScreensWatcher';
 const PlayersScore = ({gameBoard}) => {
   const t = useI18n('game.screens.score');
   const {
-    loading,
     result: players,
-  } = usePromise(::gameBoard.client.getPlayersDescriptions);
+    loading,
+  } = useIntervalResourceFetch(
+    {
+      fetchFn: ::gameBoard.client.getPlayersDescriptions,
+    },
+  );
 
   const {onGoToBoard} = useScreensWatcher(
     {

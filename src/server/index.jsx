@@ -8,6 +8,8 @@ import consola from 'consola';
 import BASIC_NEURAL_AI from '@game/server-res/ai/basic-ai.json';
 import BASIC_NEURAL_AI_2 from '@game/server-res/ai/basic-ai-2.json';
 import BASIC_NEURAL_AI_3 from '@game/server-res/ai/basic-ai-3.json';
+import BASIC_NEURAL_AI_4 from '@game/server-res/ai/basic-ai-4.json';
+import BASIC_NEURAL_AI_5 from '@game/server-res/ai/basic-ai-5.json';
 
 import {GAME_LANG_PACK} from '@game/i18n';
 import assignI18nPackMiddleware from '@ui/i18n/server/assignLangPackMiddleware';
@@ -50,6 +52,8 @@ const app = express();
         BASIC_NEURAL_AI,
         BASIC_NEURAL_AI_2,
         BASIC_NEURAL_AI_3,
+        BASIC_NEURAL_AI_4,
+        BASIC_NEURAL_AI_5,
       ],
       onDumpTrackRecord: (...args) => writeTrackRecording(
         {

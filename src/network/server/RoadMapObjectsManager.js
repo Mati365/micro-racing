@@ -125,22 +125,35 @@ export default class RoadMapObjectsManager {
     },
   ) {
     const {segments} = this.segmentsInfo;
+    const segmentIndex = wrapAroundMod(
+      absolutePosition
+        ? position
+        : (segments.length - position - 1),
+      segments.length,
+    );
+
     const bodyParams = alignFn(
       {
-        segment: segments[
-          wrapAroundMod(
-            absolutePosition
-              ? position
-              : (segments.length - position - 1),
-            segments.length,
-          )
-        ],
+        segment: segments[segmentIndex],
         align,
       },
     );
 
     Object.assign(playerElement.body, bodyParams);
     playerElement.body.updateVerticesShapeCache();
+
+    if (absolutePosition) {
+      const racing = playerElement.player.info?.racingState;
+
+      if (racing) {
+        if (position < 0) {
+          racing.laps = Math.max(0, racing.laps - 1);
+          racing.lapsTimes.pop();
+        }
+
+        racing.currentCheckpoint = segmentIndex;
+      }
+    }
 
     return playerElement;
   }

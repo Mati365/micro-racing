@@ -449,7 +449,7 @@ export default class RoomRacing {
       map.resetPlayerPositionToSegment(
         {
           absolutePosition: true,
-          position: info.racingState.currentCheckpoint - i,
+          position: info.racingState.currentCheckpoint - i - 1,
           playerElement: info.car,
           align: CAR_ALIGN.CENTER,
         },

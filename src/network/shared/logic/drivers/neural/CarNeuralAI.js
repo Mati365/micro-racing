@@ -18,7 +18,7 @@ export const NEURAL_CAR_OUTPUTS = {
   TURN_OUTPUT: 1,
 };
 
-export const MAX_TANH_DISTANCE = 3.0;
+export const MAX_TANH_DISTANCE = 2.0;
 
 export const NEURAL_OUTPUT_SCALE = {
   THROTTLE: 15,

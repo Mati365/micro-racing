@@ -54,7 +54,7 @@ export default class CarNeuralTrainer {
     )(players);
 
     // check if regression
-    if (!bestNeuralItems || bestNeuralItems[0].score < neuralItems[0].score) {
+    if (!bestNeuralItems || bestNeuralItems[0].score <= neuralItems[0].score) {
       consola.warn(`Population: good! ${neuralItems[0].score}!`);
       observers.bestNeuralItems.notify(neuralItems);
     }

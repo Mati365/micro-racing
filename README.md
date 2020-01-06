@@ -1,6 +1,10 @@
 # micro-racing
 multiplayer 2.5D isometric racing game written in WebGL 2.x
 
+**Demo:**
+https://micro-racing.herokuapp.com/
+(it uses free server so it can be really slow)
+
 ## Gameplay
 ![Screen 3](/doc/screens/screen-3.png) <br />
 ![Screen](/doc/screens/screen.png) <br />

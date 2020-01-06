@@ -412,7 +412,7 @@ export default class PlayerSocket extends Player {
       ),
     )(
       (cmdID, room, {id, points}) => {
-        if (!points || points.length < 4 || vec2.sumDistances(points) > 5000) {
+        if ((!id && !points) || (points && points.length < 4 && vec2.sumDistances(points) > 5000)) {
           this.sendActionResponse(
             cmdID,
             {

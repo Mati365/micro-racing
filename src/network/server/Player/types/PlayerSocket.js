@@ -508,10 +508,23 @@ export default class PlayerSocket extends Player {
     }),
 
     [PLAYER_ACTIONS.GET_PLAYERS_DESCRIPTIONS_LIST]: requireRoomWrapper((cmdID, room) => {
+      const players = serializeBsonList(room.players);
+
       this.sendActionResponse(
         cmdID,
         {
-          players: serializeBsonList(room.players),
+          players: R.compose(
+            R.addIndex(R.map)((item, index) => ({
+              ...item,
+              racingState: {
+                ...item.racingState,
+                position: index + 1,
+              },
+            })),
+            R.sortBy(
+              player => player.racingState.time,
+            ),
+          )(players),
         },
       );
     }),

@@ -1,7 +1,10 @@
 import {useRef} from 'react';
 import * as R from 'ramda';
 
-import {SERVER_PORT} from '@game/network/constants/runtimeConfig';
+import {
+  SERVER_PORT,
+  SERVER_PROD,
+} from '@game/network/constants/runtimeConfig';
 
 import {safeArray, ssr} from '@pkg/basic-helpers';
 import usePromiseCallback from '@ui/basic-hooks/async/usePromiseCallback';
@@ -10,7 +13,7 @@ import PlayerClientSocket from '../../protocol/PlayerClientSocket';
 
 const useClientSocket = (
   {
-    uri = `${process.env.NODE_ENV === 'production' ? 'wss' : 'ws'}://${ssr ? 'lvh.me' : document.domain}:${SERVER_PORT}`,
+    uri = `${SERVER_PROD ? 'wss' : 'ws'}://${ssr ? 'lvh.me' : document.domain}${SERVER_PROD ? '' : `:${SERVER_PORT}`}`,
   } = {},
 ) => {
   const socket = useRef(null);

@@ -18,7 +18,7 @@ export default class CarNodeEffects extends MeshWireframe {
   constructor(f, sceneNode, config = {}) {
     const {
       wireframeColor = f.colors.BLUE,
-      renderRaysWireframe = process.env.NODE_ENV === 'development',
+      renderRaysWireframe = (process.env.NODE_ENV === 'development'),
     } = config;
 
     const {
@@ -93,7 +93,7 @@ export default class CarNodeEffects extends MeshWireframe {
     const {meshWheels, wheelTracks, rays} = this;
 
     super.release();
-    rays?.release();
+    rays && rays.release();
 
     R.forEach(
       meshWheel => meshWheel.release(),

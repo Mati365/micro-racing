@@ -32,7 +32,7 @@ import {
   writeTrackRecording,
 } from './utils';
 
-const APP_PORT = 3000;
+const APP_PORT = process.env.PORT || process.env.APP_PORT || 3000;
 
 const CRITICAL_SHEET_STORE_DUMP = criticalSheetStore.dump();
 

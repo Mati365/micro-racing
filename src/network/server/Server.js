@@ -14,6 +14,7 @@ import Room from './Room';
 import ServerError from '../shared/ServerError';
 import {RoomConfig} from '../shared/room';
 
+import {SERVER_PORT} from '../constants/runtimeConfig';
 import {
   PLAYER_ACTIONS,
   ERROR_CODES,
@@ -34,7 +35,7 @@ export default class GameServer {
       neurals,
       playersLimit = 64,
       socketOptions = {
-        port: 8080,
+        port: SERVER_PORT,
         perMessageDeflate: false,
       },
       onDumpTrainingPopulation,

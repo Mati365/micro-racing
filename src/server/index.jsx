@@ -4,6 +4,7 @@ import ReactDOMServer from 'react-dom/server';
 import {resolve} from 'path';
 import express from 'express';
 import consola from 'consola';
+import http from 'http';
 
 import BASIC_NEURAL_AI from '@game/server-res/ai/basic-ai.json';
 import BASIC_NEURAL_AI_2 from '@game/server-res/ai/basic-ai-2.json';
@@ -12,6 +13,8 @@ import BASIC_NEURAL_AI_4 from '@game/server-res/ai/basic-ai-4.json';
 import BASIC_NEURAL_AI_5 from '@game/server-res/ai/basic-ai-5.json';
 
 import {GAME_LANG_PACK} from '@game/i18n';
+import {SERVER_PORT} from '@game/network/constants/runtimeConfig';
+
 import assignI18nPackMiddleware from '@ui/i18n/server/assignLangPackMiddleware';
 
 import CacheStoreReactMetatags from '@pkg/fast-stylesheet/src/react/server/CacheStoreReactMetatags';
@@ -32,11 +35,10 @@ import {
   writeTrackRecording,
 } from './utils';
 
-const APP_PORT = process.env.PORT || process.env.APP_PORT || 3000;
-
 const CRITICAL_SHEET_STORE_DUMP = criticalSheetStore.dump();
 
 const app = express();
+const server = http.createServer(app);
 
 (async () => {
   const maps = await loadMapsDirectory(
@@ -48,6 +50,9 @@ const app = express();
   new GameServer(
     {
       maps,
+      socketOptions: {
+        server,
+      },
       neurals: [
         BASIC_NEURAL_AI,
         BASIC_NEURAL_AI_2,
@@ -125,9 +130,9 @@ app
     }
   });
 
-app.listen(
-  APP_PORT,
+server.listen(
+  SERVER_PORT,
   () => {
-    consola.info(`Server is running! Check http://lvh.me:${APP_PORT}!`);
+    consola.info(`Server is running! Check http://lvh.me:${SERVER_PORT}!`);
   },
 );

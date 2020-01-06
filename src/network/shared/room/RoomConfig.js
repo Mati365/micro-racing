@@ -5,7 +5,7 @@ export default class RoomConfig {
   constructor(
     {
       laps = 3,
-      playersLimit = 2,
+      playersLimit = 4,
       aiTraining = false,
       countdown = 1000,
       playerIdleTime = 3500,

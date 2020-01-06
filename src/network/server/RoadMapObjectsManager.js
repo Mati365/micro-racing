@@ -125,7 +125,7 @@ export default class RoadMapObjectsManager {
     },
   ) {
     const {segments} = this.segmentsInfo;
-    const segmentIndex = wrapAroundMod(
+    let segmentIndex = wrapAroundMod(
       absolutePosition
         ? position
         : (segments.length - position - 1),
@@ -147,8 +147,11 @@ export default class RoadMapObjectsManager {
 
       if (racing) {
         if (position <= 0) {
-          racing.laps = Math.max(0, racing.laps - 1);
-          racing.lapsTimes.pop();
+          if (racing.laps > 0) {
+            racing.laps--;
+            racing.lapsTimes.pop();
+          } else
+            segmentIndex = 0;
         }
 
         racing.currentCheckpoint = segmentIndex;

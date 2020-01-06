@@ -122,10 +122,12 @@ export default class BinarySocketRPCWrapper {
       deferred = new Deferred;
       cmdID = cmdResponseQueue.__id;
 
+      console.log('send!');
       if (cmdResponseQueue[cmdID])
         throw new Error('BinarySocketWrapper buffer overflow!');
 
       cmdResponseQueue[cmdID] = (response) => {
+        console.log('response', response);
         if (response.error) {
           deferred.reject(
             ServerError.fromJSON(response.error),

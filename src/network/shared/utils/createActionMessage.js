@@ -58,7 +58,7 @@ const createActionMessage = (cmdID, actionCode, flags, data) => {
     cmdID = MAGIC_NULL_CMD_ID;
 
   tmp[0] = cmdID & 0xFF;
-  tmp[1] = (cmdID << 0x8) & 0xFF;
+  tmp[1] = (cmdID >> 0x8) & 0xFF;
 
   tmp[2] = actionCode;
   tmp[3] = flags | payloadTypeFlag;

@@ -497,7 +497,6 @@ export default class PlayerSocket extends Player {
     }),
 
     [PLAYER_ACTIONS.GET_PLAYERS_DESCRIPTIONS_LIST]: requireRoomWrapper((cmdID, room) => {
-      console.log('players!');
       this.sendActionResponse(
         cmdID,
         {

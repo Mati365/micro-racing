@@ -143,6 +143,7 @@ export default class CarNodeEffects extends MeshWireframe {
       // add segment to wheel
       const track = wheelTracks[i];
       if (track
+          && interpolate.fixedStepUpdate
           && body.corneringIntensity >= 0.7
           && prevWheelTrackPos
           && vec2.dist(prevWheelTrackPos, translate) > 0.05) {

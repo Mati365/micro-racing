@@ -59,6 +59,8 @@ https://github.com/Mati365/micro-racing/tree/master/src/packages/fast-stylesheet
 ### Bezier lines and de Castelja algorithm implementation
 https://github.com/Mati365/micro-racing/blob/master/src/packages/beizer-lines/src/index.js
 
+### Car steering logic based on Marco Monster docs
+https://github.com/Mati365/micro-racing/blob/master/src/network/shared/logic/physics/CarPhysicsBody.js#L43
 
 ### Server update loop
 https://github.com/Mati365/micro-racing/blob/master/src/network/server/RoomRacing.js#L148

@@ -11,6 +11,7 @@ import fromScalar from './operations/fromScalar';
 import angleBetweenPoints from './operations/angleBetweenPoints';
 import vectorAngle from './operations/vectorAngle';
 import reflectByNormal from './operations/reflectByNormal';
+import sumDistances from './operations/sumDistances';
 
 const vec2 = createVectorOptimizedOperations(
   2,
@@ -29,5 +30,6 @@ const vec2 = createVectorOptimizedOperations(
 );
 
 vec2.reflectByNormal = reflectByNormal(vec2);
+vec2.sumDistances = sumDistances(vec2);
 
 export default vec2;

@@ -13,6 +13,7 @@ import {
 
 import {PLAYER_TYPES_BODY_CONFIG} from '@game/network/shared/map/PlayerMapElement';
 
+import {vec2} from '@pkg/gl-math';
 import logMethod, {logFunction} from '@pkg/basic-helpers/decorators/logMethod';
 import {getRandomObjValue} from '@pkg/basic-helpers';
 
@@ -411,6 +412,16 @@ export default class PlayerSocket extends Player {
       ),
     )(
       (cmdID, room, {id, points}) => {
+        if (!points || points.length < 4 || vec2.sumDistances(points) > 5000) {
+          this.sendActionResponse(
+            cmdID,
+            {
+              result: false,
+            },
+          );
+          return;
+        }
+
         room.loadProvidedMap(
           {
             id,

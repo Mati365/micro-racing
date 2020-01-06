@@ -71,8 +71,8 @@ export default class GameServer {
    * Run server, wait for connections and assign users to rooms
    */
   @logMethod(
-    ({socketOptions}) => {
-      consola.info(`Starting websocket server at ${socketOptions.port}!`);
+    () => {
+      consola.info('Starting websocket server!');
     },
   )
   start() {

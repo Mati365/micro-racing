@@ -10,7 +10,7 @@ import PlayerClientSocket from '../../protocol/PlayerClientSocket';
 
 const useClientSocket = (
   {
-    uri = `ws://${ssr ? 'lvh.me' : document.domain}:${SERVER_PORT}`,
+    uri = `${process.env.NODE_ENV === 'production' ? 'wss' : 'ws'}://${ssr ? 'lvh.me' : document.domain}:${SERVER_PORT}`,
   } = {},
 ) => {
   const socket = useRef(null);

@@ -29,6 +29,8 @@ import RootContainer from '../public/src/RootContainer';
 import ProvideGlobalJSON from './components/ProvideGlobalJSON';
 
 import staticManifest from './constants/staticManifest';
+
+import serveCompressed from './middlewares/serveCompressed';
 import {
   loadMapsDirectory,
   writeAiPopulation,
@@ -36,6 +38,7 @@ import {
 } from './utils';
 
 const CRITICAL_SHEET_STORE_DUMP = criticalSheetStore.dump();
+const PUBLIC_PATH = resolve(__dirname, '../public');
 
 const app = express();
 const server = http.createServer(app);
@@ -75,10 +78,36 @@ const server = http.createServer(app);
   ).start();
 })();
 
+app.get(
+  '*.js',
+  serveCompressed(
+    {
+      publicPath: PUBLIC_PATH,
+      contentType: 'text/javascript',
+    },
+  ),
+);
+
+app.get(
+  '*.css',
+  serveCompressed(
+    {
+      publicPath: PUBLIC_PATH,
+      contentType: 'text/css',
+    },
+  ),
+);
+
 app
   .use(
     '/static',
-    express.static(resolve(__dirname, '../public')),
+    express.static(
+      PUBLIC_PATH,
+      {
+        immutable: true,
+        maxAge: '30min',
+      },
+    ),
   )
 
   .get('*', assignI18nPackMiddleware(GAME_LANG_PACK), (req, res) => {

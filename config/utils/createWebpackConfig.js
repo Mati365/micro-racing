@@ -1,6 +1,10 @@
 const {resolve} = require('path');
 const nodeExternals = require('webpack-node-externals');
 const ManifestPlugin = require('webpack-manifest-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
+
+const mode = process.env.NODE_ENV || 'development';
+const prod = mode === 'production';
 
 const createWebpackConfig = ({
   plugins = [],
@@ -12,6 +16,7 @@ const createWebpackConfig = ({
   outputName,
   manifestName,
 }) => ({
+  mode,
   target,
   externals: (
     target === 'node'
@@ -29,7 +34,7 @@ const createWebpackConfig = ({
     __filename: false,
   },
 
-  devtool: 'eval-source-map',
+  devtool: prod ? 'cheap-source-map' : 'eval-source-map',
   entry,
   output: {
     publicPath,
@@ -45,6 +50,34 @@ const createWebpackConfig = ({
     alias,
   },
   plugins: [
+    ...(
+      prod
+        ? [
+          new CompressionPlugin(
+            {
+              filename: '[path].br[query]',
+              algorithm: 'brotliCompress',
+              test: /\.(js|css|html|svg)$/,
+              compressionOptions: {
+                level: 11,
+              },
+              threshold: 10240,
+              minRatio: 0.8,
+              deleteOriginalAssets: false,
+            },
+          ),
+          new CompressionPlugin(
+            {
+              filename: '[path].gz[query]',
+              algorithm: 'gzip',
+              test: /\.js$|\.css$|\.html$/,
+              threshold: 10240,
+              minRatio: 0.8,
+            },
+          ),
+        ]
+        : []
+    ),
     ...plugins,
     ...(
       manifestName

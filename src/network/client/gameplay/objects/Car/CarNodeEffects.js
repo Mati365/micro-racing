@@ -18,7 +18,7 @@ export default class CarNodeEffects extends MeshWireframe {
   constructor(f, sceneNode, config = {}) {
     const {
       wireframeColor = f.colors.BLUE,
-      renderRaysWireframe = true,
+      renderRaysWireframe = process.env.NODE_ENV === 'development',
     } = config;
 
     const {

@@ -61,6 +61,7 @@ export default class RenderableGameBoard extends GameBoard {
   release() {
     this.frameRendererHandle?.();
     this.refsStore?.release();
+    this.keyboardController?.release();
     super.release();
   }
 }

@@ -4,11 +4,17 @@ import {toRadians} from '@pkg/gl-math';
 import {
   setBit,
   getBit,
+  assignElementListeners,
 } from '@pkg/basic-helpers';
 
 import PlayerInput from '@game/network/shared/PlayerInput';
 
 const ROTATE_CAR_SPEED = toRadians(1);
+
+const isInputActive = () => (
+  document.activeElement?.tagName === 'INPUT'
+);
+
 
 /**
  * @see
@@ -30,30 +36,34 @@ export class GameKeyboardController {
     this.canvas = this.attachCanvasListeners(canvas);
   }
 
-  attachCanvasListeners(canvas) {
-    canvas.addEventListener(
-      'keydown',
-      (e) => {
-        this.inputs = setBit(
-          ACTION_KEYCODES_MAP[e.which],
-          1,
-          this.inputs,
-        );
-      },
-      true,
-    );
+  release() {
+    this.unmountListeners?.();
+  }
 
-    canvas.addEventListener(
-      'keyup',
-      (e) => {
-        this.inputs = setBit(
-          ACTION_KEYCODES_MAP[e.which],
-          0,
-          this.inputs,
-        );
+  attachCanvasListeners(canvas) {
+    this.unmountListeners?.();
+    this.unmountListeners = assignElementListeners(
+      {
+        keyup: (e) => {
+          this.inputs = setBit(
+            ACTION_KEYCODES_MAP[e.which],
+            0,
+            this.inputs,
+          );
+        },
+
+        keydown: (e) => {
+          if (isInputActive())
+            return;
+
+          this.inputs = setBit(
+            ACTION_KEYCODES_MAP[e.which],
+            1,
+            this.inputs,
+          );
+        },
       },
-      true,
-    );
+    )(window);
 
     return canvas;
   }

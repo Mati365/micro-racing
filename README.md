@@ -27,30 +27,43 @@ multiplayer 2.5D isometric racing game written in WebGL 2.x
 - Bots using Neural Network for AI(see neural-cars)
 - Multiplayer
 
-## Packages created for project
-**@pkg/isometric-renderer:**
-> FGL with scene manager that generated 3D scene using WebGL 2<br />
-[Link](https://github.com/Mati365/kart-racing/tree/master/src/packages/isometric-renderer)
+## Parts
+### Neural Network Implementation
 
-**@pkg/gl-math:**
-> Matrix/Vector implementation with JS loop unroll precompile<br />
-[Link](https://github.com/Mati365/kart-racing/tree/master/src/packages/gl-math)
+**forward propagation:**
+https://github.com/Mati365/micro-racing/blob/master/src/packages/neural-network/src/unsafe/forwardPropagate.js
 
-**@pkg/physics-scene:**
-> Simple physics engine for top down racing game that uses diagonal collisions detection<br />
-[Link](https://github.com/Mati365/kart-racing/tree/master/src/packages/physics-scene)
+**backward propagation:**
+https://github.com/Mati365/micro-racing/blob/master/src/packages/neural-network/src/unsafe/backwardPropagate.js
 
-**@pkg/fast-stylesheet:**
-> Fast and small CSS in JS implementation with syntax similar to JSS but much faster<br />
-[Link](https://github.com/Mati365/kart-racing/tree/master/src/packages/fast-stylesheet)
+**evolution population train generation:**
+https://github.com/Mati365/micro-racing/blob/master/src/packages/neural-network/src/genetic/forkPopulation.js#L70
 
-**@pkg/struct-pack:**
-> Creates C/C++/GLSL style structs that are used in shaders or RPC handler, performs code precompile<br />
-[Link](https://github.com/Mati365/kart-racing/tree/master/src/packages/struct-pack)
+**ai car driver:**
+https://github.com/Mati365/micro-racing/blob/master/src/network/shared/logic/drivers/neural/CarNeuralAI.js
 
-**@pkg/beizer-lines:**
-> Simple cubic beizer lines implementation<br />
-[Link](https://github.com/Mati365/kart-racing/tree/master/src/packages/beizer-lines)
+**ai cars trainer:**
+https://github.com/Mati365/micro-racing/blob/master/src/network/shared/logic/drivers/neural/CarNeuralTrainer.js
+
+**cars intersection rays:**
+https://github.com/Mati365/micro-racing/blob/master/src/network/shared/logic/drivers/neural/CarIntersectRays.js
+
+
+### Quad Tree
+**implementation:**
+https://github.com/Mati365/micro-racing/blob/master/src/packages/quad-tree/src/index.js
+
+Quad Tree handles multiple moving objects as list, stores only static objects
+
+### CSS in JS implementation
+https://github.com/Mati365/micro-racing/tree/master/src/packages/fast-stylesheet
+
+### Bezier lines and de Castelja algorithm implementation
+https://github.com/Mati365/micro-racing/blob/master/src/packages/beizer-lines/src/index.js
+
+
+### Server update loop
+https://github.com/Mati365/micro-racing/blob/master/src/network/server/RoomRacing.js#L148
 
 ## See also
 https://webcache.googleusercontent.com/search?q=cache%3A5cH3UfBvb2YJ%3Avodacek.zvb.cz%2Farchiv%2F681.html&hl=en&gl=us&strip=1&vwsrc=0&fbclid=IwAR2jxD6EayJZqvcOSNOBHgww35indUbC6pAeVA_3XtTCckCVeabjnbEuJvI <br />

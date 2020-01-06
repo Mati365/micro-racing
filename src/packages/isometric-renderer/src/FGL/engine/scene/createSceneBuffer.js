@@ -38,7 +38,13 @@ export class SceneItemsContainer {
 }
 
 export class SceneBuffer {
-  constructor(f, {itemsContainer = new SceneItemsContainer, cameraConfig} = {}) {
+  constructor(
+    f,
+    {
+      itemsContainer = new SceneItemsContainer,
+      cameraConfig,
+    } = {},
+  ) {
     this.f = f;
 
     // lists
@@ -171,7 +177,13 @@ export class SceneBuffer {
       const node = allNodes[i];
       const {opacity} = node.renderConfig.uniforms;
 
-      if (R.isNil(opacity) || opacity === 1.0)
+      node.prevInViewport = node.inViewport === undefined ? true : node.inViewport;
+      node.inViewport = camera.isInViewport(node);
+
+      if (!node.inViewport && !node.ignoreRenderCulling)
+        continue;
+
+      if (opacity === undefined || opacity === null || opacity === 1.0)
         node.render(interpolate, camera.mpMatrix, f);
       else
         transparentNodes.push(node);

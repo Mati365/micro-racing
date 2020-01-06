@@ -51,6 +51,9 @@ export default class HTMLTextNode {
     this.margin = margin;
     this.initialHidden = true;
 
+    this.prevInViewport = true;
+    this.inViewport = true;
+
     this.cache = {
       translateMatrix: mat.create(1, 4),
     };
@@ -115,9 +118,24 @@ export default class HTMLTextNode {
       translate,
       margin,
       cache,
+
+      prevInViewport,
+      inViewport,
     } = this;
 
     if (!text)
+      return;
+
+    // toggle css style
+    if (prevInViewport !== inViewport) {
+      htmlNode.style.visibility = (
+        inViewport
+          ? 'visible'
+          : 'hidden'
+      );
+    }
+
+    if (!inViewport)
       return;
 
     const {array} = mat.mul(

@@ -97,6 +97,7 @@ export default class CarNode extends PhysicsMeshNode {
       },
     );
 
+    this.ignoreRenderCulling = true;
     this.player = player;
     this.type = type;
     this.flashCounter = FLASH_INTERVAL;
@@ -172,9 +173,17 @@ export default class CarNode extends PhysicsMeshNode {
   }
 
   render(interpolate, mpMatrix, f) {
-    const {nickNode} = this;
+    const {wireframe, nickNode, inViewport, prevInViewport} = this;
 
-    nickNode && nickNode.render(interpolate, mpMatrix, f);
-    super.render(interpolate, mpMatrix);
+    if (nickNode) {
+      nickNode.prevInViewport = prevInViewport;
+      nickNode.inViewport = inViewport;
+      nickNode.render(interpolate, mpMatrix, f);
+    }
+
+    if (inViewport === false)
+      wireframe.renderTracks(interpolate, mpMatrix);
+    else
+      super.render(interpolate, mpMatrix);
   }
 }

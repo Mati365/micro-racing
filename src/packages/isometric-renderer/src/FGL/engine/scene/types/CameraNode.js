@@ -7,6 +7,7 @@ export default class Camera extends SceneNode {
     {
       pos,
       target,
+      cullingRadius = 14,
       lerpSpeed = 0.45,
       viewportOffset = [0, 0.9, 0],
     },
@@ -22,10 +23,26 @@ export default class Camera extends SceneNode {
     this.viewportOffset = viewportOffset;
     this.lerpSpeed = lerpSpeed;
     this.target = target;
+    this.cullingRadius = cullingRadius;
   }
 
   get mpMatrix() {
     return this.cache.mpTransform;
+  }
+
+  isInViewport(object) {
+    const {target, cullingRadius} = this;
+    if (!target || !target.body || !object.body)
+      return true;
+
+    const {translate: camTranslate} = target.transform;
+    const {translate: objTranslate} = object.transform;
+
+    if (!objTranslate || !camTranslate)
+      return true;
+
+    const dist = vec3.dist(camTranslate, objTranslate);
+    return dist <= cullingRadius;
   }
 
   render(interpolate, mpMatrix) {

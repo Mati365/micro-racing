@@ -163,14 +163,20 @@ export default class CarNodeEffects extends MeshWireframe {
     super.update(interpolate);
   }
 
-  render(interpolate, mpMatrix) {
-    const {wheelTracks, meshWheels, config, rays} = this;
+  renderTracks(interpolate, mpMatrix) {
+    const {wheelTracks} = this;
 
     for (let i = wheelTracks.length - 1; i >= 0; --i) {
       const wheelTrack = wheelTracks[i];
       if (wheelTrack)
         wheelTrack.render(interpolate, mpMatrix);
     }
+  }
+
+  render(interpolate, mpMatrix) {
+    const {meshWheels, config, rays} = this;
+
+    this.renderTracks(interpolate, mpMatrix);
 
     if (config.renderBorders) {
       for (let i = meshWheels.length - 1; i >= 0; --i)

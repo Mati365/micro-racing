@@ -12,6 +12,18 @@ https://micro-racing.herokuapp.com/
 
 ![GIF](/doc/screens/gameplay.gif)
 
+## Installation
+Development mode (running at http://lvh.me:3000):
+```bash
+yarn install
+yarn run develop
+```
+Production:
+```
+yarn install
+yarn run build:production
+```
+
 ## Features
 - Client side prediction
 - High performance isometric engine using WebGL 2.x

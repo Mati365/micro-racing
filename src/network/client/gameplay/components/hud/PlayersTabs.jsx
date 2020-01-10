@@ -114,6 +114,8 @@ const PlayerTab = injectClassesStylesheet(
       currentPlayer,
     }, ref) => {
       const lapNode = useRef();
+      const lapNthNode = useRef();
+
       const elementNode = useRef();
       const positionNode = useRef();
 
@@ -137,6 +139,12 @@ const PlayerTab = injectClassesStylesheet(
               }
             };
           })(),
+
+          setLap: (nth) => {
+            const {current: node} = lapNthNode;
+            if (node)
+              node.textContent = `${nth + 1} / ${totalLaps}`;
+          },
 
           setLapTime: (time) => {
             const {current: node} = lapNode;
@@ -173,7 +181,7 @@ const PlayerTab = injectClassesStylesheet(
             </div>
 
             <div className={classes.time}>
-              <span>
+              <span ref={lapNthNode}>
                 {`${racingState.lap + 1} / ${totalLaps}`}
               </span>
               <span ref={lapNode}>
@@ -237,8 +245,11 @@ const PlayersTabs = ({gameBoard}) => {
                 const handle = playersHandles[player.id];
 
                 if (handle) {
-                  handle.setLapTime(player.racingState.currentLapTime);
-                  handle.setPosition(player.racingState.position);
+                  const {racingState} = player;
+
+                  handle.setLapTime(racingState.currentLapTime);
+                  handle.setLap(racingState.lap);
+                  handle.setPosition(racingState.position);
                 } else {
                   setPlayersNodes(newState);
                   break;

@@ -6,11 +6,10 @@ https://micro-racing.herokuapp.com/
 (it uses free server so it can be really slow)
 
 ## Gameplay
+![GIF](/doc/screens/gameplay.gif) <br />
 ![Screen 3](/doc/screens/screen-3.png) <br />
 ![Screen](/doc/screens/screen.png) <br />
-![Screen 2](/doc/screens/screen-2.png) <br />
-
-![GIF](/doc/screens/gameplay.gif)
+![Screen 2](/doc/screens/screen-2.png)
 
 ## Installation
 Development mode (running at http://lvh.me:3000):

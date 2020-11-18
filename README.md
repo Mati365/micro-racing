@@ -1,5 +1,5 @@
 # micro-racing
-multiplayer 2.5D isometric racing game written in WebGL 2.x. Steering(both): WSAD / Arrows.
+multiplayer 3D isometric racing game written in WebGL 2.x. Steering(both): WSAD / Arrows.
 
 **Live demo:**
 https://micro-racing.herokuapp.com/

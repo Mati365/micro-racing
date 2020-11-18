@@ -7,9 +7,14 @@ https://micro-racing.herokuapp.com/
 
 ## Gameplay
 ![GIF](/doc/screens/gameplay.gif) <br />
-![Screen 3](/doc/screens/screen-3.png) <br />
 ![Screen](/doc/screens/screen.png) <br />
+![Screen 3](/doc/screens/screen-3.png) <br />
 ![Screen 2](/doc/screens/screen-2.png)
+
+## Todo
+- [ ] Improve client side prediction
+- [ ] Improve overall performance of server
+- [ ] Improve controls
 
 ## Installation
 Development mode (running at http://lvh.me:3000):
